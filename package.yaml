@@ -1,0 +1,22 @@
+package:
+  name: piz
+  license: MIT
+  description: |
+    Automates the heavy lifting of release and distribution management
+    for pure Python packages.
+
+install:
+  requirements:
+    python: ^2.7|^3.4
+    any-platform:
+      - requests
+      - nr.types ~4.1.0
+    win32:
+      - windows-curses
+
+  entry-points:
+    console_scripts:
+      - piz = piz.main:console_main
+
+publish:
+  - to: pypi

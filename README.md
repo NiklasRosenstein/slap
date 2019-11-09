@@ -81,11 +81,20 @@ package:
   name: package-a
   license: MIT
   description: MY package A.
+
+install:
   requirements:
-    - python ^2.7|^3.4
-    - requests
-  requirements-win32:
-    - windows-curses
+    python: ^2.7|^3.4
+    any-platform:
+      - requests
+    win32:
+      - windows-curses
+
+  entry-points:
+    console_scripts:
+      - package-a-command = package_a.__main__:console_main
+
+distribution:
   data-files:
     - data/**
 
