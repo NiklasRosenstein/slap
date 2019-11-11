@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.types.struct import Field, Struct
+from nr.databind import Field, Struct
 from enum import Enum
 
 
