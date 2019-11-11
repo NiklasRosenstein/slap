@@ -21,7 +21,7 @@
 
 """ Provides base classes for building nested command parsers. """
 
-from nr.types.collections import OrderedDict
+from nr.collections import OrderedDict
 import argparse
 import uuid
 

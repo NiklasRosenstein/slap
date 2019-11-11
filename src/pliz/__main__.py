@@ -31,7 +31,7 @@ commands = CommandList([
 
 def main(argv=None, prog=None):
   if prog is None and __name__ == '__main__':
-    prog = 'piz'
+    prog = 'pliz'
   parser = argparse.ArgumentParser(prog=prog)
   commands.update_parser(parser)
   args = parser.parse_args()

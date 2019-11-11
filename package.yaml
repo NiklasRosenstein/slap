@@ -1,5 +1,5 @@
 package:
-  name: piz
+  name: pliz
   license: MIT
   description: |
     Automates the heavy lifting of release and distribution management
@@ -16,7 +16,7 @@ install:
 
   entry-points:
     console_scripts:
-      - piz = piz.main:console_main
+      - pliz = pliz.main:console_main
 
 publish:
   - to: pypi
