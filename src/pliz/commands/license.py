@@ -21,7 +21,7 @@
 
 """ A CLI to retrieve license metadata from DejaCode. """
 
-from . import Command
+from .core import Command
 from ..util.license import get_license_metadata, wrap_license_text
 from nr.proxy import proxy_decorator
 import json

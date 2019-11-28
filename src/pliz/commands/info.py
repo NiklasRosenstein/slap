@@ -19,25 +19,28 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import re
+from .base import PlizCommand
+from termcolor import colored
 
 
-def expand_range_selectors(req):
-  """ Expands semver range selectors of the form `^X.Y.Z` and `~X.Y.Z` in
-  the string *req*.
+class InfoCommand(PlizCommand):
 
-  * `^` (caret) modifier expands into `>=X.Y.Z,<X+1.Y.Z`
-  * `~` (caret) modifier expands into `>=X.Y.Z,<X.Y+1.Z`
- """
+  name = 'info'
+  description = 'Show information on the current monorepo/package.'
 
-  regex = r'[~^](\d+\.\d+\.\d+[.\-\w]*)'
-  def sub(match):
-    index = {'^': 0, '~': 1}[match.group(0)[0]]
-    max_version = match.group(1).split('.')[:3]
-    if '-' in max_version[-1]:
-      max_version[-1] = max_version[-1].partition('-')[0]
-    max_version[index] = str(int(max_version[index]) + 1)
-    for i in range(index+1, 3):
-      max_version[i] = '0'
-    return '>={},<{}'.format(match.group(1), '.'.join(max_version))
-  return re.sub(regex, sub, req)
+  def execute(self, parser, args):
+    monorepo, package = self.get_configuration()
+    if monorepo:
+      display = colored(monorepo.project.name, 'blue', attrs=['bold'])
+      if monorepo.project.version:
+        display += colored('@v' + monorepo.project.version, 'magenta')
+      print(display + '/')
+      for child in monorepo.list_packages():
+        self._display_package(child, full=package==child, indent=2)
+    elif package:
+      self._display_package(package)
+
+  def _display_package(self, package, full=True, indent=0):
+      display = colored(package.package.name, 'cyan', attrs=['bold'])
+      display += colored('@v' + package.package.version, 'magenta')
+      print(indent * ' ' + display + ('/' if full else ''))

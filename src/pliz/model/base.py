@@ -19,28 +19,18 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import DeserializableFromFileMixin
-from .package import CommonPackageData, Package
-from nr.databind import Field, Struct
+from nr.databind import Field, Struct, ObjectMapper
+from nr.databind.json import JsonModule
 import os
+import yaml
 
 
-class ProjectData(Struct):
-  name = Field(str)
-  version = Field(str, default=None)
+class DeserializableFromFileMixin(object):
 
-
-class Monorepo(Struct, DeserializableFromFileMixin):
-  directory = Field(str, default=None)
-  project = Field(ProjectData)
-  packages = Field(CommonPackageData, default=None)
-
-  def list_packages(self):
-    results = []
-    for name in os.listdir(self.directory):
-      path = os.path.join(self.directory, name, 'package.yaml')
-      if os.path.isfile(path):
-        package = Package.load(path)
-        package.inherit_fields(self)
-        results.append(package)
-    return results
+  @classmethod
+  def load(cls, filename):
+    with open(filename) as fp:
+      result = ObjectMapper(JsonModule).deserialize(yaml.safe_load(fp), cls)
+    if 'directory' in cls.__fields__:
+      result.directory = os.path.dirname(filename)
+    return result

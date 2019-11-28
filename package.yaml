@@ -1,22 +1,21 @@
 package:
   name: pliz
+  version: 0.9.0
   license: MIT
+  url: https://git.niklasrosenstein.com/NiklasRosenstein/pliz
   description: |
     Automates the heavy lifting of release and distribution management
     for pure Python packages.
+  author: Niklas Rosenstein <rosensteinniklas@gmail.com>
 
-install:
-  requirements:
-    python: ^2.7|^3.4
-    any-platform:
-      - requests
-      - nr.types ~4.1.0
-    win32:
-      - windows-curses
+requirements:
+  - python ^2.7|^3.4
+  - contexter ~0.1.4
+  - nr.databind ^0.9.0
+  - requests ^2.22.0
+  - PyYAML ^5.1.0
+  - termcolor ^1.1.0
 
-  entry-points:
-    console_scripts:
-      - pliz = pliz.main:console_main
-
-publish:
-  - to: pypi
+entrypoints:
+  console_scripts:
+    - pliz = pliz.main:console_main

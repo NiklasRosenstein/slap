@@ -19,28 +19,24 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import DeserializableFromFileMixin
-from .package import CommonPackageData, Package
-from nr.databind import Field, Struct
-import os
+import contexter
+import functools
 
 
-class ProjectData(Struct):
-  name = Field(str)
-  version = Field(str, default=None)
+def with_contexter(argname=None):
+  """ Decorator for a function that passes a #contexter.Contexter object
+  to a function as the first argument, or the as a keyword argument with
+  the specified *argname*. """
 
+  def decorator(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+      with contexter.Contexter() as ctx:
+        if argname is None:
+          return func(ctx, *args, **kwargs)
+        else:
+          kwargs[argname] = ctx
+          return func(*args, **kwargs)
+    return wrapper
 
-class Monorepo(Struct, DeserializableFromFileMixin):
-  directory = Field(str, default=None)
-  project = Field(ProjectData)
-  packages = Field(CommonPackageData, default=None)
-
-  def list_packages(self):
-    results = []
-    for name in os.listdir(self.directory):
-      path = os.path.join(self.directory, name, 'package.yaml')
-      if os.path.isfile(path):
-        package = Package.load(path)
-        package.inherit_fields(self)
-        results.append(package)
-    return results
+  return decorator

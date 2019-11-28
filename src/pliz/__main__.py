@@ -19,13 +19,17 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .commands import CommandList
+from .commands.core import CommandList
+from .commands.info import InfoCommand
 from .commands.license import LicenseCommand
+from .commands.render import RenderCommand
 import argparse
 import sys
 
 commands = CommandList([
-  LicenseCommand()
+  LicenseCommand(),
+  InfoCommand(),
+  RenderCommand()
 ])
 
 
