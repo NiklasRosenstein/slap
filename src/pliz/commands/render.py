@@ -40,12 +40,12 @@ def _get_package_warnings(package):  # type: (Package) -> Iterable[str]
 
 def _get_package_consistency_checks(package):
   data = package.load_entry_file_data()
-  if data.version != package.package.version:
-    yield 'Inconsistent package version ({!r} != {!r})'.format(
-      data.version, package.package.version)
   if data.author != str(package.package.author):
     yield 'Inconsistent package author ({!r} != {!r})'.format(
       data.author, str(package.package.author))
+  if data.version != package.package.version:
+    yield 'Inconsistent package version ({!r} != {!r})'.format(
+      data.version, package.package.version)
 
 
 class RenderCommand(PlizCommand):
