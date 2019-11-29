@@ -67,7 +67,7 @@ class PlizCommand(Command):
     monorepo, package = find_configuration()
     if not monorepo and not package:
       self.parser.error('could not find package.yaml or monorepo.yaml')
-    if monorepo:
+    if monorepo and package:
       package.inherit_fields(monorepo)
     return monorepo, package
 

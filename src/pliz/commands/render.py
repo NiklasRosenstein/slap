@@ -28,11 +28,11 @@ from termcolor import colored
 def _get_package_warnings(package):  # type: (Package) -> Iterable[str]
   package = package.package
   if not package.author:
-    yield 'missing ' + colored('$.package.author', 'yellow')
+    yield 'missing ' + colored('$.package.author', attrs=['bold'])
   if not package.license:
-    yield 'missing ' + colored('$.package.license', 'yellow')
+    yield 'missing ' + colored('$.package.license', attrs=['bold'])
   if not package.url:
-    yield 'missing ' +  colored('$.package.url', 'yellow')
+    yield 'missing ' +  colored('$.package.url', attrs=['bold'])
 
 
 class RenderCommand(PlizCommand):
@@ -47,19 +47,23 @@ class RenderCommand(PlizCommand):
       packages = [package] if package else monorepo.list_packages()
       render_monorepo(monorepo)
       for package in packages:
-        self._package_warnings(package)
-        render_package(package)
+        self._render_package(package)
     else:
-      self._package_warnings(package)
-      render_package(package)
-    print(package)
+      self._render_package(package)
 
-  def _package_warnings(self, package):
+  def _render_package(self, package):
+    print(
+      colored('RENDER', 'blue', attrs=['bold']),
+      package.package.name,
+      colored('({})'.format(package.directory), 'grey', attrs=['bold']),
+      end=' ')
+
     warnings = list(_get_package_warnings(package))
     if warnings:
-      print(colored('WARNINGS', 'magenta', attrs=['bold']),
-        '({}) for package'.format(len(warnings)),
-        colored(package.package.name, 'cyan', attrs=['bold']),
-        '({})'.format(package.directory))
+      print(colored('{} warning(s)'.format(len(warnings)), 'magenta'))
       for warning in warnings:
-        print('  |', warning)
+        print('  -', warning)
+    else:
+      print()
+
+    render_package(package)

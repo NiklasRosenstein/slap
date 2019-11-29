@@ -20,9 +20,12 @@
 # IN THE SOFTWARE.
 
 from ..util.decorators import with_contexter
+import collections
 import json
 import os
 import textwrap
+
+_Readme = collections.namedtuple('Readme', 'file,content_type')
 
 
 def get_default_entry_file(package):
@@ -47,11 +50,11 @@ def find_readme_file(directory):
   choices = []
   for name in os.listdir(directory):
     if name in preferred:
-      return name, preferred[name]
+      return _Readme(name, preferred[name])
     if name.startswith('README.'):
       choices.append(name)
   if choices:
-    return sorted(choices)[0], 'text/plain'
+    return _Readme(sorted(choices)[0], 'text/plain')
   return None
 
 
@@ -86,17 +89,17 @@ def render_setup_file(ctx, package):
   ''').format(entrypoint_file=package.package.entry_file))
 
   # Write the part that reads the readme for the long description.
-  readme_file, readme_content_type = find_readme_file(package.directory)
-  if readme_file:
+  readme = find_readme_file(package.directory)
+  if readme:
     fp.write(textwrap.dedent('''
       with io.open({readme!r}, encoding='utf8') as fp:
         long_description = fp.read()
-    ''').format(readme=readme_file))
+    ''').format(readme=readme.file))
   else:
     fp.write(textwrap.dedent('''
       long_description = {long_description!r}
     '''.format(long_description=package.package.long_description)))
-    readme_content_type = 'text/plain'
+    readme = _Readme(None, 'text/plain')
 
   # Write the install requirements.
   def format_reqs(reqs): return [x.to_setuptools() for x in reqs]
@@ -136,9 +139,9 @@ def render_setup_file(ctx, package):
   ''').format(
     package=package.package,
     description=package.package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
-    long_description_content_type=readme_content_type,
+    long_description_content_type=readme.content_type,
     tests_require=tests_require,
-    python_requires=package.requirements.python.to_setuptools(),
+    python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
     entry_points=textwrap.indent(json.dumps(package.entrypoints, indent=2), '  ').lstrip(),
     include_package_data=False,#package.package_data != [],
   ))

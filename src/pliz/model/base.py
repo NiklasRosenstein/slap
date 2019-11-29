@@ -30,7 +30,7 @@ class DeserializableFromFileMixin(object):
   @classmethod
   def load(cls, filename):
     with open(filename) as fp:
-      result = ObjectMapper(JsonModule).deserialize(yaml.safe_load(fp), cls)
+      result = ObjectMapper(JsonModule).deserialize(yaml.safe_load(fp), cls, filename=filename)
     if 'directory' in cls.__fields__:
       result.directory = os.path.dirname(filename)
     return result

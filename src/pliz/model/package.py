@@ -228,7 +228,7 @@ class Requirements(object):
 class Package(Struct, DeserializableFromFileMixin):
   directory = Field(str, default=None)
   package = Field(PackageData)
-  requirements = Field(Requirements)
+  requirements = Field(Requirements, default=Requirements)
   entrypoints = Field({"value_type": [str]}, default={})
 
   def inherit_fields(self, monorepo):  # type: (Monorepo) -> None
