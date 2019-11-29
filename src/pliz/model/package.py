@@ -20,11 +20,17 @@
 # IN THE SOFTWARE.
 
 from .base import DeserializableFromFileMixin
+from ..util.ast import load_module_members
 from nr.databind import Collection, Field, Struct, SerializationValueError, \
   SerializationTypeError
 from nr.databind.json import JsonDeserializer
+import ast
+import collections
+import os
 import re
 import yaml
+
+EntryFileData = collections.namedtuple('EntryFileData', 'author,version')
 
 
 class VersionSelector(object):
@@ -125,6 +131,9 @@ class AuthorData(Struct):
   email = Field(str)
 
   AUTHOR_EMAIL_REGEX = re.compile(r'([^<]+)<([^>]+)>')
+
+  def __str__(self):
+    return '{} <{}>'.format(self.name, self.email)
 
   @JsonDeserializer
   def __json_deserialize(cls, context, location):
@@ -237,3 +246,36 @@ class Package(Struct, DeserializableFromFileMixin):
     for key in CommonPackageData.__fields__:
       if not getattr(self.package, key):
         setattr(self.package, key, getattr(monorepo.packages, key))
+
+  def get_default_entry_file(self):
+    name = self.package.name.replace('-', '_')
+    parts = name.split('.')
+    prefix = os.sep.join(parts[:-1])
+    for filename in [parts[-1] + '.py', os.path.join(parts[-1], '__init__.py')]:
+      filename = os.path.join('src', prefix, filename)
+      if os.path.isfile(os.path.join(self.directory, filename)):
+        return filename
+    raise ValueError('Entry file for package "{}" could not be determined'
+                     .format(self.package.name))
+
+  def load_entry_file_data(self):  # type: () -> EntryFileData
+    # Load the package/version data from the entry file.
+    entry_file = self.package.entry_file or self.get_default_entry_file()
+    members = load_module_members(os.path.join(self.directory, entry_file))
+
+    author = None
+    version = None
+
+    if '__version__' in members:
+      try:
+        version = ast.literal_eval(members['__version__'])
+      except ValueError as exc:
+        version = '<Non-literal expression>'
+
+    if '__author__' in members:
+      try:
+        author = ast.literal_eval(members['__author__'])
+      except ValueError as exc:
+        author = '<Non-literal expression>'
+
+    return EntryFileData(author, version)

@@ -21,7 +21,7 @@
 
 from nr.interface import implements
 from .base import IRenderer, FileToRender
-from .util import get_default_entry_file, find_readme_file, Readme
+from .util import find_readme_file, Readme
 import json
 import textwrap
 
@@ -42,7 +42,7 @@ class SetuptoolsRenderer(object):
     '''))
 
     # Write the hepler that extracts the version number from the entry file.
-    entry_file = package.package.entry_file or get_default_entry_file(package)
+    entry_file = package.package.entry_file or package.get_default_entry_file()
     fp.write(textwrap.dedent('''
       with io.open({entrypoint_file!r}, encoding='utf8') as fp:
         version = re.search(r"__version__\s*=\s*'(.*)'", fp.read()).group(1)

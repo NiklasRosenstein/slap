@@ -20,25 +20,17 @@
 # IN THE SOFTWARE.
 
 import ast
-import collections
-import os
-
-Readme = collections.namedtuple('Readme', 'file,content_type')
 
 
-def find_readme_file(directory):
-  preferred = {
-    'README.md': 'text/markdown',
-    'README.rst': 'text/x-rst',
-    'README.txt': 'text/plain',
-    'README': 'text/plain'
-  }
-  choices = []
-  for name in os.listdir(directory):
-    if name in preferred:
-      return Readme(name, preferred[name])
-    if name.startswith('README.'):
-      choices.append(name)
-  if choices:
-    return Readme(sorted(choices)[0], 'text/plain')
-  return None
+def load_module_members(filename):
+  """ Loads members from *filename* as ast nodes. """
+
+  with open(filename) as fp:
+    module = ast.parse(fp.read(), filename)
+  members = {}
+  for node in module.body:
+    if isinstance(node, ast.Assign):
+      for target in node.targets:
+        if isinstance(target, ast.Name):
+          members[target.id] = node.value
+  return members

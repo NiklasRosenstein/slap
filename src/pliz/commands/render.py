@@ -28,13 +28,24 @@ import os
 
 
 def _get_package_warnings(package):  # type: (Package) -> Iterable[str]
-  package = package.package
-  if not package.author:
+  if not package.package.author:
     yield 'missing ' + colored('$.package.author', attrs=['bold'])
-  if not package.license:
+  if not package.package.license:
     yield 'missing ' + colored('$.package.license', attrs=['bold'])
-  if not package.url:
+  if not package.package.url:
     yield 'missing ' +  colored('$.package.url', attrs=['bold'])
+  for check in _get_package_consistency_checks(package):
+    yield check
+
+
+def _get_package_consistency_checks(package):
+  data = package.load_entry_file_data()
+  if data.version != package.package.version:
+    yield 'Inconsistent package version ({!r} != {!r})'.format(
+      data.version, package.package.version)
+  if data.author != str(package.package.author):
+    yield 'Inconsistent package author ({!r} != {!r})'.format(
+      data.author, str(package.package.author))
 
 
 class RenderCommand(PlizCommand):
@@ -75,6 +86,7 @@ class RenderCommand(PlizCommand):
     self._render_files(package.directory, files)
 
   def _print_title(self, name, directory, warnings):
+    print()
     print(
       colored('RENDER', 'blue', attrs=['bold']),
       name,
@@ -83,9 +95,10 @@ class RenderCommand(PlizCommand):
 
     warnings = list(warnings)
     if warnings:
-      print(colored('{} warning(s)'.format(len(warnings)), 'magenta'))
+      print(colored('{} warning(s)'.format(len(warnings)), 'magenta', attrs=['bold']))
       for warning in warnings:
-        print('  -', warning)
+        print(' ', warning)
+      print('  ----')
     else:
       print()
 
