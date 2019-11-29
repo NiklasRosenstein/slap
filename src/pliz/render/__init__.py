@@ -133,7 +133,7 @@ def render_setup_file(ctx, package):
       include_package_data = {include_package_data!r},
       install_requires = requirements,
       tests_require = {tests_require},
-      python_requires = {python_requires!r},
+      python_requires = None, # TODO: {python_requires!r},
       entry_points = {entry_points}
     )
   ''').format(
