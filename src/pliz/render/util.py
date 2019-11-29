@@ -19,5 +19,37 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .monorepo import Monorepo
-from .package import Package
+import collections
+import os
+
+Readme = collections.namedtuple('Readme', 'file,content_type')
+
+
+def get_default_entry_file(package):
+  name = package.package.name.replace('-', '_')
+  parts = name.split('.')
+  prefix = os.sep.join(parts[:-1])
+  for filename in [parts[-1] + '.py', os.path.join(parts[-1], '__init__.py')]:
+    filename = os.path.join('src', prefix, filename)
+    if os.path.isfile(os.path.join(package.directory, filename)):
+      return filename
+  raise EnvironmentError('Entry file for package "{}" could not be determined'
+                         .format(package.package.name))
+
+
+def find_readme_file(directory):
+  preferred = {
+    'README.md': 'text/markdown',
+    'README.rst': 'text/x-rst',
+    'README.txt': 'text/plain',
+    'README': 'text/plain'
+  }
+  choices = []
+  for name in os.listdir(directory):
+    if name in preferred:
+      return Readme(name, preferred[name])
+    if name.startswith('README.'):
+      choices.append(name)
+  if choices:
+    return Readme(sorted(choices)[0], 'text/plain')
+  return None

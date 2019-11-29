@@ -19,5 +19,39 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .monorepo import Monorepo
-from .package import Package
+from nr.interface import Interface, attr, default, implements
+from ..model import Monorepo, Package
+
+__all__ = ['IFileToRender', 'FileToRender', 'IRenderer']
+
+
+class IFileToRender(Interface):
+
+  name = attr(str)
+
+  def render(self, fp):
+    pass
+
+
+@implements(IFileToRender)
+class FileToRender(object):
+
+  def __init__(self, name, callable, *args, **kwargs):
+    self.name = name
+    self._callable = callable
+    self._args = args
+    self._kwargs = kwargs
+
+  def render(self, fp):
+    return self._callable(fp, *self._args, *self._kwargs)
+
+
+class IRenderer(Interface):
+
+  @default
+  def files_for_monorepo(self, item):  # type: (Monorepo) -> Iterable[IFileToRender]
+    return; yield
+
+  @default
+  def files_for_package(self, item):  # type: (Package) -> Iterable[IFileToRender]
+    return; yield

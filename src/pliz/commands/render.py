@@ -22,8 +22,10 @@
 """ Renders monorepo and package files. """
 
 from .base import PlizCommand
-from ..render import render_monorepo, render_package
+from ..render import IRenderer
 from termcolor import colored
+import os
+
 
 def _get_package_warnings(package):  # type: (Package) -> Iterable[str]
   package = package.package
@@ -40,25 +42,46 @@ class RenderCommand(PlizCommand):
   name = 'render'
   description = __doc__
 
+  def update_parser(self, parser):
+    super(RenderCommand, self).update_parser(parser)
+    parser.add_argument('--dry', action='store_true', help='Dry rendering. '
+      'Output a list of files that would be rendered instead of actually '
+      'rendering them.')
+
   def execute(self, parser, args):
     super(RenderCommand, self).execute(parser, args)
     monorepo, package = self.get_configuration()
     if monorepo:
       packages = [package] if package else monorepo.list_packages()
-      render_monorepo(monorepo)
+      self._render_monorepo(monorepo)
       for package in packages:
         self._render_package(package)
     else:
       self._render_package(package)
 
+  def _render_monorepo(self, monorepo):
+    self._print_title(monorepo.project.name, monorepo.directory, [])
+    files = []
+    for impl in IRenderer.implementations():
+      files.extend(impl().files_for_monorepo(monorepo))
+    self._render_files(monorepo.directory, files)
+
   def _render_package(self, package):
+    self._print_title(package.package.name, package.directory,
+      _get_package_warnings(package))
+    files = []
+    for impl in IRenderer.implementations():
+      files.extend(impl().files_for_package(package))
+    self._render_files(package.directory, files)
+
+  def _print_title(self, name, directory, warnings):
     print(
       colored('RENDER', 'blue', attrs=['bold']),
-      package.package.name,
-      colored('({})'.format(package.directory), 'grey', attrs=['bold']),
+      name,
+      colored('({})'.format(directory), 'grey', attrs=['bold']),
       end=' ')
 
-    warnings = list(_get_package_warnings(package))
+    warnings = list(warnings)
     if warnings:
       print(colored('{} warning(s)'.format(len(warnings)), 'magenta'))
       for warning in warnings:
@@ -66,4 +89,12 @@ class RenderCommand(PlizCommand):
     else:
       print()
 
-    render_package(package)
+  def _render_files(self, directory, files):
+    for f in files:
+      print('  rendering "{}" ...'.format(f.name), end=' ')
+      try:
+        if not self.args.dry:
+          with open(os.path.join(directory, f.name), 'w') as fp:
+            f.render(fp)
+      finally:
+        print('done.')
