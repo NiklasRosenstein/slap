@@ -21,7 +21,7 @@
 
 from .base import DeserializableFromFileMixin
 from .package import CommonPackageData, Package
-from nr.databind import Field, Struct
+from nr.databind.core import Field, Struct
 import os
 
 

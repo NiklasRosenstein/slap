@@ -21,8 +21,13 @@
 
 from .base import DeserializableFromFileMixin
 from ..util.ast import load_module_members
-from nr.databind import Collection, Field, Struct, SerializationValueError, \
-  SerializationTypeError
+from nr.databind.core import (
+  Collection,
+  Field,
+  Struct,
+  SerializationValueError,
+  SerializationTypeError,
+  Mixin)
 from nr.databind.json import JsonDeserializer
 import ast
 import collections
@@ -117,11 +122,11 @@ class Requirement(object):
     return '{} {}'.format(self.package, self.version.to_setuptools())
 
   @JsonDeserializer
-  def __json_deserialize(cls, context, location):
+  def __deserialize(context, location):
     if not isinstance(location.value, str):
       raise SerializationTypeError(location)
     try:
-      return cls.parse(location.value)
+      return Requirement.parse(location.value)
     except ValueError as exc:
       raise SerializationValueError(location, exc)
 
@@ -136,13 +141,13 @@ class AuthorData(Struct):
     return '{} <{}>'.format(self.name, self.email)
 
   @JsonDeserializer
-  def __json_deserialize(cls, context, location):
+  def __deserialize(context, location):
     if isinstance(location.value, str):
-      match = cls.AUTHOR_EMAIL_REGEX.match(location.value)
+      match = AuthorData.AUTHOR_EMAIL_REGEX.match(location.value)
       if match:
         author = match.group(1).strip()
         email = match.group(2).strip()
-        return cls(author, email)
+        return AuthorData(author, email)
     raise NotImplementedError
 
 
@@ -211,11 +216,11 @@ class Requirements(object):
       .format(self.python, self.required, self.test, self.platforms)
 
   @JsonDeserializer
-  def __deserialize(cls, context, location):
+  def __deserialize(context, location):
     deserialize_type = [(Requirement, {"value_type": [Requirement]})]
     items = context.deserialize(location.value, deserialize_type)
 
-    self = cls()
+    self = Requirements()
     for item in items:
       if isinstance(item, Requirement):
         if item.package == 'python':
@@ -234,7 +239,9 @@ class Requirements(object):
     return self
 
 
-class Package(Struct, DeserializableFromFileMixin):
+class Package(Struct):
+  Mixin('tuple', DeserializableFromFileMixin)
+
   directory = Field(str, default=None)
   package = Field(PackageData)
   requirements = Field(Requirements, default=Requirements)

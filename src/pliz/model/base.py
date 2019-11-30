@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind import Field, Struct, ObjectMapper
+from nr.databind.core import Field, Struct, ObjectMapper
 from nr.databind.json import JsonModule
 import os
 import yaml
