@@ -29,8 +29,8 @@ setuptools.setup(
   tests_require = [],
   python_requires = None, # TODO: '>=2.7,<3.0.0|>=3.4,<4.0.0',
   entry_points = {
-    "console_scripts": [
-      "pliz = pliz.__main__:console_main"
-    ]
+    'console_scripts': [
+      'pliz = pliz.__main__:console_main',
+    ],
   }
 )
