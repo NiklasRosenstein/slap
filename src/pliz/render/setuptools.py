@@ -23,11 +23,18 @@ from nr.interface import implements
 from .base import IRenderer, FileToRender
 from .util import find_readme_file, Readme
 import json
+import os
 import textwrap
+import sys
 
 
 @implements(IRenderer)
 class SetuptoolsRenderer(object):
+
+  ENTRYPOINT_VARS = {
+    'python-major-version': 'sys.version[0]',
+    'python-major-minor-version': 'sys.version[:3]'
+  }
 
   def files_for_package(self, package):
     yield FileToRender('setup.py', self._render_setup, package)
@@ -88,8 +95,8 @@ class SetuptoolsRenderer(object):
         long_description_content_type = {long_description_content_type!r},
         url = {package.url!r},
         license = {package.license!r},
-        packages = setuptools.find_packages('src'),
-        package_dir = {{'': 'src'}},
+        packages = setuptools.find_packages({src_directory!r}),
+        package_dir = {{'': {src_directory!r}}},
         include_package_data = {include_package_data!r},
         install_requires = requirements,
         tests_require = {tests_require},
@@ -102,6 +109,26 @@ class SetuptoolsRenderer(object):
       long_description_content_type=readme.content_type,
       tests_require=tests_require,
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
-      entry_points=textwrap.indent(json.dumps(package.entrypoints, indent=2), '  ').lstrip(),
+      src_directory=package.package.source_directory,
       include_package_data=False,#package.package_data != [],
+      entry_points=self._render_entrypoints(package.entrypoints),
     ))
+
+  def _render_entrypoints(self, entrypoints):
+    lines = ['{']
+    for key, value in entrypoints.items():
+      lines.append('    {!r}: ['.format(key))
+      for item in value:
+        item = repr(item)
+        args = []
+        for varname, expr in self.ENTRYPOINT_VARS.items():
+          varname = '{{' + varname + '}}'
+          if varname in item:
+            item = item.replace(varname, '{' + str(len(args)) + '}')
+            args.append(expr)
+        if args:
+          item += '.format(' + ', '.join(args) + ')'
+        lines.append('      ' + item.strip() + ',')
+      lines.append('    ],')
+    lines.append('  }')
+    return '\n'.join(lines)

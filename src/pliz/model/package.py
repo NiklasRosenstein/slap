@@ -163,6 +163,7 @@ class PackageData(CommonPackageData):
   description = Field(str)
   long_description = Field(str, default=None)
   entry_file = Field(str, default=None)
+  source_directory = Field(str, default='src')
 
 
 class Requirements(object):
