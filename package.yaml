@@ -11,7 +11,7 @@ package:
 requirements:
   - python ^2.7|^3.4
   - contexter ~0.1.4
-  - nr.databind ^0.9.0.dev0
+  - nr.databind ^0.1.0
   - requests ^2.22.0
   - PyYAML ^5.1.0
   - termcolor ^1.1.0

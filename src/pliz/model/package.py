@@ -292,7 +292,7 @@ class Package(Struct):
   directory = Field(str, default=None)
   package = Field(PackageData)
 
-  requirements = Field(RootRequirements, default=Requirements)
+  requirements = Field(RootRequirements, default=RootRequirements)
   entrypoints = Field({"value_type": [str]}, default={})
   datafiles = Field([Datafile], default=[])
 
