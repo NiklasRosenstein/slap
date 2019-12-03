@@ -81,7 +81,17 @@ class SetuptoolsRenderer(object):
     else:
       tests_require = '[]'
 
-    # TODO (@NiklasRosenstein): package data
+    # TODO @NiklasRosenstein: Include datafiles in MANIFEST.in
+    if package.datafiles:
+      self._render_datafiles(fp, package.package.name, package.datafiles)
+      data_files = 'data_files'
+    else:
+      data_files = '[]'
+
+    exclude_packages = []
+    for pkg in package.package.exclude_packages:
+      exclude_packages.append(pkg)
+      exclude_packages.append(pkg + '.*')
 
     # Write the setup function.
     fp.write(textwrap.dedent('''
@@ -95,12 +105,13 @@ class SetuptoolsRenderer(object):
         long_description_content_type = {long_description_content_type!r},
         url = {package.url!r},
         license = {package.license!r},
-        packages = setuptools.find_packages({src_directory!r}),
+        packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),
         package_dir = {{'': {src_directory!r}}},
         include_package_data = {include_package_data!r},
         install_requires = requirements,
         tests_require = {tests_require},
         python_requires = None, # TODO: {python_requires!r},
+        data_files = {data_files},
         entry_points = {entry_points}
       )
     ''').format(
@@ -110,11 +121,15 @@ class SetuptoolsRenderer(object):
       tests_require=tests_require,
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
       src_directory=package.package.source_directory,
+      exclude_packages=exclude_packages,
       include_package_data=False,#package.package_data != [],
+      data_files=data_files,
       entry_points=self._render_entrypoints(package.entrypoints),
     ))
 
   def _render_entrypoints(self, entrypoints):
+    if not entrypoints:
+      return '{}'
     lines = ['{']
     for key, value in entrypoints.items():
       lines.append('    {!r}: ['.format(key))
@@ -130,5 +145,30 @@ class SetuptoolsRenderer(object):
           item += '.format(' + ', '.join(args) + ')'
         lines.append('      ' + item.strip() + ',')
       lines.append('    ],')
+    lines[-1] = lines[-1][:-1]
     lines.append('  }')
     return '\n'.join(lines)
+
+  def _render_datafiles(self, fp, package_name, datafiles):
+    fp.write(textwrap.dedent('''
+      import os, fnmatch
+      def _collect_data_files(data_files, target, path, include, exclude):
+        for root, dirs, files in os.walk(path):
+          parent_dir = os.path.normpath(os.path.join(target, os.path.relpath(root, path)))
+          install_files = []
+          for filename in files:
+            filename = os.path.join(root, filename)
+            if include and not any(fnmatch.fnmatch(filename, x) for x in include):
+              continue
+            if exclude and any(fnmatch.fnmatch(filename, x) for x in exclude):
+              continue
+            install_files.append(filename)
+          data_files.setdefault(parent_dir, []).extend(install_files)
+
+      data_files = {}
+    '''))
+    for entry in datafiles:
+      fp.write('_collect_data_files(data_files, {!r}, {!r}, {!r}, {!r})\n'.format(
+        'data/{}/{}'.format(package_name, entry.target.lstrip('/')),
+        entry.source, entry.include, entry.exclude))
+    fp.write('data_files = list(data_files.items())\n')

@@ -151,6 +151,29 @@ class AuthorData(Struct):
     raise NotImplementedError
 
 
+class Datafile(Struct):
+  """ Represents an entry in the #Package.datafiles configuration. """
+
+  source = Field(str)
+  target = Field(str)
+  include = Field([str])
+  exclude = Field([str])
+
+  @JsonDeserializer
+  def __deserialize(context, location):
+    if isinstance(location.value, str):
+      left, patterns = location.value.partition(',')[::2]
+      source, target = left.partition(':')[::2]
+      if not source or not target:
+        raise SerializationValueError('invalid DataFile spec: {!r}'.format(location.value))
+      include = []
+      exclude = []
+      for pattern in patterns.split(','):
+        (exclude if pattern.startswith('!') else include).append(pattern.lstrip('!'))
+      return Datafile(source, target, include, exclude)
+    raise NotImplementedError
+
+
 class CommonPackageData(Struct):
   author = Field(AuthorData, default=None)
   license = Field(str, default=None)
@@ -164,6 +187,7 @@ class PackageData(CommonPackageData):
   long_description = Field(str, default=None)
   entry_file = Field(str, default=None)
   source_directory = Field(str, default='src')
+  exclude_packages = Field([str], default=['test', 'docs'])
 
 
 class Requirements(object):
@@ -247,6 +271,7 @@ class Package(Struct):
   package = Field(PackageData)
   requirements = Field(Requirements, default=Requirements)
   entrypoints = Field({"value_type": [str]}, default={})
+  datafiles = Field([Datafile], default=[])
 
   def inherit_fields(self, monorepo):  # type: (Monorepo) -> None
     if not monorepo.packages:
