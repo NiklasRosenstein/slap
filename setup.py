@@ -10,7 +10,7 @@ with io.open('src/pliz/__init__.py', encoding='utf8') as fp:
 with io.open('README.md', encoding='utf8') as fp:
   long_description = fp.read()
 
-requirements = ['contexter >=0.1.4,<0.2.0', 'nr.databind >=0.1.0,<0.2.0', 'requests >=2.22.0,<3.0.0', 'PyYAML >=5.1.0,<6.0.0', 'termcolor >=1.1.0,<2.0.0']
+requirements = ['contexter >=0.1.4,<0.2.0', 'nr.databind >=0.1.0,<1.0.0', 'requests >=2.22.0,<3.0.0', 'PyYAML >=5.1.0,<6.0.0', 'termcolor >=1.1.0,<2.0.0']
 
 setuptools.setup(
   name = 'pliz',
@@ -26,6 +26,7 @@ setuptools.setup(
   package_dir = {'': 'src'},
   include_package_data = False,
   install_requires = requirements,
+  extras_require = {},
   tests_require = [],
   python_requires = None, # TODO: '>=2.7,<3.0.0|>=3.4,<4.0.0',
   data_files = [],

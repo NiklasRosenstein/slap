@@ -77,7 +77,7 @@ class SetuptoolsRenderer(object):
         self._render_requirements(fp, 'extras_require[{!r}]'.format(key), value)
       extras_require = 'extras_require'
     else:
-      extras_require = '[]'
+      extras_require = '{}'
     if package.requirements.test:
       fp.write('tests_require = []\n')
       self._render_requirements(fp, 'tests_require', package.requirements.test)
