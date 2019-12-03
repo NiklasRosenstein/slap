@@ -21,6 +21,7 @@
 
 from .base import DeserializableFromFileMixin
 from ..util.ast import load_module_members
+from nr.commons.py import classdef
 from nr.databind.core import (
   Collection,
   Field,
@@ -106,7 +107,7 @@ class Requirement(object):
     return '{} {}'.format(self.package, self.version)
 
   def __repr__(self):
-    return 'Requirement({!r})'.format(str(self))
+    return repr(str(self))#'Requirement({!r})'.format(str(self))
 
   @classmethod
   def parse(cls, requirement_string):
@@ -230,38 +231,59 @@ class Requirements(object):
       file.
   """
 
+  classdef.repr('python,required,platforms')
+
   def __init__(self):
     self.python = None
     self.required = []
-    self.test = []
     self.platforms = {}
-
-  def __repr__(self):
-    return 'Requirements(python={!r}, required={!r}, test={!r}, platforms={!r})'\
-      .format(self.python, self.required, self.test, self.platforms)
 
   @JsonDeserializer
   def __deserialize(context, location):
-    deserialize_type = [(Requirement, {"value_type": [Requirement]})]
+    deserialize_type = [(Requirement, dict)]
     items = context.deserialize(location.value, deserialize_type)
 
-    self = Requirements()
-    for item in items:
-      if isinstance(item, Requirement):
-        if item.package == 'python':
-          self.python = item.version
-        else:
-          self.required.append(item)
-      elif isinstance(item, dict):
-        for key, value in item.items():
-          if key == 'test':
-            self.test.extend(value)
-          elif key in result.platforms:
-            self.platforms[key].extend(value)
-          else:
-            self.platforms[key] = value
-
+    self = location.datatype.cls()
+    for index, item in enumerate(items):
+      self._extract_from_item(context, (index,), item)
     return self
+
+  def _extract_from_item(self, context, path, item):
+    if isinstance(item, Requirement):
+      if item.package == 'python':
+        self.python = item.version
+      else:
+        self.required.append(item)
+    elif isinstance(item, dict):
+      if len(item) != 1:
+        raise ValueError('expected only a single key in requirements list')
+      for key, value in item.items():
+        # Deserialize the requirements in this platform selector.
+        deser = lambda i, v: context.deserialize(v, Requirement, path + (key, i))
+        value = [deser(i, v) for i, v in enumerate(value)]
+        if key in self.platforms:
+          self.platforms[key].extend(value)
+        else:
+          self.platforms[key] = value
+
+
+class RootRequirements(Requirements):
+
+  classdef.repr(Requirements.__repr_properties__ + ['test', 'extra',])
+
+  def __init__(self):
+    super(RootRequirements, self).__init__()
+    self.test = None
+    self.extra = {}
+
+  def _extract_from_item(self, context, path, item):
+    if isinstance(item, dict) and len(item) == 1 and 'extra' in item:
+      for key, value in item['extra'].items():
+        self.extra[key] = context.deserialize(value, Requirements, path + ('extra', key))
+    elif isinstance(item, dict) and len(item) == 1 and 'test' in item:
+      self.test = context.deserialize(item['test'], Requirements, path + ('test',))
+    else:
+      super(RootRequirements, self)._extract_from_item(context, path, item)
 
 
 class Package(Struct):
@@ -269,7 +291,8 @@ class Package(Struct):
 
   directory = Field(str, default=None)
   package = Field(PackageData)
-  requirements = Field(Requirements, default=Requirements)
+
+  requirements = Field(RootRequirements, default=Requirements)
   entrypoints = Field({"value_type": [str]}, default={})
   datafiles = Field([Datafile], default=[])
 

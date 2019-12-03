@@ -69,15 +69,19 @@ class SetuptoolsRenderer(object):
       readme = Readme(None, 'text/plain')
 
     # Write the install requirements.
-    def format_reqs(reqs): return [x.to_setuptools() for x in reqs]
     fp.write('\n')
-    fp.write('requirements = {!r}\n'.format(format_reqs(package.requirements.required)))
-    for os_name in package.requirements.platforms:
-      fp.write('if sys.platform.startswith({!r}):\n'.format(os_name))
-      fp.write('  requirements += {!r}\n'.format(format_reqs(package.requirements.platforms[os_name])))
+    self._render_requirements(fp, 'requirements', package.requirements)
+    if package.requirements.extra:
+      fp.write('extras_require = {}\n')
+      for key, value in package.requirements.extra.items():
+        self._render_requirements(fp, 'extras_require[{!r}]'.format(key), value)
+      extras_require = 'extras_require'
+    else:
+      extras_require = '[]'
     if package.requirements.test:
-      fp.write('test_requirements = {!r}\n'.format(format_reqs(package.requirements.test)))
-      tests_require = 'test_requirements'
+      fp.write('tests_require = []\n')
+      self._render_requirements(fp, 'tests_require', package.requirements.test)
+      tests_require = 'tests_require'
     else:
       tests_require = '[]'
 
@@ -109,6 +113,7 @@ class SetuptoolsRenderer(object):
         package_dir = {{'': {src_directory!r}}},
         include_package_data = {include_package_data!r},
         install_requires = requirements,
+        extras_require = {extras_require},
         tests_require = {tests_require},
         python_requires = None, # TODO: {python_requires!r},
         data_files = {data_files},
@@ -118,6 +123,7 @@ class SetuptoolsRenderer(object):
       package=package.package,
       description=package.package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
       long_description_content_type=readme.content_type,
+      extras_require=extras_require,
       tests_require=tests_require,
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
       src_directory=package.package.source_directory,
@@ -172,3 +178,13 @@ class SetuptoolsRenderer(object):
         'data/{}/{}'.format(package_name, entry.target.lstrip('/')),
         entry.source, entry.include, entry.exclude))
     fp.write('data_files = list(data_files.items())\n')
+
+  @staticmethod
+  def _format_reqs(reqs):
+    return [x.to_setuptools() for x in reqs]
+
+  def _render_requirements(self, fp, target, requirements):
+    fp.write('{} = {!r}\n'.format(target, self._format_reqs(requirements.required)))
+    for os_name in requirements.platforms:
+      fp.write('if sys.platform.startswith({!r}):\n'.format(os_name))
+      fp.write('  {} += {!r}\n'.format(target, self._format_reqs(requirements.platforms[os_name])))
