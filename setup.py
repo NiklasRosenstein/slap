@@ -33,6 +33,9 @@ setuptools.setup(
   entry_points = {
     'console_scripts': [
       'pliz = pliz.__main__:console_main',
+    ],
+    'pliz.render': [
+      'setuptools = pliz.render.setuptools:SetuptoolsRenderer',
     ]
   }
 )
