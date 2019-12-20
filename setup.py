@@ -35,6 +35,7 @@ setuptools.setup(
       'pliz = pliz.__main__:console_main',
     ],
     'pliz.render': [
+      'devinstallscript = pliz.render.devinstallscript:DevInstallScriptRenderer',
       'setuptools = pliz.render.setuptools:SetuptoolsRenderer',
     ]
   }
