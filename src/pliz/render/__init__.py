@@ -20,4 +20,13 @@
 # IN THE SOFTWARE.
 
 from .base import *
-from . import setuptools
+from pkg_resources import iter_entry_points
+
+_RENDERER_ENTRYPOINT = 'pliz.render'
+assert _RENDERER_ENTRYPOINT == __name__
+
+
+def get_renderer(name):
+  for ep in iter_entry_points(_RENDERER_ENTRYPOINT, name):
+    return ep.load()
+  raise ValueError('unknown renderer: {!r}'.format(name))

@@ -19,10 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-""" Renders monorepo and package files. """
+""" CLI dispatcher for renderers. """
 
 from .base import PlizCommand
-from ..render import IRenderer
+from ..render import get_renderer
 from termcolor import colored
 import os
 
@@ -55,12 +55,19 @@ class RenderCommand(PlizCommand):
 
   def update_parser(self, parser):
     super(RenderCommand, self).update_parser(parser)
+    parser.add_argument('renderers', help='A comma-separated list of '
+      'renderers to invoke for the current package or monorepo.')
     parser.add_argument('--dry', action='store_true', help='Dry rendering. '
       'Output a list of files that would be rendered instead of actually '
       'rendering them.')
 
   def execute(self, parser, args):
     super(RenderCommand, self).execute(parser, args)
+    try:
+      self._renderers = [get_renderer(x) for x in args.renderers.split(',')]
+    except ValueError as exc:
+      parser.error(exc)
+
     monorepo, package = self.get_configuration()
     if monorepo:
       packages = [package] if package else monorepo.list_packages()
@@ -73,7 +80,7 @@ class RenderCommand(PlizCommand):
   def _render_monorepo(self, monorepo):
     self._print_title(monorepo.project.name, monorepo.directory, [])
     files = []
-    for impl in IRenderer.implementations():
+    for impl in self._renderers:
       files.extend(impl().files_for_monorepo(monorepo))
     self._render_files(monorepo.directory, files)
 
@@ -81,7 +88,7 @@ class RenderCommand(PlizCommand):
     self._print_title(package.package.name, package.directory,
       _get_package_warnings(package))
     files = []
-    for impl in IRenderer.implementations():
+    for impl in self._renderers:
       files.extend(impl().files_for_package(package))
     self._render_files(package.directory, files)
 
