@@ -28,6 +28,10 @@ import textwrap
 import sys
 
 
+def _normpath(x):
+  return os.path.normpath(x).replace(os.sep, '/')
+
+
 @implements(IRenderer)
 class SetuptoolsRenderer(object):
 
@@ -53,7 +57,7 @@ class SetuptoolsRenderer(object):
     fp.write(textwrap.dedent('''
       with io.open({entrypoint_file!r}, encoding='utf8') as fp:
         version = re.search(r"__version__\s*=\s*'(.*)'", fp.read()).group(1)
-    ''').format(entrypoint_file=entry_file))
+    ''').format(entrypoint_file=_normpath(entry_file)))
 
     # Write the part that reads the readme for the long description.
     readme = find_readme_file(package.directory)
