@@ -19,16 +19,18 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import IRenderer, FileToRender
+from .base import Option, Renderer, FileToRender
 from nr.commons.algo.graph import toposort
-from nr.interface import implements
 import os
 
 
-@implements(IRenderer)
-class DevInstallScriptRenderer(object):
+class DevInstallScriptRenderer(Renderer):
   """ Renders a "bin/dev-install" shell script for a monorepo that installs
   Pip packages in the order, respecting their inter-dependencies. """
+
+  options = [
+    Option('filename', default='bin/dev-install'),
+  ]
 
   def files_for_monorepo(self, item):  # type: (Monorepo) -> Iterable[FileToRender]
     # Collect packages and their dependencies for this monorepo.
@@ -59,4 +61,7 @@ class DevInstallScriptRenderer(object):
           fp.write(' \\')
         fp.write('\n')
 
-    yield FileToRender('bin/dev-install', write_script)
+    yield FileToRender(self.config['filename'], write_script)
+
+  def files_for_package(self, item):
+    raise RuntimeError('devinstallscript can only be used with monorepos')

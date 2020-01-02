@@ -26,7 +26,13 @@ _RENDERER_ENTRYPOINT = 'pliz.render'
 assert _RENDERER_ENTRYPOINT == __name__
 
 
+class RendererNotFound(Exception):
+
+  def __str__(self):
+    return 'unknown renderer "{}"'.format(self.args[0])
+
+
 def get_renderer(name):
   for ep in iter_entry_points(_RENDERER_ENTRYPOINT, name):
     return ep.load()
-  raise ValueError('unknown renderer: {!r}'.format(name))
+  raise RendererNotFound(name)
