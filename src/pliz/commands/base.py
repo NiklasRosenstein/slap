@@ -27,10 +27,11 @@ import os
 _stop_searching_if_found = ['.git']
 
 
-def find_configuration(path=None):
+def find_configuration(path=None, load=True):
   """ Finds the current Package and Monorepo configuration from the specified
   *path* or the current working directory. Returns a tuple of (monorepo,
-  package) """
+  package). If *load* is set to True, the files will be loaded, otherwise
+  the filenames are returned. """
 
   filenames = {'monorepo.yaml': None, 'package.yaml': None}
 
@@ -52,10 +53,10 @@ def find_configuration(path=None):
       break
     path = next_path
 
-  monorepo = package = None
-  if filenames['monorepo.yaml']:
+  monorepo, package = filenames['monorepo.yaml'], filenames['package.yaml']
+  if load and filenames['monorepo.yaml']:
     monorepo = Monorepo.load(filenames['monorepo.yaml'])
-  if filenames['package.yaml']:
+  if load and filenames['package.yaml']:
     package = Package.load(filenames['package.yaml'])
 
   return monorepo, package
@@ -63,11 +64,11 @@ def find_configuration(path=None):
 
 class PlizCommand(Command):
 
-  def get_configuration(self):  # () -> Tuple[Monorepo, Package]
-    monorepo, package = find_configuration()
-    if not monorepo and not package:
+  def get_configuration(self, load=True, error=True):  # (Bool, Bool) -> Union[Tuple[Monorepo, Package], Tuple[str, str]]
+    monorepo, package = find_configuration(load=load)
+    if error and (not monorepo and not package):
       self.parser.error('could not find package.yaml or monorepo.yaml')
-    if monorepo and package:
+    if load and (monorepo and package):
       package.inherit_fields(monorepo)
     return monorepo, package
 

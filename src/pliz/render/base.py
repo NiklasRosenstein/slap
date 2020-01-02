@@ -19,10 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from nr.commons.notset import NotSet
 from nr.interface import Interface, attr, default, implements
 from ..model import Monorepo, Package
 
-__all__ = ['IFileToRender', 'FileToRender', 'IRenderer']
+__all__ = ['IFileToRender', 'FileToRender', 'Option', 'Renderer']
 
 
 class IFileToRender(Interface):
@@ -46,12 +47,48 @@ class FileToRender(object):
     return self._callable(fp, *self._args, *self._kwargs)
 
 
-class IRenderer(Interface):
+class Option(object):
 
-  @default
+  def __init__(self, name, default=NotSet):
+    self.name = name
+    self.default = default
+
+  def __repr__(self):
+    return 'Option(name={!r}, default={!r})'.format(self.name, self.default)
+
+  @property
+  def required(self):
+    return self.default is NotSet
+
+  def get_default(self):
+    if self.default is NotSet:
+      raise RuntimeError('{!r} no default set'.format(self.name))
+    if callable(self.default):
+      return self.default()
+    return self.default
+
+
+class Renderer(object):
+
+  options = []  # type: List[Option]
+
+  def __init__(self, config):
+    self.config = config
+
   def files_for_monorepo(self, item):  # type: (Monorepo) -> Iterable[IFileToRender]
     return; yield
 
-  @default
   def files_for_package(self, item):  # type: (Package) -> Iterable[IFileToRender]
     return; yield
+
+  @classmethod
+  def get_options_from(cls, options):  # type: (Dict[str, Any]) -> Dict[str, Any]
+    """ May raise a #KeyError if a required option is not in *options*. """
+
+    result = {}
+    for option in cls.options:
+      if not option.required or option.name in options:
+        result[option.name] = options[option.name]
+      else:
+        result[option.name] = option.get_default()
+    return result

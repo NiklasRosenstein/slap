@@ -19,8 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.interface import implements
-from .base import IRenderer, FileToRender
+from .base import Renderer, FileToRender
 from .util import find_readme_file, Readme
 import json
 import os
@@ -32,8 +31,7 @@ def _normpath(x):
   return os.path.normpath(x).replace(os.sep, '/')
 
 
-@implements(IRenderer)
-class SetuptoolsRenderer(object):
+class SetuptoolsRenderer(Renderer):
 
   ENTRYPOINT_VARS = {
     'python-major-version': 'sys.version[0]',
