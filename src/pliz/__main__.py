@@ -38,8 +38,8 @@ def main(argv=None, prog=None):
     prog = 'pliz'
   parser = argparse.ArgumentParser(prog=prog)
   commands.update_parser(parser)
-  args = parser.parse_args()
-  commands.dispatch(parser, args)
+  args, argv = parser.parse_known_args()
+  commands.dispatch(parser, args, argv)
 
 
 def console_main():

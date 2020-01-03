@@ -20,17 +20,46 @@
 # IN THE SOFTWARE.
 
 from nr.commons.notset import NotSet
+from nr.fs import atomic_file
 from nr.interface import Interface, attr, default, implements
 from ..model import Monorepo, Package
+import os
 
-__all__ = ['IFileToRender', 'FileToRender', 'Option', 'Renderer']
+__all__ = [
+  'write_to_disk',
+  'IFileToRender',
+  'FileToRender',
+  'Option',
+  'BaseRenderer',
+  'RendererMisconfiguration',
+]
+
+
+def write_to_disk(file, directory='.'):  # type: (IFileToRender)
+  target_fn = os.path.join(directory, file.name)
+  with atomic_file(target_fn, text=True, encoding=file.encoding) as dst:
+    if os.path.isfile(target_fn):
+      current = open(target_fn, 'r', encoding=file.encoding)
+    else:
+      current = None
+    try:
+      file.render(current, dst)
+    finally:
+      if current:
+        current.close()
+
+
+
+class RendererMisconfiguration(Exception):
+  pass
 
 
 class IFileToRender(Interface):
 
   name = attr(str)
+  encoding = attr(str, default='utf8')
 
-  def render(self, fp):
+  def render(self, current, dst):  # types: (Optional[TextIO], TextIO)
     pass
 
 
@@ -38,13 +67,15 @@ class IFileToRender(Interface):
 class FileToRender(object):
 
   def __init__(self, name, callable, *args, **kwargs):
+    super(FileToRender, self).__init__()
     self.name = name
+    self.encoding = kwargs.pop('encoding', self.encoding)
     self._callable = callable
     self._args = args
     self._kwargs = kwargs
 
-  def render(self, fp):
-    return self._callable(fp, *self._args, *self._kwargs)
+  def render(self, current, dst):
+    return self._callable(current, dst, *self._args, *self._kwargs)
 
 
 class Option(object):
@@ -68,27 +99,33 @@ class Option(object):
     return self.default
 
 
-class Renderer(object):
+class BaseRenderer(object):
 
   options = []  # type: List[Option]
 
   def __init__(self, config):
-    self.config = config
-
-  def files_for_monorepo(self, item):  # type: (Monorepo) -> Iterable[IFileToRender]
-    return; yield
-
-  def files_for_package(self, item):  # type: (Package) -> Iterable[IFileToRender]
-    return; yield
+    try:
+      self.config = self._get_options(config)
+    except KeyError as exc:
+      raise RendererMisconfiguration('missing option {}'.format(exc))
 
   @classmethod
-  def get_options_from(cls, options):  # type: (Dict[str, Any]) -> Dict[str, Any]
+  def _get_options(cls, options):  # type: (Dict[str, Any]) -> Dict[str, Any]
     """ May raise a #KeyError if a required option is not in *options*. """
 
     result = {}
     for option in cls.options:
-      if not option.required or option.name in options:
+      if option.name in options or option.required:
         result[option.name] = options[option.name]
       else:
         result[option.name] = option.get_default()
     return result
+
+  def files(self):  # type: () -> Iterable[IFileToRender]
+    raise NotImplementedError
+
+  def files_for_monorepo(self, item):  # type: (Monorepo) -> Iterable[IFileToRender]
+    raise NotImplementedError
+
+  def files_for_package(self, item):  # type: (Package) -> Iterable[IFileToRender]
+    raise NotImplementedError

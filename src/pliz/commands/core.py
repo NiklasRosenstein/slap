@@ -41,6 +41,10 @@ class Command(object):
   def update_parser(self, parser):
     pass
 
+  def handle_unknown_args(self, parser, args, argv):
+    if argv:
+      parser.error('unknown argument {!r}'.format(argv[0]))
+
   def execute(self, parser, args):
     raise NotImplementedError
 
@@ -65,7 +69,7 @@ class CommandList(object):
       parser = subparser.add_parser(key, description=command.description)
       command.update_parser(parser)
 
-  def dispatch(self, parser, args):
+  def dispatch(self, parser, args, argv):
     name = getattr(args, self._uid)
     if not name:
       parser.print_help()
@@ -73,4 +77,5 @@ class CommandList(object):
     command = self.commands[name]
     subparser = next(x for x in parser._actions if
         isinstance(x, argparse._SubParsersAction)).choices[name]
+    command.handle_unknown_args(parser, args, argv)
     return command.execute(subparser, args)

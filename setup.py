@@ -10,7 +10,7 @@ with io.open('src/pliz/__init__.py', encoding='utf8') as fp:
 with io.open('README.md', encoding='utf8') as fp:
   long_description = fp.read()
 
-requirements = ['beautifulsoup4 >=4.8.1,<5.0.0', 'nr.databind >=0.1.0,<1.0.0', 'nr.proxy >=0.1.0,<1.0.0', 'requests >=2.22.0,<3.0.0', 'PyYAML >=5.1.0,<6.0.0', 'termcolor >=1.1.0,<2.0.0']
+requirements = ['beautifulsoup4 >=4.8.1,<5.0.0', 'nr.databind >=0.1.0,<1.0.0', 'nr.fs >=1.5.0,<2.0.0', 'nr.proxy >=0.1.0,<1.0.0', 'requests >=2.22.0,<3.0.0', 'PyYAML >=5.1.0,<6.0.0', 'termcolor >=1.1.0,<2.0.0']
 
 setuptools.setup(
   name = 'pliz',

@@ -132,65 +132,6 @@ class Requirement(object):
       raise SerializationValueError(location, exc)
 
 
-class AuthorData(Struct):
-  name = Field(str)
-  email = Field(str)
-
-  AUTHOR_EMAIL_REGEX = re.compile(r'([^<]+)<([^>]+)>')
-
-  def __str__(self):
-    return '{} <{}>'.format(self.name, self.email)
-
-  @JsonDeserializer
-  def __deserialize(context, location):
-    if isinstance(location.value, str):
-      match = AuthorData.AUTHOR_EMAIL_REGEX.match(location.value)
-      if match:
-        author = match.group(1).strip()
-        email = match.group(2).strip()
-        return AuthorData(author, email)
-    raise NotImplementedError
-
-
-class Datafile(Struct):
-  """ Represents an entry in the #Package.datafiles configuration. """
-
-  source = Field(str)
-  target = Field(str)
-  include = Field([str])
-  exclude = Field([str])
-
-  @JsonDeserializer
-  def __deserialize(context, location):
-    if isinstance(location.value, str):
-      left, patterns = location.value.partition(',')[::2]
-      source, target = left.partition(':')[::2]
-      if not source or not target:
-        raise SerializationValueError('invalid DataFile spec: {!r}'.format(location.value))
-      include = []
-      exclude = []
-      for pattern in patterns.split(','):
-        (exclude if pattern.startswith('!') else include).append(pattern.lstrip('!'))
-      return Datafile(source, target, include, exclude)
-    raise NotImplementedError
-
-
-class CommonPackageData(Struct):
-  author = Field(AuthorData, default=None)
-  license = Field(str, default=None)
-  url = Field(str, default=None)
-
-
-class PackageData(CommonPackageData):
-  name = Field(str)
-  version = Field(str)
-  description = Field(str)
-  long_description = Field(str, default=None)
-  entry_file = Field(str, default=None)
-  source_directory = Field(str, default='src')
-  exclude_packages = Field([str], default=['test', 'docs'])
-
-
 class Requirements(object):
   """ Represents package requirements, consisting of a #RequirementsList *any*
   that is comprised of requirements that always need to be present, and
@@ -286,6 +227,67 @@ class RootRequirements(Requirements):
       super(RootRequirements, self)._extract_from_item(context, path, item)
 
 
+class Author(Struct):
+  name = Field(str)
+  email = Field(str)
+
+  AUTHOR_EMAIL_REGEX = re.compile(r'([^<]+)<([^>]+)>')
+
+  def __str__(self):
+    return '{} <{}>'.format(self.name, self.email)
+
+  @JsonDeserializer
+  def __deserialize(context, location):
+    if isinstance(location.value, str):
+      match = Author.AUTHOR_EMAIL_REGEX.match(location.value)
+      if match:
+        author = match.group(1).strip()
+        email = match.group(2).strip()
+        return Author(author, email)
+    raise NotImplementedError
+
+
+class Datafile(Struct):
+  """ Represents an entry in the #Package.datafiles configuration. Can be
+  deserialized from a JSON-like object or a string formatted as
+  `source:target,includepattern,!excludepattern`. """
+
+  source = Field(str)
+  target = Field(str)
+  include = Field([str])
+  exclude = Field([str])
+
+  @JsonDeserializer
+  def __deserialize(context, location):
+    if isinstance(location.value, str):
+      left, patterns = location.value.partition(',')[::2]
+      source, target = left.partition(':')[::2]
+      if not source or not target:
+        raise SerializationValueError(location, 'invalid DataFile spec: {!r}'.format(location.value))
+      include = []
+      exclude = []
+      for pattern in patterns.split(','):
+        (exclude if pattern.startswith('!') else include).append(pattern.lstrip('!'))
+      return Datafile(source, target, include, exclude)
+    raise NotImplementedError
+
+
+class CommonPackageData(Struct):
+  author = Field(Author, default=None)
+  license = Field(str, default=None)
+  url = Field(str, default=None)
+
+
+class PackageData(CommonPackageData):
+  name = Field(str)
+  version = Field(str)
+  description = Field(str)
+  long_description = Field(str, default=None)
+  entry_file = Field(str, default=None)
+  source_directory = Field(str, default='src')
+  exclude_packages = Field([str], default=['test', 'docs'])
+
+
 class Package(Struct):
   Mixin('tuple', DeserializableFromFileMixin)
 
@@ -293,8 +295,9 @@ class Package(Struct):
   package = Field(PackageData)
 
   requirements = Field(RootRequirements, default=RootRequirements)
-  entrypoints = Field({"value_type": [str]}, default={})
-  datafiles = Field([Datafile], default=[])
+  entrypoints = Field({"value_type": [str]}, default=dict)
+  datafiles = Field([Datafile], default=list)
+  manifest = Field([str], default=list)
 
   def inherit_fields(self, monorepo):  # type: (Monorepo) -> None
     if not monorepo.packages:
