@@ -19,12 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import Option, Renderer, FileToRender
+from .base import Option, BaseRenderer, FileToRender
 from nr.commons.algo.graph import toposort
 import os
 
 
-class DevInstallScriptRenderer(Renderer):
+class DevInstallScriptRenderer(BaseRenderer):
   """ Renders a "bin/dev-install" shell script for a monorepo that installs
   Pip packages in the order, respecting their inter-dependencies. """
 
@@ -48,7 +48,7 @@ class DevInstallScriptRenderer(Renderer):
     # Sort the packages in topological order for the install script.
     ordered = list(toposort(sorted(nodes.keys()), lambda x: nodes[x]['dependencies']))
     # Write the install script.
-    def write_script(fp):
+    def write_script(_current, fp):
       fp.write('#!/bin/sh\n\n')
       fp.write('${PYTHON:-python} -m pip install \\\n')
       for package in ordered:
@@ -62,6 +62,3 @@ class DevInstallScriptRenderer(Renderer):
         fp.write('\n')
 
     yield FileToRender(self.config['filename'], write_script)
-
-  def files_for_package(self, item):
-    raise RuntimeError('devinstallscript can only be used with monorepos')

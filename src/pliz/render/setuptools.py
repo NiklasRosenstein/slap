@@ -19,8 +19,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import Renderer, FileToRender
+from .base import BaseRenderer, FileToRender
 from .util import find_readme_file, Readme
+import contextlib
 import json
 import os
 import textwrap
@@ -31,7 +32,31 @@ def _normpath(x):
   return os.path.normpath(x).replace(os.sep, '/')
 
 
-class SetuptoolsRenderer(Renderer):
+def split_section(data, begin_marker, end_marker):
+  start = data.find(begin_marker)
+  end = data.find(end_marker, start)
+  if start >= 0 and end >= 0:
+    prefix = data[:start]
+    middle = data[start+len(begin_marker):end]
+    suffix = data[end+len(end_marker)+1:]
+    return prefix, middle, suffix
+  return (data, '', '')
+
+
+@contextlib.contextmanager
+def rewrite_section(fp, data, begin_marker, end_marker):
+  prefix, suffix = split_section(data, begin_marker, end_marker)[::2]
+  fp.write(prefix)
+  fp.write(begin_marker + '\n')
+  yield fp
+  fp.write(end_marker + '\n')
+  fp.write(suffix)
+
+
+class SetuptoolsRenderer(BaseRenderer):
+
+  BEGIN_SECTION = '# Auto-generated with Pliz. Do not edit. {'
+  END_SECTION = '# }'
 
   ENTRYPOINT_VARS = {
     'python-major-version': 'sys.version[0]',
@@ -39,9 +64,17 @@ class SetuptoolsRenderer(Renderer):
   }
 
   def files_for_package(self, package):
+    if package.manifest:
+      yield FileToRender('MANIFEST.in', self._render_manifest, package)
     yield FileToRender('setup.py', self._render_setup, package)
 
-  def _render_setup(self, fp, package):
+  def _render_manifest(self, current, fp, package):
+    markers = (self.BEGIN_SECTION, self.END_SECTION)
+    with rewrite_section(fp, current.read() if current else '', *markers):
+      for entry in package.manifest:
+        fp.write('{}\n'.format(entry))
+
+  def _render_setup(self, _current, fp, package):
     # Write the header/imports.
     fp.write(textwrap.dedent('''
       import io
@@ -87,7 +120,6 @@ class SetuptoolsRenderer(Renderer):
     else:
       tests_require = '[]'
 
-    # TODO @NiklasRosenstein: Include datafiles in MANIFEST.in
     if package.datafiles:
       self._render_datafiles(fp, package.package.name, package.datafiles)
       data_files = 'data_files'
