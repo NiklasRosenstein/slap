@@ -136,7 +136,7 @@ class RenderCommand(PlizCommand):
     renderer.render_general(context)
     if monorepo:
       renderer.render_monorepo(context)
-      if self.recursive:
+      if args.recursive:
         packages = [package] if package else monorepo.list_packages()
         for package in packages:
           context.package = package
