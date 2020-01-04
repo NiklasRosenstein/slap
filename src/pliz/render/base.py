@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 from nr.commons.notset import NotSet
-from nr.fs import atomic_file
+from nr.fs import atomic_file, makedirs
 from nr.interface import Interface, attr, default, implements
 from ..model import Monorepo, Package
 import os
@@ -37,6 +37,7 @@ __all__ = [
 
 def write_to_disk(file, directory='.'):  # type: (IFileToRender)
   target_fn = os.path.join(directory, file.name)
+  makedirs(os.path.dirname(target_fn))
   with atomic_file(target_fn, text=True, encoding=file.encoding) as dst:
     if os.path.isfile(target_fn):
       current = open(target_fn, 'r', encoding=file.encoding)
