@@ -134,15 +134,15 @@ class RenderCommand(PlizCommand):
 
     renderer = args._renderer
     renderer.render_general(context)
-    if monorepo:
+    if package:
+      renderer.render_package(context)
+    else:
       renderer.render_monorepo(context)
       if args.recursive:
         packages = [package] if package else monorepo.list_packages()
         for package in packages:
           context.package = package
           renderer.render_package(context)
-    else:
-      renderer.render_package(context)
 
     if not self._rendered_any:
       print(colored(
