@@ -76,8 +76,9 @@ class RenderCommand(PlizCommand):
     pos_args = []
 
     it = iter(argv)
+    queue = []
     while True:
-      item = next(it, None)
+      item = queue.pop(0) if queue else next(it, None)
       if item is None:
         break
       if not item.startswith('--'):
@@ -90,6 +91,9 @@ class RenderCommand(PlizCommand):
       else:
         k = item[2:]
         v = next(it, 'true')
+        if v.startswith('--'):
+          queue.append(v)
+          v = 'true'
       if v.lower().strip() in ('true', 'yes', '1', 'y', 'on', 'enabled'):
         v = True
       elif v.lower().strip() in ('false', 'no', '0', 'n', 'off', 'disabled'):
@@ -161,7 +165,7 @@ class RenderCommand(PlizCommand):
         directory = os.path.relpath(context.package.directory)
       if directory == '.':
         directory += '/'
-      else:
+      elif directory:
         directory = './' + directory
       self._rendered_any = True
       print(colored('RENDER', 'blue', attrs=['bold']), name, end=' ')
