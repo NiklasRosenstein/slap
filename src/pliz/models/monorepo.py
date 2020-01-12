@@ -35,6 +35,7 @@ class Monorepo(Struct, DeserializableFromFileMixin):
   directory = Field(str, default=None)
   project = Field(ProjectData)
   packages = Field(CommonPackageData, default=None)
+  plugins = Field(dict, default=dict)
 
   def list_packages(self):
     results = []

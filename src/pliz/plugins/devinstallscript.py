@@ -42,7 +42,8 @@ class DevInstallScriptRenderer(object):
 
   @override
   def get_files_to_render(self, context):  # type: (PluginContext) -> Iterable[FileToRender]
-    assert context.monorepo
+    if not context.monorepo:
+      return; yield
 
     # Collect packages and their dependencies for this monorepo.
     nodes = {}

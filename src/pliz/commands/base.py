@@ -20,8 +20,8 @@
 # IN THE SOFTWARE.
 
 from .core import Command
-from ..model.monorepo import Monorepo
-from ..model.package import Package
+from pliz.models.monorepo import Monorepo
+from pliz.models.package import Package
 import os
 
 _stop_searching_if_found = ['.git']

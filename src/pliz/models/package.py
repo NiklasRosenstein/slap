@@ -277,6 +277,7 @@ class CommonPackageData(Struct):
   author = Field(Author, default=None)
   license = Field(str, default=None)
   url = Field(str, default=None)
+  use = Field([str], default=list)
 
 
 class PackageData(CommonPackageData):
@@ -300,13 +301,17 @@ class Package(Struct):
   entrypoints = Field({"value_type": [str]}, default=dict)
   datafiles = Field([Datafile], default=list)
   manifest = Field([str], default=list)
+  plugins = Field(dict, default=dict)
 
   def inherit_fields(self, monorepo):  # type: (Monorepo) -> None
-    if not monorepo.packages:
-      return
-    for key in CommonPackageData.__fields__:
-      if not getattr(self.package, key):
-        setattr(self.package, key, copy.copy(getattr(monorepo.packages, key)))
+    if monorepo.packages:
+      for key in CommonPackageData.__fields__:
+        if not getattr(self.package, key):
+          setattr(self.package, key, copy.copy(getattr(monorepo.packages, key)))
+    self.package.use = list(set(self.package.use) | set(monorepo.packages.use))
+    for key, value in monorepo.plugins.items():
+      if key in self.package.use:
+        self.plugins[key].update(value)
 
   def get_default_entry_file(self):
     name = self.package.name.replace('-', '_')
