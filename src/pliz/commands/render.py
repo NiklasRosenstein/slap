@@ -109,7 +109,12 @@ class RenderCommand(PlizCommand):
         parser.error('duplicate argument value for option "{}"'.format(option.name))
       config[option.name] = value
 
-    args._plugin = plugin_cls(config)
+    # TODO (@NiklasRosenstein): If custom options are defined for this
+    #   plugin in the monorepo or package, we probably want to inherit
+    #   the settings and only override what is defined as CLI options.
+    #   That will require us to move the construction of the plugin
+    #   instance to execute() and create one instance per monorepo/package.
+    args._plugin = construct_plugin(plugin_cls, config)
 
   def execute(self, parser, args):
     super(RenderCommand, self).execute(parser, args)
