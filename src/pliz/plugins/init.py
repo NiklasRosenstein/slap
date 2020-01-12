@@ -19,7 +19,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import Option, BaseRenderer, FileToRender
+from pliz.core.plugins import FileToRender, IPlugin, Options, Option
+from nr.interface import implements, override
 import jinja2
 import os
 import pkg_resources
@@ -35,24 +36,32 @@ def resource_walk(module, directory, _joinwith=''):
       yield relative_path
 
 
-class InitRenderer(BaseRenderer):
+@implements(IPlugin)
+class InitRenderer(object):
   """ Renders a template for packages. """
 
-  options = [
-    Option('name'),
-    Option('version', default=None),
-    Option('license', default=None),
-    Option('in', default=None)
-  ]
+  _DIRECTORY = 'templates/init'
 
-  _directory = 'templates/init'
+  def __init__(self, options):
+    self._options = options
 
-  def files(self):
-    for source_filename in resource_walk('pliz', self._directory):
+  @override
+  @classmethod
+  def get_options(self):  # type: () -> Options
+    return Options({
+      'name': Option(),
+      'version': Option(default=None),
+      'license': Option(default=None),
+      'in': Option(default=None),
+    })
+
+  @override
+  def get_files_to_render(self, _context):
+    for source_filename in resource_walk('pliz', self._DIRECTORY):
       filename = self._render_template(source_filename, name=self.config['name'].replace('.', '/'))
       dest = os.path.join(self.config['in'] or self.config['name'], filename)
       yield FileToRender(os.path.normpath(dest), self._render_file,
-        self._directory + '/' + source_filename)
+        self._DIRECTORY + '/' + source_filename)
     # Add namespace supporting files.
     def render_namespace(_current, fp):
       fp.write("__path__ = __import__('pkgutil').extend_path(__path__, __name__)\n")
@@ -61,6 +70,10 @@ class InitRenderer(BaseRenderer):
       parts.append(item)
       dest = os.path.join(self.config['in'] or self.config['name'], 'src', *parts, '__init__.py')
       yield FileToRender(os.path.normpath(dest), render_namespace)
+
+  @override
+  def perform_checks(self, context):
+    return; yield
 
   def _render_template(self, template_string, **kwargs):
     assert isinstance(template_string, str), type(template_string)

@@ -32,6 +32,7 @@ from nr.databind.core import (
 from nr.databind.json import JsonDeserializer
 import ast
 import collections
+import copy
 import os
 import re
 import yaml
@@ -285,7 +286,8 @@ class PackageData(CommonPackageData):
   long_description = Field(str, default=None)
   entry_file = Field(str, default=None)
   source_directory = Field(str, default='src')
-  exclude_packages = Field([str], default=['test', 'docs'])
+  exclude_packages = Field([str], default=lambda: ['test', 'docs'])
+  use = Field([str], default=list)
 
 
 class Package(Struct):
@@ -304,7 +306,7 @@ class Package(Struct):
       return
     for key in CommonPackageData.__fields__:
       if not getattr(self.package, key):
-        setattr(self.package, key, getattr(monorepo.packages, key))
+        setattr(self.package, key, copy.copy(getattr(monorepo.packages, key)))
 
   def get_default_entry_file(self):
     name = self.package.name.replace('-', '_')

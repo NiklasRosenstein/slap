@@ -28,6 +28,7 @@ import os
 class ProjectData(Struct):
   name = Field(str)
   version = Field(str, default=None)
+  use = Field([str], default=list)
 
 
 class Monorepo(Struct, DeserializableFromFileMixin):

@@ -19,23 +19,34 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import Option, BaseRenderer, FileToRender
+from pliz.core.plugins import FileToRender, IPlugin, Options, Option
 from nr.commons.algo.graph import toposort
+from nr.interface import implements, override
 import os
 
 
-class DevInstallScriptRenderer(BaseRenderer):
+@implements(IPlugin)
+class DevInstallScriptRenderer(object):
   """ Renders a "bin/dev-install" shell script for a monorepo that installs
   Pip packages in the order, respecting their inter-dependencies. """
 
-  options = [
-    Option('filename', default='bin/dev-install'),
-  ]
+  def __init__(self, options):
+    self._options = options
 
-  def files_for_monorepo(self, item):  # type: (Monorepo) -> Iterable[FileToRender]
+  @override
+  @classmethod
+  def get_options(cls):  # type: () -> Options
+    return Options({
+      'filename': Option(default='bin/dev-install')
+    })
+
+  @override
+  def get_files_to_render(self, context):  # type: (PluginContext) -> Iterable[FileToRender]
+    assert context.monorepo
+
     # Collect packages and their dependencies for this monorepo.
     nodes = {}
-    packages = item.list_packages()
+    packages = context.monorepo.list_packages()
     for package in packages:
       nodes[package.package.name] = {
         'directory': os.path.basename(package.directory),
@@ -61,4 +72,9 @@ class DevInstallScriptRenderer(BaseRenderer):
           fp.write(' \\')
         fp.write('\n')
 
-    yield FileToRender(self.config['filename'], write_script)
+    yield FileToRender(context.monorepo.directory,
+      self._options['filename'], write_script).with_chmod('+x')
+
+  @override
+  def perform_checks(self, context):
+    return; yield

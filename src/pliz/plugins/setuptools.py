@@ -19,8 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .base import BaseRenderer, FileToRender
-from .util import find_readme_file, Readme
+""" A plugin that generates setuptools files (setup.py, MANIFEST.in). This
+plugin is used by default in packages. """
+
+from ._util import find_readme_file, Readme
+from pliz.core.plugins import FileToRender, IPlugin, Options
+from nr.interface import implements, override
 import contextlib
 import json
 import os
@@ -53,7 +57,36 @@ def rewrite_section(fp, data, begin_marker, end_marker):
   fp.write(suffix)
 
 
-class SetuptoolsRenderer(BaseRenderer):
+@implements(IPlugin)
+class SetuptoolsRenderer(object):
+
+  def __init__(self, options):
+    pass
+
+  @override
+  @classmethod
+  def get_options(cls):
+    return Options({})
+
+  @override
+  def get_files_to_render(self, context):
+    for package in context.packages:
+      if package.manifest:
+        yield FileToRender(package.directory,
+          'MANIFEST.in', self._render_manifest, package)
+      yield FileToRender(package.directory,
+        'setup.py', self._render_setup, package)
+
+  @override
+  def perform_checks(self, context):
+    for package in context.packages:
+      for name in ('LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'):
+        filename = os.path.join(package.directory, name)
+        if os.path.isfile(filename):
+          break
+      else:
+        yield CheckResult(package, CheckResult.Level.WARNING,
+          'No LICENSE file found.')
 
   BEGIN_SECTION = '# Auto-generated with Pliz. Do not edit. {'
   END_SECTION = '# }'
@@ -62,11 +95,6 @@ class SetuptoolsRenderer(BaseRenderer):
     'python-major-version': 'sys.version[0]',
     'python-major-minor-version': 'sys.version[:3]'
   }
-
-  def files_for_package(self, package):
-    if package.manifest:
-      yield FileToRender('MANIFEST.in', self._render_manifest, package)
-    yield FileToRender('setup.py', self._render_setup, package)
 
   def _render_manifest(self, current, fp, package):
     markers = (self.BEGIN_SECTION, self.END_SECTION)

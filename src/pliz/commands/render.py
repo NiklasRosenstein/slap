@@ -22,15 +22,7 @@
 """ CLI dispatcher for renderers. """
 
 from .base import PlizCommand
-from ..render import (
-  get_renderer,
-  write_to_disk,
-  RenderContext,
-  Renderer,
-  RenderStatus,
-  RenderType,
-  RendererNotFound,
-  RendererMisconfiguration)
+from ..core.plugins import load_plugin, PluginContext, write_to_disk
 from termcolor import colored
 import os
 
@@ -70,9 +62,9 @@ class RenderCommand(PlizCommand):
   def handle_unknown_args(self, parser, args, argv):
     """ Parses additional `--` flags for the renderer options. """
 
-    renderer_cls = get_renderer(args.renderer)
-    options = {o.name: o for o in renderer_cls.options}
-    config = {}
+    plugin_cls = load_plugin(args.renderer)
+    options = plugin_cls.get_options()
+    config = {o.name: o.get_default() for o in options if not o.required}
     pos_args = []
 
     it = iter(argv)
@@ -106,75 +98,29 @@ class RenderCommand(PlizCommand):
             pass
       config[k] = v
 
-    if len(pos_args) > len(renderer_cls.options):
+    if len(pos_args) > len(options):
       parser.error('expected at max {} positional arguments, got {}'.format(
-        len(renderer_cls.options), len(pos_args)))
-    for option, value in zip(renderer_cls.options, pos_args):
+        len(plugin_cls.options), len(pos_args)))
+    for option, value in zip(options, pos_args):
       if option.name in config:
         parser.error('duplicate argument value for option "{}"'.format(option.name))
       config[option.name] = value
 
-    try:
-      args._renderer = Renderer(renderer_cls, config)
-    except RendererMisconfiguration as exc:
-      parser.error(exc)
+    args._plugin = plugin_cls(config)
 
   def execute(self, parser, args):
     super(RenderCommand, self).execute(parser, args)
+
     monorepo, package = self.get_configuration()
-
-    context = RenderContext(
-      directory='.',
-      dry=args.dry,
-      reporter=self._report,
-      monorepo=monorepo,
-      package=package)
-
-    self._rendered_any = False
-
-    renderer = args._renderer
-    renderer.render_general(context)
     if package:
-      renderer.render_package(context)
+      context = PluginContext(None, [package])
     else:
-      renderer.render_monorepo(context)
-      if args.recursive:
-        packages = [package] if package else monorepo.list_packages()
-        for package in packages:
-          context.package = package
-          renderer.render_package(context)
+      packages = monorepo.list_packages() if args.recursive else []
+      context = PluginContext(monorepo, packages)
 
-    if not self._rendered_any:
-      print(colored(
-        'fatal: renderer "{}" is not applicable in this context'.format(args.renderer),
-        'red'))
-      exit(1)
-
-  def _report(self, type, status, context):
-    if status == RenderStatus.NotImplemented:
-      pass
-    elif status == RenderStatus.StartRender:
-      if type == RenderType.General:
-        name = 'GENERAL'
-        directory = None
-      elif type == RenderType.Monorepo:
-        name = context.monorepo.project.name
-        directory = os.path.relpath(context.monorepo.directory)
-      elif type == RenderType.Package:
-        name = context.package.package.name
-        directory = os.path.relpath(context.package.directory)
-      if directory == '.':
-        directory += '/'
-      elif directory:
-        directory = './' + directory
-      self._rendered_any = True
-      print(colored('RENDER', 'blue', attrs=['bold']), name, end=' ')
-      if directory:
-        print(colored('({})'.format(directory), 'grey', attrs=['bold']))
-      else:
-        print()
-    elif status == RenderStatus.EndRender:
-      print()
-    elif status == RenderStatus.RenderFile:
-      print('  rendering "{}" ...'.format(context.file.name))
-      write_to_disk(context.file, context.directory)
+    files = list(args._plugin.get_files_to_render(context))
+    print('Rendering {} file(s)'.format(len(files)))
+    for file in files:
+      print(' ', file.name)
+      if not args.dry:
+        write_to_disk(file)

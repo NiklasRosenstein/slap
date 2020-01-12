@@ -34,10 +34,10 @@ setuptools.setup(
     'console_scripts': [
       'pliz = pliz.__main__:console_main',
     ],
-    'pliz.render': [
-      'devinstallscript = pliz.render.devinstallscript:DevInstallScriptRenderer',
-      'init = pliz.render.init:InitRenderer',
-      'setuptools = pliz.render.setuptools:SetuptoolsRenderer',
+    'pliz.core.plugins': [
+      'devinstallscript = pliz.plugins.devinstallscript:DevInstallScriptRenderer',
+      'init = pliz.plugins.init:InitRenderer',
+      'setuptools = pliz.plugins.setuptools:SetuptoolsRenderer',
     ]
   }
 )
