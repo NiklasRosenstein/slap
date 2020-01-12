@@ -30,6 +30,7 @@ perform several types of actions.
 from nr.collections import abc
 from nr.commons.notset import NotSet
 from nr.interface import Interface, attr, implements, override
+from pliz.models import Monorepo, Package
 from pkg_resources import iter_entry_points
 import enum
 import nr.fs
@@ -45,6 +46,19 @@ class PluginContext(object):
     # type: (Optional[Monorepo], List[Packages])
     self.monorepo = monorepo
     self.packages = packages
+
+  def iter_plugin_ctx_combinations(self):
+    """ Returns a generator yielding pairs of #IPlugin and #PluginContext
+    objects, where the plugins are created as defined in #Monorepo.project.use
+    and #Package.package.use. """
+
+    for plugin in self.monorepo.project.use:
+      config = self.monorepo.plugins.get(plugin, {})
+      yield construct_plugin(plugin, config), PluginContext(self.monorepo, [])
+    for package in self.packages:
+      for plugin in package.package.use:
+        config = package.plugins.get(plugin, {})
+        yield construct_plugin(plugin, config), PluginContext(None, [package])
 
 
 class CheckResult(object):
@@ -172,6 +186,10 @@ class IPlugin(Interface):
     """ Perform checks on the data given via the context. """
 
 
+class PluginNotFound(Exception):
+  pass
+
+
 def load_plugin(name):  # type: (str) -> Type[IPlugin]
   """ Loads a plugin by its entrypoint name. Returns the class that implements
   the #IPlugin interface. Raises a #PluginNotFound exception if *name* does
@@ -187,8 +205,15 @@ def load_plugin(name):  # type: (str) -> Type[IPlugin]
   return cls
 
 
-class PluginNotFound(Exception):
-  pass
+def construct_plugin(name_or_cls, options):
+  cls = load_plugin(name_or_cls) if isinstance(name_or_cls, str) else name_or_cls
+  base_options = {o.name: o.get_default() for o in cls.get_options()}
+  base_options.update(options)
+  missing_options = [o.name for o in cls.get_options()
+    if o.required and o.name not in base_options]
+  if missing_options:
+    raise ValueError('missing options for {!r}: {}'.format(cls, missing_options))
+  return cls(base_options)
 
 
 def write_to_disk(file):  # type: (IFileToRender)
