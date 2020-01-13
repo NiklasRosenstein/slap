@@ -52,9 +52,10 @@ class PluginContext(object):
     objects, where the plugins are created as defined in #Monorepo.project.use
     and #Package.package.use. """
 
-    for plugin in self.monorepo.project.use:
-      config = self.monorepo.plugins.get(plugin, {})
-      yield construct_plugin(plugin, config), PluginContext(self.monorepo, [])
+    if self.monorepo:
+      for plugin in self.monorepo.project.use:
+        config = self.monorepo.plugins.get(plugin, {})
+        yield construct_plugin(plugin, config), PluginContext(self.monorepo, [])
     for package in self.packages:
       for plugin in package.package.use:
         config = package.plugins.get(plugin, {})
