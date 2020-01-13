@@ -99,7 +99,7 @@ class FileToRender(object):
 
   def __init__(self, directory, name, callable, *args, **kwargs):
     super(FileToRender, self).__init__()
-    self.name = nr.fs.norm(nr.fs.join(directory, name))
+    self.name = nr.fs.norm(nr.fs.join(directory or '.', name))
     self.encoding = kwargs.pop('encoding', self.encoding)
     self._callable = callable
     self._args = args
@@ -207,7 +207,7 @@ def load_plugin(name):  # type: (str) -> Type[IPlugin]
 
 def construct_plugin(name_or_cls, options):
   cls = load_plugin(name_or_cls) if isinstance(name_or_cls, str) else name_or_cls
-  base_options = {o.name: o.get_default() for o in cls.get_options()}
+  base_options = {o.name: o.get_default() for o in cls.get_options() if not o.required}
   base_options.update(options)
   missing_options = [o.name for o in cls.get_options()
     if o.required and o.name not in base_options]
