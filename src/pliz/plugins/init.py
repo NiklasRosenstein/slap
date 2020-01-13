@@ -58,18 +58,18 @@ class InitRenderer(object):
   @override
   def get_files_to_render(self, _context):
     for source_filename in resource_walk('pliz', self._DIRECTORY):
-      filename = self._render_template(source_filename, name=self.config['name'].replace('.', '/'))
-      dest = os.path.join(self.config['in'] or self.config['name'], filename)
-      yield FileToRender(os.path.normpath(dest), self._render_file,
+      filename = self._render_template(source_filename, name=self._options['name'].replace('.', '/'))
+      dest = os.path.join(self._options['in'] or self._options['name'], filename)
+      yield FileToRender(None, os.path.normpath(dest), self._render_file,
         self._DIRECTORY + '/' + source_filename)
     # Add namespace supporting files.
     def render_namespace(_current, fp):
       fp.write("__path__ = __import__('pkgutil').extend_path(__path__, __name__)\n")
     parts = []
-    for item in self.config['name'].split('.')[:-1]:
+    for item in self._options['name'].split('.')[:-1]:
       parts.append(item)
-      dest = os.path.join(self.config['in'] or self.config['name'], 'src', *parts, '__init__.py')
-      yield FileToRender(os.path.normpath(dest), render_namespace)
+      dest = os.path.join(self._options['in'] or self._options['name'], 'src', *parts, '__init__.py')
+      yield FileToRender(None, os.path.normpath(dest), render_namespace)
 
   @override
   def perform_checks(self, context):
@@ -77,7 +77,7 @@ class InitRenderer(object):
 
   def _render_template(self, template_string, **kwargs):
     assert isinstance(template_string, str), type(template_string)
-    return jinja2.Template(template_string).render(**(kwargs or self.config))
+    return jinja2.Template(template_string).render(**(kwargs or self._options))
 
   def _render_file(self, _current, fp, filename):
     content = pkg_resources.resource_string('pliz', filename).decode()
