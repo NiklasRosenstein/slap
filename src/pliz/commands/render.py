@@ -121,6 +121,9 @@ class RenderCommand(PlizCommand):
   def execute(self, parser, args):
     super(RenderCommand, self).execute(parser, args)
 
+    if not args.plugin:
+      args.recursive = True
+
     monorepo, package = self.get_configuration()
     if package:
       context = PluginContext(None, [package])
