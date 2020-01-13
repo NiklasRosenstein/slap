@@ -223,7 +223,7 @@ def construct_plugin(name_or_cls, options):
 def write_to_disk(file):  # type: (IFileToRender)
   """ Writes an #IFileToRender to disk. """
 
-  nr.fs.makedirs(nr.fs.dir(file.name))
+  nr.fs.makedirs(nr.fs.dir(file.name) or '.')
   with nr.fs.atomic_file(file.name, text=True, encoding=file.encoding) as dst:
     if nr.fs.isfile(file.name):
       current = open(file.name, 'r', encoding=file.encoding)

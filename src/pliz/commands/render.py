@@ -104,12 +104,15 @@ class RenderCommand(PlizCommand):
     if not args.plugin:
       args.recursive = True
 
-    monorepo, package = self.get_configuration()
-    if package:
-      context = PluginContext(None, [package])
+    if args.plugin == 'init':  # TODO (@NiklasRosenstein): IPlugin interface feature
+      context = PluginContext(None, [])
     else:
-      packages = monorepo.list_packages() if args.recursive else []
-      context = PluginContext(monorepo, packages)
+      monorepo, package = self.get_configuration()
+      if package:
+        context = PluginContext(None, [package])
+      else:
+        packages = monorepo.list_packages() if args.recursive else []
+        context = PluginContext(monorepo, packages)
 
     files = []
     checks = []
