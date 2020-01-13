@@ -72,6 +72,9 @@ class CheckResult(object):
 
   def __init__(self, on, level, message):
     # type: (Union[Monorepo, Package], str, Level)
+    if isinstance(level, str):
+      level = self.Level[level]
+    assert isinstance(level, self.Level)
     self.on = on
     self.level = level
     self.message = message

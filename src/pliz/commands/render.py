@@ -24,28 +24,8 @@
 from .base import PlizCommand
 from ..core.plugins import load_plugin, construct_plugin, PluginContext, write_to_disk
 from termcolor import colored
+from nr.stream import Stream
 import os
-
-
-def _get_package_warnings(package):  # type: (Package) -> Iterable[str]
-  if not package.package.author:
-    yield 'missing ' + colored('$.package.author', attrs=['bold'])
-  if not package.package.license:
-    yield 'missing ' + colored('$.package.license', attrs=['bold'])
-  if not package.package.url:
-    yield 'missing ' +  colored('$.package.url', attrs=['bold'])
-  for check in _get_package_consistency_checks(package):
-    yield check
-
-
-def _get_package_consistency_checks(package):
-  data = package.load_entry_file_data()
-  if data.author != str(package.package.author):
-    yield 'Inconsistent package author ({!r} != {!r})'.format(
-      data.author, str(package.package.author))
-  if data.version != package.package.version:
-    yield 'Inconsistent package version ({!r} != {!r})'.format(
-      data.version, package.package.version)
 
 
 class RenderCommand(PlizCommand):
@@ -132,11 +112,22 @@ class RenderCommand(PlizCommand):
       context = PluginContext(monorepo, packages)
 
     files = []
+    checks = []
     if args.plugin:
       files.extend(args._plugin.get_files_to_render(context))
+      checks.extend(args._plugin.perform_checks(context))
     else:
       for plugin, ctx in context.iter_plugin_ctx_combinations():
         files.extend(plugin.get_files_to_render(ctx))
+        checks.extend(plugin.perform_checks(ctx))
+
+    if checks:
+      for element, checks in Stream(checks).groupby(lambda x: x.on):
+        for check in checks:
+          color = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
+          color = color[check.level.name]
+          print('{}:{}: {}'.format(element.name,
+            colored(check.level.name, color), check.message))
 
     print('Rendering {} file(s)'.format(len(files)))
     for file in files:

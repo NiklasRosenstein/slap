@@ -23,7 +23,7 @@
 plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
-from pliz.core.plugins import FileToRender, IPlugin, Options
+from pliz.core.plugins import FileToRender, IPlugin, Options, CheckResult
 from nr.interface import implements, override
 import contextlib
 import json
@@ -85,8 +85,25 @@ class SetuptoolsRenderer(object):
         if os.path.isfile(filename):
           break
       else:
-        yield CheckResult(package, CheckResult.Level.WARNING,
-          'No LICENSE file found.')
+        yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
+
+    if not package.package.author:
+      yield CheckResult(package, 'WARNING', 'missing $.package.author field')
+    if not package.package.license:
+      yield CheckResult(package, 'WARNING', 'missing $.package.license field')
+    if not package.package.url:
+      yield CheckResult(package, 'WARNING', 'missing $.package.url field')
+
+    data = package.load_entry_file_data()
+    if data.author != str(package.package.author):
+      yield CheckResult(package, 'ERROR',
+        'Inconsistent package author ({!r} != {!r})'.format(
+          data.author, str(package.package.author)))
+    if data.version != package.package.version:
+      yield CheckResult(package, 'ERROR',
+        'Inconsistent package version ({!r} != {!r})'.format(
+          data.version, package.package.version))
+
 
   BEGIN_SECTION = '# Auto-generated with Pliz. Do not edit. {'
   END_SECTION = '# }'

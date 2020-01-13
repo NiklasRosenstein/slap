@@ -37,6 +37,10 @@ class Monorepo(Struct, DeserializableFromFileMixin):
   packages = Field(CommonPackageData, default=None)
   plugins = Field(dict, default=dict)
 
+  @property
+  def name(self):
+    return self.project.name
+
   def list_packages(self):
     results = []
     for name in os.listdir(self.directory):
