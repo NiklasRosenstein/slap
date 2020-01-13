@@ -303,6 +303,10 @@ class Package(Struct):
   manifest = Field([str], default=list)
   plugins = Field(dict, default=dict)
 
+  @property
+  def name(self):
+    return self.package.name
+
   def inherit_fields(self, monorepo):  # type: (Monorepo) -> None
     if monorepo.packages:
       for key in CommonPackageData.__fields__:
