@@ -67,7 +67,7 @@ class RenderCommand(PlizCommand):
 
     plugin_cls = load_plugin(args.plugin)
     options = plugin_cls.get_options()
-    config = {o.name: o.get_default() for o in options if not o.required}
+    config = {}
     pos_args = []
 
     it = iter(argv)
@@ -77,10 +77,8 @@ class RenderCommand(PlizCommand):
       if item is None:
         break
       if not item.startswith('--'):
-        if not config:  # No options have been parsed yet.
-          pos_args.append(item)
-          continue
-        parser.error('unexpected argument {!r}'.format(item))
+        pos_args.append(item)
+        continue
       if '=' in item:
         k, v = item[2:].partition('=')[::2]
       else:
@@ -108,6 +106,10 @@ class RenderCommand(PlizCommand):
       if option.name in config:
         parser.error('duplicate argument value for option "{}"'.format(option.name))
       config[option.name] = value
+
+    base_config = {o.name: o.get_default() for o in options if not o.required}
+    base_config.update(config)
+    config = base_config
 
     # TODO (@NiklasRosenstein): If custom options are defined for this
     #   plugin in the monorepo or package, we probably want to inherit
