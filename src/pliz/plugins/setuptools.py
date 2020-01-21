@@ -23,8 +23,9 @@
 plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
-from pliz.core.plugins import FileToRender, IPlugin, Options, CheckResult
+from pliz.core.plugins import FileToRender, IPlugin, PluginContext, Options, CheckResult
 from nr.interface import implements, override
+from typing import Iterable
 import contextlib
 import json
 import os
@@ -69,6 +70,10 @@ class SetuptoolsRenderer(object):
     return Options({})
 
   @override
+  def perform_checks(self, context: PluginContext) -> Iterable[CheckResult]:
+    return; yield
+
+  @override
   def get_files_to_render(self, context):
     for package in context.packages:
       if package.manifest:
@@ -76,34 +81,6 @@ class SetuptoolsRenderer(object):
           'MANIFEST.in', self._render_manifest, package)
       yield FileToRender(package.directory,
         'setup.py', self._render_setup, package)
-
-  @override
-  def perform_checks(self, context):
-    for package in context.packages:
-      for name in ('LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'):
-        filename = os.path.join(package.directory, name)
-        if os.path.isfile(filename):
-          break
-      else:
-        yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
-
-    if not package.package.author:
-      yield CheckResult(package, 'WARNING', 'missing $.package.author field')
-    if not package.package.license:
-      yield CheckResult(package, 'WARNING', 'missing $.package.license field')
-    if not package.package.url:
-      yield CheckResult(package, 'WARNING', 'missing $.package.url field')
-
-    data = package.load_entry_file_data()
-    if data.author != str(package.package.author):
-      yield CheckResult(package, 'ERROR',
-        'Inconsistent package author ({!r} != {!r})'.format(
-          data.author, str(package.package.author)))
-    if data.version != package.package.version:
-      yield CheckResult(package, 'ERROR',
-        'Inconsistent package version ({!r} != {!r})'.format(
-          data.version, package.package.version))
-
 
   BEGIN_SECTION = '# Auto-generated with Pliz. Do not edit. {'
   END_SECTION = '# }'
@@ -181,8 +158,8 @@ class SetuptoolsRenderer(object):
       setuptools.setup(
         name = {package.name!r},
         version = version,
-        author = {package.author.name!r},
-        author_email = {package.author.email!r},
+        author = {author_name!r},
+        author_email = {author_email!r},
         description = {description!r},
         long_description = long_description,
         long_description_content_type = {long_description_content_type!r},
@@ -200,6 +177,8 @@ class SetuptoolsRenderer(object):
       )
     ''').format(
       package=package.package,
+      author_name=package.package.author.name if package.package.author else None,
+      author_email=package.package.author.email if package.package.author else None,
       description=package.package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
       long_description_content_type=readme.content_type,
       extras_require=extras_require,
