@@ -19,8 +19,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, Struct, ObjectMapper
-from nr.databind.json import JsonModule
+from nr.databind.core import Field, Struct, ObjectMapper, MutablePath
+from nr.databind.json import JsonModule, JsonStoreRemainingKeys
 import os
 import yaml
 
@@ -29,8 +29,17 @@ class DeserializableFromFileMixin(object):
 
   @classmethod
   def load(cls, filename):
+    """ Deserializes *cls* from a YAML file specified by *filename*. """
+
     with open(filename) as fp:
-      result = ObjectMapper(JsonModule).deserialize(yaml.safe_load(fp), cls, filename=filename)
+      result = ObjectMapper(JsonModule).deserialize(
+        yaml.safe_load(fp),
+        cls,
+        filename=filename,
+        decorations=[JsonStoreRemainingKeys()])
+
     if 'directory' in cls.__fields__:
       result.directory = os.path.dirname(filename)
+
+    result.unhandled_keys = list(JsonStoreRemainingKeys().iter_paths(result))
     return result

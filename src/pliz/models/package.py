@@ -28,8 +28,9 @@ from nr.databind.core import (
   Struct,
   SerializationValueError,
   SerializationTypeError,
-  Mixin)
+  MixinDecoration)
 from nr.databind.json import JsonDeserializer
+from typing import List
 import ast
 import collections
 import copy
@@ -292,11 +293,10 @@ class PackageData(CommonPackageData):
 
 
 class Package(Struct):
-  Mixin('tuple', DeserializableFromFileMixin)
+  MixinDecoration(DeserializableFromFileMixin)
 
-  directory = Field(str, default=None)
+  directory = Field(str, default=None, hidden=True)
   package = Field(PackageData)
-
   requirements = Field(RootRequirements, default=RootRequirements)
   entrypoints = Field({"value_type": [str]}, default=dict)
   datafiles = Field([Datafile], default=list)
@@ -349,3 +349,11 @@ class Package(Struct):
         author = '<Non-literal expression>'
 
     return EntryFileData(author, version)
+
+  def get_used_plugins(self) -> List[str]:
+    plugins = list(self.package.use)
+    if not plugins:
+      plugins = ['setuptools']
+    if 'core' not in plugins:
+      plugins.append('core')
+    return plugins

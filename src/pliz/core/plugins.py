@@ -53,11 +53,11 @@ class PluginContext(object):
     and #Package.package.use. """
 
     if self.monorepo:
-      for plugin in self.monorepo.project.use:
+      for plugin in self.monorepo.get_used_plugins():
         config = self.monorepo.plugins.get(plugin, {})
         yield construct_plugin(plugin, config), PluginContext(self.monorepo, [])
     for package in self.packages:
-      for plugin in package.package.use:
+      for plugin in package.get_used_plugins():
         config = package.plugins.get(plugin, {})
         yield construct_plugin(plugin, config), PluginContext(None, [package])
 

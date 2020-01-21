@@ -22,6 +22,7 @@
 from .base import DeserializableFromFileMixin
 from .package import CommonPackageData, Package
 from nr.databind.core import Field, Struct
+from typing import List
 import os
 
 
@@ -50,3 +51,11 @@ class Monorepo(Struct, DeserializableFromFileMixin):
         package.inherit_fields(self)
         results.append(package)
     return results
+
+  def get_used_plugins(self) -> List[str]:
+    plugins = list(self.packages.use)
+    if not plugins:
+      plugins = ['setuptools']
+    if 'core' not in plugins:
+      plugins.append('core')
+    return plugins

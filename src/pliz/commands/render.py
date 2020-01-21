@@ -126,11 +126,18 @@ class RenderCommand(PlizCommand):
 
     if checks:
       for element, checks in Stream(checks).groupby(lambda x: x.on):
+        checks = list(checks)
+        print(
+          len(checks),
+          'check(s) triggered for',
+          colored(element.name, 'blue', attrs=['bold']),
+          '({})'.format(element.directory))
         for check in checks:
           color = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
           color = color[check.level.name]
-          print('{}:{}: {}'.format(element.name,
-            colored(check.level.name, color), check.message))
+          print('  {}: {}'.format(colored(check.level.name, color),
+            check.message))
+      print()
 
     print('Rendering {} file(s)'.format(len(files)))
     for file in files:
