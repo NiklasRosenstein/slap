@@ -13,6 +13,7 @@ use:
 requirements:
   - python ^2.7|^3.4
   - beautifulsoup4 ^4.8.1
+  - jinja2 ^2.11.1
   - nr.databind ^0.0.1
   - nr.fs ^1.5.0
   - nr.proxy ^0.0.1
@@ -24,7 +25,7 @@ entrypoints:
   console_scripts:
     - shore = shore.__main__:_entry_main
   shore.core.plugins:
-    - core = shore.plugins.coreplugin:CorePlugin
+    - core = shore.plugins.core:CorePlugin
     - devinstallscript = shore.plugins.devinstallscript:DevInstallScriptRenderer
     - init = shore.plugins.init:InitRenderer
     - setuptools = shore.plugins.setuptools:SetuptoolsRenderer
