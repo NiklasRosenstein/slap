@@ -29,8 +29,7 @@ perform several types of actions.
 
 from nr.collections import abc
 from nr.commons.notset import NotSet
-from nr.interface import Interface, attr, default, implements, override
-from shore.models import Monorepo, Package
+from nr.interface import Interface, attr, default, implements, override, staticattr
 from pkg_resources import iter_entry_points
 from typing import Iterable
 import enum
@@ -38,29 +37,6 @@ import nr.fs
 
 _PLUGINS_ENTRYPOINT = 'shore.core.plugins'
 assert _PLUGINS_ENTRYPOINT == __name__
-
-
-class PluginContext(object):
-  """ Contextual data for plugin execution. """
-
-  def __init__(self, monorepo, packages):
-    # type: (Optional[Monorepo], List[Packages])
-    self.monorepo = monorepo
-    self.packages = packages
-
-  def iter_plugin_ctx_combinations(self):
-    """ Returns a generator yielding pairs of #IPlugin and #PluginContext
-    objects, where the plugins are created as defined in #Monorepo.project.use
-    and #Package.package.use. """
-
-    if self.monorepo:
-      for plugin in self.monorepo.get_used_plugins():
-        config = self.monorepo.plugins.get(plugin, {})
-        yield construct_plugin(plugin, config), PluginContext(self.monorepo, [])
-    for package in self.packages:
-      for plugin in package.get_used_plugins():
-        config = package.plugins.get(plugin, {})
-        yield construct_plugin(plugin, config), PluginContext(None, [package])
 
 
 class CheckResult(object):
@@ -119,93 +95,58 @@ class FileToRender(object):
     return self._callable(current, dst, *self._args, *self._kwargs)
 
 
-class Option(object):
+class IBasePlugin(Interface):
+  """ Interface for plugins. """
 
-  def __init__(self, name=None, default=NotSet):
-    self.name = name
-    self.default = default
-
-  def __repr__(self):
-    return 'Option(name={!r}, default={!r})'.format(self.name, self.default)
-
-  @property
-  def required(self):
-    return self.default is NotSet
-
-  def get_default(self):
-    if self.default is NotSet:
-      raise RuntimeError('{!r} no default set'.format(self.name))
-    if callable(self.default):
-      return self.default()
-    return self.default
-
-
-class Options(object):
-
-  def __init__(self, options):  # type: (Union[List[Option], Dict[str, Option]])
-    if isinstance(options, abc.Mapping):
-      for key, value in options.items():
-        assert value.name is None or value.name == key, (key, value)
-        value.name = key
-      options = dict(options.items())
-    else:
-      options = {v.name: v for v in options}
-    self._options = options
-
-  def __getitem__(self, name):
-    return self._options[name]
-
-  def __setitem__(self, name, option):
-    assert isinstance(name, str), repr(name)
-    assert isinstance(option, Option), repr(option)
-    assert option.name is None or option.name == name, (name, option)
-    option.name = name
-    self._options[name] = option
-
-  def __iter__(self):
-    return iter(self._options.values())
-
-  def __len__(self):
-    return len(self._options)
-
-  def __repr__(self):
-    return 'Options({})'.format(self._options)
-
-
-class IPlugin(Interface):
-  """ Interface for plugins. Plugins must be constructible with an options
-  dictionary as an argument. """
+  ConfigClass = staticattr(None)
+  config = attr(default=None)
 
   @default
   @classmethod
-  def get_options(cls) -> Options:
-    """ Returns #Options for this plugin. """
+  def new_instance(cls, config: 'ConfigClass') -> 'IBasePlugin':
+    """ Create a new instance of the plugin. The default implementation
+    assumes that the constructor does not accept any arguments and the
+    #config member is set after construction. """
 
-    return Options()
+    if cls.ConfigClass is None and config is not None:
+      raise ValueError('{} does not expect a config, got {}'.format(
+        cls.__name__, type(config).__name__))
+    elif cls.ConfigClass and not isinstance(config, cls.ConfigClass):
+      raise ValueError('{} expects a config of type {}, got {}'.format(
+        cls.__name__, cls.ConfigClass.__name__, type(config).__name__))
 
-  @default
-  def get_files_to_render(self, context: PluginContext) -> Iterable[IFileToRender]:
-    """ Given a monorepo and/or a list of packages, the plugin shall return
-    an iterable of #IFileToRender objects that represent the files to be
-    rendered by this plugin. """
+    instance = cls()
+    instance.config = config
+    return instance
 
-    return; yield
 
-  @default
-  def perform_checks(self, context: PluginContext) -> Iterable[IFileToRender]:
-    # type: (PluginContext) -> Iterable[CheckResult]
-    """ Perform checks on the data given via the context. """
+class IPackagePlugin(IBasePlugin):
+  """ A plugin that can be used with packages to render files. """
 
-    return; yield
+  def get_package_files(self, package: 'Package') -> Iterable[IFileToRender]:
+    pass
+
+  def check_package(self, package: 'Package') -> Iterable[CheckResult]:
+    pass
+
+
+class IMonorepoPlugin(IBasePlugin):
+  """ A plugin that can be used with monorepos. """
+
+  def get_monorepo_files(self, package: 'Monorepo') -> Iterable[IFileToRender]:
+    pass
+
+  def check_monorepo(self, package: 'Monorepo') -> Iterable[CheckResult]:
+    pass
 
 
 class PluginNotFound(Exception):
   pass
 
 
-def load_plugin(name):  # type: (str) -> Type[IPlugin]
+def load_plugin(name):  # type: (str) -> Type[IBasePlugin]
   """ Loads a plugin by its entrypoint name. Returns the class that implements
-  the #IPlugin interface. Raises a #PluginNotFound exception if *name* does
+  the #IBasePlugin interface. Raises a #PluginNotFound exception if *name* does
   not describe a known plugin implementation. """
 
   for ep in iter_entry_points(_PLUGINS_ENTRYPOINT, name):
@@ -214,7 +155,7 @@ def load_plugin(name):  # type: (str) -> Type[IPlugin]
   else:
     raise PluginNotFound(name)
 
-  assert IPlugin.implemented_by(cls), (name, cls)
+  assert IBasePlugin.implemented_by(cls), (name, cls)
   return cls
 
 

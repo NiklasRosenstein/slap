@@ -82,7 +82,7 @@ class SetuptoolsRenderer(object):
       yield FileToRender(package.directory,
         'setup.py', self._render_setup, package)
 
-  BEGIN_SECTION = '# Auto-generated with Pliz. Do not edit. {'
+  BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
   END_SECTION = '# }'
 
   ENTRYPOINT_VARS = {
@@ -105,8 +105,8 @@ class SetuptoolsRenderer(object):
       import sys
     '''))
 
-    # Write the hepler that extracts the version number from the entry file.
-    entry_file = package.package.entry_file or package.get_default_entry_file()
+    # Write the helper that extracts the version number from the entry file.
+    entry_file = package.get_default_entry_file()
     fp.write(textwrap.dedent('''
       with io.open({entrypoint_file!r}, encoding='utf8') as fp:
         version = re.search(r"__version__\s*=\s*'(.*)'", fp.read()).group(1)

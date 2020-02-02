@@ -111,7 +111,7 @@ class RenderCommand(PlizCommand):
       if package:
         context = PluginContext(None, [package])
       else:
-        packages = monorepo.list_packages() if args.recursive else []
+        packages = monorepo.get_packages() if args.recursive else []
         context = PluginContext(monorepo, packages)
 
     files = []

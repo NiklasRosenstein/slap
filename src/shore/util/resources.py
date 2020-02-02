@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-# Copyright (c) 2019 Niklas Rosenstein
+# Copyright (c) 2020 Niklas Rosenstein
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -19,27 +19,18 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, Struct, ObjectMapper, MutablePath
-from nr.databind.json import JsonModule, JsonStoreRemainingKeys
-import os
-import yaml
+import pkg_resources
+import posixpath
 
 
-class DeserializableFromFileMixin(object):
+def walk_package_resources(module, directory, _joinwith=''):
+  """ Walks the package resources of *module* inside *directory*. Raises
+  #NotADirectoryError if *directory* is not a directory. """
 
-  @classmethod
-  def load(cls, filename):
-    """ Deserializes *cls* from a YAML file specified by *filename*. """
-
-    with open(filename) as fp:
-      result = ObjectMapper(JsonModule).deserialize(
-        yaml.safe_load(fp),
-        cls,
-        filename=filename,
-        decorations=[JsonStoreRemainingKeys()])
-
-    if 'directory' in cls.__fields__:
-      result.directory = os.path.dirname(filename)
-
-    result.unhandled_keys = list(JsonStoreRemainingKeys().iter_paths(result))
-    return result
+  for name in pkg_resources.resource_listdir(module, directory):
+    relative_path = posixpath.join(_joinwith, name)
+    try:
+      yield from walk_package_resources(module, directory + '/' + name,
+                                        relative_path)
+    except NotADirectoryError:
+      yield relative_path
