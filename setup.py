@@ -37,7 +37,6 @@ setuptools.setup(
     'shore.core.plugins': [
       'core = shore.plugins.core:CorePlugin',
       'devinstallscript = shore.plugins.devinstallscript:DevInstallScriptRenderer',
-      'init = shore.plugins.init:InitRenderer',
       'setuptools = shore.plugins.setuptools:SetuptoolsRenderer',
     ]
   }
