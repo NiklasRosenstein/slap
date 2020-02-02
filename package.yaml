@@ -1,13 +1,14 @@
-package:
-  name: shore
-  version: 0.1.0
-  license: MIT
-  url: https://git.niklasrosenstein.com/NiklasRosenstein/shore
-  description: |
-    Automates the heavy lifting of release and distribution management
-    for pure Python packages.
-  author: Niklas Rosenstein <rosensteinniklas@gmail.com>
-  use: [setuptools]
+name: shore
+version: 0.1.0
+license: MIT
+url: https://git.niklasrosenstein.com/NiklasRosenstein/shore
+description: |
+  Automates the heavy lifting of release and distribution management
+  for pure Python packages.
+author: Niklas Rosenstein <rosensteinniklas@gmail.com>
+
+use:
+  - setuptools
 
 requirements:
   - python ^2.7|^3.4
@@ -21,7 +22,7 @@ requirements:
 
 entrypoints:
   console_scripts:
-    - shore = shore.__main__:console_main
+    - shore = shore.__main__:_entry_main
   shore.core.plugins:
     - core = shore.plugins.coreplugin:CorePlugin
     - devinstallscript = shore.plugins.devinstallscript:DevInstallScriptRenderer

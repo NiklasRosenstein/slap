@@ -47,7 +47,7 @@ class DevInstallScriptRenderer(object):
 
     # Collect packages and their dependencies for this monorepo.
     nodes = {}
-    packages = context.monorepo.list_packages()
+    packages = context.monorepo.get_packages()
     for package in packages:
       nodes[package.package.name] = {
         'directory': os.path.basename(package.directory),

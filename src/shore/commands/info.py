@@ -35,7 +35,7 @@ class InfoCommand(PlizCommand):
       if monorepo.project.version:
         display += colored('@v' + monorepo.project.version, 'magenta')
       print(display + '/')
-      for child in monorepo.list_packages():
+      for child in monorepo.get_packages():
         self._display_package(child, full=package==child, indent=2)
     elif package:
       self._display_package(package)

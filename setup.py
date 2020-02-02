@@ -32,7 +32,7 @@ setuptools.setup(
   data_files = [],
   entry_points = {
     'console_scripts': [
-      'shore = shore.__main__:console_main',
+      'shore = shore.__main__:_entry_main',
     ],
     'shore.core.plugins': [
       'core = shore.plugins.coreplugin:CorePlugin',
