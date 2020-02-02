@@ -27,6 +27,7 @@ from shore.core.plugins import (
   write_to_disk)
 from shore.util.resources import walk_package_resources
 from shore.model import Monorepo, ObjectCache, Package
+from termcolor import colored
 from typing import Iterable, Union
 import argparse
 import jinja2
@@ -176,11 +177,20 @@ def _check(parser, args):
       check_results.append(plugin.plugin.check_package(subject))
     else:
       logger.debug('skipping plugin {}'.format(plugin.name))
+  colors = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
+  status = 0
   check_result = None
   for check_result in Stream.concat(check_results):
-    logger.info('%s: %s', check_result.level.name, check_result.message)
+    level = colored(check_result.level.name, colors[check_result.level.name])
+    print('{}: {}'.format(level, check_result.message))
+    if check_result.level == check_result.Level.ERROR or (
+        args.treat_warnings_as_errors and
+        check_result.level == check_result.Level.WARNING):
+      status = 1
   if not check_result:
     logger.info('looking good 👌')
+  logger.debug('exiting with status %s', status)
+  return status
 
 
 _entry_main = lambda: sys.exit(main())
