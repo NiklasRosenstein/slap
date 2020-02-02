@@ -29,9 +29,10 @@ perform several types of actions.
 
 from nr.collections import abc
 from nr.commons.notset import NotSet
-from nr.interface import Interface, attr, implements, override
+from nr.interface import Interface, attr, default, implements, override
 from pliz.models import Monorepo, Package
 from pkg_resources import iter_entry_points
+from typing import Iterable
 import enum
 import nr.fs
 
@@ -175,19 +176,27 @@ class IPlugin(Interface):
   """ Interface for plugins. Plugins must be constructible with an options
   dictionary as an argument. """
 
+  @default
   @classmethod
-  def get_options(cls):  # type: () -> Options
+  def get_options(cls) -> Options:
     """ Returns #Options for this plugin. """
 
-  def get_files_to_render(self, context):
-    # type: (PluginContext) -> Iterable[IFileToRender]
+    return Options()
+
+  @default
+  def get_files_to_render(self, context: PluginContext) -> Iterable[IFileToRender]:
     """ Given a monorepo and/or a list of packages, the plugin shall return
     an iterable of #IFileToRender objects that represent the files to be
     rendered by this plugin. """
 
-  def perform_checks(self, context):
+    return; yield
+
+  @default
+  def perform_checks(self, context: PluginContext) -> Iterable[IFileToRender]:
     # type: (PluginContext) -> Iterable[CheckResult]
     """ Perform checks on the data given via the context. """
+
+    return; yield
 
 
 class PluginNotFound(Exception):
