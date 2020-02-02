@@ -30,13 +30,13 @@ perform several types of actions.
 from nr.collections import abc
 from nr.commons.notset import NotSet
 from nr.interface import Interface, attr, default, implements, override
-from pliz.models import Monorepo, Package
+from shore.models import Monorepo, Package
 from pkg_resources import iter_entry_points
 from typing import Iterable
 import enum
 import nr.fs
 
-_PLUGINS_ENTRYPOINT = 'pliz.core.plugins'
+_PLUGINS_ENTRYPOINT = 'shore.core.plugins'
 assert _PLUGINS_ENTRYPOINT == __name__
 
 

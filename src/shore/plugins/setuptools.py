@@ -23,7 +23,7 @@
 plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
-from pliz.core.plugins import FileToRender, IPlugin, PluginContext, Options, CheckResult
+from shore.core.plugins import FileToRender, IPlugin, PluginContext, Options, CheckResult
 from nr.interface import implements, override
 from typing import Iterable
 import contextlib
