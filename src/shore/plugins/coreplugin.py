@@ -19,52 +19,48 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.core.plugins import CheckResult, IPlugin, PluginContext
-from nr.interface import implements
+from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin
+from shore.model import BaseObject, Monorepo, Package
+from nr.interface import implements, override
 from typing import Iterable
 import os
 
 
-@implements(IPlugin)
+@implements(IPackagePlugin)
 class CorePlugin:
 
-  def __init__(self, options):
-    pass
+  def _unhandled_keys(self, object: BaseObject) -> Iterable[CheckResult]:
+    for path in object.unhandled_keys:
+      yield CheckResult(item, CheckResult.Level.WARNING, 'unknown key {}'.format(path))
 
-  @classmethod
-  def get_options(self):
-    return; yield
+  @override
+  def check_package(self, package: Package) -> Iterable[CheckResult]:
+    yield from self._unhandled_keys(package)
 
-  def perform_checks(self, context: PluginContext) -> Iterable[CheckResult]:
-    items = list(filter(bool, [context.monorepo] + context.packages))
-    for item in items:
-      for path in item.unhandled_keys:
-        yield CheckResult(item, CheckResult.Level.WARNING, 'unknown key {}'.format(path))
+    for name in ('LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'):
+      filename = os.path.join(package.directory, name)
+      if os.path.isfile(filename):
+        break
+    else:
+      yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
 
-    for package in context.packages:
-      for name in ('LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'):
-        filename = os.path.join(package.directory, name)
-        if os.path.isfile(filename):
-          break
-      else:
-        yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
+    if not package.author:
+      yield CheckResult(package, 'WARNING', 'missing $.author')
+    if not package.license:
+      yield CheckResult(package, 'WARNING', 'missing $.license')
+    if not package.url:
+      yield CheckResult(package, 'WARNING', 'missing $.url')
 
-    if not package.package.author:
-      yield CheckResult(package, 'WARNING', 'missing $.package.author')
-    if not package.package.license:
-      yield CheckResult(package, 'WARNING', 'missing $.package.license')
-    if not package.package.url:
-      yield CheckResult(package, 'WARNING', 'missing $.package.url')
-
-    data = package.load_entry_file_data()
-    if package.package.author and data.author != str(package.package.author):
+    data = package.get_entry_metadata()
+    if package.author and data.author != str(package.author):
       yield CheckResult(package, 'ERROR',
         'Inconsistent package author ({!r} != {!r})'.format(
-          data.author, str(package.package.author)))
-    if package.package.version and data.version != package.package.version:
+          data.author, str(package.author)))
+    if package.version and data.version != package.version:
       yield CheckResult(package, 'ERROR',
         'Inconsistent package version ({!r} != {!r})'.format(
-          data.version, package.package.version))
+          data.version, package.version))
 
-  def get_files_to_render(self, context):
+  @override
+  def get_package_files(self, package: Package) -> Iterable[FileToRender]:
     return; yield

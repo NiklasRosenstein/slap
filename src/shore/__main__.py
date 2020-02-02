@@ -19,19 +19,42 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.core.plugins import FileToRender, write_to_disk
+from nr.stream import Stream
+from shore.core.plugins import (
+  FileToRender,
+  IMonorepoPlugin,
+  IPackagePlugin,
+  write_to_disk)
 from shore.util.resources import walk_package_resources
-from typing import Iterable
+from shore.model import Monorepo, ObjectCache, Package
+from typing import Iterable, Union
 import argparse
 import jinja2
+import logging
 import os
 import pkg_resources
 import sys
+
+_cache = ObjectCache()
+logger = logging.getLogger(__name__)
+
+
+def _load_subject() -> Union[Monorepo, Package, None]:
+  package, monorepo = None, None
+  if os.path.isfile('package.yaml'):
+    package = Package.load('package.yaml', _cache)
+  if os.path.isfile('monorepo.yaml'):
+    monorepo = Monorepo.load('package.yaml', _cache)
+  if package and monorepo:
+    raise RuntimeError('found package.yaml and monorepo.yaml in the same '
+      'directory')
+  return package or monorepo
 
 
 def get_argument_parser(prog=None):
   parser = argparse.ArgumentParser(prog=prog)
   parser.add_argument('-C', '--change-directory', metavar='DIR')
+  parser.add_argument('-v', '--verbose', action='store_true')
   subparser = parser.add_subparsers(dest='command')
 
   new = subparser.add_parser('new')
@@ -72,6 +95,10 @@ def main(argv=None, prog=None):
   if not args.command:
     parser.print_usage()
     return 0
+
+  logging.basicConfig(
+    format='[%(levelname)s:%(name)s]: %(message)s' if args.verbose else '%(message)s',
+    level=logging.DEBUG if args.verbose else logging.INFO)
 
   if args.command in ('build', 'publish'):
     # Convert relative to absolute paths before changing directory.
@@ -131,8 +158,29 @@ def _new(parser, args):
     # TODO (@NiklasRosenstein): Render the license file if it does not exist.
 
   for file in _get_files():
-    print(file.name)
+    logger.info(file.name)
     write_to_disk(file)
+
+
+def _check(parser, args):
+  subject = _load_subject()
+  if not subject:
+    parser.error('no package.yaml or monorepo.yaml in current directory')
+  check_results = []
+  for plugin in subject.get_plugins():
+    if isinstance(subject, Monorepo) and plugin.is_monorepo_plugin:
+      logger.debug('getting check results from plugin {}'.format(plugin.name))
+      check_results.append(plugin.plugin.check_monorepo(subject))
+    elif isinstance(subject, Package) and plugin.is_package_plugin:
+      logger.debug('getting check results from plugin {}'.format(plugin.name))
+      check_results.append(plugin.plugin.check_package(subject))
+    else:
+      logger.debug('skipping plugin {}'.format(plugin.name))
+  check_result = None
+  for check_result in Stream.concat(check_results):
+    logger.info('%s: %s', check_result.level.name, check_result.message)
+  if not check_result:
+    logger.info('looking good 👌')
 
 
 _entry_main = lambda: sys.exit(main())
