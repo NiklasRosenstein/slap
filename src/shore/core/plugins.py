@@ -98,22 +98,22 @@ class FileToRender(object):
 class IBasePlugin(Interface):
   """ Interface for plugins. """
 
-  ConfigClass = staticattr(None)
+  Config = staticattr(None)
   config = attr(default=None)
 
   @default
   @classmethod
-  def new_instance(cls, config: 'ConfigClass') -> 'IBasePlugin':
+  def new_instance(cls, config: 'Config') -> 'IBasePlugin':
     """ Create a new instance of the plugin. The default implementation
     assumes that the constructor does not accept any arguments and the
     #config member is set after construction. """
 
-    if cls.ConfigClass is None and config is not None:
+    if cls.Config is None and config is not None:
       raise ValueError('{} does not expect a config, got {}'.format(
         cls.__name__, type(config).__name__))
-    elif cls.ConfigClass and not isinstance(config, cls.ConfigClass):
+    elif cls.Config and not isinstance(config, cls.Config):
       raise ValueError('{} expects a config of type {}, got {}'.format(
-        cls.__name__, cls.ConfigClass.__name__, type(config).__name__))
+        cls.__name__, cls.Config.__name__, type(config).__name__))
 
     instance = cls()
     instance.config = config

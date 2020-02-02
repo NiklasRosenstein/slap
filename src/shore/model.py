@@ -23,16 +23,22 @@ from nr.commons.py import classdef
 from nr.databind.core import (
   Collection,
   Field,
+  MutablePath,
+  MixinDecoration,
   ObjectMapper,
   Struct,
   SerializationValueError,
   SerializationTypeError,
-  MutablePath,
-  MixinDecoration)
+  translate_type_def)
 from nr.databind.json import JsonDeserializer, JsonModule, JsonStoreRemainingKeys
-from typing import List, Type
-from shore.core.plugins import IBasePlugin, IPackagePlugin, IMonorepoPlugin, load_plugin
+from shore.core.plugins import (
+  IBasePlugin,
+  IPackagePlugin,
+  IMonorepoPlugin,
+  load_plugin,
+  PluginNotFound)
 from shore.util.ast import load_module_members
+from typing import Any, Callable, Iterable, Optional, List, Type
 import ast
 import collections
 import copy
@@ -281,7 +287,7 @@ class Datafile(Struct):
 
 class PluginConfig(Struct):
   name = Field(str)
-  plugin = Field(IPlugin)
+  plugin = Field(IBasePlugin)
 
   @property
   def is_package_plugin(self) -> bool:
@@ -306,7 +312,16 @@ class PluginConfig(Struct):
       plugin_cls = load_plugin(plugin_name)
     except PluginNotFound as exc:
       raise SerializationValueError(location, str(exc))
-    config = context.deserialize(config, translate_type_def(plugin_cls.Config), plugin_name)
+    if plugin_cls.Config is not None:
+      config = context.deserialize(
+        config,
+        translate_type_def(plugin_cls.Config),
+        plugin_name)
+    elif plugin_cls.Config is None and config:
+      raise SerializationTypeError(location,
+        'plugin {} expects no configuration'.format(plugin_name))
+    else:
+      config = None
     return PluginConfig(plugin_name, plugin_cls.new_instance(config))
 
 
@@ -357,7 +372,7 @@ class BaseObject(Struct):
 
   @property
   def directory(self) -> str:
-    return os.path.dirname(filename)
+    return os.path.dirname(self.filename)
 
   def has_plugin(self, plugin_name: str) -> bool:
     return any(x.name == plugin_name for x in self.use)
@@ -381,7 +396,7 @@ class BaseObject(Struct):
           filename=filename,
           decorations=[JsonStoreRemainingKeys()])
       obj.filename = filename
-      obj.unhandled_keys = list(JsonStoreRemainingKeys().iter_paths(result))
+      obj.unhandled_keys = list(JsonStoreRemainingKeys().iter_paths(obj))
       obj.on_load_hook(loader)
       return obj
 
@@ -391,6 +406,25 @@ class BaseObject(Struct):
     """ Called after the object was loaded with #load(). """
 
     pass
+
+
+class Monorepo(BaseObject):
+  #: Overrides the version field as it's optional for monorepos.
+  version = Field(str, default=None)
+
+  #: The data in this field propagates to the packages that are inside this
+  #: mono repository.
+  packages = Field(CommonPackageData, default=None)
+
+  def get_packages(self, cache: ObjectCache) -> Iterable['Package']:
+    """ Loads the packages for this mono repository. """
+
+    for name in os.listdir(self.directory):
+      path = os.path.join(self.directory, name, 'package.yaml')
+      if os.path.isfile(path):
+        package = Package.load(path, cache)
+        assert package.monorepo is self, "woah hold up"
+        yield package
 
 
 class Package(BaseObject, CommonPackageData):
@@ -474,7 +508,7 @@ class Package(BaseObject, CommonPackageData):
     belongs to this package and load it. If there is a Monorepo, the package
     will inherit some of the fields defined in #Monorepo.packages. """
 
-    monorepo_fn = os.path.join(os.path.directory(self.directory), 'monorepo.yaml')
+    monorepo_fn = os.path.join(os.path.dirname(self.directory), 'monorepo.yaml')
     if os.path.isfile(monorepo_fn):
       self.monorepo = Monorepo.load(loader)
 
@@ -500,7 +534,7 @@ class Package(BaseObject, CommonPackageData):
     variables defined in the file. """
 
     # Load the package/version data from the entry file.
-    entry_file = self.get_default_entry_file()
+    entry_file = self.get_entry_file()
     members = load_module_members(os.path.join(self.directory, entry_file))
 
     author = None
@@ -518,23 +552,4 @@ class Package(BaseObject, CommonPackageData):
       except ValueError as exc:
         author = '<Non-literal expression>'
 
-    return EntryFileData(author, version)
-
-
-class Monorepo(BaseObject):
-  #: Overrides the version field as it's optional for monorepos.
-  version = Field(str, default=None)
-
-  #: The data in this field propagates to the packages that are inside this
-  #: mono repository.
-  packages = Field(CommonPackageData, default=None)
-
-  def get_packages(self, cache: ObjectCache) -> Iterable[Package]:
-    """ Loads the packages for this mono repository. """
-
-    for name in os.listdir(self.directory):
-      path = os.path.join(self.directory, name, 'package.yaml')
-      if os.path.isfile(path):
-        package = Package.load(path, cache)
-        assert package.monorepo is self, "woah hold up"
-        yield package
+    return self.EntryMetadata(author, version)

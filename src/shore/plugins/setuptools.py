@@ -23,7 +23,8 @@
 plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
-from shore.core.plugins import FileToRender, IPlugin, PluginContext, Options, CheckResult
+from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin
+from shore.model import Package
 from nr.interface import implements, override
 from typing import Iterable
 import contextlib
@@ -58,29 +59,21 @@ def rewrite_section(fp, data, begin_marker, end_marker):
   fp.write(suffix)
 
 
-@implements(IPlugin)
+@implements(IPackagePlugin)
 class SetuptoolsRenderer(object):
 
-  def __init__(self, options):
-    pass
-
   @override
-  @classmethod
-  def get_options(cls):
-    return Options({})
-
-  @override
-  def perform_checks(self, context: PluginContext) -> Iterable[CheckResult]:
-    return; yield
-
-  @override
-  def get_files_to_render(self, context):
+  def get_package_files(self, package: Package) -> Iterable[FileToRender]:
     for package in context.packages:
       if package.manifest:
         yield FileToRender(package.directory,
           'MANIFEST.in', self._render_manifest, package)
       yield FileToRender(package.directory,
         'setup.py', self._render_setup, package)
+
+  @override
+  def check_package(self, package: Package) -> Iterable[CheckResult]:
+    return; yield
 
   BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
   END_SECTION = '# }'
