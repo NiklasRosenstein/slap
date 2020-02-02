@@ -1,8 +1,8 @@
 package:
-  name: pliz
+  name: shore
   version: 0.1.0
   license: MIT
-  url: https://git.niklasrosenstein.com/NiklasRosenstein/pliz
+  url: https://git.niklasrosenstein.com/NiklasRosenstein/shore
   description: |
     Automates the heavy lifting of release and distribution management
     for pure Python packages.
@@ -21,9 +21,9 @@ requirements:
 
 entrypoints:
   console_scripts:
-    - pliz = pliz.__main__:console_main
-  pliz.core.plugins:
-    - core = pliz.plugins.coreplugin:CorePlugin
-    - devinstallscript = pliz.plugins.devinstallscript:DevInstallScriptRenderer
-    - init = pliz.plugins.init:InitRenderer
-    - setuptools = pliz.plugins.setuptools:SetuptoolsRenderer
+    - shore = shore.__main__:console_main
+  shore.core.plugins:
+    - core = shore.plugins.coreplugin:CorePlugin
+    - devinstallscript = shore.plugins.devinstallscript:DevInstallScriptRenderer
+    - init = shore.plugins.init:InitRenderer
+    - setuptools = shore.plugins.setuptools:SetuptoolsRenderer

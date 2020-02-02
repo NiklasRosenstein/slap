@@ -35,7 +35,7 @@ commands = CommandList([
 
 def main(argv=None, prog=None):
   if prog is None and __name__ == '__main__':
-    prog = 'pliz'
+    prog = 'shore'
   parser = argparse.ArgumentParser(prog=prog)
   commands.update_parser(parser)
   args, argv = parser.parse_known_args()

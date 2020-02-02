@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from pliz.core.plugins import FileToRender, IPlugin, Options, Option
+from shore.core.plugins import FileToRender, IPlugin, Options, Option
 from nr.commons.algo.graph import toposort
 from nr.interface import implements, override
 import os

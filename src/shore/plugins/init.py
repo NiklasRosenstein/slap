@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from pliz.core.plugins import FileToRender, IPlugin, Options, Option
+from shore.core.plugins import FileToRender, IPlugin, Options, Option
 from nr.interface import implements, override
 import jinja2
 import os
@@ -57,7 +57,7 @@ class InitRenderer(object):
 
   @override
   def get_files_to_render(self, _context):
-    for source_filename in resource_walk('pliz', self._DIRECTORY):
+    for source_filename in resource_walk('shore', self._DIRECTORY):
       filename = self._render_template(source_filename, name=self._options['name'].replace('.', '/'))
       dest = os.path.join(self._options['in'] or self._options['name'], filename)
       yield FileToRender(None, os.path.normpath(dest), self._render_file,
@@ -80,5 +80,5 @@ class InitRenderer(object):
     return jinja2.Template(template_string).render(**(kwargs or self._options))
 
   def _render_file(self, _current, fp, filename):
-    content = pkg_resources.resource_string('pliz', filename).decode()
+    content = pkg_resources.resource_string('shore', filename).decode()
     fp.write(self._render_template(content))
