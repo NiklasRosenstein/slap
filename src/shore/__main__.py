@@ -21,6 +21,7 @@
 
 from nr.stream import Stream
 from shore.core.plugins import (
+  CheckResult,
   FileToRender,
   IMonorepoPlugin,
   IPackagePlugin,
@@ -28,7 +29,7 @@ from shore.core.plugins import (
 from shore.util.resources import walk_package_resources
 from shore.model import Monorepo, ObjectCache, Package
 from termcolor import colored
-from typing import Iterable, Union
+from typing import Iterable, Optional, Union
 import argparse
 import jinja2
 import logging
@@ -57,7 +58,7 @@ def _load_subject(parser) -> Union[Monorepo, Package, None]:
   if os.path.isfile('package.yaml'):
     package = Package.load('package.yaml', _cache)
   if os.path.isfile('monorepo.yaml'):
-    monorepo = Monorepo.load('package.yaml', _cache)
+    monorepo = Monorepo.load('monorepo.yaml', _cache)
   if package and monorepo:
     raise RuntimeError('found package.yaml and monorepo.yaml in the same '
       'directory')
@@ -93,6 +94,8 @@ def get_argument_parser(prog=None):
   bump.add_argument('--dry', action='store_true')
 
   update = subparser.add_parser('update')
+  update.add_argument('--skip-checks', action='store_true')
+  update.add_argument('--all', action='store_true')
   update.add_argument('--dry', action='store_true')
 
   build = subparser.add_parser('build')
@@ -186,37 +189,58 @@ def _new(parser, args):
     write_to_disk(file)
 
 
-def _check(parser, args):
-  subject = _load_subject(parser)
+def _checks_for(subject: Union[Package, Monorepo]) -> Optional[CheckResult.Level]:
   checks = []
   for plugin in subject.get_plugins():
     checks.extend(plugin.get_checks(subject))
   colors = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
-  status = 0
   for check in checks:
     level = colored(check.level.name, colors[check.level.name])
     print('{}: {}'.format(level, check.message))
-    if check.level == check.Level.ERROR or (
-        args.treat_warnings_as_errors and
-        check.level == check.Level.WARNING):
-      status = 1
-  if not checks:
+  return max(x.level for x in checks) if checks else None
+
+
+def _check(parser, args):
+  subject = _load_subject(parser)
+  max_level = _checks_for(subject)
+  if max_level is None or max_level == CheckResult.Level.INFO:
     logger.info('looking good 👌')
+    status = 0
+  elif max_level ==  CheckResult.Level.ERROR or (
+        args.treat_warnings_as_errors and
+        max_level == CheckResult.Level.WARNING):
+    status = 1
+  else:
+    status = 0
   logger.debug('exiting with status %s', status)
-  return status
+  return 1
 
 
 def _update(parser, args):
-  subject = _load_subject(parser)
-  files = []
-  for plugin in subject.get_plugins():
-    files.extend(plugin.get_files(subject))
+  def _render(subject):
+    files = []
+    for plugin in subject.get_plugins():
+      files.extend(plugin.get_files(subject))
 
-  logger.info('rendering %s file(s)', len(files))
-  for file in files:
-    logger.info('  %s', os.path.relpath(file.name))
-    if not args.dry:
-      write_to_disk(file)
+    color = 'blue' if isinstance(subject, Monorepo) else 'cyan'
+    logger.info('rendering %s file(s) for %s', len(files), colored(subject.name, color))
+    for file in files:
+      logger.info('  %s', os.path.relpath(file.name))
+      if not args.dry:
+        write_to_disk(file)
+    if not args.skip_checks:
+      max_level = _checks_for(subject)
+      if max_level is not None:
+        print()
+
+  subject = _load_subject(parser)
+  if args.all:
+    if not isinstance(subject, Monorepo):
+      parser.error('--all can only be used in a monorepo context')
+    subjects = [subject] + list(subject.get_packages(_cache))
+    [_render(x) for x in subjects]
+  else:
+    _render(subject)
 
 
 def _bump(parser, args):

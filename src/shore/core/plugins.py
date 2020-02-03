@@ -45,10 +45,10 @@ VersionRef = collections.namedtuple('VersionRef', 'filename,start,end,value')
 class CheckResult(object):
   """ The result of a check performed by a plugin. """
 
-  class Level(enum.Enum):
-    INFO = 'INFO'
-    WARNING = 'WARNING'
-    ERROR = 'ERROR'
+  class Level(enum.IntEnum):
+    INFO = 0
+    WARNING = 1
+    ERROR = 2
 
   def __init__(self, on, level, message):
     # type: (Union[Monorepo, Package], str, Level)
