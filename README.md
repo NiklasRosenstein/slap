@@ -41,7 +41,7 @@ be run separately. For CI checks, it's useful to turn on the
 `--treat-warnings-as-errors` option which will cause the command to return a
 non-zero status code if at least one warning is generated.
 
-    $ shore check --treat-warnings-as-errors
+    $ shore checks --treat-warnings-as-errors
 
 __Rendering setup files__
 
