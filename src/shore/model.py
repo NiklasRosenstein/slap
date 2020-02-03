@@ -42,11 +42,14 @@ from typing import Any, Callable, Iterable, Optional, List, Type
 import ast
 import collections
 import copy
+import logging
 import os
 import re
 import yaml
 
 __all__ = ['Package', 'Monorepo']
+
+logger = logging.getLogger(__name__)
 
 
 class VersionSelector(object):
@@ -296,6 +299,36 @@ class PluginConfig(Struct):
   @property
   def is_monorepo_plugin(self) -> bool:
     return IMonorepoPlugin.provided_by(self.plugin)
+
+  def get_checks(self, subject: 'BaseObject'):
+    if isinstance(subject, Package) and self.is_package_plugin:
+      logger.debug('getting package checks for plugin {}'.format(self.name))
+      return self.plugin.check_package(subject)
+    if isinstance(subject, Monorepo) and self.is_monorepo_plugin:
+      logger.debug('getting monorepo checks for plugin {}'.format(self.name))
+      return self.plugin.check_monorepo(subject)
+    logger.debug('skipping plugin {}'.format(self.name))
+    return ()
+
+  def get_files(self, subject: 'BaseObject'):
+    if isinstance(subject, Package) and self.is_package_plugin:
+      logger.debug('getting package files for plugin {}'.format(self.name))
+      return self.plugin.get_package_files(subject)
+    if isinstance(subject, Monorepo) and self.is_monorepo_plugin:
+      logger.debug('getting monorepo files for plugin {}'.format(self.name))
+      return self.plugin.get_monorepo_files(subject)
+    logger.debug('skipping plugin {}'.format(self.name))
+    return ()
+
+  def get_version_refs(self, subject: 'BaseObject'):
+    if isinstance(subject, Package) and self.is_package_plugin:
+      logger.debug('getting package version refs for plugin {}'.format(self.name))
+      return self.plugin.get_package_version_refs(subject)
+    if isinstance(subject, Monorepo) and self.is_monorepo_plugin:
+      logger.debug('getting monorepo version refs for plugin {}'.format(self.name))
+      return self.plugin.get_monorepo_version_refs(subject)
+    logger.debug('skipping plugin {}'.format(self.name))
+    return ()
 
   @JsonDeserializer
   def __deserialize(context, location):

@@ -23,15 +23,16 @@
 plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
-from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin
+from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin, VersionRef
 from shore.model import Package
 from nr.interface import implements, override
 from typing import Iterable
 import contextlib
 import json
 import os
-import textwrap
+import re
 import sys
+import textwrap
 
 
 def _normpath(x):
@@ -72,19 +73,25 @@ class SetuptoolsRenderer(object):
         'setup.py', self._render_setup, package)
 
   @override
-  def check_package(self, package: Package) -> Iterable[CheckResult]:
-    return; yield
+  def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
+    entry_file = package.get_entry_file()
+    if not os.path.isfile(entry_file):
+      return; yield
+    with open(entry_file) as fp:
+      match = re.search(self._VERSION_REGEX, fp.read())
+      if match:
+        yield VersionRef(entry_file, match.start(1), match.end(1), match.group(1))
 
-  BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
-  END_SECTION = '# }'
-
-  ENTRYPOINT_VARS = {
+  _VERSION_REGEX = '__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
+  _BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
+  _END_SECTION = '# }'
+  _ENTRTYPOINT_VARS = {
     'python-major-version': 'sys.version[0]',
     'python-major-minor-version': 'sys.version[:3]'
   }
 
   def _render_manifest(self, current, fp, package):
-    markers = (self.BEGIN_SECTION, self.END_SECTION)
+    markers = (self._BEGIN_SECTION, self._END_SECTION)
     with rewrite_section(fp, current.read() if current else '', *markers):
       for entry in package.manifest:
         fp.write('{}\n'.format(entry))
@@ -193,7 +200,7 @@ class SetuptoolsRenderer(object):
       for item in value:
         item = repr(item)
         args = []
-        for varname, expr in self.ENTRYPOINT_VARS.items():
+        for varname, expr in self._ENTRTYPOINT_VARS.items():
           varname = '{{' + varname + '}}'
           if varname in item:
             item = item.replace(varname, '{' + str(len(args)) + '}')
