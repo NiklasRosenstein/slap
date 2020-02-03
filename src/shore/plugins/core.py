@@ -19,14 +19,15 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin
+from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin, IMonorepoPlugin, VersionRef
 from shore.model import BaseObject, Monorepo, Package
 from nr.interface import implements, override
-from typing import Iterable
+from typing import Iterable, Optional
 import os
+import re
 
 
-@implements(IPackagePlugin)
+@implements(IPackagePlugin, IMonorepoPlugin)
 class CorePlugin:
 
   def _unhandled_keys(self, object: BaseObject) -> Iterable[CheckResult]:
@@ -62,5 +63,22 @@ class CorePlugin:
           data.version, package.version))
 
   @override
-  def get_package_files(self, package: Package) -> Iterable[FileToRender]:
-    return; yield
+  def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
+    ref = self._version_ref(package.filename)
+    assert ref is not None, "packages must always have a version"
+    yield ref
+
+  @override
+  def get_monorepo_version_refs(self, monorepo: Monorepo) -> Iterable[VersionRef]:
+    ref = self._version_ref(monorepo.filename)
+    if ref is not None:
+      yield ref
+
+  _VERSION_REGEX = '^version\s*:\s*[\'"]?(.*?)[\'"]?\s*(#.*)?$'
+
+  def _version_ref(self, filename: str) -> Optional[VersionRef]:
+    with open(filename) as fp:
+      match = re.search(self._VERSION_REGEX, fp.read(), re.S | re.M)
+      if match:
+        return VersionRef(filename, match.start(1), match.end(1), match.group(1))
+    return None

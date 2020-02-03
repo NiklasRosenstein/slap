@@ -32,11 +32,14 @@ from nr.commons.notset import NotSet
 from nr.interface import Interface, attr, default, implements, override, staticattr
 from pkg_resources import iter_entry_points
 from typing import Iterable
+import collections
 import enum
 import nr.fs
 
 _PLUGINS_ENTRYPOINT = 'shore.core.plugins'
 assert _PLUGINS_ENTRYPOINT == __name__
+
+VersionRef = collections.namedtuple('VersionRef', 'filename,start,end,value')
 
 
 class CheckResult(object):
@@ -123,21 +126,33 @@ class IBasePlugin(Interface):
 class IPackagePlugin(IBasePlugin):
   """ A plugin that can be used with packages to render files. """
 
+  @default
   def get_package_files(self, package: 'Package') -> Iterable[IFileToRender]:
-    pass
+    return ()
 
+  @default
   def check_package(self, package: 'Package') -> Iterable[CheckResult]:
-    pass
+    return ()
+
+  @default
+  def get_package_version_refs(self, package: 'Package') -> Iterable[VersionRef]:
+    return ()
 
 
 class IMonorepoPlugin(IBasePlugin):
   """ A plugin that can be used with monorepos. """
 
+  @default
   def get_monorepo_files(self, package: 'Monorepo') -> Iterable[IFileToRender]:
-    pass
+    return ()
 
+  @default
   def check_monorepo(self, package: 'Monorepo') -> Iterable[CheckResult]:
-    pass
+    return ()
+
+  @default
+  def get_monorepo_version_refs(self, monorepo: 'Monorepo') -> Iterable[VersionRef]:
+    return ()
 
 
 class PluginNotFound(Exception):

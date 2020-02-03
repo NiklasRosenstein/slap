@@ -40,7 +40,7 @@ _cache = ObjectCache()
 logger = logging.getLogger(__name__)
 
 
-def _load_subject() -> Union[Monorepo, Package, None]:
+def _load_subject(parser) -> Union[Monorepo, Package, None]:
   package, monorepo = None, None
   if os.path.isfile('package.yaml'):
     package = Package.load('package.yaml', _cache)
@@ -49,6 +49,8 @@ def _load_subject() -> Union[Monorepo, Package, None]:
   if package and monorepo:
     raise RuntimeError('found package.yaml and monorepo.yaml in the same '
       'directory')
+  if not package and not monorepo:
+    parser.error('no package.yaml or monorepo.yaml in current directory')
   return package or monorepo
 
 
@@ -69,12 +71,15 @@ def get_argument_parser(prog=None):
   check = subparser.add_parser('check')
   check.add_argument('--treat-warnings-as-errors', action='store_true')
 
+  bump = subparser.add_parser('bump')
+  bump.add_argument('--patch', action='store_true')
+  bump.add_argument('--minor', action='store_true')
+  bump.add_argument('--major', action='store_true')
+  bump.add_argument('--version')
+  bump.add_argument('--show', action='store_true')
+  bump.add_argument('--dry', action='store_true')
+
   update = subparser.add_parser('update')
-  update.add_argument('--hotfix', action='store_true')
-  update.add_argument('--patch', action='store_true')
-  update.add_argument('--minor', action='store_true')
-  update.add_argument('--major', action='store_true')
-  update.add_argument('--version')
 
   build = subparser.add_parser('build')
   build.add_argument('target', nargs='?')
@@ -164,33 +169,97 @@ def _new(parser, args):
 
 
 def _check(parser, args):
-  subject = _load_subject()
-  if not subject:
-    parser.error('no package.yaml or monorepo.yaml in current directory')
-  check_results = []
+  subject = _load_subject(parser)
+  checks = []
   for plugin in subject.get_plugins():
-    if isinstance(subject, Monorepo) and plugin.is_monorepo_plugin:
-      logger.debug('getting check results from plugin {}'.format(plugin.name))
-      check_results.append(plugin.plugin.check_monorepo(subject))
-    elif isinstance(subject, Package) and plugin.is_package_plugin:
-      logger.debug('getting check results from plugin {}'.format(plugin.name))
-      check_results.append(plugin.plugin.check_package(subject))
-    else:
-      logger.debug('skipping plugin {}'.format(plugin.name))
+    checks.extend(plugin.get_checks(subject))
   colors = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
   status = 0
-  check_result = None
-  for check_result in Stream.concat(check_results):
-    level = colored(check_result.level.name, colors[check_result.level.name])
-    print('{}: {}'.format(level, check_result.message))
-    if check_result.level == check_result.Level.ERROR or (
+  for check in checks:
+    level = colored(check.level.name, colors[check.level.name])
+    print('{}: {}'.format(level, check.message))
+    if check.level == check.Level.ERROR or (
         args.treat_warnings_as_errors and
-        check_result.level == check_result.Level.WARNING):
+        check.level == check.Level.WARNING):
       status = 1
-  if not check_result:
+  if not checks:
     logger.info('looking good 👌')
   logger.debug('exiting with status %s', status)
   return status
+
+
+def _bump(parser, args):
+  subject = _load_subject(parser)
+  options = (args.patch, args.minor, args.major, args.version, args.show)
+  if sum(map(bool, options)) == 0:
+    parser.error('no operation specified')
+  elif sum(map(bool, options)) > 1:
+    parser.error('multiple operations specified')
+
+  version_refs = []
+  for plugin in subject.get_plugins():
+    version_refs.extend(plugin.get_version_refs(subject))
+
+  if not version_refs:
+    parser.error('no version refs found 👎')
+    return 1
+
+  if args.show:
+    for ref in version_refs:
+      print('{}: {}'.format(os.path.relpath(ref.filename), ref.value))
+    return 0
+
+  # Ensure the version is the same accross all refs.
+  current_version = version_refs[0].value
+  different = [x for x in version_refs if x.value != current_version]
+  if different:
+    logging.error('inconsistent versions across files need to be fixed first.')
+    return 1
+
+  # TODO (@NiklasRosenstein): Support four parts (hotfix)
+  nums = tuple(map(int, current_version.split('.')))
+  assert len(nums) == 3, "version number must consist of 3 parts"
+
+  if args.patch:
+    new_version = (nums[0], nums[1], nums[2] + 1)
+  elif args.minor:
+    new_version = (nums[0], nums[1] + 1, 0)
+  elif args.major:
+    new_version = (nums[0] + 1, 0, 0)
+    new_version[0] += 1
+  elif args.version:
+    new_version = tuple(map(int, args.version.split('.')))
+    assert len(nums) == 3, "version number must consist of 3 parts"
+  else:
+    raise RuntimeError('what happened?')
+
+  if new_version < nums:
+    parser.error('new version {} is lower than currenet version {}'.format(
+      '.'.join(map(str, new_version)), '.'.join(map(str, nums))))
+  if new_version == nums:
+    parser.error('new version is equal to current version {}'.format(
+      '.'.join(map(str, nums))))
+
+  new_version = '.'.join(map(str, new_version))
+
+  # The replacement below does not work if the same file is listed multiple
+  # times so let's check for now that every file is listed only once.
+  n_files = set(os.path.normpath(os.path.abspath(ref.filename))
+                for ref in version_refs)
+  assert len(n_files) == len(version_refs), "multiple version refs in one "\
+    "file is not currently supported."
+
+  logger.info('bumping {} version reference(s)'.format(
+    len(version_refs), current_version, new_version))
+  for ref in version_refs:
+    assert ref.value == current_version
+    logger.info('  {}: {} → {}'.format(os.path.relpath(ref.filename), ref.value, new_version))
+    if not args.dry:
+      with open(ref.filename) as fp:
+        contents = fp.read()
+      contents = contents[:ref.start] + new_version + contents[ref.end:]
+      with open(ref.filename, 'w') as fp:
+        fp.write(contents)
 
 
 _entry_main = lambda: sys.exit(main())

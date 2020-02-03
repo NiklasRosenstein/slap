@@ -52,13 +52,15 @@ on shore to install your package.
 
     $ shore update
 
-To bump the version number of your package at the same time, simply add the
-`--version X.Y.Z` option add the specify `--hotfix`, `--patch`, `--minor` or
-`--major` flags. Note that this will also update the version number in any
-files that shore knows also contain the version number (eg. the entrypoint
-source file of your package that contains the `__version__` variable).
+__Bumping the version number__
 
-    $ shore update --minor
+To bump the version number of your package at the same time, simply add the
+`--version X.Y.Z` option add the specify `--patch`, `--minor` or `--major`
+flags. Note that this will also update the version number in any files that
+shore knows also contain the version number (eg. the entrypoin source file of
+your package that contains the `__version__` variable).
+
+    $ shore bump --minor
 
 __Publishing your package__
 
