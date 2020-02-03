@@ -31,7 +31,7 @@ from shore.model import Monorepo, ObjectCache, Package
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
 from termcolor import colored
-from typing import Iterable, Optional, Union
+from typing import Any, Iterable, List, Optional, Union
 import argparse
 import jinja2
 import json
@@ -92,6 +92,7 @@ def get_argument_parser(prog=None):
   new.add_argument('--monorepo', action='store_true')
 
   checks = subparser.add_parser('checks')
+  checks.add_argument('--all', action='store_true')
   checks.add_argument('--treat-warnings-as-errors', action='store_true')
 
   bump = subparser.add_parser('bump')
@@ -213,10 +214,27 @@ def _new(parser, args):
     write_to_disk(file)
 
 
-def _print_checks_for(subject: Union[Package, Monorepo]) -> Optional[CheckResult.Level]:
+def _run_for_subject(subject: Union[Package, Monorepo], func, all: bool) -> List[Any]:
+  if all:
+    if not isinstance(subject, Monorepo):
+      parser.error('--all can only be used in a monorepo context')
+    subjects = [subject] + list(subject.get_packages(_cache))
+    return [func(x) for x in subjects]
+  else:
+    return [func(subject)]
+
+
+def _color_subject_name(subject: Union[Package, Monorepo]) -> str:
+    color = 'blue' if isinstance(subject, Monorepo) else 'cyan'
+    return colored(subject.name, color)
+
+
+def _print_checks_for(subject: Union[Package, Monorepo], print_header: bool=True) -> Optional[CheckResult.Level]:
   checks = []
   for plugin in subject.get_plugins():
     checks.extend(plugin.get_checks(subject))
+  if print_header:
+    logging.info('triggered %s check(s) for %s', len(checks), _color_subject_name(subject))
   colors = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
   for check in checks:
     level = colored(check.level.name, colors[check.level.name])
@@ -226,13 +244,16 @@ def _print_checks_for(subject: Union[Package, Monorepo]) -> Optional[CheckResult
 
 def _checks(parser, args):
   subject = _load_subject(parser)
-  max_level = _print_checks_for(subject)
+  levels = _run_for_subject(subject, _print_checks_for, args.all)
+  max_level = max(filter(bool, levels), default=None)
   if max_level is None or max_level == CheckResult.Level.INFO:
-    logger.info('looking good 👌')
+    logger.info('👌 looking good')
     status = 0
-  elif max_level ==  CheckResult.Level.ERROR or (
-        args.treat_warnings_as_errors and
-        max_level == CheckResult.Level.WARNING):
+  elif max_level == CheckResult.Level.WARNING:
+    logger.info('👎 warnings found')
+    status = 1 if args.treat_warnings_as_errors else 0
+  elif max_level ==  CheckResult.Level.ERROR:
+    logger.info('❌ errors found')
     status = 1
   else:
     status = 0
@@ -246,25 +267,18 @@ def _update(parser, args):
     for plugin in subject.get_plugins():
       files.extend(plugin.get_files(subject))
 
-    color = 'blue' if isinstance(subject, Monorepo) else 'cyan'
-    logger.info('rendering %s file(s) for %s', len(files), colored(subject.name, color))
+    logger.info('rendering %s file(s) for %s', len(files), _color_subject_name(subject))
     for file in files:
       logger.info('  %s', os.path.relpath(file.name))
       if not args.dry:
         write_to_disk(file)
     if not args.skip_checks:
-      max_level = _print_checks_for(subject)
+      max_level = _print_checks_for(subject, print_header=False)
       if max_level is not None:
         print()
 
   subject = _load_subject(parser)
-  if args.all:
-    if not isinstance(subject, Monorepo):
-      parser.error('--all can only be used in a monorepo context')
-    subjects = [subject] + list(subject.get_packages(_cache))
-    [_render(x) for x in subjects]
-  else:
-    _render(subject)
+  _run_for_subject(subject, _render, args.all)
 
 
 def _bump(parser, args):
