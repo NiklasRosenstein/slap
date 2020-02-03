@@ -449,6 +449,9 @@ class Monorepo(BaseObject):
   #: mono repository.
   packages = Field(CommonPackageData, default=None)
 
+  #: The use field is optional on monorepos.
+  use = Field([PluginConfig], default=list)
+
   def get_packages(self, cache: ObjectCache) -> Iterable['Package']:
     """ Loads the packages for this mono repository. """
 
@@ -536,14 +539,14 @@ class Package(BaseObject, CommonPackageData):
 
     return plugins
 
-  def on_load_hook(self, loader: ObjectCache):
+  def on_load_hook(self, cache: ObjectCache):
     """ Called when the package is loaded. Attempts to find the Monorepo that
     belongs to this package and load it. If there is a Monorepo, the package
     will inherit some of the fields defined in #Monorepo.packages. """
 
     monorepo_fn = os.path.join(os.path.dirname(self.directory), 'monorepo.yaml')
     if os.path.isfile(monorepo_fn):
-      self.monorepo = Monorepo.load(loader)
+      self.monorepo = Monorepo.load(monorepo_fn, cache)
 
   def get_entry_file(self) -> str:
     """ Returns the filename of the entry file that contains package metadata

@@ -45,22 +45,22 @@ class CorePlugin:
     else:
       yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
 
-    if not package.author:
+    if not package.get_author():
       yield CheckResult(package, 'WARNING', 'missing $.author')
-    if not package.license:
+    if not package.get_license():
       yield CheckResult(package, 'WARNING', 'missing $.license')
-    if not package.url:
+    if not package.get_url():
       yield CheckResult(package, 'WARNING', 'missing $.url')
 
     data = package.get_entry_metadata()
-    if package.author and data.author != str(package.author):
+    if package.get_author() and data.author != str(package.get_author()):
       yield CheckResult(package, 'ERROR',
         'Inconsistent package author ({!r} != {!r})'.format(
-          data.author, str(package.author)))
-    if package.version and data.version != package.version:
+          data.author, str(package.get_author())))
+    if package.get_version() and data.version != package.get_version():
       yield CheckResult(package, 'ERROR',
         'Inconsistent package version ({!r} != {!r})'.format(
-          data.version, package.version))
+          data.version, package.get_version()))
 
   @override
   def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:

@@ -162,8 +162,8 @@ class SetuptoolsRenderer(object):
         description = {description!r},
         long_description = long_description,
         long_description_content_type = {long_description_content_type!r},
-        url = {package.url!r},
-        license = {package.license!r},
+        url = {url!r},
+        license = {license!r},
         packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),
         package_dir = {{'': {src_directory!r}}},
         include_package_data = {include_package_data!r},
@@ -176,8 +176,10 @@ class SetuptoolsRenderer(object):
       )
     ''').format(
       package=package,
-      author_name=package.author.name if package.author else None,
-      author_email=package.author.email if package.author else None,
+      author_name=package.get_author().name if package.get_author() else None,
+      author_email=package.get_author().email if package.get_author() else None,
+      url=package.get_url(),
+      license=package.get_license(),
       description=package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
       long_description_content_type=readme.content_type,
       extras_require=extras_require,
