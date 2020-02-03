@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from nr.proxy import proxy_decorator
 from nr.stream import Stream
 from shore.core.plugins import (
   CheckResult,
@@ -26,12 +27,14 @@ from shore.core.plugins import (
   IMonorepoPlugin,
   IPackagePlugin,
   write_to_disk)
-from shore.util.resources import walk_package_resources
 from shore.model import Monorepo, ObjectCache, Package
+from shore.util.license import get_license_metadata, wrap_license_text
+from shore.util.resources import walk_package_resources
 from termcolor import colored
 from typing import Iterable, Optional, Union
 import argparse
 import jinja2
+import json
 import logging
 import os
 import pkg_resources
@@ -72,6 +75,12 @@ def get_argument_parser(prog=None):
   parser.add_argument('-C', '--change-directory', metavar='DIR')
   parser.add_argument('-v', '--verbose', action='store_true')
   subparser = parser.add_subparsers(dest='command')
+
+  license_ = subparser.add_parser('license')
+  license_.add_argument('license_name')
+  license_.add_argument('--json', action='store_true')
+  license_.add_argument('--text', action='store_true')
+  license_.add_argument('--notice', action='store_true')
 
   new = subparser.add_parser('new')
   new.add_argument('name')
@@ -132,6 +141,21 @@ def main(argv=None, prog=None):
     os.chdir(args.change_directory)
 
   return globals()['_' + args.command](parser, args)
+
+
+def _license(parser, args):
+  @proxy_decorator(deref=True, lazy=True)
+  def data():
+    return get_license_metadata(args.license_name)
+
+  if args.json:
+    print(json.dumps(data(), sort_keys=True))
+  elif args.text:
+    print(wrap_license_text(data['license_text']))
+  elif args.notice:
+    print(wrap_license_text(data['standard_notice'] or data['license_text']))
+  else:
+    parser.print_usage()
 
 
 def _new(parser, args):
