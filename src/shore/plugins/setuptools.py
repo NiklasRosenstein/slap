@@ -65,12 +65,11 @@ class SetuptoolsRenderer(object):
 
   @override
   def get_package_files(self, package: Package) -> Iterable[FileToRender]:
-    for package in context.packages:
-      if package.manifest:
-        yield FileToRender(package.directory,
-          'MANIFEST.in', self._render_manifest, package)
+    if package.manifest:
       yield FileToRender(package.directory,
-        'setup.py', self._render_setup, package)
+        'MANIFEST.in', self._render_manifest, package)
+    yield FileToRender(package.directory,
+      'setup.py', self._render_setup, package)
 
   @override
   def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
@@ -106,7 +105,7 @@ class SetuptoolsRenderer(object):
     '''))
 
     # Write the helper that extracts the version number from the entry file.
-    entry_file = package.get_default_entry_file()
+    entry_file = package.get_entry_file()
     fp.write(textwrap.dedent('''
       with io.open({entrypoint_file!r}, encoding='utf8') as fp:
         version = re.search(r"__version__\s*=\s*'(.*)'", fp.read()).group(1)
@@ -122,7 +121,7 @@ class SetuptoolsRenderer(object):
     else:
       fp.write(textwrap.dedent('''
         long_description = {long_description!r}
-      '''.format(long_description=package.package.long_description)))
+      '''.format(long_description=package.long_description)))
       readme = Readme(None, 'text/plain')
 
     # Write the install requirements.
@@ -143,13 +142,13 @@ class SetuptoolsRenderer(object):
       tests_require = '[]'
 
     if package.datafiles:
-      self._render_datafiles(fp, package.package.name, package.datafiles)
+      self._render_datafiles(fp, package.name, package.datafiles)
       data_files = 'data_files'
     else:
       data_files = '[]'
 
     exclude_packages = []
-    for pkg in package.package.exclude_packages:
+    for pkg in package.exclude_packages:
       exclude_packages.append(pkg)
       exclude_packages.append(pkg + '.*')
 
@@ -176,15 +175,15 @@ class SetuptoolsRenderer(object):
         entry_points = {entry_points}
       )
     ''').format(
-      package=package.package,
-      author_name=package.package.author.name if package.package.author else None,
-      author_email=package.package.author.email if package.package.author else None,
-      description=package.package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
+      package=package,
+      author_name=package.author.name if package.author else None,
+      author_email=package.author.email if package.author else None,
+      description=package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
       long_description_content_type=readme.content_type,
       extras_require=extras_require,
       tests_require=tests_require,
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
-      src_directory=package.package.source_directory,
+      src_directory=package.source_directory,
       exclude_packages=exclude_packages,
       include_package_data=False,#package.package_data != [],
       data_files=data_files,
