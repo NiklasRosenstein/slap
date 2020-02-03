@@ -91,8 +91,8 @@ def get_argument_parser(prog=None):
   new.add_argument('--modulename')
   new.add_argument('--monorepo', action='store_true')
 
-  check = subparser.add_parser('check')
-  check.add_argument('--treat-warnings-as-errors', action='store_true')
+  checks = subparser.add_parser('checks')
+  checks.add_argument('--treat-warnings-as-errors', action='store_true')
 
   bump = subparser.add_parser('bump')
   bump.add_argument('--patch', action='store_true')
@@ -213,7 +213,7 @@ def _new(parser, args):
     write_to_disk(file)
 
 
-def _checks_for(subject: Union[Package, Monorepo]) -> Optional[CheckResult.Level]:
+def _print_checks_for(subject: Union[Package, Monorepo]) -> Optional[CheckResult.Level]:
   checks = []
   for plugin in subject.get_plugins():
     checks.extend(plugin.get_checks(subject))
@@ -224,9 +224,9 @@ def _checks_for(subject: Union[Package, Monorepo]) -> Optional[CheckResult.Level
   return max(x.level for x in checks) if checks else None
 
 
-def _check(parser, args):
+def _checks(parser, args):
   subject = _load_subject(parser)
-  max_level = _checks_for(subject)
+  max_level = _print_checks_for(subject)
   if max_level is None or max_level == CheckResult.Level.INFO:
     logger.info('looking good 👌')
     status = 0
@@ -253,7 +253,7 @@ def _update(parser, args):
       if not args.dry:
         write_to_disk(file)
     if not args.skip_checks:
-      max_level = _checks_for(subject)
+      max_level = _print_checks_for(subject)
       if max_level is not None:
         print()
 
