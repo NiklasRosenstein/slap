@@ -80,6 +80,7 @@ def get_argument_parser(prog=None):
   bump.add_argument('--dry', action='store_true')
 
   update = subparser.add_parser('update')
+  update.add_argument('--dry', action='store_true')
 
   build = subparser.add_parser('build')
   build.add_argument('target', nargs='?')
@@ -186,6 +187,19 @@ def _check(parser, args):
     logger.info('looking good 👌')
   logger.debug('exiting with status %s', status)
   return status
+
+
+def _update(parser, args):
+  subject = _load_subject(parser)
+  files = []
+  for plugin in subject.get_plugins():
+    files.extend(plugin.get_files(subject))
+
+  logger.info('rendering %s file(s)', len(files))
+  for file in files:
+    logger.info('  %s', os.path.relpath(file.name))
+    if not args.dry:
+      write_to_disk(file)
 
 
 def _bump(parser, args):
