@@ -34,10 +34,22 @@ import jinja2
 import logging
 import os
 import pkg_resources
+import subprocess
 import sys
 
 _cache = ObjectCache()
 logger = logging.getLogger(__name__)
+
+
+def _get_author_info_from_git():
+  try:
+    name = subprocess.getoutput('git config user.name')
+    email = subprocess.getoutput('git config user.email')
+  except FileNotFoundError:
+    return None
+  if not name and not email:
+    return None
+  return '{} <{}>'.format(name, email)
 
 
 def _load_subject(parser) -> Union[Monorepo, Package, None]:
@@ -63,10 +75,11 @@ def get_argument_parser(prog=None):
   new = subparser.add_parser('new')
   new.add_argument('name')
   new.add_argument('directory', nargs='?')
-  new.add_argument('--monorepo', action='store_true')
   new.add_argument('--version')
+  new.add_argument('--author')
   new.add_argument('--license')
   new.add_argument('--modulename')
+  new.add_argument('--monorepo', action='store_true')
 
   check = subparser.add_parser('check')
   check.add_argument('--treat-warnings-as-errors', action='store_true')
@@ -123,9 +136,13 @@ def _new(parser, args):
   if not args.directory:
     args.directory = args.name
 
+  if not args.author:
+    args.author = _get_author_info_from_git()
+
   env_vars = {
     'name': args.name,
     'version': args.version,
+    'author': args.author,
     'license': args.license,
     'modulename': args.modulename
   }
