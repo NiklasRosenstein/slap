@@ -419,6 +419,9 @@ class BaseObject(Struct):
   #: Contains all the unhandled keys from the deserialization.
   unhandled_keys = Field([str], default=None, hidden=True)
 
+  #: The cache that this object is stored in.
+  cache = Field(ObjectCache, default=None, hidden=True)
+
   @property
   def directory(self) -> str:
     return os.path.dirname(self.filename)
@@ -454,7 +457,7 @@ class BaseObject(Struct):
     return targets
 
   @classmethod
-  def load(cls, filename: str, loader: ObjectCache) -> '_DeserializableFromFile':
+  def load(cls, filename: str, cache: ObjectCache) -> '_DeserializableFromFile':
     """ Deserializes *cls* from a YAML file specified by *filename*. """
 
     def _load(filename):
@@ -466,12 +469,13 @@ class BaseObject(Struct):
           decorations=[JsonStoreRemainingKeys()])
       obj.filename = filename
       obj.unhandled_keys = list(JsonStoreRemainingKeys().iter_paths(obj))
-      obj.on_load_hook(loader)
+      obj.cache = cache
+      obj.on_load_hook()
       return obj
 
-    return loader.get_or_load(filename, _load)
+    return cache.get_or_load(filename, _load)
 
-  def on_load_hook(self, loader: ObjectCache):
+  def on_load_hook(self):
     """ Called after the object was loaded with #load(). """
 
     pass
@@ -488,13 +492,13 @@ class Monorepo(BaseObject):
   #: The use field is optional on monorepos.
   use = Field([PluginConfig], default=list)
 
-  def get_packages(self, cache: ObjectCache) -> Iterable['Package']:
+  def get_packages(self) -> Iterable['Package']:
     """ Loads the packages for this mono repository. """
 
     for name in os.listdir(self.directory):
       path = os.path.join(self.directory, name, 'package.yaml')
       if os.path.isfile(path):
-        package = Package.load(path, cache)
+        package = Package.load(path, self.cache)
         assert package.monorepo is self, "woah hold up"
         yield package
 
@@ -575,14 +579,14 @@ class Package(BaseObject, CommonPackageData):
 
     return plugins
 
-  def on_load_hook(self, cache: ObjectCache):
+  def on_load_hook(self):
     """ Called when the package is loaded. Attempts to find the Monorepo that
     belongs to this package and load it. If there is a Monorepo, the package
     will inherit some of the fields defined in #Monorepo.packages. """
 
     monorepo_fn = os.path.join(os.path.dirname(self.directory), 'monorepo.yaml')
     if os.path.isfile(monorepo_fn):
-      self.monorepo = Monorepo.load(monorepo_fn, cache)
+      self.monorepo = Monorepo.load(monorepo_fn, self.cache)
 
   def get_entry_file(self) -> str:
     """ Returns the filename of the entry file that contains package metadata

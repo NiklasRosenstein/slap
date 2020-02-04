@@ -19,46 +19,30 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.core.plugins import FileToRender, IPlugin, Options, Option
+from shore.core.plugins import FileToRender, IMonorepoPlugin
+from shore.model import Monorepo
 from nr.commons.algo.graph import toposort
+from nr.databind.core import Field, Struct
 from nr.interface import implements, override
+from typing import Dict, Iterable
 import os
 
 
-@implements(IPlugin)
-class DevInstallScriptRenderer(object):
+@implements(IMonorepoPlugin)
+class DevInstallRenderer:
   """ Renders a "bin/dev-install" shell script for a monorepo that installs
   Pip packages in the order, respecting their inter-dependencies. """
 
-  def __init__(self, options):
-    self._options = options
+  class Config(Struct):
+    filename = Field(str, default='bin/dev-install')
 
   @override
-  @classmethod
-  def get_options(cls):  # type: () -> Options
-    return Options({
-      'filename': Option(default='bin/dev-install')
-    })
+  def get_monorepo_files(self, monorepo: Monorepo) -> Iterable[FileToRender]:
+    nodes = self._get_interpackage_dependencies(monorepo)
 
-  @override
-  def get_files_to_render(self, context):  # type: (PluginContext) -> Iterable[FileToRender]
-    if not context.monorepo:
-      return; yield
-
-    # Collect packages and their dependencies for this monorepo.
-    nodes = {}
-    packages = context.monorepo.get_packages()
-    for package in packages:
-      nodes[package.package.name] = {
-        'directory': os.path.basename(package.directory),
-        'dependencies': []
-      }
-    for package in packages:
-      for req in package.requirements.required:
-        if req.package in nodes:
-          nodes[package.package.name]['dependencies'].append(req.package)
     # Sort the packages in topological order for the install script.
     ordered = list(toposort(sorted(nodes.keys()), lambda x: nodes[x]['dependencies']))
+
     # Write the install script.
     def write_script(_current, fp):
       fp.write('#!/bin/sh\n\n')
@@ -73,9 +57,20 @@ class DevInstallScriptRenderer(object):
           fp.write(' \\')
         fp.write('\n')
 
-    yield FileToRender(context.monorepo.directory,
-      self._options['filename'], write_script).with_chmod('+x')
+    yield FileToRender(monorepo.directory,
+      self.config.filename, write_script).with_chmod('+x')
 
-  @override
-  def perform_checks(self, context):
-    return; yield
+  def _get_interpackage_dependencies(self, monorepo: Monorepo) -> Dict[str, Dict]:
+    nodes = {}
+    packages = list(monorepo.get_packages())
+    for package in packages:
+      nodes[package.name] = {
+        'directory': os.path.basename(package.directory),
+        'dependencies': []
+      }
+    for package in packages:
+      for req in package.requirements.required:
+        if req.package in nodes:
+          nodes[package.name]['dependencies'].append(req.package)
+
+    return nodes
