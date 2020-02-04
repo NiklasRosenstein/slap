@@ -31,7 +31,7 @@ from shore.model import Monorepo, ObjectCache, Package
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
 from termcolor import colored
-from typing import Any, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 import argparse
 import jinja2
 import json
@@ -111,13 +111,13 @@ def get_argument_parser(prog=None):
   build = subparser.add_parser('build')
   build.add_argument('target', nargs='?')
   build.add_argument('--all', action='store_true')
-  build.add_argument('--directory')
+  build.add_argument('--directory', default='build')
 
   publish = subparser.add_parser('publish')
   publish.add_argument('target', nargs='?')
   publish.add_argument('--all', action='store_true')
   publish.add_argument('--test', action='store_true')
-  publish.add_argument('--build-directory')
+  publish.add_argument('--build-directory', default='build')
 
   return parser
 
@@ -353,6 +353,79 @@ def _bump(parser, args):
       contents = contents[:ref.start] + new_version + contents[ref.end:]
       with open(ref.filename, 'w') as fp:
         fp.write(contents)
+
+
+def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
+  return {
+    k: v for k, v in targets.items()
+    if target == k or k.startswith(target + ':')}
+
+
+def _build(parser, args):
+  subject = _load_subject(parser)
+  targets = subject.get_build_targets()
+
+  if args.target:
+    targets = _filter_targets(targets, args.target)
+    if not targets:
+      logging.error('no build targets matched "{}"'.format(args.target))
+      return 1
+
+  if not targets:
+    logging.info('no build targets')
+    return 0
+
+  os.makedirs(args.directory, exist_ok=True)
+  for target_id, target in targets.items():
+    logger.info('building target %s', colored(target_id, 'blue'))
+    target.build(args.directory)
+
+
+def _publish(parser, args):
+  subject = _load_subject(parser)
+  builds = subject.get_build_targets()
+  publishers = subject.get_publish_targets()
+
+  if args.target:
+    publishers = _filter_targets(publishers, args.target)
+    if not publishers:
+      logger.error('no publish targets matched "{}"'.format(args.target))
+      return 1
+
+  if not publishers:
+    logging.info('no publish targets')
+
+  def _needs_build(build):
+    for filename in build.get_build_artifacts():
+      if not os.path.isfile(os.path.join(args.build_directory, filename)):
+        return True
+    return False
+
+  def _run_publisher(name, publisher):
+    try:
+      logging.info('collecting builds for "{}" ...'.format(name))
+      required_builds = {}
+      for selector in publisher.get_build_selectors():
+        selector_builds = _filter_targets(builds, selector)
+        if not selector_builds:
+          logger.error('selector "%s" could not be satisfied', selector)
+          return False
+        required_builds.update(selector_builds)
+
+      for target_id, build in required_builds.items():
+        if _needs_build(build):
+          logger.info('building target %s', colored(target_id, 'blue'))
+          os.makedirs(args.build_directory, exist_ok=True)
+          build.build(args.build_directory)
+        else:
+          logger.info('skipping target %s', colored(target_id, 'blue'))
+
+      publisher.publish(required_builds.values(), args.test, args.build_directory)
+    except:
+      logger.exception('error while running publisher "%s"', name)
+
+  for key, publisher in publishers.items():
+    _run_publisher(key, publisher)
 
 
 _entry_main = lambda: sys.exit(main())

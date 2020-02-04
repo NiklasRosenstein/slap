@@ -42,6 +42,35 @@ assert _PLUGINS_ENTRYPOINT == __name__
 VersionRef = collections.namedtuple('VersionRef', 'filename,start,end,value')
 
 
+class BuildResult(enum.Enum):
+  SUCCESS = 'SUCCESS'
+  FAILURE = 'FAILURE'
+
+
+class IBuildTarget(Interface):
+
+  def get_name(self) -> str:
+    pass
+
+  def get_build_artifacts(self) -> Iterable[str]:
+    pass
+
+  def build(self, build_directory: str) -> BuildResult:
+    pass
+
+
+class IPublishTarget(Interface):
+
+  def get_name(self) -> str:
+    pass
+
+  def get_build_selectors(self) -> Iterable[str]:
+    pass
+
+  def publish(self, builds: Iterable[IBuildTarget], test: bool, build_directory: str):
+    pass
+
+
 class CheckResult(object):
   """ The result of a check performed by a plugin. """
 
@@ -136,6 +165,14 @@ class IPackagePlugin(IBasePlugin):
 
   @default
   def get_package_version_refs(self, package: 'Package') -> Iterable[VersionRef]:
+    return ()
+
+  @default
+  def get_package_build_targets(self, package: 'Package') -> Iterable[IBuildTarget]:
+    return ()
+
+  @default
+  def get_package_publish_targets(self, package: 'Package') -> Iterable[IPublishTarget]:
     return ()
 
 

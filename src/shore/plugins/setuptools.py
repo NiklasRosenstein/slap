@@ -23,14 +23,22 @@
 plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
-from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin, VersionRef
-from shore.model import Package
 from nr.interface import implements, override
-from typing import Iterable
+from shore.core.plugins import (
+  BuildResult,
+  CheckResult,
+  FileToRender,
+  IBuildTarget,
+  IPackagePlugin,
+  VersionRef)
+from shore.model import Package
+from typing import Iterable, Optional
 import contextlib
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 import textwrap
 
@@ -60,8 +68,65 @@ def rewrite_section(fp, data, begin_marker, end_marker):
   fp.write(suffix)
 
 
+@implements(IBuildTarget)
+class SetuptoolsBuildTarget:
+
+  _FORMATS_MAP = {
+    'zip': '.zip',
+    'gztar': '.tar.gz',
+    'bztar': '.tar.bz2',
+    'ztar': '.tar.Z',
+    'tar': '.tar'
+  }
+
+  def __init__(self, build_type: str, package: Package):
+    self.build_type = build_type
+    self.formats = ['gztar']
+    self.package = package
+
+  @override
+  def get_name(self) -> str:
+    return self.build_type
+
+  @override
+  def get_build_artifacts(self) -> Iterable[str]:
+    for f in self.formats:
+      yield '{}-{}{}'.format(self.package.name, self.package.version,
+        self._FORMATS_MAP[f])
+
+  @override
+  def build(self, build_directory: str) -> BuildResult:
+    # TODO: Can we change the distribution output directory with an option?
+    dist_directory = os.path.join(self.package.directory, 'dist')
+    dist_exists = os.path.exists(dist_directory)
+    res = subprocess.call([
+        'python',
+        'setup.py',
+        self.build_type,
+        '--formats', ','.join(self.formats)
+      ],
+      cwd=self.package.directory)
+    if res != 0:
+      return BuildResult.FAILURE
+
+    # Make sure the files end up in the correct directory.
+    for filename in self.get_build_artifacts():
+      src = os.path.join(dist_directory, filename)
+      dst = os.path.join(build_directory, filename)
+      if not os.path.isfile(src):
+        raise RuntimeError('{} not produced during build'.format(src))
+      if src != dst:
+        os.rename(src, dst)
+
+    # Cleanup after yourself.
+    if not dist_exists:
+      shutil.rmtree(dist_directory)
+
+    return BuildResult.SUCCESS
+
+
 @implements(IPackagePlugin)
-class SetuptoolsRenderer(object):
+class SetuptoolsRenderer:
 
   @override
   def get_package_files(self, package: Package) -> Iterable[FileToRender]:
@@ -80,6 +145,10 @@ class SetuptoolsRenderer(object):
       match = re.search(self._VERSION_REGEX, fp.read())
       if match:
         yield VersionRef(entry_file, match.start(1), match.end(1), match.group(1))
+
+  @override
+  def get_package_build_targets(self, package: Package) -> Iterable[IBuildTarget]:
+    yield SetuptoolsBuildTarget('sdist', package)
 
   _VERSION_REGEX = '__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
   _BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
