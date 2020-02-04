@@ -1,0 +1,3 @@
+# Auto-generated with shore. Do not edit. {
+recursive-include src/shore/templates *
+# }
