@@ -7,10 +7,6 @@ description: |
   for pure Python packages.
 author: Niklas Rosenstein <rosensteinniklas@gmail.com>
 
-use:
-  - setuptools
-  - pypi
-
 requirements:
   - python ^2.7|^3.4
   - beautifulsoup4 ^4.8.1
