@@ -21,6 +21,7 @@
 
 from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin, IMonorepoPlugin, VersionRef
 from shore.model import BaseObject, Monorepo, Package
+from shore.plugins._util import find_readme_file
 from nr.interface import implements, override
 from typing import Iterable, Optional
 import os
@@ -44,6 +45,9 @@ class CorePlugin:
         break
     else:
       yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
+
+    if not find_readme_file(package.directory):
+      yield CheckResult(package, 'WARNING', 'No README file found.')
 
     if not package.get_author():
       yield CheckResult(package, 'WARNING', 'missing $.author')
