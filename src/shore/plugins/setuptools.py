@@ -116,6 +116,8 @@ class SetuptoolsBuildTarget:
       if not os.path.isfile(src):
         raise RuntimeError('{} not produced during build'.format(src))
       if src != dst:
+        if os.path.isfile(dst):
+          os.remove(dst)
         os.rename(src, dst)
 
     # Cleanup after yourself.
