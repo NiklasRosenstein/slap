@@ -252,10 +252,8 @@ def _checks(parser, args):
     logger.info('👌 looking good')
     status = 0
   elif max_level == CheckResult.Level.WARNING:
-    logger.info('👎 warnings found')
     status = 1 if args.treat_warnings_as_errors else 0
   elif max_level ==  CheckResult.Level.ERROR:
-    logger.info('❌ errors found')
     status = 1
   else:
     status = 0
