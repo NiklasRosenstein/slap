@@ -218,7 +218,7 @@ def _run_for_subject(subject: Union[Package, Monorepo], func, all: bool) -> List
   if all:
     if not isinstance(subject, Monorepo):
       parser.error('--all can only be used in a monorepo context')
-    subjects = [subject] + list(subject.get_packages(_cache))
+    subjects = [subject] + list(subject.get_packages())
     return [func(x) for x in subjects]
   else:
     return [func(subject)]
