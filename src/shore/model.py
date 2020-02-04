@@ -33,6 +33,7 @@ from nr.databind.core import (
 from nr.databind.json import (
   JsonDefault,
   JsonDeserializer,
+  JsonFieldName,
   JsonModule,
   JsonStoreRemainingKeys)
 from shore.core.plugins import (
@@ -387,6 +388,7 @@ class CommonPackageData(Struct):
   license = Field(str, default=None)
   url = Field(str, default=None)
   use = Field([PluginConfig], default=list)
+  tag_format = Field(str, JsonFieldName('tag-format'), default='{version}')
 
 
 class ObjectCache(object):
@@ -521,11 +523,12 @@ class Package(BaseObject, CommonPackageData):
 
   #: The long description of the package. If this is not defined, the
   #: setuptools plugin will load the README file.
-  long_description = Field(str, default=None)
+  long_description = Field(str, JsonFieldName('long-description'), default=None)
 
   #: The content type for the long description. If not specified, the
   #: setuptools plugin will base that on the suffix of the README file.
-  long_description_content_type = Field(str, default=None)
+  long_description_content_type = Field(str,
+    JsonFieldName('long-description-content-type'), default=None)
 
   #: The name of the module (potentially as a dottet path for namespaced
   #: modules). This is used to find the entry file in #get_entry_file().
@@ -533,13 +536,14 @@ class Package(BaseObject, CommonPackageData):
   modulename = Field(str, default=None)
 
   #: The directory for the source files.
-  source_directory = Field(str, default='src')
+  source_directory = Field(str, JsonFieldName('source-directory'), default='src')
 
   #: The names of packages that should be excluded when installing the
   #: package. The setuptools plugin will automatically expand the names
   #: here to conform with what the #setuptools.find_packages() function
   #: expects (eg. 'test' is converted into 'test' and 'test.*').
-  exclude_packages = Field([str], default=lambda: ['test', 'docs'])
+  exclude_packages = Field([str], JsonFieldName('exclude-packages'),
+    default=lambda: ['test', 'docs'])
 
   #: The requirements for the package.
   requirements = Field(RootRequirements, default=RootRequirements)
@@ -585,6 +589,10 @@ class Package(BaseObject, CommonPackageData):
         if not self.has_plugin(x.name))
 
     return plugins
+
+  def get_tag(self, version: str) -> str:
+    return self._get_inherited_field('tag_format').format(
+      name=self.name, version=version)
 
   def on_load_hook(self):
     """ Called when the package is loaded. Attempts to find the Monorepo that
