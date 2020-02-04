@@ -30,7 +30,11 @@ from nr.databind.core import (
   SerializationValueError,
   SerializationTypeError,
   translate_type_def)
-from nr.databind.json import JsonDeserializer, JsonModule, JsonStoreRemainingKeys
+from nr.databind.json import (
+  JsonDefault,
+  JsonDeserializer,
+  JsonModule,
+  JsonStoreRemainingKeys)
 from shore.core.plugins import (
   IBasePlugin,
   IBuildTarget,
@@ -511,6 +515,9 @@ class Package(BaseObject, CommonPackageData):
 
   #: The package description.
   description = Field(str)
+
+  #: The default "use" field is populated with setuptools and pypi.
+  use = Field([PluginConfig], JsonDefault(['setuptools', 'pypi']))
 
   #: The long description of the package. If this is not defined, the
   #: setuptools plugin will load the README file.
