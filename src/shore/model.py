@@ -33,12 +33,14 @@ from nr.databind.core import (
 from nr.databind.json import JsonDeserializer, JsonModule, JsonStoreRemainingKeys
 from shore.core.plugins import (
   IBasePlugin,
+  IBuildTarget,
   IPackagePlugin,
+  IPublishTarget,
   IMonorepoPlugin,
   load_plugin,
   PluginNotFound)
 from shore.util.ast import load_module_members
-from typing import Any, Callable, Iterable, Optional, List, Type
+from typing import Any, Callable, Dict, Iterable, Optional, List, Type
 import ast
 import collections
 import copy
@@ -330,6 +332,20 @@ class PluginConfig(Struct):
     logger.debug('skipping plugin {}'.format(self.name))
     return ()
 
+  def get_build_targets(self, subject: 'BaseObject'):
+    if isinstance(subject, Package) and self.is_package_plugin:
+      logger.debug('getting package builders for plugin {}'.format(self.name))
+      return self.plugin.get_package_build_targets(subject)
+    logger.debug('skipping plugin {}'.format(self.name))
+    return ()
+
+  def get_publish_targets(self, subject: 'BaseObject'):
+    if isinstance(subject, Package) and self.is_package_plugin:
+      logger.debug('getting package publishers for plugin {}'.format(self.name))
+      return self.plugin.get_package_publish_targets(subject)
+    logger.debug('skipping plugin {}'.format(self.name))
+    return ()
+
   @JsonDeserializer
   def __deserialize(context, location):
     if isinstance(location.value, str):
@@ -344,7 +360,7 @@ class PluginConfig(Struct):
     try:
       plugin_cls = load_plugin(plugin_name)
     except PluginNotFound as exc:
-      raise SerializationValueError(location, str(exc))
+      raise SerializationValueError(location, 'plugin "{}" not found'.format(exc))
     if plugin_cls.Config is not None:
       config = context.deserialize(
         config,
@@ -416,6 +432,26 @@ class BaseObject(Struct):
       core_plugin = load_plugin('core')
       plugins.insert(0, PluginConfig('core', core_plugin.new_instance(None)))
     return plugins
+
+  def get_build_targets(self) -> Dict[str, IBuildTarget]:
+    targets = {}
+    for plugin in self.get_plugins():
+      for target in plugin.get_build_targets(self):
+        target_id = plugin.name + ':' + target.get_name()
+        if target_id in targets:
+          raise RuntimeError('build target ID {} is not unique'.format(target_id))
+        targets[target_id] = target
+    return targets
+
+  def get_publish_targets(self) -> Dict[str, IPublishTarget]:
+    targets = {}
+    for plugin in self.get_plugins():
+      for target in plugin.get_publish_targets(self):
+        target_id = plugin.name + ':' + target.get_name()
+        if target_id in targets:
+          raise RuntimeError('publish target ID {} is not unique'.format(target_id))
+        targets[target_id] = target
+    return targets
 
   @classmethod
   def load(cls, filename: str, loader: ObjectCache) -> '_DeserializableFromFile':

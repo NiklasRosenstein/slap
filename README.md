@@ -68,22 +68,14 @@ After the setup files have been generated, you can use the package manager
 to build and publish your package. Shore can do the same for you if you don't
 want to leave your comfort zone however. ;-)
 
-By default, there is only one publishing target defined in any `package.yaml`
-which is PyPI. Shore also supports generating Conda package files and
-publishing to multiple Conda packages at the same time.
-
-    $ shore publish --all
-
-This will attempt to publish the package to all configured targets. If one
-target fails, all other targets will continue to be tried (as to not make the
-order of targets define targets will be skipped if one fails).
-
-Some targets support publishing to a test registry (eg. PyPI). This can be
-done by specifying the targe to publish to and the `--test` flag.
+Currently shore only supports the `pypi` publishing target, which by default
+publishes your package on `https://pypi.org` (or `https://test.pypi.org` if
+you add the `--test` flag).
 
     $ shore publish pypi --test
 
-> Note: The target name here is the name that is defined in `package.yaml`.
+> Note: If you explicityl specify the `use` section in `package.yaml`, you
+> need to ensure that the `setuptools` and `pypi` plugin is in that list.
 
 __Including package data__
 
