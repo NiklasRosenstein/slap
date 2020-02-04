@@ -100,8 +100,10 @@ def get_argument_parser(prog=None):
   bump.add_argument('--minor', action='store_true')
   bump.add_argument('--major', action='store_true')
   bump.add_argument('--version')
-  bump.add_argument('--show', action='store_true')
+  bump.add_argument('--force', action='store_true')
+  bump.add_argument('--tag', action='store_true')
   bump.add_argument('--dry', action='store_true')
+  bump.add_argument('--show', action='store_true')
 
   update = subparser.add_parser('update')
   update.add_argument('--skip-checks', action='store_true')
@@ -305,9 +307,11 @@ def _bump(parser, args):
   # Ensure the version is the same accross all refs.
   current_version = version_refs[0].value
   different = [x for x in version_refs if x.value != current_version]
-  if different:
-    logging.error('inconsistent versions across files need to be fixed first.')
+  if different and not args.force:
+    logger.error('inconsistent versions across files need to be fixed first.')
     return 1
+  elif different:
+    logger.warning('found inconsistent versions across files.')
 
   # TODO (@NiklasRosenstein): Support four parts (hotfix)
   nums = tuple(map(int, current_version.split('.')))
@@ -326,10 +330,10 @@ def _bump(parser, args):
   else:
     raise RuntimeError('what happened?')
 
-  if new_version < nums:
+  if new_version < nums and not args.force:
     parser.error('new version {} is lower than currenet version {}'.format(
       '.'.join(map(str, new_version)), '.'.join(map(str, nums))))
-  if new_version == nums:
+  if new_version == nums and not args.force:
     parser.error('new version is equal to current version {}'.format(
       '.'.join(map(str, nums))))
 
@@ -353,6 +357,20 @@ def _bump(parser, args):
       contents = contents[:ref.start] + new_version + contents[ref.end:]
       with open(ref.filename, 'w') as fp:
         fp.write(contents)
+
+  if args.tag:
+    tag_name = subject.get_tag(new_version)
+    logger.info('tagging {}'.format(tag_name))
+    if not args.dry:
+      changed_files = [x.filename for x in version_refs]
+      command = ['git', 'add'] + changed_files
+      subprocess.check_call(command)
+      command = ['git', 'commit', '-m', 'bump version to {}'.format(new_version)]
+      subprocess.check_call(command)
+      command = ['git', 'tag', tag_name]
+      if args.force:
+        command += ['-f']
+      subprocess.check_call(command)
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
