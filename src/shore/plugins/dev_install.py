@@ -46,6 +46,7 @@ class DevInstallRenderer:
     # Write the install script.
     def write_script(_current, fp):
       fp.write('#!/bin/sh\n\n')
+      fp.write('pushd "$(dirname $(dirname ${BASH_SOURCE[0]}))"\n')
       fp.write('${PYTHON:-python} -m pip install \\\n')
       for package in ordered:
         directory = nodes[package]['directory']
@@ -56,6 +57,7 @@ class DevInstallRenderer:
         if package != ordered[-1]:
           fp.write(' \\')
         fp.write('\n')
+      fp.write('popd\n')
 
     yield FileToRender(monorepo.directory,
       self.config.filename, write_script).with_chmod('+x')
