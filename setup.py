@@ -36,7 +36,7 @@ setuptools.setup(
     ],
     'shore.core.plugins': [
       'core = shore.plugins.core:CorePlugin',
-      'devinstallscript = shore.plugins.devinstallscript:DevInstallScriptRenderer',
+      'dev-install = shore.plugins.dev_install:DevInstallRenderer',
       'pypi = shore.plugins.pypi:PypiPublisher',
       'setuptools = shore.plugins.setuptools:SetuptoolsRenderer',
     ]
