@@ -347,7 +347,6 @@ def _bump(parser, args):
   logger.info('bumping {} version reference(s)'.format(
     len(version_refs), current_version, new_version))
   for ref in version_refs:
-    assert ref.value == current_version
     logger.info('  {}: {} → {}'.format(os.path.relpath(ref.filename), ref.value, new_version))
     if not args.dry:
       with open(ref.filename) as fp:
