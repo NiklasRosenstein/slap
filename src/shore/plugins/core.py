@@ -57,14 +57,15 @@ class CorePlugin:
       yield CheckResult(package, 'WARNING', 'missing $.url')
 
     data = package.get_entry_metadata()
+    rel_entry_file = os.path.relpath(package.get_entry_file(), package.directory)
     if package.get_author() and data.author != str(package.get_author()):
       yield CheckResult(package, 'ERROR',
-        'Inconsistent package author ({!r} != {!r})'.format(
-          data.author, str(package.get_author())))
+        'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
+          data.author, rel_entry_file, str(package.get_author())))
     if package.get_version() and data.version != package.get_version():
       yield CheckResult(package, 'ERROR',
-        'Inconsistent package version ({!r} != {!r})'.format(
-          data.version, package.get_version()))
+        'Inconsistent package version (package.yaml: {!r} != {}: {!r})'.format(
+          data.version, rel_entry_file, package.get_version()))
 
   @override
   def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
