@@ -34,6 +34,7 @@ from shore.util.resources import walk_package_resources
 from termcolor import colored
 from typing import Any, Dict, Iterable, List, Optional, Union
 import argparse
+import io
 import jinja2
 import json
 import logging
@@ -110,6 +111,10 @@ def get_argument_parser(prog=None):
   update.add_argument('--skip-checks', action='store_true')
   update.add_argument('--all', action='store_true')
   update.add_argument('--dry', action='store_true')
+
+  verify = subparser.add_parser('verify')
+  verify.add_argument('--all')
+  verify.add_argument('--tag')
 
   build = subparser.add_parser('build')
   build.add_argument('target', nargs='?')
@@ -264,9 +269,7 @@ def _checks(parser, args):
 
 def _update(parser, args):
   def _render(subject):
-    files = []
-    for plugin in subject.get_plugins():
-      files.extend(plugin.get_files(subject))
+    files = Stream.concat(x.get_files(subject) for x in subject.get_plugins()).collect()
 
     logger.info('rendering %s file(s) for %s', len(files), _color_subject_name(subject))
     for file in files:
@@ -280,6 +283,59 @@ def _update(parser, args):
 
   subject = _load_subject(parser)
   _run_for_subject(subject, _render, args.all)
+
+
+def _verify(parser, args):
+  def _virtual_update(subject) -> Iterable[str]:
+    files = Stream.concat(x.get_files(subject) for x in subject.get_plugins())
+    for file in files:
+      if not os.path.isfile(file.name):
+        yield file.name
+        continue
+      fp = io.StringIO()
+      write_to_disk(file, fp=fp)
+      with open(file.name) as on_disk:
+        if fp.getvalue() != on_disk.read():
+          yield file.name
+
+  def _tag_matcher(subject) -> Iterable[Union[Monorepo, Package]]:
+    if isinstance(subject, Monorepo):
+      # Shore does not support tagging workflows for monorepos yet.
+      return; yield
+    if subject.get_tag(subject.version) == args.tag:
+      yield subject
+
+  status = 0
+
+  subject = _load_subject(parser)
+  files = _run_for_subject(subject, _virtual_update, args.all)
+  files = Stream.concat(files).collect()
+  if files:
+    logger.warning('%s file(s) would be changed by an update.', len(files))
+    status = 1
+  else:
+    logger.info('✔ no files would be changed by an update.')
+  for file in files:
+    logger.warning('  %s', os.path.relpath(file))
+
+  if args.tag:
+    matches = _run_for_subject(subject, _tag_matcher, args.all)
+    matches = Stream.concat(matches).collect()
+    if len(matches) == 0:
+      # TODO (@NiklasRosenstein): If we matched the {name} portion of the
+      #   tag_format (if present) we could find which package (or monorepo)
+      #   the tag was intended for.
+      logger.error('❌ unexpected tag: %s', args.tag)
+      status = 1
+    elif len(matches) > 1:
+      logger.error('❌ tag matches multiple subjects: %s', args.tag)
+      for match in matches:
+        logger.error('  %s', match.name)
+      status = 1
+    else:
+      logger.info('✔ tag %s matches %s', args.tag, matches[0].name)
+
+  return status
 
 
 def _bump(parser, args):

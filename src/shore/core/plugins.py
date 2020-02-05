@@ -33,6 +33,7 @@ from nr.interface import Interface, attr, default, implements, override, statica
 from pkg_resources import iter_entry_points
 from typing import Iterable
 import collections
+import contextlib
 import enum
 import nr.fs
 
@@ -222,19 +223,23 @@ def construct_plugin(name_or_cls, options):
   return cls(base_options)
 
 
-def write_to_disk(file):  # type: (IFileToRender)
-  """ Writes an #IFileToRender to disk. """
+def write_to_disk(file, fp=None):  # type: (IFileToRender, Optional[TextIO])
+  """ Writes an #IFileToRender to disk. If *fp* is specified, it will be used
+  as the target file to write to and the function simply handles the opening
+  of the current file version on disk.
 
+  Note also that if *fp* is specified, no file permissions will be changed. """
+
+  dst = fp
+  current = None
   nr.fs.makedirs(nr.fs.dir(file.name) or '.')
-  with nr.fs.atomic_file(file.name, text=True, encoding=file.encoding) as dst:
+  with contextlib.ExitStack() as stack:
+    if dst is None:
+      dst = stack.enter_context(nr.fs.atomic_file(
+        file.name, text=True, encoding=file.encoding))
     if nr.fs.isfile(file.name):
-      current = open(file.name, 'r', encoding=file.encoding)
-    else:
-      current = None
-    try:
-      file.render(current, dst)
-    finally:
-      if current:
-        current.close()
-  if file.chmod:
+      current = stack.enter_context(
+        open(file.name, 'r', encoding=file.encoding))
+    file.render(current, fp or dst)
+  if file.chmod and fp:
     nr.fs.chmod(file.name, file.chmod)
