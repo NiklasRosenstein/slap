@@ -167,13 +167,66 @@ class SetuptoolsRenderer:
         fp.write('{}\n'.format(entry))
 
   def _render_setup(self, _current, fp, package):
+    has_hooks = any(package.install_hooks)
+    has_install_hooks = any(x.event in ('before-install', 'install') for x in package.install_hooks)
+    has_develop_hooks = any(x.event in ('before-develop', 'develop') for x in package.install_hooks)
+
     # Write the header/imports.
+    fp.write('\n')
+    if has_hooks or has_install_hooks:
+      fp.write('from setuptools.command.install import install as _install_command\n')
+    if has_hooks or has_develop_hooks:
+      fp.write('from setuptools.command.develop import develop as _develop_command\n')
     fp.write(textwrap.dedent('''
       import io
       import re
       import setuptools
       import sys
-    '''))
+    ''').lstrip())
+
+    # Write hook overrides.
+    cmdclass = {}
+    if has_hooks:
+      fp.write('\ninstall_hooks = [\n')
+      for hook in package.install_hooks:
+        fp.write('  ' + json.dumps(hook.normalize().to_json(), sort_keys=True) + ',\n')
+      fp.write(']\n')
+      fp.write(textwrap.dedent('''
+        def _run_hooks(event):
+          import subprocess, shlex, os
+          def _shebang(fn):
+            with open(fn) as fp:
+              line = fp.readline()
+              if line.startswith('#'):
+                return shlex.split(line[1:].strip())
+              return []
+          for hook in install_hooks:
+            if not hook['event'] or hook['event'] == event:
+              command = [x.replace('$SHORE_INSTALL_HOOK_EVENT', event) for x in hook['command']]
+              if command[0].endswith('.py') or 'python' in _shebang(command[0]):
+                command.insert(0, sys.executable)
+              env = os.environ.copy()
+              env['SHORE_INSTALL_HOOK_EVENT'] = event
+              subprocess.call(command, env=env)
+      '''))
+    if has_install_hooks:
+      fp.write(textwrap.dedent('''
+        class install_command(_install_command):
+          def run(self):
+            _run_hooks('before-install')
+            super(install_command, self).run()
+            _run_hooks('install')
+      '''))
+      cmdclass['install'] = 'install_command'
+    if has_develop_hooks:
+      fp.write(textwrap.dedent('''
+        class develop_command(_develop_command):
+          def run(self):
+            _run_hooks('before-develop')
+            super(develop_command, self).run()
+            _run_hooks('develop')
+      '''))
+      cmdclass['develop'] = 'develop_command'
 
     # Write the helper that extracts the version number from the entry file.
     entry_file = package.get_entry_file()
@@ -243,7 +296,8 @@ class SetuptoolsRenderer:
         tests_require = {tests_require},
         python_requires = None, # TODO: {python_requires!r},
         data_files = {data_files},
-        entry_points = {entry_points}
+        entry_points = {entry_points},
+        cmdclass = {cmdclass}
       )
     ''').format(
       package=package,
@@ -261,6 +315,7 @@ class SetuptoolsRenderer:
       include_package_data=False,#package.package_data != [],
       data_files=data_files,
       entry_points=self._render_entrypoints(package.entrypoints),
+      cmdclass = '{' + ', '.join('{!r}: {}'.format(k, v) for k, v in cmdclass.items()) + '}'
     ))
 
   def _render_entrypoints(self, entrypoints):

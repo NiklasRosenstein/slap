@@ -23,7 +23,7 @@ if args.no_develop and args.uninstall:
 if args.type == 'develop':
   if args.no_develop:
     parser.error('conflicting options: --type=develop and --no-develop')
-else:
+elif args.type == 'install':
   args.no_develop = True
 
 if not args.packages:
@@ -45,13 +45,14 @@ command = [python, '-m', 'pip', 'uninstall' if args.uninstall else 'install']
 for pkgname in install_packages:
   if not args.no_develop and not args.uninstall:
     command.append('-e')
-  command.append(pkgname)
+  command.append(pkgname if args.uninstall else './' + pkgname)
 if args.uninstall:
   command.append('-y')
 
 project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if args.verbose:
+  command.append('-v')
   print('Running command in working directory', project_dir)
   print('$', ' '.join(command))
 
