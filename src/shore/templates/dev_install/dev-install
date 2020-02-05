@@ -10,13 +10,21 @@ package_def = {{package_def}}
 
 parser = argparse.ArgumentParser()
 parser.add_argument('packages', nargs='*')
-parser.add_argument('--no-develop', action='store_true')
-parser.add_argument('--uninstall', action='store_true')
-parser.add_argument('-v', '--verbose', action='store_true')
+parser.add_argument('--no-develop', action='store_true', help='Perform a normal install of the packages.')
+parser.add_argument('--uninstall', action='store_true', help='Uninstall the packages instead.')
+parser.add_argument('--type', choices=('install', 'develop'), help='Alternative for using or not using --no-develop.')
+parser.add_argument('-v', '--verbose', action='store_true', help='Print the Pip command that is run.')
 args = parser.parse_args()
 
-if args.uninstall and args.no_develop:
-  parser.error('conflicting options: --uninstall and --no-develop')
+if args.type and args.uninstall:
+  parser.error('conflicting options: --type and --uninstall')
+if args.no_develop and args.uninstall:
+  parser.error('conflicting options: --no-develop and --uninstall')
+if args.type == 'develop':
+  if args.no_develop:
+    parser.error('conflicting options: --type=develop and --no-develop')
+else:
+  args.no_develop = True
 
 if not args.packages:
   install_packages = [x['name'] for x in package_def]
