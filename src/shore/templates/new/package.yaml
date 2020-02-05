@@ -1,9 +1,12 @@
 package:
   name: "{{name}}"
+{% if modulename %}  modulename: "{{ modulename }}"{% endif %}
   version: "{{version or "0.0.1"}}"
+{% if author %}  author: "{{ author }}"{% endif %}
   license: "{{license or "MIT"}}"
   description: "Package description here."
 
 requirements:
   - python ^3.4
   - test: []
+

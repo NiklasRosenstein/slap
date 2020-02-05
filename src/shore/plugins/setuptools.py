@@ -23,14 +23,24 @@
 plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
-from pliz.core.plugins import FileToRender, IPlugin, PluginContext, Options, CheckResult
 from nr.interface import implements, override
-from typing import Iterable
+from shore.core.plugins import (
+  BuildResult,
+  CheckResult,
+  FileToRender,
+  IBuildTarget,
+  IPackagePlugin,
+  VersionRef)
+from shore.model import Package
+from typing import Iterable, Optional
 import contextlib
 import json
 import os
-import textwrap
+import re
+import shutil
+import subprocess
 import sys
+import textwrap
 
 
 def _normpath(x):
@@ -58,40 +68,100 @@ def rewrite_section(fp, data, begin_marker, end_marker):
   fp.write(suffix)
 
 
-@implements(IPlugin)
-class SetuptoolsRenderer(object):
+@implements(IBuildTarget)
+class SetuptoolsBuildTarget:
 
-  def __init__(self, options):
-    pass
+  _FORMATS_MAP = {
+    'zip': '.zip',
+    'gztar': '.tar.gz',
+    'bztar': '.tar.bz2',
+    'ztar': '.tar.Z',
+    'tar': '.tar'
+  }
+
+  def __init__(self, build_type: str, package: Package):
+    self.build_type = build_type
+    self.formats = ['gztar']
+    self.package = package
 
   @override
-  @classmethod
-  def get_options(cls):
-    return Options({})
+  def get_name(self) -> str:
+    return self.build_type
 
   @override
-  def perform_checks(self, context: PluginContext) -> Iterable[CheckResult]:
-    return; yield
+  def get_build_artifacts(self) -> Iterable[str]:
+    for f in self.formats:
+      yield '{}-{}{}'.format(self.package.name, self.package.version,
+        self._FORMATS_MAP[f])
 
   @override
-  def get_files_to_render(self, context):
-    for package in context.packages:
-      if package.manifest:
-        yield FileToRender(package.directory,
-          'MANIFEST.in', self._render_manifest, package)
+  def build(self, build_directory: str) -> BuildResult:
+    # TODO: Can we change the distribution output directory with an option?
+    dist_directory = os.path.join(self.package.directory, 'dist')
+    dist_exists = os.path.exists(dist_directory)
+    res = subprocess.call([
+        'python',
+        'setup.py',
+        self.build_type,
+        '--formats', ','.join(self.formats)
+      ],
+      cwd=self.package.directory)
+    if res != 0:
+      return BuildResult.FAILURE
+
+    # Make sure the files end up in the correct directory.
+    for filename in self.get_build_artifacts():
+      src = os.path.join(dist_directory, filename)
+      dst = os.path.join(build_directory, filename)
+      if not os.path.isfile(src):
+        raise RuntimeError('{} not produced during build'.format(src))
+      if src != dst:
+        if os.path.isfile(dst):
+          os.remove(dst)
+        os.rename(src, dst)
+
+    # Cleanup after yourself.
+    if not dist_exists:
+      shutil.rmtree(dist_directory)
+
+    return BuildResult.SUCCESS
+
+
+@implements(IPackagePlugin)
+class SetuptoolsRenderer:
+
+  @override
+  def get_package_files(self, package: Package) -> Iterable[FileToRender]:
+    if package.manifest:
       yield FileToRender(package.directory,
-        'setup.py', self._render_setup, package)
+        'MANIFEST.in', self._render_manifest, package)
+    yield FileToRender(package.directory,
+      'setup.py', self._render_setup, package)
 
-  BEGIN_SECTION = '# Auto-generated with Pliz. Do not edit. {'
-  END_SECTION = '# }'
+  @override
+  def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
+    entry_file = package.get_entry_file()
+    if not os.path.isfile(entry_file):
+      return; yield
+    with open(entry_file) as fp:
+      match = re.search(self._VERSION_REGEX, fp.read())
+      if match:
+        yield VersionRef(entry_file, match.start(1), match.end(1), match.group(1))
 
-  ENTRYPOINT_VARS = {
+  @override
+  def get_package_build_targets(self, package: Package) -> Iterable[IBuildTarget]:
+    yield SetuptoolsBuildTarget('sdist', package)
+
+  _VERSION_REGEX = '__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
+  _BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
+  _END_SECTION = '# }'
+  _ENTRTYPOINT_VARS = {
     'python-major-version': 'sys.version[0]',
     'python-major-minor-version': 'sys.version[:3]'
   }
 
   def _render_manifest(self, current, fp, package):
-    markers = (self.BEGIN_SECTION, self.END_SECTION)
+    markers = (self._BEGIN_SECTION, self._END_SECTION)
     with rewrite_section(fp, current.read() if current else '', *markers):
       for entry in package.manifest:
         fp.write('{}\n'.format(entry))
@@ -105,8 +175,8 @@ class SetuptoolsRenderer(object):
       import sys
     '''))
 
-    # Write the hepler that extracts the version number from the entry file.
-    entry_file = package.package.entry_file or package.get_default_entry_file()
+    # Write the helper that extracts the version number from the entry file.
+    entry_file = package.get_entry_file()
     fp.write(textwrap.dedent('''
       with io.open({entrypoint_file!r}, encoding='utf8') as fp:
         version = re.search(r"__version__\s*=\s*'(.*)'", fp.read()).group(1)
@@ -122,7 +192,7 @@ class SetuptoolsRenderer(object):
     else:
       fp.write(textwrap.dedent('''
         long_description = {long_description!r}
-      '''.format(long_description=package.package.long_description)))
+      '''.format(long_description=package.long_description)))
       readme = Readme(None, 'text/plain')
 
     # Write the install requirements.
@@ -143,13 +213,13 @@ class SetuptoolsRenderer(object):
       tests_require = '[]'
 
     if package.datafiles:
-      self._render_datafiles(fp, package.package.name, package.datafiles)
+      self._render_datafiles(fp, package.name, package.datafiles)
       data_files = 'data_files'
     else:
       data_files = '[]'
 
     exclude_packages = []
-    for pkg in package.package.exclude_packages:
+    for pkg in package.exclude_packages:
       exclude_packages.append(pkg)
       exclude_packages.append(pkg + '.*')
 
@@ -163,8 +233,8 @@ class SetuptoolsRenderer(object):
         description = {description!r},
         long_description = long_description,
         long_description_content_type = {long_description_content_type!r},
-        url = {package.url!r},
-        license = {package.license!r},
+        url = {url!r},
+        license = {license!r},
         packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),
         package_dir = {{'': {src_directory!r}}},
         include_package_data = {include_package_data!r},
@@ -176,15 +246,17 @@ class SetuptoolsRenderer(object):
         entry_points = {entry_points}
       )
     ''').format(
-      package=package.package,
-      author_name=package.package.author.name if package.package.author else None,
-      author_email=package.package.author.email if package.package.author else None,
-      description=package.package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
+      package=package,
+      author_name=package.get_author().name if package.get_author() else None,
+      author_email=package.get_author().email if package.get_author() else None,
+      url=package.get_url(),
+      license=package.get_license(),
+      description=package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
       long_description_content_type=readme.content_type,
       extras_require=extras_require,
       tests_require=tests_require,
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
-      src_directory=package.package.source_directory,
+      src_directory=package.source_directory,
       exclude_packages=exclude_packages,
       include_package_data=False,#package.package_data != [],
       data_files=data_files,
@@ -200,7 +272,7 @@ class SetuptoolsRenderer(object):
       for item in value:
         item = repr(item)
         args = []
-        for varname, expr in self.ENTRYPOINT_VARS.items():
+        for varname, expr in self._ENTRTYPOINT_VARS.items():
           varname = '{{' + varname + '}}'
           if varname in item:
             item = item.replace(varname, '{' + str(len(args)) + '}')
