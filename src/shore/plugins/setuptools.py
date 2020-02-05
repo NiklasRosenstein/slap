@@ -213,18 +213,18 @@ class SetuptoolsRenderer:
       fp.write(textwrap.dedent('''
         class install_command(_install_command):
           def run(self):
-            _run_hooks('before-install')
-            super(install_command, self).run()
             _run_hooks('install')
+            super(install_command, self).run()
+            _run_hooks('post-install')
       '''))
       cmdclass['install'] = 'install_command'
     if has_develop_hooks:
       fp.write(textwrap.dedent('''
         class develop_command(_develop_command):
           def run(self):
-            _run_hooks('before-develop')
-            super(develop_command, self).run()
             _run_hooks('develop')
+            super(develop_command, self).run()
+            _run_hooks('post-develop')
       '''))
       cmdclass['develop'] = 'develop_command'
 
