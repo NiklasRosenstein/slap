@@ -25,6 +25,7 @@ from nr.databind.core import (
   Field,
   MutablePath,
   MixinDecoration,
+  MultiType,
   ObjectMapper,
   Struct,
   SerializationValueError,
@@ -52,6 +53,7 @@ import copy
 import logging
 import os
 import re
+import shlex
 import yaml
 
 __all__ = ['Package', 'Monorepo']
@@ -359,7 +361,7 @@ class PluginConfig(Struct):
     elif isinstance(location.value, dict):
       if len(location.value) != 1:
         raise SerializationValueError(location, 'expected only one key')
-      plugin_name, config = next(location.value.items())
+      plugin_name, config = next(iter(location.value.items()))
     else:
       raise SerializationTypeError(location, 'expected str or dict')
     try:
@@ -377,6 +379,30 @@ class PluginConfig(Struct):
     else:
       config = None
     return PluginConfig(plugin_name, plugin_cls.new_instance(config))
+
+
+class InstallHook(Struct):
+  MixinDecoration('json')
+  event = Field(str, default=None)
+  command = Field(MultiType((str, [str])))  #: Can be a string or list of strings.
+
+  def normalize(self) -> 'InstallHook':
+    if isinstance(self.command, str):
+      return InstallHook(self.event, shlex.split(self.command))
+    return self
+
+  @JsonDeserializer
+  def __deserialize(context, location):
+    if isinstance(location.value, str):
+      return InstallHook(None, location.value)
+    elif isinstance(location.value, dict):
+      if len(location.value) != 1:
+        raise SerializationValueError(location, 'expected only one key')
+      event, command = next(iter(location.value.items()))
+      command = context.deserialize(command, InstallHook.command.datatype, 'command')
+      return InstallHook(event, command)
+    else:
+      raise NotImplementedError  # Default deserialization
 
 
 class CommonPackageData(Struct):
@@ -557,6 +583,9 @@ class Package(BaseObject, CommonPackageData):
 
   #: A list of instructions to render in the MANIFEST.in file.
   manifest = Field([str], default=list)
+
+  #: Hooks that will be executed on install events (install/develop).
+  install_hooks = Field([InstallHook], JsonFieldName('install-hooks'), default=list)
 
   def _get_inherited_field(self, field_name: str) -> Any:
     value = getattr(self, field_name)

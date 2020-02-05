@@ -40,5 +40,6 @@ setuptools.setup(
       'pypi = shore.plugins.pypi:PypiPublisher',
       'setuptools = shore.plugins.setuptools:SetuptoolsRenderer',
     ]
-  }
+  },
+  cmdclass = {}
 )
