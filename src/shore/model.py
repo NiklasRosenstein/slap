@@ -591,8 +591,10 @@ class Package(BaseObject, CommonPackageData):
     return plugins
 
   def get_tag(self, version: str) -> str:
-    return self._get_inherited_field('tag_format').format(
-      name=self.name, version=version)
+    tag_format = self._get_inherited_field('tag_format')
+    if '{name}' not in tag_format:
+      tag_format = '{name}@' + tag_format
+    return tag_format.format(name=self.name, version=version)
 
   def on_load_hook(self):
     """ Called when the package is loaded. Attempts to find the Monorepo that
