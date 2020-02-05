@@ -299,7 +299,7 @@ def _verify(parser, args):
         continue
       fp = io.StringIO()
       write_to_disk(file, fp=fp)
-      with open(file.name) as on_disk:
+      with io.open(file.name, newline='') as on_disk:
         if fp.getvalue() != on_disk.read():
           yield file.name
 
