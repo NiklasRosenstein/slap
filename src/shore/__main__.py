@@ -237,52 +237,57 @@ def _color_subject_name(subject: Union[Package, Monorepo]) -> str:
     return colored(subject.name, color)
 
 
-def _print_checks_for(subject: Union[Package, Monorepo], print_header: bool=True) -> Optional[CheckResult.Level]:
-  checks = []
-  for plugin in subject.get_plugins():
-    checks.extend(plugin.get_checks(subject))
-  if print_header:
-    logging.info('triggered %s check(s) for %s', len(checks), _color_subject_name(subject))
-  colors = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
-  for check in checks:
-    level = colored(check.level.name, colors[check.level.name])
-    print('{}: {}'.format(level, check.message))
-  return max(x.level for x in checks) if checks else None
+def _run_checks(subject, all: bool, treat_warnings_as_errors: bool=False):
+  def _collect_checks(subject):
+    return Stream.concat(x.get_checks(subject) for x in subject.get_plugins())
+  checks = Stream.concat(_run_for_subject(subject, _collect_checks, all)).collect()
+  if not checks:
+    logger.info('✔ no checks triggered')
+    return 0
 
-
-def _checks(parser, args):
-  subject = _load_subject(parser)
-  levels = _run_for_subject(subject, _print_checks_for, args.all)
-  max_level = max(filter(bool, levels), default=None)
-  if max_level is None or max_level == CheckResult.Level.INFO:
-    logger.info('👌 looking good')
+  max_level = max(x.level for x in checks)
+  if max_level == CheckResult.Level.INFO:
     status = 0
   elif max_level == CheckResult.Level.WARNING:
-    status = 1 if args.treat_warnings_as_errors else 0
+    status = 1 if treat_warnings_as_errors else 0
   elif max_level ==  CheckResult.Level.ERROR:
     status = 1
   else:
-    status = 0
+    assert False, max_level
+
+  logger.info('%s %s check(s) triggered', '❌' if status != 0 else '✔',
+    len(checks))
+
+  colors = {'ERROR': 'red', 'WARNING': 'magenta', 'INFO': None}
+  for check in checks:
+    level = colored(check.level.name, colors[check.level.name])
+    print('  {} ({}): {}'.format(level, _color_subject_name(check.on), check.message))
+
   logger.debug('exiting with status %s', status)
   return 1
 
 
-def _update(parser, args):
-  def _render(subject):
-    files = Stream.concat(x.get_files(subject) for x in subject.get_plugins()).collect()
+def _checks(parser, args):
+  subject = _load_subject(parser)
+  return _run_checks(subject, args.all, args.treat_warnings_as_errors)
 
-    logger.info('rendering %s file(s) for %s', len(files), _color_subject_name(subject))
-    for file in files:
-      logger.info('  %s', os.path.relpath(file.name))
-      if not args.dry:
-        write_to_disk(file)
-    if not args.skip_checks:
-      max_level = _print_checks_for(subject, print_header=False)
-      if max_level is not None:
-        print()
+
+def _update(parser, args):
+  def _collect_files(subject):
+    return Stream.concat(x.get_files(subject) for x in subject.get_plugins())
 
   subject = _load_subject(parser)
-  _run_for_subject(subject, _render, args.all)
+  if not args.skip_checks:
+    _run_checks(subject, args.all)
+
+  files = _run_for_subject(subject, _collect_files, args.all)
+  files = Stream.concat(files).collect()
+
+  logger.info('⚪ rendering %s file(s)', len(files))
+  for file in files:
+    logger.info('  %s', os.path.relpath(file.name))
+    if not args.dry:
+      write_to_disk(file)
 
 
 def _verify(parser, args):
@@ -311,7 +316,7 @@ def _verify(parser, args):
   files = _run_for_subject(subject, _virtual_update, args.all)
   files = Stream.concat(files).collect()
   if files:
-    logger.warning('%s file(s) would be changed by an update.', len(files))
+    logger.warning('❌ %s file(s) would be changed by an update.', len(files))
     status = 1
   else:
     logger.info('✔ no files would be changed by an update.')
