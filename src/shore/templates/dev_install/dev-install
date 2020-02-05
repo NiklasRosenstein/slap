@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import argparse
+import os
+import subprocess
+import sys
+
+package_def = {{package_def}}
+
+parser = argparse.ArgumentParser()
+parser.add_argument('packages', nargs='*')
+parser.add_argument('--no-develop', action='store_true')
+parser.add_argument('--uninstall', action='store_true')
+parser.add_argument('-v', '--verbose', action='store_true')
+args = parser.parse_args()
+
+if args.uninstall and args.no_develop:
+  parser.error('conflicting options: --uninstall and --no-develop')
+
+if not args.packages:
+  install_packages = [x['name'] for x in package_def]
+else:
+  install_packages = []
+  def _resolve(pkgname):
+    if pkgname in install_packages:
+      return
+    package = next((x for x in package_def if x['name'] == pkgname), None)
+    if package is None:
+      parser.error('not a package of this monorepo: {}'.format(pkgname))
+    [_resolve(x) for x in package['requires']]
+    install_packages.append(pkgname)
+  [_resolve(x) for x in args.packages]
+
+python = os.getenv('PYTHON', 'python')
+command = [python, '-m', 'pip', 'uninstall' if args.uninstall else 'install']
+for pkgname in install_packages:
+  if not args.no_develop and not args.uninstall:
+    command.append('-e')
+  command.append(pkgname)
+if args.uninstall:
+  command.append('-y')
+
+project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+if args.verbose:
+  print('Running command in working directory', project_dir)
+  print('$', ' '.join(command))
+
+sys.exit(subprocess.call(command, cwd=project_dir))

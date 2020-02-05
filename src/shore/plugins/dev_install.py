@@ -19,12 +19,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from pkg_resources import resource_string
 from shore.core.plugins import FileToRender, IMonorepoPlugin
 from shore.model import Monorepo
 from nr.commons.algo.graph import toposort
 from nr.databind.core import Field, Struct
 from nr.interface import implements, override
 from typing import Dict, Iterable
+import json
 import os
 
 
@@ -39,25 +41,16 @@ class DevInstallRenderer:
   @override
   def get_monorepo_files(self, monorepo: Monorepo) -> Iterable[FileToRender]:
     nodes = self._get_interpackage_dependencies(monorepo)
+    pkg_order = list(toposort(sorted(nodes.keys()), lambda x: nodes[x]['dependencies']))
+    package_def = '[\n'
+    for pkgname in pkg_order:
+      package = {'name': pkgname, 'requires': nodes[pkgname]['dependencies']}
+      package_def += '  ' + json.dumps(package, sort_keys=True) + ',\n'
+    package_def += ']'
 
-    # Sort the packages in topological order for the install script.
-    ordered = list(toposort(sorted(nodes.keys()), lambda x: nodes[x]['dependencies']))
-
-    # Write the install script.
     def write_script(_current, fp):
-      fp.write('#!/bin/sh\n\n')
-      fp.write('pushd "$(dirname $(dirname ${BASH_SOURCE[0]}))"\n')
-      fp.write('${PYTHON:-python} -m pip install \\\n')
-      for package in ordered:
-        directory = nodes[package]['directory']
-        dependencies = nodes[package]['dependencies']
-        fp.write('  -e "{}"'.format(directory))
-        if dependencies:
-          fp.write(' `# depends on {}`'.format(', '.join(dependencies)))
-        if package != ordered[-1]:
-          fp.write(' \\')
-        fp.write('\n')
-      fp.write('popd\n')
+      template = resource_string('shore', 'templates/dev_install/dev-install').decode('utf8')
+      fp.write(template.replace('{{package_def}}', package_def))
 
     yield FileToRender(monorepo.directory,
       self.config.filename, write_script).with_chmod('+x')
