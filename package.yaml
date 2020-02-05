@@ -1,17 +1,16 @@
-package:
-  name: pliz
-  version: 0.1.0
-  license: MIT
-  url: https://git.niklasrosenstein.com/NiklasRosenstein/pliz
-  description: |
-    Automates the heavy lifting of release and distribution management
-    for pure Python packages.
-  author: Niklas Rosenstein <rosensteinniklas@gmail.com>
-  use: [setuptools]
+name: shore
+version: "0.0.1"
+license: MIT
+url: https://git.niklasrosenstein.com/NiklasRosenstein/shore
+description: |
+  Automates the heavy lifting of release and distribution management
+  for pure Python packages.
+author: Niklas Rosenstein <rosensteinniklas@gmail.com>
 
 requirements:
   - python ^2.7|^3.4
   - beautifulsoup4 ^4.8.1
+  - jinja2 ^2.11.1
   - nr.databind ^0.0.1
   - nr.fs ^1.5.0
   - nr.proxy ^0.0.1
@@ -21,9 +20,12 @@ requirements:
 
 entrypoints:
   console_scripts:
-    - pliz = pliz.__main__:console_main
-  pliz.core.plugins:
-    - core = pliz.plugins.coreplugin:CorePlugin
-    - devinstallscript = pliz.plugins.devinstallscript:DevInstallScriptRenderer
-    - init = pliz.plugins.init:InitRenderer
-    - setuptools = pliz.plugins.setuptools:SetuptoolsRenderer
+    - shore = shore.__main__:_entry_main
+  shore.core.plugins:
+    - core = shore.plugins.core:CorePlugin
+    - dev-install = shore.plugins.dev_install:DevInstallRenderer
+    - pypi = shore.plugins.pypi:PypiPublisher
+    - setuptools = shore.plugins.setuptools:SetuptoolsRenderer
+
+manifest:
+  - recursive-include src/shore/templates *

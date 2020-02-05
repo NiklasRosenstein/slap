@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-# Copyright (c) 2019 Niklas Rosenstein
+# Copyright (c) 2020 Niklas Rosenstein
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -19,32 +19,27 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .commands.core import CommandList
-from .commands.info import InfoCommand
-from .commands.license import LicenseCommand
-from .commands.render import RenderCommand
-import argparse
-import sys
+from typing import Iterable, List
+import collections
+import subprocess
 
-commands = CommandList([
-  LicenseCommand(),
-  InfoCommand(),
-  RenderCommand()
-])
+FileStatus = collections.namedtuple('FileStatus', 'mode,filename')
 
 
-def main(argv=None, prog=None):
-  if prog is None and __name__ == '__main__':
-    prog = 'pliz'
-  parser = argparse.ArgumentParser(prog=prog)
-  commands.update_parser(parser)
-  args, argv = parser.parse_known_args()
-  commands.dispatch(parser, args, argv)
+def porcelain() -> Iterable[FileStatus]:
+  for line in subprocess.getoutput('git status --porcelain'):
+    mode, filename = line.strip().partition(' ')[::2]
+    yield FileStatus(mode, filename)
 
 
-def console_main():
-  sys.exit(main())
+def add(filenames: List[str]):
+  subprocess.check_call(['git', 'add'] + filenames)
 
 
-if __name__ == '__main__':
-  console_main()
+def commit(message):
+  subprocess.check_call(['git', 'commit', '-m', message])
+
+
+def tag(tag_name: str, force: bool=False):
+  command = ['git', 'tag', tag_name] + (['-f'] if force else [])
+  subprocess.check_call(command)
