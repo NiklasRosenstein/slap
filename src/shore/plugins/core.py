@@ -33,7 +33,7 @@ class CorePlugin:
 
   def _unhandled_keys(self, object: BaseObject) -> Iterable[CheckResult]:
     for path in object.unhandled_keys:
-      yield CheckResult(item, CheckResult.Level.WARNING, 'unknown key {}'.format(path))
+      yield CheckResult(object, CheckResult.Level.WARNING, 'unknown key {}'.format(path))
 
   @override
   def check_package(self, package: Package) -> Iterable[CheckResult]:
