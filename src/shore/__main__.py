@@ -28,6 +28,7 @@ from shore.core.plugins import (
   IPackagePlugin,
   write_to_disk)
 from shore.model import Monorepo, ObjectCache, Package
+from shore.util import git as _git
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
 from termcolor import colored
@@ -356,18 +357,22 @@ def _bump(parser, args):
         fp.write(contents)
 
   if args.tag:
+    if any(f.mode == 'A' for f in _git.porcelain()):
+      logger.error('cannot tag with non-empty staging area')
+      return 1
+
     tag_name = subject.get_tag(new_version)
     logger.info('tagging {}'.format(tag_name))
+
     if not args.dry:
       changed_files = [x.filename for x in version_refs]
-      command = ['git', 'add'] + changed_files
-      subprocess.check_call(command)
-      command = ['git', 'commit', '-m', 'bump version to {}'.format(new_version)]
-      subprocess.check_call(command)
-      command = ['git', 'tag', tag_name]
-      if args.force:
-        command += ['-f']
-      subprocess.check_call(command)
+      _git.add(changed_files)
+      if any(x.mode == 'A' for f in _git.porcelain()):
+        # The files may not have changed if the version did not actually
+        # update but --force was used (the goal of this is usually to end
+        # up here for the tagging).
+        _git.commit('bump version to {}'.format(new_version))
+      _git.tag(tag_name, force=args.force)
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
