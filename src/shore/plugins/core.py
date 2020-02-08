@@ -62,10 +62,10 @@ class CorePlugin:
       yield CheckResult(package, 'ERROR',
         'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
           data.author, rel_entry_file, str(package.get_author())))
-    if package.get_version() and data.version != package.get_version():
+    if package.get_version() and data.version != str(package.get_version()):
       yield CheckResult(package, 'ERROR',
         'Inconsistent package version (package.yaml: {!r} != {}: {!r})'.format(
-          data.version, rel_entry_file, package.get_version()))
+          data.version, rel_entry_file, str(package.get_version())))
 
   @override
   def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:

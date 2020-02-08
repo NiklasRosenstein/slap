@@ -91,7 +91,9 @@ class SetuptoolsBuildTarget:
   @override
   def get_build_artifacts(self) -> Iterable[str]:
     for f in self.formats:
-      yield '{}-{}{}'.format(self.package.name, self.package.version,
+      yield '{}-{}{}'.format(
+        self.package.name,
+        self.package.version,
         self._FORMATS_MAP[f])
 
   @override
@@ -111,10 +113,12 @@ class SetuptoolsBuildTarget:
 
     # Make sure the files end up in the correct directory.
     for filename in self.get_build_artifacts():
-      src = os.path.join(dist_directory, filename)
+      src = next(filter(os.path.isfile, [
+        os.path.join(dist_directory, filename),
+        os.path.join(dist_directory, filename.lower())]), None)
+      if not src:
+        raise RuntimeError('{} not produced by setup.py {}'.format(filename, self.build_type))
       dst = os.path.join(build_directory, filename)
-      if not os.path.isfile(src):
-        raise RuntimeError('{} not produced during build'.format(src))
       if src != dst:
         if os.path.isfile(dst):
           os.remove(dst)
@@ -251,10 +255,12 @@ class SetuptoolsRenderer:
     # Write the install requirements.
     fp.write('\n')
     self._render_requirements(fp, 'requirements', package.requirements)
-    if package.requirements.extra:
+    if package.requirements.extra or package.requirements.test:
       fp.write('extras_require = {}\n')
       for key, value in package.requirements.extra.items():
         self._render_requirements(fp, 'extras_require[{!r}]'.format(key), value)
+      if package.requirements.test:
+        self._render_requirements(fp, 'extras_require[{!r}]'.format('test'), package.requirements.test)
       extras_require = 'extras_require'
     else:
       extras_require = '{}'

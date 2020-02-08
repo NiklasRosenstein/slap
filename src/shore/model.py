@@ -19,23 +19,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from packaging.version import Version
 from nr.commons.py import classdef
-from nr.databind.core import (
-  Collection,
-  Field,
-  MutablePath,
-  MixinDecoration,
-  MultiType,
-  ObjectMapper,
-  Struct,
-  SerializationValueError,
-  SerializationTypeError,
-  translate_type_def)
+from nr.databind.core import Field, MixinDecoration, Struct
 from nr.databind.json import (
   JsonDefault,
   JsonDeserializer,
   JsonFieldName,
-  JsonModule,
   JsonStoreRemainingKeys)
 from shore.core.plugins import (
   IBasePlugin,
@@ -45,6 +35,7 @@ from shore.core.plugins import (
   IMonorepoPlugin,
   load_plugin,
   PluginNotFound)
+from shore.mapper import mapper
 from shore.util.ast import load_module_members
 from typing import Any, Callable, Dict, Iterable, Optional, List, Type
 import ast
@@ -147,11 +138,8 @@ class Requirement(object):
   @JsonDeserializer
   def __deserialize(context, location):
     if not isinstance(location.value, str):
-      raise SerializationTypeError(location)
-    try:
-      return Requirement.parse(location.value)
-    except ValueError as exc:
-      raise SerializationValueError(location, exc)
+      raise TypeError(location)
+    return Requirement.parse(location.value)
 
 
 class Requirements(object):
@@ -200,6 +188,9 @@ class Requirements(object):
     self.python = None
     self.required = []
     self.platforms = {}
+
+  def __bool__(self):
+    return bool(self.python or self.required or self.platforms)
 
   @JsonDeserializer
   def __deserialize(context, location):
@@ -288,7 +279,7 @@ class Datafile(Struct):
       else:
         source, target = left, '.'
       if not source or not target:
-        raise SerializationValueError(location, 'invalid DataFile spec: {!r}'.format(location.value))
+        raise ValueError('invalid DataFile spec: {!r}'.format(location.value))
       include = []
       exclude = []
       for pattern in patterns.split(','):
@@ -360,22 +351,18 @@ class PluginConfig(Struct):
       config = {}
     elif isinstance(location.value, dict):
       if len(location.value) != 1:
-        raise SerializationValueError(location, 'expected only one key')
+        raise ValueError('expected only one key')
       plugin_name, config = next(iter(location.value.items()))
     else:
-      raise SerializationTypeError(location, 'expected str or dict')
+      raise TypeError('expected str or dict')
     try:
       plugin_cls = load_plugin(plugin_name)
     except PluginNotFound as exc:
-      raise SerializationValueError(location, 'plugin "{}" not found'.format(exc))
+      raise ValueError('plugin "{}" not found'.format(exc))
     if plugin_cls.Config is not None:
-      config = context.deserialize(
-        config,
-        translate_type_def(plugin_cls.Config),
-        plugin_name)
+      config = context.deserialize(config, plugin_cls.Config, plugin_name)
     elif plugin_cls.Config is None and config:
-      raise SerializationTypeError(location,
-        'plugin {} expects no configuration'.format(plugin_name))
+      raise TypeError('plugin {} expects no configuration'.format(plugin_name))
     else:
       config = None
     return PluginConfig(plugin_name, plugin_cls.new_instance(config))
@@ -384,7 +371,7 @@ class PluginConfig(Struct):
 class InstallHook(Struct):
   MixinDecoration('json')
   event = Field(str, default=None)
-  command = Field(MultiType((str, [str])))  #: Can be a string or list of strings.
+  command = Field((str, [str]))  #: Can be a string or list of strings.
 
   def normalize(self) -> 'InstallHook':
     if isinstance(self.command, str):
@@ -397,7 +384,7 @@ class InstallHook(Struct):
       return InstallHook(None, location.value)
     elif isinstance(location.value, dict):
       if len(location.value) != 1:
-        raise SerializationValueError(location, 'expected only one key')
+        raise ValueError('expected only one key')
       event, command = next(iter(location.value.items()))
       command = context.deserialize(command, InstallHook.command.datatype, 'command')
       return InstallHook(event, command)
@@ -409,7 +396,7 @@ class CommonPackageData(Struct):
   """ Represents common fields for a package that can be defined in the
   `monorepo.yaml` to inherit by packages inside the mono repository. """
 
-  version = Field(str, default=None)
+  version = Field(Version, default=None)
   author = Field(Author, default=None)
   license = Field(str, default=None)
   url = Field(str, default=None)
@@ -438,7 +425,7 @@ class BaseObject(Struct):
   name = Field(str)
 
   #: The version of the object.
-  version = Field(str)
+  version = Field(Version)
 
   #: Plugins for this object.
   use = Field([PluginConfig])
@@ -494,7 +481,7 @@ class BaseObject(Struct):
 
     def _load(filename):
       with open(filename) as fp:
-        obj = ObjectMapper(JsonModule).deserialize(
+        obj = mapper.deserialize(
           yaml.safe_load(fp),
           cls,
           filename=filename,
@@ -515,7 +502,7 @@ class BaseObject(Struct):
 
 class Monorepo(BaseObject):
   #: Overrides the version field as it's optional for monorepos.
-  version = Field(str, default=None)
+  version = Field(Version, default=None)
 
   #: The data in this field propagates to the packages that are inside this
   #: mono repository.
