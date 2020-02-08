@@ -29,8 +29,10 @@ from shore.core.plugins import (
   write_to_disk)
 from shore.model import Monorepo, ObjectCache, Package
 from shore.util import git as _git
+from shore.util.ci import get_ci_version
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
+from shore.util.version import parse_version
 from termcolor import colored
 from typing import Any, Dict, Iterable, List, Optional, Union
 import argparse
@@ -56,6 +58,16 @@ def _get_author_info_from_git():
   if not name and not email:
     return None
   return '{} <{}>'.format(name, email)
+
+
+def _report_conflict(parser, args, *opts: str):
+  """ Checks if any two of the specified *opts* is present in *args*. If so,
+  a parser error will indicate the conflicting options. """
+
+  has_opts = set(k for k in opts if getattr(args, k))
+  if len(has_opts) > 1:
+    parser.error('conflicting options: {}'.format(
+      ' and '.join('--' + k for k in has_opts)))
 
 
 def _load_subject(parser) -> Union[Monorepo, Package, None]:
@@ -98,10 +110,11 @@ def get_argument_parser(prog=None):
   checks.add_argument('--treat-warnings-as-errors', action='store_true')
 
   bump = subparser.add_parser('bump')
+  bump.add_argument('--version')
   bump.add_argument('--patch', action='store_true')
   bump.add_argument('--minor', action='store_true')
   bump.add_argument('--major', action='store_true')
-  bump.add_argument('--version')
+  bump.add_argument('--ci', action='store_true')
   bump.add_argument('--force', action='store_true')
   bump.add_argument('--tag', action='store_true')
   bump.add_argument('--dry', action='store_true')
@@ -344,8 +357,11 @@ def _verify(parser, args):
 
 
 def _bump(parser, args):
+  _report_conflict(parser, args, 'version', 'ci')
+  _report_conflict(parser, args, 'major', 'minor', 'patch', 'version')
+
   subject = _load_subject(parser)
-  options = (args.patch, args.minor, args.major, args.version, args.show)
+  options = (args.patch, args.minor, args.major, args.version, args.show, args.ci)
   if sum(map(bool, options)) == 0:
     parser.error('no operation specified')
   elif sum(map(bool, options)) > 1:
@@ -365,39 +381,35 @@ def _bump(parser, args):
     return 0
 
   # Ensure the version is the same accross all refs.
-  current_version = version_refs[0].value
-  different = [x for x in version_refs if x.value != current_version]
-  if different and not args.force:
+  is_inconsistent = any(parse_version(x.value) != subject.version for x in version_refs)
+  if is_inconsistent and not args.force:
     logger.error('inconsistent versions across files need to be fixed first.')
     return 1
-  elif different:
+  elif is_inconsistent:
     logger.warning('found inconsistent versions across files.')
 
-  # TODO (@NiklasRosenstein): Support four parts (hotfix)
-  nums = tuple(map(int, current_version.split('.')))
-  assert len(nums) == 3, "version number must consist of 3 parts"
-
+  current_version = subject.version
   if args.patch:
-    new_version = (nums[0], nums[1], nums[2] + 1)
+    new_version = current_version.bump_patch()
   elif args.minor:
-    new_version = (nums[0], nums[1] + 1, 0)
+    new_version = current_version.bump_minor()
   elif args.major:
-    new_version = (nums[0] + 1, 0, 0)
-    new_version[0] += 1
+    new_version = current_version.bump_major()
   elif args.version:
-    new_version = tuple(map(int, args.version.split('.')))
-    assert len(nums) == 3, "version number must consist of 3 parts"
+    new_version = parse_version(args.version)
+  elif args.ci:
+    new_version = get_ci_version(subject)
   else:
     raise RuntimeError('what happened?')
 
-  if new_version < nums and not args.force:
+  if new_version < current_version and not args.force:
     parser.error('new version {} is lower than currenet version {}'.format(
-      '.'.join(map(str, new_version)), '.'.join(map(str, nums))))
-  if new_version == nums and not args.force:
-    parser.error('new version is equal to current version {}'.format(
-      '.'.join(map(str, nums))))
-
-  new_version = '.'.join(map(str, new_version))
+      new_version, current_version))
+  # Comparing as strings to include the prerelease/build number in the
+  # comparison.
+  if str(new_version) == str(current_version) and not args.force:
+    parser.error('new version {} is equal to current version {}'.format(
+      new_version, current_version))
 
   # The replacement below does not work if the same file is listed multiple
   # times so let's check for now that every file is listed only once.
@@ -413,7 +425,7 @@ def _bump(parser, args):
     if not args.dry:
       with open(ref.filename) as fp:
         contents = fp.read()
-      contents = contents[:ref.start] + new_version + contents[ref.end:]
+      contents = contents[:ref.start] + str(new_version) + contents[ref.end:]
       with open(ref.filename, 'w') as fp:
         fp.write(contents)
 
@@ -502,11 +514,18 @@ def _publish(parser, args):
           logger.info('skipping target %s', colored(target_id, 'blue'))
 
       publisher.publish(required_builds.values(), args.test, args.build_directory)
+      return True
     except:
       logger.exception('error while running publisher "%s"', name)
+      return False
 
+  status = 0
   for key, publisher in publishers.items():
-    _run_publisher(key, publisher)
+    if not _run_publisher(key, publisher):
+      status = 1
+
+  logger.debug('exit with status code %s', status)
+  return status
 
 
 _entry_main = lambda: sys.exit(main())

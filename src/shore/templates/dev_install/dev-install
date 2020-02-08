@@ -14,6 +14,7 @@ parser.add_argument('--no-develop', action='store_true', help='Perform a normal 
 parser.add_argument('--uninstall', action='store_true', help='Uninstall the packages instead.')
 parser.add_argument('--type', choices=('install', 'develop'), help='Alternative for using or not using --no-develop.')
 parser.add_argument('-v', '--verbose', action='store_true', help='Print the Pip command that is run.')
+parser.add_argument('--extras', help='Comma-separated extras to install.')
 args = parser.parse_args()
 
 if args.type and args.uninstall:
@@ -45,6 +46,8 @@ command = [python, '-m', 'pip', 'uninstall' if args.uninstall else 'install']
 for pkgname in install_packages:
   if not args.no_develop and not args.uninstall:
     command.append('-e')
+  if args.extras:
+    pkgname += '[' + args.extras + ']'
   command.append(pkgname if args.uninstall else './' + pkgname)
 if args.uninstall:
   command.append('-y')
