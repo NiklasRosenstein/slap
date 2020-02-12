@@ -13,6 +13,7 @@ requirements:
   - jinja2 ^2.11.1
   - nr.databind ^0.0.1
   - nr.fs ^1.5.0
+  - nr.pylang.utils ^0.0.1
   - nr.proxy ^0.0.1
   - requests ^2.22.0
   - packaging ^20.1

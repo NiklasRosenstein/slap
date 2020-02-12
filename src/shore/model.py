@@ -20,13 +20,13 @@
 # IN THE SOFTWARE.
 
 from packaging.version import Version
-from nr.commons.py import classdef
 from nr.databind.core import Field, MixinDecoration, Struct
 from nr.databind.json import (
   JsonDefault,
   JsonDeserializer,
   JsonFieldName,
   JsonStoreRemainingKeys)
+from nr.pylang.utils import classdef
 from shore.core.plugins import (
   IBasePlugin,
   IBuildTarget,
