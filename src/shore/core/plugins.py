@@ -28,7 +28,6 @@ perform several types of actions.
 """
 
 from nr.collections import abc
-from nr.commons.notset import NotSet
 from nr.interface import Interface, attr, default, implements, override, staticattr
 from pkg_resources import iter_entry_points
 from typing import Iterable
