@@ -22,7 +22,7 @@
 from pkg_resources import resource_string
 from shore.core.plugins import FileToRender, IMonorepoPlugin
 from shore.model import Monorepo
-from nr.commons.algo.graph import toposort
+from nr.algo.graph.toposort import toposort
 from nr.databind.core import Field, Struct
 from nr.interface import implements, override
 from typing import Dict, Iterable
