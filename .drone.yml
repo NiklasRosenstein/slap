@@ -12,7 +12,7 @@ steps:
   commands:
     # install
   - git submodule update --init
-  - vendor/nr-python-libs/bin/dev-install nr.databind nr.fs nr.proxy
+  - vendor/nr/bin/dev-install nr.algo.graph nr.databind nr.fs nr.proxy nr.pylang.utils
   - pip install -e .
   - pip install twine
 
