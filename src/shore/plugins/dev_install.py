@@ -44,7 +44,10 @@ class DevInstallRenderer:
     pkg_order = list(toposort(sorted(nodes.keys()), lambda x: nodes[x]['dependencies']))
     package_def = '[\n'
     for pkgname in pkg_order:
-      package = {'name': pkgname, 'requires': nodes[pkgname]['dependencies']}
+      package = {
+        'name': pkgname,
+        'requires': nodes[pkgname]['dependencies'],
+        'extra_requires': nodes[pkgname]['extra_requires']}
       package_def += '  ' + json.dumps(package, sort_keys=True) + ',\n'
     package_def += ']'
 
@@ -61,11 +64,19 @@ class DevInstallRenderer:
     for package in packages:
       nodes[package.name] = {
         'directory': os.path.basename(package.directory),
-        'dependencies': []
+        'dependencies': [],
+        'extra_requires': {}
       }
     for package in packages:
       for req in package.requirements.required:
         if req.package in nodes:
           nodes[package.name]['dependencies'].append(req.package)
+      for extra in package.requirements.extra:
+        for req in package.requirements.extra[extra]:
+          if req.package in nodes:
+            nodes[pacakge.name]['extra_requires'].setdefault(extra, []).append(req.package)
+      for req in (package.requirements.test.required if package.requirements.test else []):
+        if req.package in nodes:
+          nodes[package.name]['extra_requires'].setdefault('test', []).append(req.package)
 
     return nodes

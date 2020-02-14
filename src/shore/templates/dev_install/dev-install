@@ -31,15 +31,17 @@ if not args.packages:
   install_packages = [x['name'] for x in package_def]
 else:
   install_packages = []
-  def _resolve(pkgname):
+  def _resolve(pkgname, extras=()):
     if pkgname in install_packages:
       return
     package = next((x for x in package_def if x['name'] == pkgname), None)
     if package is None:
       parser.error('not a package of this monorepo: {}'.format(pkgname))
     [_resolve(x) for x in package['requires']]
+    for extra in extras:
+      [_resolve(x) for x in package['extra_requires'].get(extra, [])]
     install_packages.append(pkgname)
-  [_resolve(x) for x in args.packages]
+  [_resolve(x, (args.extras or '').split(',')) for x in args.packages]
 
 python = os.getenv('PYTHON', 'python')
 command = [python, '-m', 'pip', 'uninstall' if args.uninstall else 'install']
