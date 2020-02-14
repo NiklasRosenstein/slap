@@ -240,5 +240,5 @@ def write_to_disk(file, fp=None):  # type: (IFileToRender, Optional[TextIO])
       current = stack.enter_context(
         open(file.name, 'r', encoding=file.encoding))
     file.render(current, fp or dst)
-  if file.chmod and fp:
+  if file.chmod and not fp:
     nr.fs.chmod(file.name, file.chmod)
