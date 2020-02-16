@@ -32,6 +32,7 @@ if not args.packages:
 else:
   install_packages = []
   def _resolve(pkgname, extras=()):
+    extras = list(filter(bool, extras))
     if pkgname in install_packages:
       return
     package = next((x for x in package_def if x['name'] == pkgname), None)
