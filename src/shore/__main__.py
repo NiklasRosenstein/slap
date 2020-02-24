@@ -109,6 +109,7 @@ def get_argument_parser(prog=None):
   checks.add_argument('--treat-warnings-as-errors', action='store_true')
 
   bump = subparser.add_parser('bump')
+  bump.add_argument('path', nargs='?')
   bump.add_argument('--version')
   bump.add_argument('--patch', action='store_true')
   bump.add_argument('--minor', action='store_true')
@@ -149,9 +150,9 @@ def main(argv=None, prog=None):
     format='[%(levelname)s:%(name)s]: %(message)s' if args.verbose else '%(message)s',
     level=logging.DEBUG if args.verbose else logging.INFO)
 
-  if args.command in ('build', 'publish'):
+  if args.command in ('bump', 'build', 'publish'):
     # Convert relative to absolute paths before changing directory.
-    for attr in ('directory', 'build_directory'):
+    for attr in ('path', 'directory', 'build_directory'):
       if getattr(args, attr, None):
         setattr(args, attr, os.path.abspath(getattr(args, attr)))
   if args.change_directory:
@@ -352,6 +353,9 @@ def _verify(parser, args):
 def _bump(parser, args):
   _report_conflict(parser, args, 'version', 'ci')
   _report_conflict(parser, args, 'major', 'minor', 'patch', 'version')
+
+  if args.path:
+    os.chdir(args.path)
 
   subject = _load_subject(parser)
   options = (args.patch, args.minor, args.major, args.version, args.show, args.ci)
