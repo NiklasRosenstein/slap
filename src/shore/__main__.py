@@ -128,13 +128,23 @@ def get_argument_parser(prog=None):
   verify.add_argument('--tag')
 
   build = subparser.add_parser('build')
-  build.add_argument('target', nargs='?')
-  build.add_argument('--directory', default='build')
+  build.add_argument('target', nargs='?',
+    help='The target to build. If no target is specified, all targets will '
+         'be built.')
+  build.add_argument('--build-dir', default='build', metavar='DIR',
+    help='Override the build directory. Defaults to ./build')
 
   publish = subparser.add_parser('publish')
-  publish.add_argument('target', nargs='?')
-  publish.add_argument('--test', action='store_true')
-  publish.add_argument('--build-directory', default='build')
+  publish.add_argument('target', nargs='?',
+    help='The target to publish. If no target is specified, all targets '
+         'will be published.')
+  publish.add_argument('--test', action='store_true',
+    help='Publish to a test repository.')
+  publish.add_argument('--build-dir', default='build', metavar='DIR',
+    help='Override the build directory. Defaults to ./build')
+  publish.add_argument('--reuse', action='store_true',
+    help='Reuse existing build artifacts. Use this option only if you '
+         'used the build command before.')
 
   return parser
 
@@ -152,7 +162,7 @@ def main(argv=None, prog=None):
 
   if args.command in ('bump', 'build', 'publish'):
     # Convert relative to absolute paths before changing directory.
-    for attr in ('path', 'directory', 'build_directory'):
+    for attr in ('path', 'build_dir'):
       if getattr(args, attr, None):
         setattr(args, attr, os.path.abspath(getattr(args, attr)))
   if args.change_directory:
@@ -487,7 +497,7 @@ def _publish(parser, args):
 
   def _needs_build(build):
     for filename in build.get_build_artifacts():
-      if not os.path.isfile(os.path.join(args.build_directory, filename)):
+      if not os.path.isfile(os.path.join(args.build_dir, filename)):
         return True
     return False
 
@@ -503,14 +513,14 @@ def _publish(parser, args):
         required_builds.update(selector_builds)
 
       for target_id, build in required_builds.items():
-        if _needs_build(build):
-          logger.info('building target %s', colored(target_id, 'blue'))
-          os.makedirs(args.build_directory, exist_ok=True)
-          build.build(args.build_directory)
-        else:
+        if args.reuse and not _needs_build(build):
           logger.info('skipping target %s', colored(target_id, 'blue'))
+        else:
+          logger.info('building target %s', colored(target_id, 'blue'))
+          os.makedirs(args.build_dir, exist_ok=True)
+          build.build(args.build_dir)
 
-      publisher.publish(required_builds.values(), args.test, args.build_directory)
+      publisher.publish(required_builds.values(), args.test, args.build_dir)
       return True
     except:
       logger.exception('error while running publisher "%s"', name)
