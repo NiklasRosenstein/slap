@@ -111,9 +111,10 @@ def get_argument_parser(prog=None):
   bump = subparser.add_parser('bump')
   bump.add_argument('path', nargs='?')
   bump.add_argument('--version')
-  bump.add_argument('--patch', action='store_true')
-  bump.add_argument('--minor', action='store_true')
   bump.add_argument('--major', action='store_true')
+  bump.add_argument('--minor', action='store_true')
+  bump.add_argument('--patch', action='store_true')
+  bump.add_argument('--post', action='store_true')
   bump.add_argument('--ci', action='store_true')
   bump.add_argument('--force', action='store_true')
   bump.add_argument('--tag', action='store_true')
@@ -368,7 +369,7 @@ def _bump(parser, args):
     os.chdir(args.path)
 
   subject = _load_subject(parser)
-  options = (args.patch, args.minor, args.major, args.version, args.show, args.ci)
+  options = (args.post, args.patch, args.minor, args.major, args.version, args.show, args.ci)
   if sum(map(bool, options)) == 0:
     parser.error('no operation specified')
   elif sum(map(bool, options)) > 1:
@@ -396,7 +397,9 @@ def _bump(parser, args):
     logger.warning('found inconsistent versions across files.')
 
   current_version = subject.version
-  if args.patch:
+  if args.post:
+    new_version = bump_version(current_version, 'post')
+  elif args.patch:
     new_version = bump_version(current_version, 'patch')
   elif args.minor:
     new_version = bump_version(current_version, 'minor')

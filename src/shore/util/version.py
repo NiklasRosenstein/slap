@@ -30,15 +30,27 @@ def parse_version(version_string: str) -> Version:
 
 
 def bump_version(version: Version, kind: str) -> Version:
-  major, minor, patch = version.major, version.minor, version.micro
-  if kind == 'patch':
+  major, minor, patch, post = version.major, version.minor, version.micro, \
+    version.post
+  if kind == 'post':
+    if post is None:
+      post = 1
+    else:
+      post += 1
+  elif kind == 'patch':
+    post = None
     patch += 1
   elif kind == 'minor':
+    post = None
     patch = 0
     minor += 1
   elif kind == 'major':
+    post = None
     patch = minor = 0
     major += 1
   else:
     raise ValueError('invalid kind: {!r}'.format(kind))
-  return Version('%s.%s.%s' % (major, minor, patch))
+  string = '%s.%s.%s' % (major, minor, patch)
+  if post:
+    string += '.post' + str(post)
+  return Version(string)
