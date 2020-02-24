@@ -27,7 +27,7 @@ FileStatus = collections.namedtuple('FileStatus', 'mode,filename')
 
 
 def porcelain() -> Iterable[FileStatus]:
-  for line in subprocess.getoutput('git status --porcelain'):
+  for line in subprocess.getoutput('git status --porcelain').split('\n'):
     mode, filename = line.strip().partition(' ')[::2]
     yield FileStatus(mode, filename)
 
