@@ -27,3 +27,18 @@ def parse_version(version_string: str) -> Version:
   if isinstance(version, LegacyVersion):
     raise ValueError('invalid version string: {!r}'.format(version_string))
   return version
+
+
+def bump_version(version: Version, kind: str) -> Version:
+  major, minor, patch = version.major, version.minor, version.micro
+  if kind == 'patch':
+    patch += 1
+  elif kind == 'minor':
+    patch = 0
+    minor += 1
+  elif kind == 'major':
+    patch = minor = 0
+    major += 1
+  else:
+    raise ValueError('invalid kind: {!r}'.format(kind))
+  return Version('%s.%s.%s' % (major, minor, patch))

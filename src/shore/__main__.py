@@ -32,7 +32,7 @@ from shore.util import git as _git
 from shore.util.ci import get_ci_version
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
-from shore.util.version import parse_version
+from shore.util.version import parse_version, bump_version
 from termcolor import colored
 from typing import Any, Dict, Iterable, List, Optional, Union
 import argparse
@@ -383,11 +383,11 @@ def _bump(parser, args):
 
   current_version = subject.version
   if args.patch:
-    new_version = current_version.bump_patch()
+    new_version = bump_version(current_version, 'patch')
   elif args.minor:
-    new_version = current_version.bump_minor()
+    new_version = bump_version(current_version, 'minor')
   elif args.major:
-    new_version = current_version.bump_major()
+    new_version = bump_version(current_version, 'major')
   elif args.version:
     new_version = parse_version(args.version)
   elif args.ci:
