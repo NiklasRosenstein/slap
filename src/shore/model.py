@@ -637,7 +637,7 @@ class Package(BaseObject, CommonPackageData):
       if os.path.isfile(os.path.join(self.directory, filename)):
         return filename
     raise ValueError('Entry file for package "{}" could not be determined'
-                     .format(self.package.name))
+                     .format(self.name))
 
   EntryMetadata = collections.namedtuple('EntryFileData', 'author,version')
 

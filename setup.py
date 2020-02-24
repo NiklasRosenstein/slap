@@ -13,7 +13,7 @@ with io.open('README.md', encoding='utf8') as fp:
 requirements = ['beautifulsoup4 >=4.8.1,<5.0.0', 'jinja2 >=2.11.1,<3.0.0', 'nr.algo.graph >=0.0.1,<1.0.0', 'nr.databind >=0.0.1,<1.0.0', 'nr.fs >=1.5.0,<2.0.0', 'nr.pylang.utils >=0.0.1,<1.0.0', 'nr.proxy >=0.0.1,<1.0.0', 'requests >=2.22.0,<3.0.0', 'packaging >=20.1,<21.0.0', 'PyYAML >=5.1.0,<6.0.0', 'termcolor >=1.1.0,<2.0.0']
 
 setuptools.setup(
-  name = 'shore',
+  name = 'shore-release-tool',
   version = version,
   author = 'Niklas Rosenstein',
   author_email = 'rosensteinniklas@gmail.com',
