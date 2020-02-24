@@ -106,7 +106,6 @@ def get_argument_parser(prog=None):
   new.add_argument('--monorepo', action='store_true')
 
   checks = subparser.add_parser('checks')
-  checks.add_argument('--all', action='store_true')
   checks.add_argument('--treat-warnings-as-errors', action='store_true')
 
   bump = subparser.add_parser('bump')
@@ -122,21 +121,17 @@ def get_argument_parser(prog=None):
 
   update = subparser.add_parser('update')
   update.add_argument('--skip-checks', action='store_true')
-  update.add_argument('--all', action='store_true')
   update.add_argument('--dry', action='store_true')
 
   verify = subparser.add_parser('verify')
-  verify.add_argument('--all')
   verify.add_argument('--tag')
 
   build = subparser.add_parser('build')
   build.add_argument('target', nargs='?')
-  build.add_argument('--all', action='store_true')
   build.add_argument('--directory', default='build')
 
   publish = subparser.add_parser('publish')
   publish.add_argument('target', nargs='?')
-  publish.add_argument('--all', action='store_true')
   publish.add_argument('--test', action='store_true')
   publish.add_argument('--build-directory', default='build')
 
@@ -235,10 +230,8 @@ def _new(parser, args):
     write_to_disk(file)
 
 
-def _run_for_subject(subject: Union[Package, Monorepo], func, all: bool) -> List[Any]:
-  if all:
-    if not isinstance(subject, Monorepo):
-      parser.error('--all can only be used in a monorepo context')
+def _run_for_subject(subject: Union[Package, Monorepo], func) -> List[Any]:
+  if isinstance(subject, Monorepo):
     subjects = [subject] + list(subject.get_packages())
     return [func(x) for x in subjects]
   else:
@@ -250,10 +243,10 @@ def _color_subject_name(subject: Union[Package, Monorepo]) -> str:
     return colored(subject.name, color)
 
 
-def _run_checks(subject, all: bool, treat_warnings_as_errors: bool=False):
+def _run_checks(subject, treat_warnings_as_errors: bool=False):
   def _collect_checks(subject):
     return Stream.concat(x.get_checks(subject) for x in subject.get_plugins())
-  checks = Stream.concat(_run_for_subject(subject, _collect_checks, all)).collect()
+  checks = Stream.concat(_run_for_subject(subject, _collect_checks)).collect()
   if not checks:
     logger.info('✔ no checks triggered')
     return 0
@@ -282,7 +275,7 @@ def _run_checks(subject, all: bool, treat_warnings_as_errors: bool=False):
 
 def _checks(parser, args):
   subject = _load_subject(parser)
-  return _run_checks(subject, args.all, args.treat_warnings_as_errors)
+  return _run_checks(subject, args.treat_warnings_as_errors)
 
 
 def _update(parser, args):
@@ -291,9 +284,9 @@ def _update(parser, args):
 
   subject = _load_subject(parser)
   if not args.skip_checks:
-    _run_checks(subject, args.all)
+    _run_checks(subject, True)
 
-  files = _run_for_subject(subject, _collect_files, args.all)
+  files = _run_for_subject(subject, _collect_files)
   files = Stream.concat(files).collect()
 
   logger.info('⚪ rendering %s file(s)', len(files))
@@ -326,7 +319,7 @@ def _verify(parser, args):
   status = 0
 
   subject = _load_subject(parser)
-  files = _run_for_subject(subject, _virtual_update, args.all)
+  files = _run_for_subject(subject, _virtual_update)
   files = Stream.concat(files).collect()
   if files:
     logger.warning('❌ %s file(s) would be changed by an update.', len(files))
@@ -337,7 +330,7 @@ def _verify(parser, args):
     logger.warning('  %s', os.path.relpath(file))
 
   if args.tag:
-    matches = _run_for_subject(subject, _tag_matcher, args.all)
+    matches = _run_for_subject(subject, _tag_matcher)
     matches = Stream.concat(matches).collect()
     if len(matches) == 0:
       # TODO (@NiklasRosenstein): If we matched the {name} portion of the
