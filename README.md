@@ -10,15 +10,10 @@ possible around the versioning and release process.
 
 __Installation__
 
-Shore is not currently available via PyPI and needs to be installed from its
-Git repository. Once shore's ability to publish packages is well tested, it
-will be made available on PyPI as well (including it's dependencies which are
-currently not published to PyPI either).
+Shore can be installed from PyPI.
 
-    $ git clone https://git.niklasrosenstein.com/NiklasRosenstein/shore.git --recursive
-    $ cd shore
-    $ vendor/nr-python-libs/bin/dev-install
-    $ python3 -m pip install -e .
+    $ pip install shore-release-tool
+    $ shore --version
 
 __Configuring a Python package__
 
