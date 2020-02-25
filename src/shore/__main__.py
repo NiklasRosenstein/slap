@@ -21,6 +21,7 @@
 
 from nr.proxy import proxy_decorator
 from nr.stream import Stream
+from shore import __version__
 from shore.core.plugins import (
   CheckResult,
   FileToRender,
@@ -88,6 +89,7 @@ def get_argument_parser(prog=None):
   parser = argparse.ArgumentParser(prog=prog)
   parser.add_argument('-C', '--change-directory', metavar='DIR')
   parser.add_argument('-v', '--verbose', action='store_true')
+  parser.add_argument('--version', action='version', version=__version__)
   subparser = parser.add_subparsers(dest='command')
 
   license_ = subparser.add_parser('license')
