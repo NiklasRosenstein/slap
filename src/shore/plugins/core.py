@@ -22,6 +22,7 @@
 from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin, IMonorepoPlugin, VersionRef
 from shore.model import BaseObject, Monorepo, Package
 from shore.plugins._util import find_readme_file
+from shore.util.classifiers import get_classifiers
 from nr.interface import implements, override
 from typing import Iterable, Optional
 import os
@@ -66,6 +67,12 @@ class CorePlugin:
       yield CheckResult(package, 'ERROR',
         'Inconsistent package version (package.yaml: {!r} != {}: {!r})'.format(
           data.version, rel_entry_file, str(package.get_version())))
+
+    classifiers = get_classifiers()
+    unknown_classifiers = [x for x in package.classifiers if x not in classifiers]
+    if unknown_classifiers:
+      yield CheckResult(package, 'WARNING',
+        'unknown $.classifiers: {}'.format(unknown_classifiers))
 
   @override
   def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:

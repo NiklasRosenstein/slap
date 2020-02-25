@@ -303,7 +303,9 @@ class SetuptoolsRenderer:
         python_requires = None, # TODO: {python_requires!r},
         data_files = {data_files},
         entry_points = {entry_points},
-        cmdclass = {cmdclass}
+        cmdclass = {cmdclass},
+        keywords = {keywords!r},
+        classifiers = {classifiers!r},
       )
     ''').format(
       package=package,
@@ -321,7 +323,9 @@ class SetuptoolsRenderer:
       include_package_data=False,#package.package_data != [],
       data_files=data_files,
       entry_points=self._render_entrypoints(package.entrypoints),
-      cmdclass = '{' + ', '.join('{!r}: {}'.format(k, v) for k, v in cmdclass.items()) + '}'
+      cmdclass = '{' + ', '.join('{!r}: {}'.format(k, v) for k, v in cmdclass.items()) + '}',
+      keywords = package.keywords,
+      classifiers = package.classifiers,
     ))
 
   def _render_entrypoints(self, entrypoints):

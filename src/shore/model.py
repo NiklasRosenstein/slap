@@ -574,6 +574,12 @@ class Package(BaseObject, CommonPackageData):
   #: Hooks that will be executed on install events (install/develop).
   install_hooks = Field([InstallHook], JsonFieldName('install-hooks'), default=list)
 
+  #: List of classifiers for the package.
+  classifiers = Field([str], default=list)
+
+  #: List of keywords.
+  keywords = Field([str], default=list)
+
   def _get_inherited_field(self, field_name: str) -> Any:
     value = getattr(self, field_name)
     if value is None and self.monorepo and self.monorepo.packages:
