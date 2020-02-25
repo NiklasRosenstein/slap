@@ -31,6 +31,7 @@ from shore.core.plugins import (
 from shore.model import Monorepo, ObjectCache, Package
 from shore.util import git as _git
 from shore.util.ci import get_ci_version
+from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
 from shore.util.version import parse_version, bump_version
@@ -97,6 +98,11 @@ def get_argument_parser(prog=None):
   license_.add_argument('--json', action='store_true')
   license_.add_argument('--text', action='store_true')
   license_.add_argument('--notice', action='store_true')
+
+  classifiers = subparser.add_parser('classifiers')
+  classifiers_subparsers = classifiers.add_subparsers(dest='classifiers_command')
+  classifiers_search = classifiers_subparsers.add_parser('search')
+  classifiers_search.add_argument('q')
 
   new = subparser.add_parser('new')
   new.add_argument('name')
@@ -185,6 +191,15 @@ def _license(parser, args):
     print(wrap_license_text(data['license_text']))
   elif args.notice:
     print(wrap_license_text(data['standard_notice'] or data['license_text']))
+  else:
+    parser.print_usage()
+
+
+def _classifiers(parser, args):
+  if args.classifiers_command == 'search':
+    for classifier in get_classifiers():
+      if args.q.strip().lower() in classifier.lower():
+        print(classifier)
   else:
     parser.print_usage()
 
