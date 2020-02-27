@@ -494,6 +494,13 @@ class Monorepo(BaseObject):
   #: Overrides the version field as it's optional for monorepos.
   version = Field(Version, default=None)
 
+  #: If this option is enabled, individual packages in the monorepo have
+  #: no individual version number. The "version" field in the package.yaml
+  #: must be consistent with the version of the monorepo. Bumping the version
+  #: of the monorepo will automatically bump the version in all packages.
+  #: Bumping the version of individual packages will fail.
+  mono_versioning = Field(bool, JsonFieldName('mono-versioning'), default=False)
+
   #: The use field is optional on monorepos.
   use = Field([PluginConfig], default=list)
 
@@ -650,6 +657,9 @@ class Package(BaseObject):
         return filename
     raise ValueError('Entry file for package "{}" could not be determined'
                      .format(self.name))
+
+  def get_entry_file_abs(self) -> str:
+    return os.path.normpath(os.path.join(self.directory, self.get_entry_file()))
 
   EntryMetadata = collections.namedtuple('EntryFileData', 'author,version')
 

@@ -118,6 +118,7 @@ def get_argument_parser(prog=None):
 
   bump = subparser.add_parser('bump')
   bump.add_argument('path', nargs='?')
+  bump.add_argument('--skip-checks', action='store_true')
   bump.add_argument('--version')
   bump.add_argument('--major', action='store_true')
   bump.add_argument('--minor', action='store_true')
@@ -392,12 +393,29 @@ def _bump(parser, args):
   elif sum(map(bool, options)) > 1:
     parser.error('multiple operations specified')
 
-  version_refs = []
-  for plugin in subject.get_plugins():
-    version_refs.extend(plugin.get_version_refs(subject))
+  if not args.skip_checks:
+    _run_checks(subject, True)
+
+  if isinstance(subject, Package) and subject.monorepo \
+      and subject.monorepo.mono_versioning:
+    if args.force:
+      logger.warning('forcing version bump on individual package version '
+        'that is usually managed by the monorepo.')
+    else:
+      parser.error('cannot bump individual package version if managed by monorepo.')
+
+  def _get_version_refs(subject):
+    for plugin in subject.get_plugins():
+      yield plugin.get_version_refs(subject)
+
+  if isinstance(subject, Monorepo) and subject.mono_versioning:
+    version_refs = Stream.concat(_run_for_subject(subject, _get_version_refs))
+  else:
+    version_refs = _get_version_refs(subject)
+  version_refs = Stream.concat(version_refs).collect()
 
   if not version_refs:
-    parser.error('no version refs found 👎')
+    parser.error('no version refs found')
     return 1
 
   if args.show:
@@ -411,7 +429,7 @@ def _bump(parser, args):
     logger.error('inconsistent versions across files need to be fixed first.')
     return 1
   elif is_inconsistent:
-    logger.warning('found inconsistent versions across files.')
+    logger.warning('inconsistent versions across files were found.')
 
   current_version = subject.version
   if args.post:

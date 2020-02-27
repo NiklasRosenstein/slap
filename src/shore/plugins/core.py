@@ -64,15 +64,14 @@ class CorePlugin:
         yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
 
     data = package.get_entry_metadata()
-    rel_entry_file = os.path.relpath(package.get_entry_file(), package.directory)
     if package.get_author() and data.author != str(package.get_author()):
       yield CheckResult(package, 'ERROR',
         'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
-          data.author, rel_entry_file, str(package.get_author())))
+          data.author, package.get_entry_file(), str(package.get_author())))
     if package.get_version() and data.version != str(package.get_version()):
       yield CheckResult(package, 'ERROR',
         'Inconsistent package version (package.yaml: {!r} != {}: {!r})'.format(
-          data.version, rel_entry_file, str(package.get_version())))
+          data.version, package.get_entry_file(), str(package.get_version())))
 
     classifiers = get_classifiers()
     unknown_classifiers = [x for x in package.classifiers if x not in classifiers]
@@ -86,21 +85,36 @@ class CorePlugin:
 
   @override
   def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
-    ref = self._version_ref(package.filename)
+    ref = self._package_version_ref(package.filename)
     assert ref is not None, "packages must always have a version"
     yield ref
 
+    ref = self._entry_version_ref(package.get_entry_file_abs())
+    if ref:
+      yield ref
+
   @override
   def get_monorepo_version_refs(self, monorepo: Monorepo) -> Iterable[VersionRef]:
-    ref = self._version_ref(monorepo.filename)
+    ref = self._package_version_ref(monorepo.filename)
     if ref is not None:
       yield ref
 
-  _VERSION_REGEX = '^version\s*:\s*[\'"]?(.*?)[\'"]?\s*(#.*)?$'
+  _PACKAGE_VERSION_REGEX = '^version\s*:\s*[\'"]?(.*?)[\'"]?\s*(#.*)?$'
+  _ENTRY_VERSION_REGEX = '__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
 
-  def _version_ref(self, filename: str) -> Optional[VersionRef]:
+  def _package_version_ref(self, filename: str) -> Optional[VersionRef]:
     with open(filename) as fp:
-      match = re.search(self._VERSION_REGEX, fp.read(), re.S | re.M)
+      match = re.search(self._PACKAGE_VERSION_REGEX, fp.read(), re.S | re.M)
+      if match:
+        return VersionRef(filename, match.start(1), match.end(1), match.group(1))
+    return None
+
+  def _entry_version_ref(self, filename: str) -> Optional[VersionRef]:
+    if not os.path.isfile(filename):
+      # This should be captured by the package checks as well.
+      return None
+    with open(filename) as fp:
+      match = re.search(self._ENTRY_VERSION_REGEX, fp.read())
       if match:
         return VersionRef(filename, match.start(1), match.end(1), match.group(1))
     return None

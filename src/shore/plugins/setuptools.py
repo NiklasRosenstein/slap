@@ -143,20 +143,9 @@ class SetuptoolsRenderer:
       'setup.py', self._render_setup, package)
 
   @override
-  def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
-    entry_file = package.get_entry_file()
-    if not os.path.isfile(entry_file):
-      return; yield
-    with open(entry_file) as fp:
-      match = re.search(self._VERSION_REGEX, fp.read())
-      if match:
-        yield VersionRef(entry_file, match.start(1), match.end(1), match.group(1))
-
-  @override
   def get_package_build_targets(self, package: Package) -> Iterable[IBuildTarget]:
     yield SetuptoolsBuildTarget('sdist', package)
 
-  _VERSION_REGEX = '__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
   _BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
   _END_SECTION = '# }'
   _ENTRTYPOINT_VARS = {
