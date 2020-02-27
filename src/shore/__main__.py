@@ -463,10 +463,9 @@ def _bump(parser, args):
   assert len(n_files) == len(version_refs), "multiple version refs in one "\
     "file is not currently supported."
 
-  logger.info('bumping {} version reference(s)'.format(
-    len(version_refs), current_version, new_version))
+  logger.info('bumping %d version reference(s)', len(version_refs))
   for ref in version_refs:
-    logger.info('  {}: {} → {}'.format(os.path.relpath(ref.filename), ref.value, new_version))
+    logger.info('  %s: %s → %s', os.path.relpath(ref.filename), ref.value, new_version)
     if not args.dry:
       with open(ref.filename) as fp:
         contents = fp.read()
@@ -480,7 +479,7 @@ def _bump(parser, args):
       return 1
 
     tag_name = subject.get_tag(new_version)
-    logger.info('tagging {}'.format(tag_name))
+    logger.info('tagging %s', tag_name)
 
     if not args.dry:
       changed_files = [x.filename for x in version_refs]
@@ -506,7 +505,7 @@ def _build(parser, args):
   if args.target:
     targets = _filter_targets(targets, args.target)
     if not targets:
-      logging.error('no build targets matched "{}"'.format(args.target))
+      logging.error('no build targets matched "%s"', args.target)
       return 1
 
   if not targets:
@@ -527,7 +526,7 @@ def _publish(parser, args):
   if args.target:
     publishers = _filter_targets(publishers, args.target)
     if not publishers:
-      logger.error('no publish targets matched "{}"'.format(args.target))
+      logger.error('no publish targets matched "%s"', args.target)
       return 1
 
   if not publishers:
@@ -541,7 +540,7 @@ def _publish(parser, args):
 
   def _run_publisher(name, publisher):
     try:
-      logging.info('collecting builds for "{}" ...'.format(name))
+      logging.info('collecting builds for "%s" ...', name)
       required_builds = {}
       for selector in publisher.get_build_selectors():
         selector_builds = _filter_targets(builds, selector)
