@@ -53,6 +53,11 @@ def rev_parse(rev: str) -> Optional[str]:
     return None
 
 
-def rev_list(rev: str) -> List[str]:
+def rev_list(rev: str, path: str = None) -> List[str]:
   command = ['git', 'rev-list', rev]
-  return subprocess.check_output(command, stderr=subprocess.STDOUT).decode().strip().split('\n')
+  if path:
+    command += ['--', path]
+  revlist = subprocess.check_output(command, stderr=subprocess.STDOUT).decode().strip().split('\n')
+  if revlist == ['']:
+    revlist = []
+  return revlist
