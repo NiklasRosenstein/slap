@@ -527,6 +527,12 @@ class Monorepo(BaseObject):
   def get_private(self) -> bool:
     return self.private
 
+  def get_tag_format(self) -> str:
+    return self.tag_format
+
+  def get_tag(self, version: str) -> str:
+    tag_format = self.get_tag_format()
+    return tag_format.format(name=self.name, version=version)
 
 class Package(BaseObject):
   #: Filled with the Monorepo if the package is associated with one. A package

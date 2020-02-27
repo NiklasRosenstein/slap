@@ -129,6 +129,7 @@ def get_argument_parser(prog=None):
   bump.add_argument('--tag', action='store_true')
   bump.add_argument('--dry', action='store_true')
   bump.add_argument('--show', action='store_true')
+  bump.add_argument('--get-single-version', action='store_true')
 
   update = subparser.add_parser('update')
   update.add_argument('--skip-checks', action='store_true')
@@ -387,13 +388,14 @@ def _bump(parser, args):
     os.chdir(args.path)
 
   subject = _load_subject(parser)
-  options = (args.post, args.patch, args.minor, args.major, args.version, args.show, args.ci)
+  options = (args.post, args.patch, args.minor, args.major, args.version,
+             args.show, args.ci, args.get_single_version)
   if sum(map(bool, options)) == 0:
     parser.error('no operation specified')
   elif sum(map(bool, options)) > 1:
     parser.error('multiple operations specified')
 
-  if not args.skip_checks:
+  if not args.get_single_version and not args.skip_checks:
     _run_checks(subject, True)
 
   if isinstance(subject, Package) and subject.monorepo \
@@ -428,8 +430,15 @@ def _bump(parser, args):
   if is_inconsistent and not args.force:
     logger.error('inconsistent versions across files need to be fixed first.')
     return 1
+  elif is_inconsistent and args.get_single_version:
+    logger.error('no single consistent version found.')
+    return 1
   elif is_inconsistent:
     logger.warning('inconsistent versions across files were found.')
+
+  if args.get_single_version:
+    print(subject.version)
+    return 0
 
   current_version = subject.version
   if args.post:
