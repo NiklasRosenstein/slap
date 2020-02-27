@@ -130,6 +130,7 @@ def get_argument_parser(prog=None):
   bump.add_argument('--dry', action='store_true')
   bump.add_argument('--show', action='store_true')
   bump.add_argument('--get-single-version', action='store_true')
+  bump.add_argument('--status', action='store_true')
 
   update = subparser.add_parser('update')
   update.add_argument('--skip-checks', action='store_true')
@@ -263,7 +264,7 @@ def _new(parser, args):
 
 def _run_for_subject(subject: Union[Package, Monorepo], func) -> List[Any]:
   if isinstance(subject, Monorepo):
-    subjects = [subject] + list(subject.get_packages())
+    subjects = [subject] + sorted(subject.get_packages(), key=lambda x: x.name)
     return [func(x) for x in subjects]
   else:
     return [func(subject)]
@@ -389,14 +390,31 @@ def _bump(parser, args):
 
   subject = _load_subject(parser)
   options = (args.post, args.patch, args.minor, args.major, args.version,
-             args.show, args.ci, args.get_single_version)
+             args.show, args.ci, args.get_single_version, args.status)
   if sum(map(bool, options)) == 0:
     parser.error('no operation specified')
   elif sum(map(bool, options)) > 1:
     parser.error('multiple operations specified')
 
-  if not args.get_single_version and not args.skip_checks:
+  if not args.status and not args.get_single_version and not args.skip_checks:
     _run_checks(subject, True)
+
+  if args.status:
+    width = max(_run_for_subject(subject, lambda s: len(s.name)))
+    def _status(subject):
+      tag = subject.get_tag(subject.version)
+      ref = _git.rev_parse(tag)
+      if not ref:
+        status = colored('tag "{}" not found'.format(tag), 'red')
+      else:
+        count = len(_git.rev_list(tag + '..HEAD', subject.directory))
+        if count == 0:
+          status = colored('no commits', 'green') + ' since "{}"'.format(tag)
+        else:
+          status = colored('{} commit(s)'.format(count), 'yellow') + ' since "{}"'.format(tag)
+      print(subject.name.rjust(width), status)
+    _run_for_subject(subject, _status)
+    return 0
 
   if isinstance(subject, Package) and subject.monorepo \
       and subject.monorepo.mono_versioning:
