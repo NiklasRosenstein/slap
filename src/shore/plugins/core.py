@@ -81,6 +81,10 @@ class CorePlugin:
         'unknown $.classifiers: {}'.format(unknown_classifiers))
 
   @override
+  def check_monorepo(self, monorepo: Monorepo) -> Iterable[CheckResult]:
+    yield from self._unhandled_keys(monorepo)
+
+  @override
   def get_package_version_refs(self, package: Package) -> Iterable[VersionRef]:
     ref = self._version_ref(package.filename)
     assert ref is not None, "packages must always have a version"
