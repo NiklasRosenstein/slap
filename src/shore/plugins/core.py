@@ -40,22 +40,28 @@ class CorePlugin:
   def check_package(self, package: Package) -> Iterable[CheckResult]:
     yield from self._unhandled_keys(package)
 
-    for name in ('LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'):
-      filename = os.path.join(package.directory, name)
-      if os.path.isfile(filename):
-        break
-    else:
-      yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
-
     if not find_readme_file(package.directory):
       yield CheckResult(package, 'WARNING', 'No README file found.')
 
     if not package.get_author():
       yield CheckResult(package, 'WARNING', 'missing $.author')
-    if not package.get_license():
+    if not package.get_license() and not package.get_private():
       yield CheckResult(package, 'WARNING', 'missing $.license')
     if not package.get_url():
       yield CheckResult(package, 'WARNING', 'missing $.url')
+
+    if package.license and package.monorepo and package.monorepo.license \
+        and package.monorepo.license != package.license:
+      yield CheckResult(package, 'ERROR', '$.license ({!r}) is inconsistent '
+        'with monorepo license ({!r})'.format(package.license, package.monorepo.license))
+
+    if package.get_license():
+      for name in ('LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'):
+        filename = os.path.join(package.directory, name)
+        if os.path.isfile(filename):
+          break
+      else:
+        yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
 
     data = package.get_entry_metadata()
     rel_entry_file = os.path.relpath(package.get_entry_file(), package.directory)
