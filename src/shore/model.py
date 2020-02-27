@@ -392,18 +392,6 @@ class InstallHook(Struct):
       raise NotImplementedError  # Default deserialization
 
 
-class CommonPackageData(Struct):
-  """ Represents common fields for a package that can be defined in the
-  `monorepo.yaml` to inherit by packages inside the mono repository. """
-
-  version = Field(Version, default=None)
-  author = Field(Author, default=None)
-  license = Field(str, default=None)
-  url = Field(str, default=None)
-  use = Field([PluginConfig], default=list)
-  tag_format = Field(str, JsonFieldName('tag-format'), default='{version}')
-
-
 class ObjectCache(object):
   """ Helper class for loading #Package or #Monorepo objects from files. It
   caches the loaded object so that the same is not loaded multiple times into
@@ -501,15 +489,23 @@ class BaseObject(Struct):
 
 
 class Monorepo(BaseObject):
+  private = Field(bool, default=False)
+
   #: Overrides the version field as it's optional for monorepos.
   version = Field(Version, default=None)
 
-  #: The data in this field propagates to the packages that are inside this
-  #: mono repository.
-  packages = Field(CommonPackageData, default=None)
-
   #: The use field is optional on monorepos.
   use = Field([PluginConfig], default=list)
+
+  #: Plugins to be used for all packages in the monorepo (unless explicitly
+  #: overwritten in the package.yaml file).
+  packages_use = Field([PluginConfig], default=list)
+
+  #: Fields that can be inherited by the package.
+  author = Field(Author, default=None)
+  license = Field(str, default=None)
+  url = Field(str, default=None)
+  tag_format = Field(str, JsonFieldName('tag-format'), default='{version}')
 
   def get_packages(self) -> Iterable['Package']:
     """ Loads the packages for this mono repository. """
@@ -522,11 +518,19 @@ class Monorepo(BaseObject):
         yield package
 
 
-class Package(BaseObject, CommonPackageData):
+class Package(BaseObject):
   #: Filled with the Monorepo if the package is associated with one. A package
   #: is associated with a monorepo if the parent directory of it's own
   #: directory contains a `monorepo.yaml` file.
   monorepo = Field(Monorepo, default=None, hidden=True)
+
+  private = Field(bool, default=False)
+  version = Field(Version, default=None)
+  author = Field(Author, default=None)
+  license = Field(str, default=None)
+  url = Field(str, default=None)
+  use = Field([PluginConfig], default=list)
+  tag_format = Field(str, JsonFieldName('tag-format'), default='{version}')
 
   #: The package description.
   description = Field(str)
@@ -582,9 +586,12 @@ class Package(BaseObject, CommonPackageData):
 
   def _get_inherited_field(self, field_name: str) -> Any:
     value = getattr(self, field_name)
-    if value is None and self.monorepo and self.monorepo.packages:
-      value = getattr(self.monorepo.packages, field_name)
+    if value is None and self.monorepo and hasattr(self.monorepo, field_name):
+      value = getattr(self.monorepo, field_name)
     return value
+
+  def get_private(self) -> bool:
+    return self._get_inherited_field('private')
 
   def get_version(self) -> str:
     version: str = self._get_inherited_field('version')
@@ -606,8 +613,8 @@ class Package(BaseObject, CommonPackageData):
 
     # Inherit only plugins from the monorepo that are not defined in the
     # package itself.
-    if self.monorepo and self.monorepo.packages:
-      plugins.extend(x for x in self.monorepo.packages.use
+    if self.monorepo and self.monorepo.packages_use:
+      plugins.extend(x for x in self.monorepo.packages_use
         if not self.has_plugin(x.name))
 
     return plugins
@@ -624,8 +631,7 @@ class Package(BaseObject, CommonPackageData):
 
   def on_load_hook(self):
     """ Called when the package is loaded. Attempts to find the Monorepo that
-    belongs to this package and load it. If there is a Monorepo, the package
-    will inherit some of the fields defined in #Monorepo.packages. """
+    belongs to this package and load it. """
 
     monorepo_fn = os.path.join(os.path.dirname(self.directory), 'monorepo.yaml')
     if os.path.isfile(monorepo_fn):
