@@ -524,6 +524,9 @@ class Monorepo(BaseObject):
         assert package.monorepo is self, "woah hold up"
         yield package
 
+  def get_private(self) -> bool:
+    return self.private
+
 
 class Package(BaseObject):
   #: Filled with the Monorepo if the package is associated with one. A package
