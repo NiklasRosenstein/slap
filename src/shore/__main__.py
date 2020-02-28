@@ -112,6 +112,8 @@ def get_argument_parser(prog=None):
   new.add_argument('--license')
   new.add_argument('--modulename')
   new.add_argument('--monorepo', action='store_true')
+  new.add_argument('--dry', action='store_true')
+  new.add_argument('-f', '--force', action='store_true')
 
   checks = subparser.add_parser('checks')
   checks.add_argument('--treat-warnings-as-errors', action='store_true')
@@ -125,7 +127,7 @@ def get_argument_parser(prog=None):
   bump.add_argument('--patch', action='store_true')
   bump.add_argument('--post', action='store_true')
   bump.add_argument('--ci', action='store_true')
-  bump.add_argument('--force', action='store_true')
+  bump.add_argument('-f', '--force', action='store_true')
   bump.add_argument('--tag', action='store_true')
   bump.add_argument('--dry', action='store_true')
   bump.add_argument('--show', action='store_true')
@@ -258,8 +260,12 @@ def _new(parser, args):
     # TODO (@NiklasRosenstein): Render the license file if it does not exist.
 
   for file in _get_files():
-    logger.info(file.name)
-    write_to_disk(file)
+    if os.path.isfile(file.name) and not args.force:
+      print(colored('Skip ' + file.name, 'yellow'))
+      continue
+    print(colored('Write ' + file.name, 'blue'))
+    if not args.dry:
+      write_to_disk(file)
 
 
 def _run_for_subject(subject: Union[Package, Monorepo], func) -> List[Any]:
