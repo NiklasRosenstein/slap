@@ -1,6 +1,6 @@
 name: shore-release-tool
 modulename: shore
-version: "0.0.2"
+version: "0.0.2.post1"
 license: MIT
 url: https://git.niklasrosenstein.com/NiklasRosenstein/shore
 description: |
