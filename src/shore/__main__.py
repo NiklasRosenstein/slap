@@ -347,25 +347,8 @@ def bump(**args):
 
   subject = _load_subject()
 
-  if not args['type'] not in ('status', 'get-single-version') and not args['skip_checks']:
+  if not args['type'] not in ('get-single-version',) and not args['skip_checks']:
     _run_checks(subject, True)
-
-  if args['type'] == 'status':
-    width = max(_run_for_subject(subject, lambda s: len(s.name)))
-    def _status(subject):
-      tag = subject.get_tag(subject.version)
-      ref = _git.rev_parse(tag)
-      if not ref:
-        status = colored('tag "{}" not found'.format(tag), 'red')
-      else:
-        count = len(_git.rev_list(tag + '..HEAD', subject.directory))
-        if count == 0:
-          status = colored('no commits', 'green') + ' since "{}"'.format(tag)
-        else:
-          status = colored('{} commit(s)'.format(count), 'yellow') + ' since "{}"'.format(tag)
-      print(subject.name.rjust(width), status)
-    _run_for_subject(subject, _status)
-    exit(0)
 
   if isinstance(subject, Package) and subject.monorepo \
       and subject.monorepo.mono_versioning:
@@ -468,6 +451,28 @@ def bump(**args):
         # up here for the tagging).
         _git.commit('({}) bump version to {}'.format(subject.name, new_version))
       _git.tag(tag_name, force=args['force'])
+
+
+@cli.command()
+def status():
+  """ Shows the number of commits since the last release. """
+
+  subject = _load_subject()
+  width = max(_run_for_subject(subject, lambda s: len(s.name)))
+  def _status(subject):
+    tag = subject.get_tag(subject.version)
+    ref = _git.rev_parse(tag)
+    if not ref:
+      status = colored('tag "{}" not found'.format(tag), 'red')
+    else:
+      count = len(_git.rev_list(tag + '..HEAD', subject.directory))
+      if count == 0:
+        status = colored('no commits', 'green') + ' since "{}"'.format(tag)
+      else:
+        status = colored('{} commit(s)'.format(count), 'yellow') + ' since "{}"'.format(tag)
+    print(subject.name.rjust(width), status)
+  _run_for_subject(subject, _status)
+  exit(0)
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
