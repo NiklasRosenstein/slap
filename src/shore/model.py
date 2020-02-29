@@ -19,7 +19,6 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from packaging.version import Version
 from nr.databind.core import Field, MixinDecoration, Struct
 from nr.databind.json import (
   JsonDefault,
@@ -37,6 +36,7 @@ from shore.core.plugins import (
   PluginNotFound)
 from shore.mapper import mapper
 from shore.util.ast import load_module_members
+from shore.util.version import Version
 from typing import Any, Callable, Dict, Iterable, Optional, List, Type
 import ast
 import collections

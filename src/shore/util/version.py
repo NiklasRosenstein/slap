@@ -19,14 +19,59 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from packaging.version import LegacyVersion, parse, Version
+from packaging.version import LegacyVersion, Version as _Version
+import re
+
+
+class Version(_Version):
+  """ An extension of #packageing.version.Version which supports a
+  commit-distance and commit SHA suffix in the format of `-X-gY` (where
+  X is the distance and Y is the lowercase 7-character SHA sum). """
+
+  def __init__(self, s: str):
+    match = re.match('(.*)-(\d+)-g([0-9a-f]{7})', s)
+    if match:
+      s = match.group(1)
+      commit_distance = int(match.group(2))
+      sha = match.group(3)
+    else:
+      commit_distance = None
+      sha = None
+    super().__init__(s)
+    self.commit_distance = commit_distance
+    self.sha = sha
+
+  def __str__(self):
+    s = super().__str__()
+    if self.commit_distance and self.sha:
+      s += '-{}-g{}'.format(self.commit_distance, self.sha)
+    return s
+
+  def __lt__(self, other):
+    if super().__lt__(other):
+      return True
+    if super().__eq__(other):
+      return (self.commit_distance or 0) < (other.commit_distance or 0)
+    return False
+
+  def __gt__(self, other):
+    return other < self and other != self
+
+  def __eq__(self, other):
+    if super().__eq__(other):
+      return (self.commit_distance, self.sha) == (other.commit_distance, other.sha)
+    return False
+
+  def __ne__(self, other):
+    return not self == other
+
+  @property
+  def pep440_compliant(self):
+    return self.sha is None
 
 
 def parse_version(version_string: str) -> Version:
-  version = parse(version_string)
-  if isinstance(version, LegacyVersion):
-    raise ValueError('invalid version string: {!r}'.format(version_string))
-  return version
+  return Version(version_string)
 
 
 def bump_version(version: Version, kind: str) -> Version:

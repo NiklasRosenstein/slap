@@ -63,16 +63,6 @@ def _get_author_info_from_git():
   return '{} <{}>'.format(name, email)
 
 
-def _report_conflict(parser, args, *opts: str):
-  """ Checks if any two of the specified *opts* is present in *args*. If so,
-  a parser error will indicate the conflicting options. """
-
-  has_opts = set(k for k in opts if getattr(args, k))
-  if len(has_opts) > 1:
-    parser.error('conflicting options: {}'.format(
-      ' and '.join('--' + k for k in has_opts)))
-
-
 def _load_subject() -> Union[Monorepo, Package, None]:
   package, monorepo = None, None
   if os.path.isfile('package.yaml'):
@@ -90,13 +80,9 @@ def _load_subject() -> Union[Monorepo, Package, None]:
 
 @click.group()
 @click.option('-C', '--change-directory')
-@click.option('-v', '--verbose')
-@click.option('--version', is_flag=True)
-def cli(change_directory, verbose, version):
-  if version:
-    print(__version__)
-    exit(0)
-
+@click.option('-v', '--verbose', is_flag=True)
+@click.version_option(version=__version__)
+def cli(change_directory, verbose):
   logging.basicConfig(
     format='[%(levelname)s:%(name)s]: %(message)s' if verbose else '%(message)s',
     level=logging.DEBUG if verbose else logging.INFO)
@@ -109,6 +95,8 @@ def cli(change_directory, verbose, version):
 @click.argument('output_type', type=click.Choice(['json', 'text', 'notice']))
 @click.argument('license_name')
 def license(output_type, license_name):
+  """ Print license information, full text or short notice. """
+
   data = get_license_metadata(license_name)
   if output_type == 'json':
     print(json.dumps(data(), sort_keys=True))
@@ -120,14 +108,11 @@ def license(output_type, license_name):
     raise RuntimeError(output_type)
 
 
-@cli.group()
-def classifiers():
-  pass
-
-
-@classifiers.command('search')
+@cli.command('classifiers:search')
 @click.argument('q')
 def search_classifiers(q):
+  """ Search package classifiers. """
+
   for classifier in get_classifiers():
     if q.strip().lower() in classifier.lower():
       print(classifier)
@@ -144,6 +129,8 @@ def search_classifiers(q):
 @click.option('--dry', is_flag=True)
 @click.option('--force', '-f', is_flag=True)
 def new(**args):
+  """ Initialize a new project or repository. """
+
   if not args['directory']:
     args['directory'] = args['name']
 
@@ -244,19 +231,23 @@ def _run_checks(subject, treat_warnings_as_errors: bool=False):
   return False
 
 
-@cli.command()
+@cli.command('dist:check')
 @click.option('--treat-warnings-as-errors', is_flag=True)
 def checks(treat_warnings_as_errors):
+  """ Run checks. """
+
   subject = _load_subject()
   if not _run_checks(subject, treat_warnings_as_errors):
     exit(1)
   exit(0)
 
 
-@cli.command()
+@cli.command('dist:update')
 @click.option('--skip-checks', is_flag=True)
 @click.option('--dry', is_flag=True)
 def update(skip_checks, dry):
+  """ (Re-)render files managed shore. """
+
   def _collect_files(subject):
     return Stream.concat(x.get_files(subject) for x in subject.get_plugins())
 
@@ -274,9 +265,11 @@ def update(skip_checks, dry):
       write_to_disk(file)
 
 
-@cli.command()
+@cli.command('dist:verify')
 @click.option('--tag')
 def verify(tag):
+  """ Check whether "update" would change any files. """
+
   def _virtual_update(subject) -> Iterable[str]:
     files = Stream.concat(x.get_files(subject) for x in subject.get_plugins())
     for file in files:
@@ -341,14 +334,16 @@ def _get_version_refs(subject) -> List[VersionRef]:
   return Stream.concat(version_refs).collect()
 
 
-@cli.command()
-@click.argument('type', type=click.Choice(['major', 'minor', 'patch', 'post', 'ci']), required=False)
+@cli.command('version:bump')
+@click.argument('type', type=click.Choice(['major', 'minor', 'patch', 'post']), required=False)
 @click.option('--version')
 @click.option('--tag', is_flag=True)
 @click.option('--dry', is_flag=True)
 @click.option('--skip-checks', is_flag=True)
 @click.option('--force', '-f', is_flag=True)
 def bump(**args):
+  """ Modify version numbers in package files. """
+
   if not args['type'] and not args['version']:
     logger.error('conflict arguments: --version and type')
     exit(1)
@@ -367,11 +362,12 @@ def bump(**args):
       logger.warning('forcing version bump on individual package version '
         'that is usually managed by the monorepo.')
     else:
-      parser.error('cannot bump individual package version if managed by monorepo.')
+      logger.error('cannot bump individual package version if managed by monorepo.')
+      exit(1)
 
   version_refs = _get_version_refs(subject)
   if not version_refs:
-    parser.error('no version refs found')
+    logger.error('no version refs found')
     exit(1)
 
   # Ensure the version is the same accross all refs.
@@ -387,6 +383,7 @@ def bump(**args):
     exit(0)
 
   current_version = subject.version
+  pep440_version = True
   if args['type'] == 'post':
     new_version = bump_version(current_version, 'post')
   elif args['type'] == 'patch':
@@ -395,21 +392,24 @@ def bump(**args):
     new_version = bump_version(current_version, 'minor')
   elif args['type'] == 'major':
     new_version = bump_version(current_version, 'major')
-  elif args['type'] == 'ci':
-    new_version = get_ci_version(subject)
   elif args['version']:
     new_version = parse_version(args['version'])
   else:
     raise RuntimeError('what happened?')
 
+  if not new_version.pep440_compliant:
+    logger.warning('version "{}" is not PEP440 compliant.'.format(new_version))
+
   if new_version < current_version and not args['force']:
-    parser.error('new version {} is lower than currenet version {}'.format(
+    logger.error('version {} is lower than current version {}'.format(
       new_version, current_version))
+    exit(1)
   # Comparing as strings to include the prerelease/build number in the
   # comparison.
   if str(new_version) == str(current_version) and not args['force']:
-    parser.error('new version {} is equal to current version {}'.format(
+    logger.error('new version {} is equal to current version {}'.format(
       new_version, current_version))
+    exit(1)
 
   # The replacement below does not work if the same file is listed multiple
   # times so let's check for now that every file is listed only once.
@@ -447,36 +447,11 @@ def bump(**args):
       _git.tag(tag_name, force=args['force'])
 
 
-@cli.command()
-@click.option('--current', '-c', is_flag=True, help='Print only the current version '
-  'of the monorepo or package.')
-@click.option('--ci', is_flag=True, help='Print the "ci version", which is '
-  'the current version with the number of commits since the last released '
-  'version.')
-@click.option('--tag', '-t', is_flag=True, help='Print the version formatted as Git tag.')
-@click.option('--status', '-s', is_flag=True, help='Show the number of commits '
-  'since the current version\'s tags.')
-def versions(current, ci, tag, status):
-  """ Prints the current monorepo and package versions. """
-
-  if status and (current or ci):
-    logger.error('invalid options: --status cannot be combined with --current or --ci')
-    exit(1)
+@cli.command('version:status')
+def status():
+  """ Print the release status. """
 
   subject = _load_subject()
-
-  def _print(v):
-    if tag:
-      print(subject.get_tag(v))
-    else:
-      print(v)
-
-  if ci:
-    _print(get_ci_version(subject))
-    exit(0)
-  elif current:
-    _print(subject.version)
-    exit(0)
 
   def _get_commits_since_last_tag(subject):
     tag = subject.get_tag(subject.version)
@@ -492,29 +467,41 @@ def versions(current, ci, tag, status):
   width = max(len(x.name) for x in items)
 
   for item in items:
-    if status:
-      tag, num_commits = _get_commits_since_last_tag(item)
-      if num_commits is None:
-        item_info = colored('tag "{}" not found'.format(tag), 'red')
-      elif num_commits == 0:
-        item_info = colored('no commits', 'green') + ' since "{}"'.format(tag)
-      else:
-        item_info = colored('{} commit(s)'.format(num_commits), 'yellow') + ' since "{}"'.format(tag)
+    tag, num_commits = _get_commits_since_last_tag(item)
+    if num_commits is None:
+      item_info = colored('tag "{}" not found'.format(tag), 'red')
+    elif num_commits == 0:
+      item_info = colored('no commits', 'green') + ' since "{}"'.format(tag)
     else:
-      item_info = str(item.version)
+      item_info = colored('{} commit(s)'.format(num_commits), 'yellow') + ' since "{}"'.format(tag)
     print('{}: {}'.format(item.name.rjust(width), item_info))
+
+
+@cli.command('version:get')
+@click.option('--tag', '-t', is_flag=True)
+@click.option('--git', '-g', is_flag=True)
+def get_version(git, tag):
+  """ Print the current package or repository version. """
+
+  subject = _load_subject()
+  version = get_ci_version(subject) if git else subject.version
+  if tag:
+    print(subject.get_tag(version))
+  else:
+    print(version)
 
 
 @cli.command()
 @click.argument('args', nargs=-1)
 def git(args):
-  """ Shortcut for
+  """ Shortcut for running git commands with a version range since the last
+  tag of the current package or repo.
+
+  This is effectively a shortcut for
 
   \b
     git $1 `shore versions -ct`..HEAD $@ -- .
-
-  This is useful for inspecting the commits or diff since the last released
-  version. """
+  """
 
   subject = _load_subject()
   tag = subject.get_tag(subject.version)
@@ -528,11 +515,13 @@ def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
     if target == k or k.startswith(target + ':')}
 
 
-@cli.command()
-@click.argument('target', nargs=-1)
+@cli.command('dist:build')
+@click.argument('target')
 @click.option('--build-dir', default='build',
   help='Override the build directory. Defaults to ./build')
 def build(**args):
+  """ Build distributions. """
+
   subject = _load_subject()
   targets = subject.get_build_targets()
 
@@ -552,8 +541,8 @@ def build(**args):
     target.build(args['build_dir'])
 
 
-@cli.command()
-@click.argument('target', nargs=-1)
+@cli.command('dist:publish')
+@click.argument('target')
 @click.option('--build-dir', default='build',
   help='Override the build directory. Defaults to ./build')
 @click.option('--test', is_flag=True,
@@ -561,6 +550,8 @@ def build(**args):
 @click.option('--rebuild/--no-rebuild', default=True,
   help='Rebuild or not rebuild existing build artifacts. Defaults to rebuild.')
 def publish(**args):
+  """ Publish releases. """
+
   subject = _load_subject()
   builds = subject.get_build_targets()
   publishers = subject.get_publish_targets()
