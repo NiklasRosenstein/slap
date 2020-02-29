@@ -27,6 +27,7 @@ from shore.core.plugins import (
   FileToRender,
   IMonorepoPlugin,
   IPackagePlugin,
+  VersionRef,
   write_to_disk)
 from shore.model import Monorepo, ObjectCache, Package
 from shore.util import git as _git
@@ -328,10 +329,20 @@ def verify(tag):
   exit(status)
 
 
+def _get_version_refs(subject) -> List[VersionRef]:
+  def _get(subject):
+    for plugin in subject.get_plugins():
+      yield plugin.get_version_refs(subject)
+
+  if isinstance(subject, Monorepo) and subject.mono_versioning:
+    version_refs = Stream.concat(_run_for_subject(subject, _get))
+  else:
+    version_refs = _get(subject)
+  return Stream.concat(version_refs).collect()
+
+
 @cli.command()
-@click.argument('type', type=click.Choice(
-  ['major', 'minor', 'patch', 'post', 'ci', 'show', 'get-single-version', 'status']),
-  required=False)
+@click.argument('type', type=click.Choice(['major', 'minor', 'patch', 'post', 'ci']), required=False)
 @click.option('--version')
 @click.option('--tag', is_flag=True)
 @click.option('--dry', is_flag=True)
@@ -347,7 +358,7 @@ def bump(**args):
 
   subject = _load_subject()
 
-  if not args['type'] not in ('get-single-version',) and not args['skip_checks']:
+  if not args['skip_checks']:
     _run_checks(subject, True)
 
   if isinstance(subject, Package) and subject.monorepo \
@@ -358,32 +369,15 @@ def bump(**args):
     else:
       parser.error('cannot bump individual package version if managed by monorepo.')
 
-  def _get_version_refs(subject):
-    for plugin in subject.get_plugins():
-      yield plugin.get_version_refs(subject)
-
-  if isinstance(subject, Monorepo) and subject.mono_versioning:
-    version_refs = Stream.concat(_run_for_subject(subject, _get_version_refs))
-  else:
-    version_refs = _get_version_refs(subject)
-  version_refs = Stream.concat(version_refs).collect()
-
+  version_refs = _get_version_refs(subject)
   if not version_refs:
     parser.error('no version refs found')
     exit(1)
-
-  if args['type'] == 'show':
-    for ref in version_refs:
-      print('{}: {}'.format(os.path.relpath(ref.filename), ref.value))
-    exit(0)
 
   # Ensure the version is the same accross all refs.
   is_inconsistent = any(parse_version(x.value) != subject.version for x in version_refs)
   if is_inconsistent and not args['force']:
     logger.error('inconsistent versions across files need to be fixed first.')
-    exit(1)
-  elif is_inconsistent and args['type'] == 'get-single-version':
-    logger.error('no single consistent version found.')
     exit(1)
   elif is_inconsistent:
     logger.warning('inconsistent versions across files were found.')
@@ -470,9 +464,35 @@ def status():
         status = colored('no commits', 'green') + ' since "{}"'.format(tag)
       else:
         status = colored('{} commit(s)'.format(count), 'yellow') + ' since "{}"'.format(tag)
-    print(subject.name.rjust(width), status)
+    print('{}: {}'.format(subject.name.rjust(width), status))
   _run_for_subject(subject, _status)
   exit(0)
+
+
+@cli.command()
+@click.option('--current', is_flag=True, help='Print only the current version '
+  'of the monorepo or package.')
+@click.option('--ci', is_flag=True, help='Print the "ci version", which is '
+  'the current version with the number of commits since the last released '
+  'version.')
+def versions(current, ci):
+  """ Prints the current monorepo and package versions. """
+
+  subject = _load_subject()
+
+  if ci:
+    print(get_ci_version(subject))
+    exit(0)
+
+  if current:
+    print(subject.version)
+  else:
+    items = [subject]
+    if isinstance(subject, Monorepo):
+      items.extend(sorted(subject.get_packages(), key=lambda x: x.name))
+    width = max(len(x.name) for x in items)
+    for item in items:
+      print('{}: {}'.format(item.name.rjust(width), item.version))
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
