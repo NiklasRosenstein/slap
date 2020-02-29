@@ -142,7 +142,7 @@ def search_classifiers(q):
 @click.option('--modulename')
 @click.option('--monorepo', is_flag=True)
 @click.option('--dry', is_flag=True)
-@click.option('-f/--force', is_flag=True)
+@click.option('--force', '-f', is_flag=True)
 def new(**args):
   if not args['directory']:
     args['directory'] = args['name']
@@ -347,7 +347,7 @@ def _get_version_refs(subject) -> List[VersionRef]:
 @click.option('--tag', is_flag=True)
 @click.option('--dry', is_flag=True)
 @click.option('--skip-checks', is_flag=True)
-@click.option('-f/--force', is_flag=True)
+@click.option('--force', '-f', is_flag=True)
 def bump(**args):
   if not args['type'] and not args['version']:
     logger.error('conflict arguments: --version and type')
