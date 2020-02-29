@@ -67,7 +67,13 @@ class IPublishTarget(Interface):
   def get_build_selectors(self) -> Iterable[str]:
     pass
 
-  def publish(self, builds: Iterable[IBuildTarget], test: bool, build_directory: str):
+  def publish(
+    self,
+    builds: Iterable[IBuildTarget],
+    test: bool,
+    build_directory: str,
+    skip_existing: bool
+  ):
     pass
 
 

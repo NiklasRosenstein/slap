@@ -6,29 +6,14 @@ name: default
 steps:
 - name: build
   image: python:3.7
-  environment:
-    TEST_PYPI_TOKEN:
-      from_secret: test_pypi_token
   commands:
-  - pip install twine -e .
-  - shore dist:verify --tag "$DRONE_TAG"
-  - GIT_VERSION=`shore version:get -g`
-  - shore version:bump --version "$GIT_VERSION"
-  - shore dist:build setuptools
-
-  - python -m venv .venv
-  - .venv/bin/pip install build/shore-release-tool-*
-  - INSTALLED_VERSION=`.venv/bin/python -c 'from shore import __version__; print(__version__)'`
-  - if [ "$GIT_VERSION" != "$INSTALLED_VERSION" ]; then
-      echo "Installed version is different from Git version. ($INSTALLED_VERSION != $GIT_VERSION)";
-      exit 1;
-    fi
-  - echo -e "\\n\\nSuccessfully built and installed shore v$INSTALLED_VERSION\\n"
-
-  - .venv/bin/pip install pytest
-  - .venv/bin/pytest src/test
-  - echo -e "\\n\\nTests with installed version ran successfully.\\n"
-
+  - git fetch
+  - pip install twine pytest -e .
+  - pytest
+  - shore status
+  - shore verify -t "$DRONE_TAG"
+  - shore bump git
+  - shore build setuptools
 
 - name: publish
   image: python:3.7
@@ -38,30 +23,11 @@ steps:
   commands:
   - git checkout .
   - pip install twine -e .
-
-  - TAG=`shore version:get -t`
-  - if [ "$DRONE_TAG" != "$TAG" ]; then
-      echo "DRONE_TAG ($DRONE_TAG) does not match the expected tag ($TAG).";
-      exit 1;
-    fi
-  - shore dist:verify --tag "$DRONE_TAG"
-
-  - echo -e "[testpypi]\\nusername = __token__\\npassword = $TEST_PYPI_TOKEN\\n" >> ~/.pypirc
-  - shore dist:publish pypy --test
-  - VERSION=`shore version:get`
-
-  - python -m venv .venv
-  - .venv/bin/pip install --index-url https://test.pypi.org/legacy/ "shore-release-tool=$VERSION"
-  - INSTALLED_VERSION=`.venv/bin/python -c "from shore import __version__; print(__version__)"`
-  - if [ "$GIT_VERSION" != "$INSTALLED_VERSION" ]; then
-      echo "Installed version is different from expected version. ($INSTALLED_VERSION != $VERSION)";
-      exit 1
-    fi
-  - echo -e "\\n\\nSuccessfully installed from test repository.\\n"
-
-  - echo -e "[pypi]\\nusername = __token_0_\\npassword = $PYPI_TOKEN\\n" >> ~/.pypirc
-  - shore dist:publish pypi
-  - echo -e "\\n\\nPublished shore $VERSION to PyPI.\\n"
+  - shore verify -et "$DRONE_TAG"
+  - echo "[testpypi]\nusername = __token__\npassword = $TEST_PYPI_TOKEN\n" >> ~/.pypirc
+  - shore publish pypi --test --skip-existing
+  - echo "[pypi]\nusername = __token__\npassword = $PYPI_TOKEN\n" >> ~/.pypirc
+  - shore publish pypi
   depends_on:
   - build
   when:
