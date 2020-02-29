@@ -448,51 +448,54 @@ def bump(**args):
 
 
 @cli.command()
-def status():
-  """ Shows the number of commits since the last release. """
-
-  subject = _load_subject()
-  width = max(_run_for_subject(subject, lambda s: len(s.name)))
-  def _status(subject):
-    tag = subject.get_tag(subject.version)
-    ref = _git.rev_parse(tag)
-    if not ref:
-      status = colored('tag "{}" not found'.format(tag), 'red')
-    else:
-      count = len(_git.rev_list(tag + '..HEAD', subject.directory))
-      if count == 0:
-        status = colored('no commits', 'green') + ' since "{}"'.format(tag)
-      else:
-        status = colored('{} commit(s)'.format(count), 'yellow') + ' since "{}"'.format(tag)
-    print('{}: {}'.format(subject.name.rjust(width), status))
-  _run_for_subject(subject, _status)
-  exit(0)
-
-
-@cli.command()
 @click.option('--current', is_flag=True, help='Print only the current version '
   'of the monorepo or package.')
 @click.option('--ci', is_flag=True, help='Print the "ci version", which is '
   'the current version with the number of commits since the last released '
   'version.')
-def versions(current, ci):
+@click.option('--status', is_flag=True, help='Show the number of commits '
+  'since the current version\'s tags.')
+def versions(current, ci, status):
   """ Prints the current monorepo and package versions. """
+
+  if status and (current or ci):
+    logger.error('invalid options: --status cannot be combined with --current or --ci')
+    exit(1)
 
   subject = _load_subject()
 
   if ci:
     print(get_ci_version(subject))
     exit(0)
-
-  if current:
+  elif current:
     print(subject.version)
-  else:
-    items = [subject]
-    if isinstance(subject, Monorepo):
-      items.extend(sorted(subject.get_packages(), key=lambda x: x.name))
-    width = max(len(x.name) for x in items)
-    for item in items:
-      print('{}: {}'.format(item.name.rjust(width), item.version))
+    exit(0)
+
+  def _get_commits_since_last_tag(subject):
+    tag = subject.get_tag(subject.version)
+    ref = _git.rev_parse(tag)
+    if not ref:
+      return tag, None
+    else:
+      return tag, len(_git.rev_list(tag + '..HEAD', subject.directory))
+
+  items = [subject]
+  if isinstance(subject, Monorepo):
+    items.extend(sorted(subject.get_packages(), key=lambda x: x.name))
+  width = max(len(x.name) for x in items)
+
+  for item in items:
+    if status:
+      tag, num_commits = _get_commits_since_last_tag(item)
+      if num_commits is None:
+        item_info = colored('tag "{}" not found'.format(tag), 'red')
+      elif num_commits == 0:
+        item_info = colored('no commits', 'green') + ' since "{}"'.format(tag)
+      else:
+        item_info = colored('{} commit(s)'.format(num_commits), 'yellow') + ' since "{}"'.format(tag)
+    else:
+      item_info = str(item.version)
+    print('{}: {}'.format(item.name.rjust(width), item_info))
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
