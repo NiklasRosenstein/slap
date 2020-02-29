@@ -448,14 +448,15 @@ def bump(**args):
 
 
 @cli.command()
-@click.option('--current', is_flag=True, help='Print only the current version '
+@click.option('--current', '-c', is_flag=True, help='Print only the current version '
   'of the monorepo or package.')
 @click.option('--ci', is_flag=True, help='Print the "ci version", which is '
   'the current version with the number of commits since the last released '
   'version.')
-@click.option('--status', is_flag=True, help='Show the number of commits '
+@click.option('--tag', '-t', is_flag=True, help='Print the version formatted as Git tag.')
+@click.option('--status', '-s', is_flag=True, help='Show the number of commits '
   'since the current version\'s tags.')
-def versions(current, ci, status):
+def versions(current, ci, tag, status):
   """ Prints the current monorepo and package versions. """
 
   if status and (current or ci):
@@ -464,11 +465,17 @@ def versions(current, ci, status):
 
   subject = _load_subject()
 
+  def _print(v):
+    if tag:
+      print(subject.get_tag(v))
+    else:
+      print(v)
+
   if ci:
-    print(get_ci_version(subject))
+    _print(get_ci_version(subject))
     exit(0)
   elif current:
-    print(subject.version)
+    _print(subject.version)
     exit(0)
 
   def _get_commits_since_last_tag(subject):
@@ -496,6 +503,23 @@ def versions(current, ci, status):
     else:
       item_info = str(item.version)
     print('{}: {}'.format(item.name.rjust(width), item_info))
+
+
+@cli.command()
+@click.argument('args', nargs=-1)
+def git(args):
+  """ Shortcut for
+
+  \b
+    git $1 `shore versions -ct`..HEAD $@ -- .
+
+  This is useful for inspecting the commits or diff since the last released
+  version. """
+
+  subject = _load_subject()
+  tag = subject.get_tag(subject.version)
+  command = ['git', args[0]] + [tag + '..HEAD'] + list(args[1:]) + ['--', '.']
+  exit(subprocess.call(command))
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
