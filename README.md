@@ -3,8 +3,16 @@
 [![Build Status](https://drone.niklasrosenstein.com/api/badges/NiklasRosenstein/shore/status.svg)](https://drone.niklasrosenstein.com/NiklasRosenstein/shore)
 
 Shore is an opinionated distribution and release management tool for pure
-Python packages and mono repositories. It attempts to automate as much as
-possible around the versioning and release process.
+Python packages and mono repositories and is most effectively used with Git
+repositories.
+
+__Goals of Shore__
+
+* Automate as much as possible of the release and distribution of Python
+  packages
+* Prevent common mistakes from the beginning or provide tools to make it
+  easier to catch them
+* Provide tooling for to handle Python package mono repositories
 
 ## Getting Started
 
@@ -22,7 +30,7 @@ The `shore new` command can help you to initialize such a file. Alternatively,
 check out the [`src/shore/model.py`](src/shore/model.py) source code to find
 the fields available for the `package.yaml` file.
 
-    $ shore new --name mypackage --license MIT --version 0.0.1
+    $ shore new mypackage . --license MIT
 
 This command will also create a `LICENSE.txt` file as well as an initial
 structure for your Python module if the files don't exist (ie.
@@ -57,7 +65,7 @@ flags. Note that this will also update the version number in any files that
 shore knows also contain the version number (eg. the entrypoin source file of
 your package that contains the `__version__` variable).
 
-    $ shore bump --minor
+    $ shore bump minor --tag
 
 __Publishing your package__
 
