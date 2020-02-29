@@ -52,7 +52,7 @@ class TwinePublishTarget(Struct):
   def get_build_selectors(self) -> Iterable[str]:
     return self.selectors
 
-  def publish(self, builds, test, build_directory):
+  def publish(self, builds, test, build_directory, skip_existing):
     files = Stream.concat(x.get_build_artifacts() for x in builds)
     files = files.map(lambda x: os.path.join(build_directory, x)).collect()
     command = ['twine', 'upload']
@@ -78,6 +78,8 @@ class TwinePublishTarget(Struct):
       command += ('--cert', self.cert)
     if self.client_cert:
       command += ('--client-cert', self.client_cert)
+    if skip_existing:
+      command.append('--skip-existing')
     command += files
     command += ['--verbose']
     subprocess.check_call(command)

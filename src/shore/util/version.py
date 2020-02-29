@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from packaging.version import LegacyVersion, Version as _Version
+from packaging.version import Version as _Version
 import re
 
 
@@ -29,7 +29,7 @@ class Version(_Version):
   X is the distance and Y is the lowercase 7-character SHA sum). """
 
   def __init__(self, s: str):
-    match = re.match('(.*)-(\d+)-g([0-9a-f]{7})', s)
+    match = re.match(r'(.*)-(\d+)-g([0-9a-f]{7})', s)
     if match:
       s = match.group(1)
       commit_distance = int(match.group(2))
