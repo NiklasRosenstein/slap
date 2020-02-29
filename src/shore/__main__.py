@@ -37,7 +37,7 @@ from shore.util.resources import walk_package_resources
 from shore.util.version import parse_version, bump_version
 from termcolor import colored
 from typing import Any, Dict, Iterable, List, Optional, Union
-import argparse
+import click
 import io
 import jinja2
 import json
@@ -72,7 +72,7 @@ def _report_conflict(parser, args, *opts: str):
       ' and '.join('--' + k for k in has_opts)))
 
 
-def _load_subject(parser) -> Union[Monorepo, Package, None]:
+def _load_subject() -> Union[Monorepo, Package, None]:
   package, monorepo = None, None
   if os.path.isfile('package.yaml'):
     package = Package.load('package.yaml', _cache)
@@ -82,147 +82,79 @@ def _load_subject(parser) -> Union[Monorepo, Package, None]:
     raise RuntimeError('found package.yaml and monorepo.yaml in the same '
       'directory')
   if not package and not monorepo:
-    parser.error('no package.yaml or monorepo.yaml in current directory')
+    logger.error('no package.yaml or monorepo.yaml in current directory')
+    exit(1)
   return package or monorepo
 
 
-def get_argument_parser(prog=None):
-  parser = argparse.ArgumentParser(prog=prog)
-  parser.add_argument('-C', '--change-directory', metavar='DIR')
-  parser.add_argument('-v', '--verbose', action='store_true')
-  parser.add_argument('--version', action='version', version=__version__)
-  subparser = parser.add_subparsers(dest='command')
-
-  license_ = subparser.add_parser('license')
-  license_.add_argument('license_name')
-  license_.add_argument('--json', action='store_true')
-  license_.add_argument('--text', action='store_true')
-  license_.add_argument('--notice', action='store_true')
-
-  classifiers = subparser.add_parser('classifiers')
-  classifiers_subparsers = classifiers.add_subparsers(dest='classifiers_command')
-  classifiers_search = classifiers_subparsers.add_parser('search')
-  classifiers_search.add_argument('q')
-
-  new = subparser.add_parser('new')
-  new.add_argument('name')
-  new.add_argument('directory', nargs='?')
-  new.add_argument('--version')
-  new.add_argument('--author')
-  new.add_argument('--license')
-  new.add_argument('--modulename')
-  new.add_argument('--monorepo', action='store_true')
-  new.add_argument('--dry', action='store_true')
-  new.add_argument('-f', '--force', action='store_true')
-
-  checks = subparser.add_parser('checks')
-  checks.add_argument('--treat-warnings-as-errors', action='store_true')
-
-  bump = subparser.add_parser('bump')
-  bump.add_argument('path', nargs='?')
-  bump.add_argument('--skip-checks', action='store_true')
-  bump.add_argument('--version')
-  bump.add_argument('--major', action='store_true')
-  bump.add_argument('--minor', action='store_true')
-  bump.add_argument('--patch', action='store_true')
-  bump.add_argument('--post', action='store_true')
-  bump.add_argument('--ci', action='store_true')
-  bump.add_argument('-f', '--force', action='store_true')
-  bump.add_argument('--tag', action='store_true')
-  bump.add_argument('--dry', action='store_true')
-  bump.add_argument('--show', action='store_true')
-  bump.add_argument('--get-single-version', action='store_true')
-  bump.add_argument('--status', action='store_true')
-
-  update = subparser.add_parser('update')
-  update.add_argument('--skip-checks', action='store_true')
-  update.add_argument('--dry', action='store_true')
-
-  verify = subparser.add_parser('verify')
-  verify.add_argument('--tag')
-
-  build = subparser.add_parser('build')
-  build.add_argument('target', nargs='?',
-    help='The target to build. If no target is specified, all targets will '
-         'be built.')
-  build.add_argument('--build-dir', default='build', metavar='DIR',
-    help='Override the build directory. Defaults to ./build')
-
-  publish = subparser.add_parser('publish')
-  publish.add_argument('target', nargs='?',
-    help='The target to publish. If no target is specified, all targets '
-         'will be published.')
-  publish.add_argument('--test', action='store_true',
-    help='Publish to a test repository.')
-  publish.add_argument('--build-dir', default='build', metavar='DIR',
-    help='Override the build directory. Defaults to ./build')
-  publish.add_argument('--reuse', action='store_true',
-    help='Reuse existing build artifacts. Use this option only if you '
-         'used the build command before.')
-
-  return parser
-
-
-def main(argv=None, prog=None):
-  parser = get_argument_parser(prog)
-  args = parser.parse_args(argv)
-  if not args.command:
-    parser.print_usage()
-    return 0
+@click.group()
+@click.option('-C', '--change-directory')
+@click.option('-v', '--verbose')
+@click.option('--version', is_flag=True)
+def cli(change_directory, verbose, version):
+  if version:
+    print(__version__)
+    exit(0)
 
   logging.basicConfig(
-    format='[%(levelname)s:%(name)s]: %(message)s' if args.verbose else '%(message)s',
-    level=logging.DEBUG if args.verbose else logging.INFO)
+    format='[%(levelname)s:%(name)s]: %(message)s' if verbose else '%(message)s',
+    level=logging.DEBUG if verbose else logging.INFO)
 
-  if args.command in ('bump', 'build', 'publish'):
-    # Convert relative to absolute paths before changing directory.
-    for attr in ('path', 'build_dir'):
-      if getattr(args, attr, None):
-        setattr(args, attr, os.path.abspath(getattr(args, attr)))
-  if args.change_directory:
-    os.chdir(args.change_directory)
-
-  return globals()['_' + args.command](parser, args)
+  if change_directory:
+    os.chdir(change_directory)
 
 
-def _license(parser, args):
-  @proxy_decorator(deref=True, lazy=True)
-  def data():
-    return get_license_metadata(args.license_name)
-
-  if args.json:
+@cli.command()
+@click.argument('output_type', type=click.Choice(['json', 'text', 'notice']))
+@click.argument('license_name')
+def license(output_type, license_name):
+  data = get_license_metadata(license_name)
+  if output_type == 'json':
     print(json.dumps(data(), sort_keys=True))
-  elif args.text:
+  elif output_type == 'text':
     print(wrap_license_text(data['license_text']))
-  elif args.notice:
+  elif ouutput_type == 'notice':
     print(wrap_license_text(data['standard_notice'] or data['license_text']))
   else:
-    parser.print_usage()
+    raise RuntimeError(output_type)
 
 
-def _classifiers(parser, args):
-  if args.classifiers_command == 'search':
-    for classifier in get_classifiers():
-      if args.q.strip().lower() in classifier.lower():
-        print(classifier)
-  else:
-    parser.print_usage()
+@cli.group()
+def classifiers():
+  pass
 
 
-def _new(parser, args):
+@classifiers.command('search')
+@click.argument('q')
+def search_classifiers(q):
+  for classifier in get_classifiers():
+    if q.strip().lower() in classifier.lower():
+      print(classifier)
 
-  if not args.directory:
-    args.directory = args.name
 
-  if not args.author:
-    args.author = _get_author_info_from_git()
+@cli.command()
+@click.argument('name')
+@click.argument('directory', required=False)
+@click.option('--author')
+@click.option('--version')
+@click.option('--license')
+@click.option('--modulename')
+@click.option('--monorepo', is_flag=True)
+@click.option('--dry', is_flag=True)
+@click.option('-f/--force', is_flag=True)
+def new(**args):
+  if not args['directory']:
+    args['directory'] = args['name']
+
+  if not args['author']:
+    args['author'] = _get_author_info_from_git()
 
   env_vars = {
-    'name': args.name,
-    'version': args.version,
-    'author': args.author,
-    'license': args.license,
-    'modulename': args.modulename
+    'name': args['name'],
+    'version': args['version'],
+    'author': args['author'],
+    'license': args['license'],
+    'modulename': args['modulename']
   }
 
   def _render_template(template_string, **kwargs):
@@ -240,8 +172,8 @@ def _new(parser, args):
     # Render the template files to the target directory.
     for source_filename in walk_package_resources('shore', 'templates/new'):
       # Expand variables in the filename.
-      filename = _render_template(source_filename, name=args.name.replace('.', '/'))
-      dest = os.path.join(args.directory, filename)
+      filename = _render_template(source_filename, name=args['name'].replace('.', '/'))
+      dest = os.path.join(args['directory'], filename)
       yield FileToRender(
         None,
         os.path.normpath(dest),
@@ -249,9 +181,9 @@ def _new(parser, args):
 
     # Render namespace supporting files.
     parts = []
-    for item in args.name.split('.')[:-1]:
+    for item in args['name'].split('.')[:-1]:
       parts.append(item)
-      dest = os.path.join(args.directory, 'src', *parts, '__init__.py')
+      dest = os.path.join(args['directory'], 'src', *parts, '__init__.py')
       yield FileToRender(
         None,
         os.path.normpath(dest),
@@ -260,11 +192,11 @@ def _new(parser, args):
     # TODO (@NiklasRosenstein): Render the license file if it does not exist.
 
   for file in _get_files():
-    if os.path.isfile(file.name) and not args.force:
+    if os.path.isfile(file.name) and not args['force']:
       print(colored('Skip ' + file.name, 'yellow'))
       continue
     print(colored('Write ' + file.name, 'blue'))
-    if not args.dry:
+    if not args['dry']:
       write_to_disk(file)
 
 
@@ -287,7 +219,7 @@ def _run_checks(subject, treat_warnings_as_errors: bool=False):
   checks = Stream.concat(_run_for_subject(subject, _collect_checks)).collect()
   if not checks:
     logger.info('✔ no checks triggered')
-    return 0
+    return True
 
   max_level = max(x.level for x in checks)
   if max_level == CheckResult.Level.INFO:
@@ -308,20 +240,27 @@ def _run_checks(subject, treat_warnings_as_errors: bool=False):
     print('  {} ({}): {}'.format(level, _color_subject_name(check.on), check.message))
 
   logger.debug('exiting with status %s', status)
-  return 1
+  return False
 
 
-def _checks(parser, args):
-  subject = _load_subject(parser)
-  return _run_checks(subject, args.treat_warnings_as_errors)
+@cli.command()
+@click.option('--treat-warnings-as-errors', is_flag=True)
+def checks(treat_warnings_as_errors):
+  subject = _load_subject()
+  if not _run_checks(subject, treat_warnings_as_errors):
+    exit(1)
+  exit(0)
 
 
-def _update(parser, args):
+@cli.command()
+@click.option('--skip-checks', is_flag=True)
+@click.option('--dry', is_flag=True)
+def update(skip_checks, dry):
   def _collect_files(subject):
     return Stream.concat(x.get_files(subject) for x in subject.get_plugins())
 
-  subject = _load_subject(parser)
-  if not args.skip_checks:
+  subject = _load_subject()
+  if not skip_checks:
     _run_checks(subject, True)
 
   files = _run_for_subject(subject, _collect_files)
@@ -330,11 +269,13 @@ def _update(parser, args):
   logger.info('⚪ rendering %s file(s)', len(files))
   for file in files:
     logger.info('  %s', os.path.relpath(file.name))
-    if not args.dry:
+    if not dry:
       write_to_disk(file)
 
 
-def _verify(parser, args):
+@cli.command()
+@click.option('--tag')
+def verify(tag):
   def _virtual_update(subject) -> Iterable[str]:
     files = Stream.concat(x.get_files(subject) for x in subject.get_plugins())
     for file in files:
@@ -351,12 +292,12 @@ def _verify(parser, args):
     if isinstance(subject, Monorepo):
       # Shore does not support tagging workflows for monorepos yet.
       return; yield
-    if subject.get_tag(subject.version) == args.tag:
+    if subject.get_tag(subject.version) == tag:
       yield subject
 
   status = 0
 
-  subject = _load_subject(parser)
+  subject = _load_subject()
   files = _run_for_subject(subject, _virtual_update)
   files = Stream.concat(files).collect()
   if files:
@@ -367,45 +308,49 @@ def _verify(parser, args):
   for file in files:
     logger.warning('  %s', os.path.relpath(file))
 
-  if args.tag:
+  if tag:
     matches = _run_for_subject(subject, _tag_matcher)
     matches = Stream.concat(matches).collect()
     if len(matches) == 0:
       # TODO (@NiklasRosenstein): If we matched the {name} portion of the
       #   tag_format (if present) we could find which package (or monorepo)
       #   the tag was intended for.
-      logger.error('❌ unexpected tag: %s', args.tag)
+      logger.error('❌ unexpected tag: %s', tag)
       status = 1
     elif len(matches) > 1:
-      logger.error('❌ tag matches multiple subjects: %s', args.tag)
+      logger.error('❌ tag matches multiple subjects: %s', tag)
       for match in matches:
         logger.error('  %s', match.name)
       status = 1
     else:
-      logger.info('✔ tag %s matches %s', args.tag, matches[0].name)
+      logger.info('✔ tag %s matches %s', tag, matches[0].name)
 
-  return status
+  exit(status)
 
 
-def _bump(parser, args):
-  _report_conflict(parser, args, 'version', 'ci')
-  _report_conflict(parser, args, 'major', 'minor', 'patch', 'version')
+@cli.command()
+@click.argument('type', type=click.Choice(
+  ['major', 'minor', 'patch', 'post', 'ci', 'show', 'get-single-version', 'status']),
+  required=False)
+@click.option('--version')
+@click.option('--tag', is_flag=True)
+@click.option('--dry', is_flag=True)
+@click.option('--skip-checks', is_flag=True)
+@click.option('-f/--force', is_flag=True)
+def bump(**args):
+  if not args['type'] and not args['version']:
+    logger.error('conflict arguments: --version and type')
+    exit(1)
+  if not args['type'] and not args['version']:
+    logger.error('missing arguments: specify type or --version')
+    exit(1)
 
-  if args.path:
-    os.chdir(args.path)
+  subject = _load_subject()
 
-  subject = _load_subject(parser)
-  options = (args.post, args.patch, args.minor, args.major, args.version,
-             args.show, args.ci, args.get_single_version, args.status)
-  if sum(map(bool, options)) == 0:
-    parser.error('no operation specified')
-  elif sum(map(bool, options)) > 1:
-    parser.error('multiple operations specified')
-
-  if not args.status and not args.get_single_version and not args.skip_checks:
+  if not args['type'] not in ('status', 'get-single-version') and not args['skip_checks']:
     _run_checks(subject, True)
 
-  if args.status:
+  if args['type'] == 'status':
     width = max(_run_for_subject(subject, lambda s: len(s.name)))
     def _status(subject):
       tag = subject.get_tag(subject.version)
@@ -420,11 +365,11 @@ def _bump(parser, args):
           status = colored('{} commit(s)'.format(count), 'yellow') + ' since "{}"'.format(tag)
       print(subject.name.rjust(width), status)
     _run_for_subject(subject, _status)
-    return 0
+    exit(0)
 
   if isinstance(subject, Package) and subject.monorepo \
       and subject.monorepo.mono_versioning:
-    if args.force:
+    if args['force']:
       logger.warning('forcing version bump on individual package version '
         'that is usually managed by the monorepo.')
     else:
@@ -442,50 +387,50 @@ def _bump(parser, args):
 
   if not version_refs:
     parser.error('no version refs found')
-    return 1
+    exit(1)
 
-  if args.show:
+  if args['type'] == 'show':
     for ref in version_refs:
       print('{}: {}'.format(os.path.relpath(ref.filename), ref.value))
-    return 0
+    exit(0)
 
   # Ensure the version is the same accross all refs.
   is_inconsistent = any(parse_version(x.value) != subject.version for x in version_refs)
-  if is_inconsistent and not args.force:
+  if is_inconsistent and not args['force']:
     logger.error('inconsistent versions across files need to be fixed first.')
-    return 1
-  elif is_inconsistent and args.get_single_version:
+    exit(1)
+  elif is_inconsistent and args['type'] == 'get-single-version':
     logger.error('no single consistent version found.')
-    return 1
+    exit(1)
   elif is_inconsistent:
     logger.warning('inconsistent versions across files were found.')
 
-  if args.get_single_version:
+  if args['type'] == 'get-single-version':
     print(subject.version)
-    return 0
+    exit(0)
 
   current_version = subject.version
-  if args.post:
+  if args['type'] == 'post':
     new_version = bump_version(current_version, 'post')
-  elif args.patch:
+  elif args['type'] == 'patch':
     new_version = bump_version(current_version, 'patch')
-  elif args.minor:
+  elif args['type'] == 'minor':
     new_version = bump_version(current_version, 'minor')
-  elif args.major:
+  elif args['type'] == 'major':
     new_version = bump_version(current_version, 'major')
-  elif args.version:
-    new_version = parse_version(args.version)
-  elif args.ci:
+  elif args['type'] == 'ci':
     new_version = get_ci_version(subject)
+  elif args['version']:
+    new_version = parse_version(args['version'])
   else:
     raise RuntimeError('what happened?')
 
-  if new_version < current_version and not args.force:
+  if new_version < current_version and not args['force']:
     parser.error('new version {} is lower than currenet version {}'.format(
       new_version, current_version))
   # Comparing as strings to include the prerelease/build number in the
   # comparison.
-  if str(new_version) == str(current_version) and not args.force:
+  if str(new_version) == str(current_version) and not args['force']:
     parser.error('new version {} is equal to current version {}'.format(
       new_version, current_version))
 
@@ -499,22 +444,22 @@ def _bump(parser, args):
   logger.info('bumping %d version reference(s)', len(version_refs))
   for ref in version_refs:
     logger.info('  %s: %s → %s', os.path.relpath(ref.filename), ref.value, new_version)
-    if not args.dry:
+    if not args['dry']:
       with open(ref.filename) as fp:
         contents = fp.read()
       contents = contents[:ref.start] + str(new_version) + contents[ref.end:]
       with open(ref.filename, 'w') as fp:
         fp.write(contents)
 
-  if args.tag:
+  if args['tag']:
     if any(f.mode == 'A' for f in _git.porcelain()):
       logger.error('cannot tag with non-empty staging area')
-      return 1
+      exit(1)
 
     tag_name = subject.get_tag(new_version)
     logger.info('tagging %s', tag_name)
 
-    if not args.dry:
+    if not args['dry']:
       changed_files = [x.filename for x in version_refs]
       _git.add(changed_files)
       if any(x.mode == 'M' for x in _git.porcelain()):
@@ -522,7 +467,7 @@ def _bump(parser, args):
         # update but --force was used (the goal of this is usually to end
         # up here for the tagging).
         _git.commit('({}) bump version to {}'.format(subject.name, new_version))
-      _git.tag(tag_name, force=args.force)
+      _git.tag(tag_name, force=args['force'])
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
@@ -531,47 +476,59 @@ def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
     if target == k or k.startswith(target + ':')}
 
 
-def _build(parser, args):
-  subject = _load_subject(parser)
+@cli.command()
+@click.argument('target', nargs=-1)
+@click.option('--build-dir', default='build',
+  help='Override the build directory. Defaults to ./build')
+def build(**args):
+  subject = _load_subject()
   targets = subject.get_build_targets()
 
-  if args.target:
-    targets = _filter_targets(targets, args.target)
+  if args['target']:
+    targets = _filter_targets(targets, args['target'])
     if not targets:
-      logging.error('no build targets matched "%s"', args.target)
-      return 1
+      logging.error('no build targets matched "%s"', args['target'])
+      exit(1)
 
   if not targets:
     logging.info('no build targets')
-    return 0
+    exit(0)
 
-  os.makedirs(args.directory, exist_ok=True)
+  os.makedirs(args['build_dir'], exist_ok=True)
   for target_id, target in targets.items():
     logger.info('building target %s', colored(target_id, 'blue'))
-    target.build(args.directory)
+    target.build(args['build_dir'])
 
 
-def _publish(parser, args):
-  subject = _load_subject(parser)
+@cli.command()
+@click.argument('target', nargs=-1)
+@click.option('--build-dir', default='build',
+  help='Override the build directory. Defaults to ./build')
+@click.option('--test', is_flag=True,
+  help='Publish to a test repository instead.')
+@click.option('--rebuild/--no-rebuild', default=True,
+  help='Rebuild or not rebuild existing build artifacts. Defaults to rebuild.')
+def publish(**args):
+  subject = _load_subject()
   builds = subject.get_build_targets()
   publishers = subject.get_publish_targets()
 
   if subject.get_private():
     logger.error('"%s" is marked private, publish prevented.', subject.name)
-    return 1
+    exit(1)
 
-  if args.target:
-    publishers = _filter_targets(publishers, args.target)
+  if args['target']:
+    publishers = _filter_targets(publishers, args['target'])
     if not publishers:
-      logger.error('no publish targets matched "%s"', args.target)
-      return 1
+      logger.error('no publish targets matched "%s"', args['target'])
+      exit(1)
 
   if not publishers:
     logging.info('no publish targets')
 
   def _needs_build(build):
     for filename in build.get_build_artifacts():
-      if not os.path.isfile(os.path.join(args.build_dir, filename)):
+      if not os.path.isfile(os.path.join(args['build_dir'], filename)):
         return True
     return False
 
@@ -587,14 +544,14 @@ def _publish(parser, args):
         required_builds.update(selector_builds)
 
       for target_id, build in required_builds.items():
-        if args.reuse and not _needs_build(build):
+        if not args['rebuild'] and not _needs_build(build):
           logger.info('skipping target %s', colored(target_id, 'blue'))
         else:
           logger.info('building target %s', colored(target_id, 'blue'))
-          os.makedirs(args.build_dir, exist_ok=True)
-          build.build(args.build_dir)
+          os.makedirs(args['build_dir'], exist_ok=True)
+          build.build(args['build_dir'])
 
-      publisher.publish(required_builds.values(), args.test, args.build_dir)
+      publisher.publish(required_builds.values(), args['test'], args['build_dir'])
       return True
     except:
       logger.exception('error while running publisher "%s"', name)
@@ -606,10 +563,10 @@ def _publish(parser, args):
       status = 1
 
   logger.debug('exit with status code %s', status)
-  return status
+  exit(status)
 
 
-_entry_main = lambda: sys.exit(main())
+_entry_point = lambda: sys.exit(cli())
 
 if __name__ == '__main__':
-  _entry_main()
+  _entry_point()
