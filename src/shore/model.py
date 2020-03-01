@@ -661,7 +661,7 @@ class Package(BaseObject):
     parts = name.split('.')
     prefix = os.sep.join(parts[:-1])
     for filename in [parts[-1] + '.py', os.path.join(parts[-1], '__init__.py')]:
-      filename = os.path.join('src', prefix, filename)
+      filename = os.path.join(self.source_directory, prefix, filename)
       if os.path.isfile(os.path.join(self.directory, filename)):
         return filename
     raise ValueError('Entry file for package "{}" could not be determined'
