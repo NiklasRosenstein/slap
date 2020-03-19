@@ -19,13 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, MixinDecoration, Struct
-from nr.databind.json import (
-  JsonDefault,
-  JsonDeserializer,
-  JsonFieldName,
-  JsonStoreRemainingKeys)
+from nr.databind.core import Field, Struct, FieldName, Raw
+from nr.databind.json import JsonDefault, JsonSerializer, JsonMixin
 from nr.pylang.utils import classdef
+from nr.stream import Stream
 from shore.core.plugins import (
   IBasePlugin,
   IBuildTarget,
@@ -102,6 +99,7 @@ class VersionSelector(object):
 VersionSelector.ANY = VersionSelector('*')
 
 
+@JsonSerializer(deserialize='_deserialize')
 class Requirement(object):
   """ A requirement is a combination of a package name and a version selector.
   """
@@ -135,13 +133,14 @@ class Requirement(object):
       return self.package
     return '{} {}'.format(self.package, self.version.to_setuptools())
 
-  @JsonDeserializer
-  def __deserialize(context, location):
-    if not isinstance(location.value, str):
-      raise TypeError(location)
-    return Requirement.parse(location.value)
+  @classmethod
+  def _deserialize(cls, mapper, context, node):
+    if not isinstance(node.value, str):
+      raise node.type_error()
+    return Requirement.parse(node.value)
 
 
+@JsonSerializer(deserialize='_deserialize')
 class Requirements(object):
   """ Represents package requirements, consisting of a #RequirementsList *any*
   that is comprised of requirements that always need to be present, and
@@ -192,17 +191,18 @@ class Requirements(object):
   def __bool__(self):
     return bool(self.python or self.required or self.platforms)
 
-  @JsonDeserializer
-  def __deserialize(context, location):
+  @classmethod
+  def _deserialize(cls, mapper, context, node):
     deserialize_type = [(Requirement, dict)]
-    items = context.deserialize(location.value, deserialize_type)
+    items = mapper.deserialize_node(node.replace(datatype=deserialize_type))
 
-    self = location.datatype.cls()
+    self = node.datatype.cls()
     for index, item in enumerate(items):
-      self._extract_from_item(context, (index,), item)
+      self._extract_from_item(mapper, node.make_child(index, None, item))
     return self
 
-  def _extract_from_item(self, context, path, item):
+  def _extract_from_item(self, mapper, node):
+    item = node.value
     if isinstance(item, Requirement):
       if item.package == 'python':
         self.python = item.version
@@ -212,9 +212,7 @@ class Requirements(object):
       if len(item) != 1:
         raise ValueError('expected only a single key in requirements list')
       for key, value in item.items():
-        # Deserialize the requirements in this platform selector.
-        deser = lambda i, v: context.deserialize(v, Requirement, path + (key, i))
-        value = [deser(i, v) for i, v in enumerate(value)]
+        value = mapper.deserialize_node(node.make_child(key, [Requirement], value))
         if key in self.platforms:
           self.platforms[key].extend(value)
         else:
@@ -230,16 +228,20 @@ class RootRequirements(Requirements):
     self.test = None
     self.extra = {}
 
-  def _extract_from_item(self, context, path, item):
+  def _extract_from_item(self, mapper, node):
+    item = node.value
     if isinstance(item, dict) and len(item) == 1 and 'extra' in item:
+      values_node = node.make_child('extra', None, item['extra'])
       for key, value in item['extra'].items():
-        self.extra[key] = context.deserialize(value, Requirements, path + ('extra', key))
+        self.extra[key] = mapper.deserialize_node(values_node.make_child(key, Requirements, value))
     elif isinstance(item, dict) and len(item) == 1 and 'test' in item:
-      self.test = context.deserialize(item['test'], Requirements, path + ('test',))
+      test_node = node.make_child('test', Requirements, item['test'])
+      self.test = mapper.deserialize_node(test_node)
     else:
-      super(RootRequirements, self)._extract_from_item(context, path, item)
+      super(RootRequirements, self)._extract_from_item(mapper, node)
 
 
+@JsonSerializer(deserialize='_deserialize')
 class Author(Struct):
   name = Field(str)
   email = Field(str)
@@ -249,10 +251,10 @@ class Author(Struct):
   def __str__(self):
     return '{} <{}>'.format(self.name, self.email)
 
-  @JsonDeserializer
-  def __deserialize(context, location):
-    if isinstance(location.value, str):
-      match = Author.AUTHOR_EMAIL_REGEX.match(location.value)
+  @classmethod
+  def _deserialize(cls, mapper, context, node):
+    if isinstance(node.value, str):
+      match = Author.AUTHOR_EMAIL_REGEX.match(node.value)
       if match:
         author = match.group(1).strip()
         email = match.group(2).strip()
@@ -260,6 +262,7 @@ class Author(Struct):
     raise NotImplementedError
 
 
+@JsonSerializer(deserialize='_deserialize')
 class Datafile(Struct):
   """ Represents an entry in the #Package.datafiles configuration. Can be
   deserialized from a JSON-like object or a string formatted as
@@ -270,16 +273,16 @@ class Datafile(Struct):
   include = Field([str])
   exclude = Field([str])
 
-  @JsonDeserializer
-  def __deserialize(context, location):
-    if isinstance(location.value, str):
-      left, patterns = location.value.partition(',')[::2]
+  @classmethod
+  def _deserialize(cls, mapper, context, node):
+    if isinstance(node.value, str):
+      left, patterns = node.value.partition(',')[::2]
       if ':' in left:
         source, target = left.partition(':')[::2]
       else:
         source, target = left, '.'
       if not source or not target:
-        raise ValueError('invalid DataFile spec: {!r}'.format(location.value))
+        raise ValueError('invalid DataFile spec: {!r}'.format(node.value))
       include = []
       exclude = []
       for pattern in patterns.split(','):
@@ -288,6 +291,7 @@ class Datafile(Struct):
     raise NotImplementedError
 
 
+@JsonSerializer(deserialize='_deserialize')
 class PluginConfig(Struct):
   name = Field(str)
   plugin = Field(IBasePlugin)
@@ -344,15 +348,15 @@ class PluginConfig(Struct):
     logger.debug('skipping plugin {}'.format(self.name))
     return ()
 
-  @JsonDeserializer
-  def __deserialize(context, location):
-    if isinstance(location.value, str):
-      plugin_name = location.value
+  @classmethod
+  def _deserialize(cls, mapper, context, node):
+    if isinstance(node.value, str):
+      plugin_name = node.value
       config = {}
-    elif isinstance(location.value, dict):
-      if len(location.value) != 1:
+    elif isinstance(node.value, dict):
+      if len(node.value) != 1:
         raise ValueError('expected only one key')
-      plugin_name, config = next(iter(location.value.items()))
+      plugin_name, config = next(iter(node.value.items()))
     else:
       raise TypeError('expected str or dict')
     try:
@@ -360,7 +364,7 @@ class PluginConfig(Struct):
     except PluginNotFound as exc:
       raise ValueError('plugin "{}" not found'.format(exc))
     if plugin_cls.Config is not None:
-      config = context.deserialize(config, plugin_cls.Config, plugin_name)
+      config = mapper.deserialize_node(node.make_child(plugin_name, plugin_cls.Config, config))
     elif plugin_cls.Config is None and config:
       raise TypeError('plugin {} expects no configuration'.format(plugin_name))
     else:
@@ -368,8 +372,8 @@ class PluginConfig(Struct):
     return PluginConfig(plugin_name, plugin_cls.new_instance(config))
 
 
-class InstallHook(Struct):
-  MixinDecoration('json')
+@JsonSerializer(deserialize='_deserialize')
+class InstallHook(JsonMixin, Struct):
   event = Field(str, default=None)
   command = Field((str, [str]))  #: Can be a string or list of strings.
 
@@ -378,15 +382,15 @@ class InstallHook(Struct):
       return InstallHook(self.event, shlex.split(self.command))
     return self
 
-  @JsonDeserializer
-  def __deserialize(context, location):
-    if isinstance(location.value, str):
-      return InstallHook(None, location.value)
-    elif isinstance(location.value, dict):
-      if len(location.value) != 1:
+  @classmethod
+  def _deserialize(cls, mapper, context, node):
+    if isinstance(node.value, str):
+      return InstallHook(None, node.value)
+    elif isinstance(node.value, dict):
+      if len(node.value) != 1:
         raise ValueError('expected only one key')
-      event, command = next(iter(location.value.items()))
-      command = context.deserialize(command, InstallHook.command.datatype, 'command')
+      event, command = next(iter(node.value.items()))
+      command = mapper.deserialize_node(node.make_child('command', InstallHook.command.datatype, command))
       return InstallHook(event, command)
     else:
       raise NotImplementedError  # Default deserialization
@@ -469,13 +473,12 @@ class BaseObject(Struct):
 
     def _load(filename):
       with open(filename) as fp:
-        obj = mapper.deserialize(
-          yaml.safe_load(fp),
-          cls,
-          filename=filename,
-          decorations=[JsonStoreRemainingKeys()])
+        node = mapper.deserialize_to_node(yaml.safe_load(fp), cls, filename=filename, collect=True)
+      obj = node.result
       obj.filename = filename
-      obj.unhandled_keys = list(JsonStoreRemainingKeys().iter_paths(obj))
+      obj.unhandled_keys = Stream.concat(
+        (x.locator.append(k) for k in x.unknowns)
+        for x in node.context.nodes).collect()
       obj.cache = cache
       obj.on_load_hook()
       return obj
@@ -499,7 +502,7 @@ class Monorepo(BaseObject):
   #: must be consistent with the version of the monorepo. Bumping the version
   #: of the monorepo will automatically bump the version in all packages.
   #: Bumping the version of individual packages will fail.
-  mono_versioning = Field(bool, JsonFieldName('mono-versioning'), default=False)
+  mono_versioning = Field(bool, FieldName('mono-versioning'), default=False)
 
   #: The use field is optional on monorepos.
   use = Field([PluginConfig], default=list)
@@ -512,7 +515,7 @@ class Monorepo(BaseObject):
   author = Field(Author, default=None)
   license = Field(str, default=None)
   url = Field(str, default=None)
-  tag_format = Field(str, JsonFieldName('tag-format'), default='{version}')
+  tag_format = Field(str, FieldName('tag-format'), default='{version}')
 
   def get_packages(self) -> Iterable['Package']:
     """ Loads the packages for this mono repository. """
@@ -534,6 +537,7 @@ class Monorepo(BaseObject):
     tag_format = self.get_tag_format()
     return tag_format.format(name=self.name, version=version)
 
+
 class Package(BaseObject):
   #: Filled with the Monorepo if the package is associated with one. A package
   #: is associated with a monorepo if the parent directory of it's own
@@ -546,7 +550,7 @@ class Package(BaseObject):
   license = Field(str, default=None)
   url = Field(str, default=None)
   use = Field([PluginConfig], default=list)
-  tag_format = Field(str, JsonFieldName('tag-format'), default='{version}')
+  tag_format = Field(str, FieldName('tag-format'), default='{version}')
 
   #: The package description.
   description = Field(str)
@@ -556,12 +560,12 @@ class Package(BaseObject):
 
   #: The long description of the package. If this is not defined, the
   #: setuptools plugin will load the README file.
-  long_description = Field(str, JsonFieldName('long-description'), default=None)
+  long_description = Field(str, FieldName('long-description'), default=None)
 
   #: The content type for the long description. If not specified, the
   #: setuptools plugin will base that on the suffix of the README file.
   long_description_content_type = Field(str,
-    JsonFieldName('long-description-content-type'), default=None)
+    FieldName('long-description-content-type'), default=None)
 
   #: The name of the module (potentially as a dottet path for namespaced
   #: modules). This is used to find the entry file in #get_entry_file().
@@ -569,13 +573,13 @@ class Package(BaseObject):
   modulename = Field(str, default=None)
 
   #: The directory for the source files.
-  source_directory = Field(str, JsonFieldName('source-directory'), default='src')
+  source_directory = Field(str, FieldName('source-directory'), default='src')
 
   #: The names of packages that should be excluded when installing the
   #: package. The setuptools plugin will automatically expand the names
   #: here to conform with what the #setuptools.find_packages() function
   #: expects (eg. 'test' is converted into 'test' and 'test.*').
-  exclude_packages = Field([str], JsonFieldName('exclude-packages'),
+  exclude_packages = Field([str], FieldName('exclude-packages'),
     default=lambda: ['test', 'docs'])
 
   #: The requirements for the package.
@@ -592,7 +596,7 @@ class Package(BaseObject):
   manifest = Field([str], default=list)
 
   #: Hooks that will be executed on install events (install/develop).
-  install_hooks = Field([InstallHook], JsonFieldName('install-hooks'), default=list)
+  install_hooks = Field([InstallHook], FieldName('install-hooks'), default=list)
 
   #: List of classifiers for the package.
   classifiers = Field([str], default=list)
