@@ -1,5 +1,6 @@
 
 from shore.util.version import Version
+from shore.model import VersionSelector
 import pytest
 
 
@@ -33,3 +34,10 @@ def test_comparison():
     assert not (Version(b) < Version(a))
     assert Version(b) > Version(a)
     assert not (Version(a) > Version(b))
+
+
+def test_version_selector():
+  assert VersionSelector('1.0.0').to_setuptools() == '==1.0.0'
+  assert VersionSelector('~1.0.0').to_setuptools() == '>=1.0.0,<1.1.0'
+  assert VersionSelector('^1.0.0').to_setuptools() == '>=1.0.0,<2.0.0'
+  assert VersionSelector('<=1.0.0,>0.5.0').to_setuptools() == '<=1.0.0,>0.5.0'

@@ -79,7 +79,12 @@ class VersionSelector(object):
 
     - `^X.Y.Z` -> `>=X.Y.Z,<X+1.0.0`
     - `~X.Y.Z` -> `>=X.Y.Z,<X.Y+1.0`
+    - `X.Y.Z -> ==X.Y.Z`
     """
+
+    # Poor-mans test if this looks like the form 'X.Y.Z' without anything around it.
+    if not ',' in self._string and self._string[0].isdigit():
+      return '==' + self._string
 
     regex = r'[~^](\d+\.\d+(\.\d+)?[.\-\w]*)'
     def sub(match):
