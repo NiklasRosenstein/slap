@@ -24,4 +24,4 @@ from nr.databind.json import JsonModule
 from shore.util.version import parse_version, Version
 
 mapper = ObjectMapper(JsonModule())
-mapper.register(Version, IDeserializer(lambda _m, _c, n: parse_version(n.value)))
+mapper.register(Version, IDeserializer(lambda _m, n: parse_version(n.value)))
