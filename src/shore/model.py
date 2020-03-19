@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, Struct, FieldName, Raw
+from nr.databind.core import Field, Struct, FieldName, Collect, Raw
 from nr.databind.json import JsonDefault, JsonSerializer, JsonMixin
 from nr.pylang.utils import classdef
 from nr.stream import Stream
@@ -472,13 +472,13 @@ class BaseObject(Struct):
     """ Deserializes *cls* from a YAML file specified by *filename*. """
 
     def _load(filename):
+      collect = Collect()
       with open(filename) as fp:
-        node = mapper.deserialize_to_node(yaml.safe_load(fp), cls, filename=filename, collect=True)
-      obj = node.result
+        obj = mapper.deserialize(yaml.safe_load(fp), cls, filename=filename, decorations=[collect])
       obj.filename = filename
       obj.unhandled_keys = Stream.concat(
         (x.locator.append(k) for k in x.unknowns)
-        for x in node.context.nodes).collect()
+        for x in collect.nodes).collect()
       obj.cache = cache
       obj.on_load_hook()
       return obj
