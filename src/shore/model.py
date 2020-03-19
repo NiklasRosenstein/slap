@@ -134,7 +134,7 @@ class Requirement(object):
     return '{} {}'.format(self.package, self.version.to_setuptools())
 
   @classmethod
-  def _deserialize(cls, mapper, context, node):
+  def _deserialize(cls, mapper, node):
     if not isinstance(node.value, str):
       raise node.type_error()
     return Requirement.parse(node.value)
@@ -192,7 +192,7 @@ class Requirements(object):
     return bool(self.python or self.required or self.platforms)
 
   @classmethod
-  def _deserialize(cls, mapper, context, node):
+  def _deserialize(cls, mapper, node):
     deserialize_type = [(Requirement, dict)]
     items = mapper.deserialize_node(node.replace(datatype=deserialize_type))
 
@@ -252,7 +252,7 @@ class Author(Struct):
     return '{} <{}>'.format(self.name, self.email)
 
   @classmethod
-  def _deserialize(cls, mapper, context, node):
+  def _deserialize(cls, mapper, node):
     if isinstance(node.value, str):
       match = Author.AUTHOR_EMAIL_REGEX.match(node.value)
       if match:
@@ -274,7 +274,7 @@ class Datafile(Struct):
   exclude = Field([str])
 
   @classmethod
-  def _deserialize(cls, mapper, context, node):
+  def _deserialize(cls, mapper, node):
     if isinstance(node.value, str):
       left, patterns = node.value.partition(',')[::2]
       if ':' in left:
@@ -349,7 +349,7 @@ class PluginConfig(Struct):
     return ()
 
   @classmethod
-  def _deserialize(cls, mapper, context, node):
+  def _deserialize(cls, mapper, node):
     if isinstance(node.value, str):
       plugin_name = node.value
       config = {}
@@ -383,7 +383,7 @@ class InstallHook(JsonMixin, Struct):
     return self
 
   @classmethod
-  def _deserialize(cls, mapper, context, node):
+  def _deserialize(cls, mapper, node):
     if isinstance(node.value, str):
       return InstallHook(None, node.value)
     elif isinstance(node.value, dict):
