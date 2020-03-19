@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, Struct, FieldName, Collect, Raw
+from nr.databind.core import Field, Struct, FieldName, Collect
 from nr.databind.json import JsonDefault, JsonSerializer, JsonMixin
 from nr.pylang.utils import classdef
 from nr.stream import Stream
