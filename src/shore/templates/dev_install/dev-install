@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# automatically created by shore
 
 from __future__ import print_function
 import argparse

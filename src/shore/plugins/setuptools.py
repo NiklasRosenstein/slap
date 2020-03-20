@@ -165,7 +165,7 @@ class SetuptoolsRenderer:
     has_develop_hooks = any(x.event in ('before-develop', 'develop') for x in package.install_hooks)
 
     # Write the header/imports.
-    fp.write('\n')
+    fp.write('# automatically created by shore\n\n')
     if has_hooks or has_install_hooks:
       fp.write('from setuptools.command.install import install as _install_command\n')
     if has_hooks or has_develop_hooks:
