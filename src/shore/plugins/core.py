@@ -79,6 +79,14 @@ class CorePlugin:
       yield CheckResult(package, 'WARNING',
         'unknown $.classifiers: {}'.format(unknown_classifiers))
 
+    try:
+      py_typed_file = os.path.join(package.get_entry_directory(), 'py.typed')
+    except ValueError:
+      pass
+    else:
+      if os.path.isfile(py_typed_file) and not package.typed:
+        yield CheckResult(package, 'WARNING', 'file "py.typed" exists but $.typed is not set')
+
   @override
   def check_monorepo(self, monorepo: Monorepo) -> Iterable[CheckResult]:
     yield from self._unhandled_keys(monorepo)
