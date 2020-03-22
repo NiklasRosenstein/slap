@@ -141,6 +141,9 @@ class SetuptoolsRenderer:
         'MANIFEST.in', self._render_manifest, package)
     yield FileToRender(package.directory,
       'setup.py', self._render_setup, package)
+    if package.typed:
+      directory = package.get_entry_directory()
+      yield FileToRender(directory, 'py.typed', lambda _c, _f: None)
 
   @override
   def get_package_build_targets(self, package: Package) -> Iterable[IBuildTarget]:
@@ -158,6 +161,10 @@ class SetuptoolsRenderer:
     with rewrite_section(fp, current.read() if current else '', *markers):
       for entry in package.manifest:
         fp.write('{}\n'.format(entry))
+      if package.typed:
+        directory = package.get_entry_directory()
+        rel_directory = os.path.relpath(directory, package.directory)
+        fp.write('include {}/py.typed\n'.format(rel_directory))
 
   def _render_setup(self, _current, fp, package):
     has_hooks = any(package.install_hooks)
