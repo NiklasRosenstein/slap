@@ -549,12 +549,26 @@ class Package(BaseObject):
   #: directory contains a `monorepo.yaml` file.
   monorepo = Field(Monorepo, default=None, hidden=True)
 
+  #: A private package will be prevented from being published with the
+  #: "shore publish" command.
   private = Field(bool, default=False)
+
+  #: The version number of the package.
   version = Field(Version, default=None)
+
+  #: The author of the package.
   author = Field(Author, default=None)
+
+  #: The license of the package. If #private is set to True, this can be None
+  #: without a check complaining about it.
   license = Field(str, default=None)
+
+  #: The URL of the package (eg. the GitHub repository).
   url = Field(str, default=None)
-  use = Field([PluginConfig], default=list)
+
+  #: A format specified when tagging a version of the package. This defaults
+  #: to `"{version}"`. If the package is a member of a monorepo, #get_tag_format()
+  #: adds the package name as a prefix.
   tag_format = Field(str, FieldName('tag-format'), default='{version}')
 
   #: The package description.
@@ -608,6 +622,11 @@ class Package(BaseObject):
 
   #: List of keywords.
   keywords = Field([str], default=list)
+
+  #: Set to true to indicate that the package is typed. This will render a
+  #: "py.typed" file in the source directory and include it in the package
+  #: data.
+  typed = Field(bool, default=False)
 
   def _get_inherited_field(self, field_name: str) -> Any:
     value = getattr(self, field_name)
@@ -678,6 +697,18 @@ class Package(BaseObject):
 
   def get_entry_file_abs(self) -> str:
     return os.path.normpath(os.path.join(self.directory, self.get_entry_file()))
+
+  def get_entry_directory(self) -> str:
+    """
+    Returns the package directory. If this package is distributed in module-only
+    form, a #ValueError is raised.
+    """
+
+    entry_file = self.get_entry_file()
+    dirname, basename = os.path.split(entry_file)
+    if basename != '__init__.py':
+      raise ValueError('this package is in module-only form')
+    return dirname
 
   EntryMetadata = collections.namedtuple('EntryFileData', 'author,version')
 
