@@ -180,8 +180,11 @@ def new(**args):
     'version': args['version'],
     'author': args['author'],
     'license': args['license'],
-    'modulename': args['modulename']
+    'modulename': args['modulename'],
+    'name_on_disk': args['modulename'] or args['name'],
   }
+
+  name_on_disk = args['modulename'] or args['name']
 
   def _render_template(template_string, **kwargs):
     assert isinstance(template_string, str), type(template_string)
@@ -198,7 +201,7 @@ def new(**args):
     # Render the template files to the target directory.
     for source_filename in walk_package_resources('shore', 'templates/new'):
       # Expand variables in the filename.
-      filename = _render_template(source_filename, name=args['name'].replace('.', '/'))
+      filename = _render_template(source_filename, name=name_on_disk.replace('.', '/'))
       dest = os.path.join(args['directory'], filename)
       yield FileToRender(
         None,
@@ -207,7 +210,7 @@ def new(**args):
 
     # Render namespace supporting files.
     parts = []
-    for item in args['name'].split('.')[:-1]:
+    for item in name_on_disk.split('.')[:-1]:
       parts.append(item)
       dest = os.path.join(args['directory'], 'src', *parts, '__init__.py')
       yield FileToRender(
