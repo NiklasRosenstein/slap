@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 from pkg_resources import resource_string
+from shore import __version__
 from shore.core.plugins import FileToRender, IMonorepoPlugin
 from shore.model import Monorepo
 from nr.algo.graph.toposort import toposort
@@ -53,6 +54,7 @@ class DevInstallRenderer:
 
     def write_script(_current, fp):
       template = resource_string('shore', 'templates/dev_install/dev-install').decode('utf8')
+      fp.write(template.replace('{{shore_version}}', __version__))
       fp.write(template.replace('{{package_def}}', package_def))
 
     yield FileToRender(monorepo.directory,
