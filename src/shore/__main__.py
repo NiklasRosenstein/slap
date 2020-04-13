@@ -385,6 +385,8 @@ def _get_version_refs(subject) -> List[VersionRef]:
 @click.option('--dry', is_flag=True)
 @click.option('--skip-checks', is_flag=True)
 @click.option('--force', '-f', is_flag=True)
+@click.option('--push', is_flag=True)
+@click.option('--publish')
 def bump(**args):
   """ Modify version numbers in package files. """
 
@@ -392,6 +394,10 @@ def bump(**args):
 
   if not args['skip_checks']:
     _run_checks(subject, True)
+
+  if args['push'] and not args['tag']:
+    logger.error('--push needs --tag')
+    exit(1)
 
   if isinstance(subject, Package) and subject.monorepo \
       and subject.monorepo.mono_versioning:
@@ -474,6 +480,12 @@ def bump(**args):
       _git.add(changed_files)
       _git.commit('({}) bump version to {}'.format(subject.name, new_version), allow_empty=True)
       _git.tag(tag_name, force=args['force'])
+
+    if not args['dry'] and args['push']:
+      _git.push(_git.current_branch(), tag_name)
+
+  if args['publish']:
+    publish([args['publish']])
 
 
 @cli.command('status')
