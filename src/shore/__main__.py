@@ -472,11 +472,7 @@ def bump(**args):
     if not args['dry']:
       changed_files = [x.filename for x in version_refs]
       _git.add(changed_files)
-      if any(x.mode == 'M' for x in _git.porcelain()):
-        # The files may not have changed if the version did not actually
-        # update but --force was used (the goal of this is usually to end
-        # up here for the tagging).
-        _git.commit('({}) bump version to {}'.format(subject.name, new_version))
+      _git.commit('({}) bump version to {}'.format(subject.name, new_version), allow_empty=True)
       _git.tag(tag_name, force=args['force'])
 
 
