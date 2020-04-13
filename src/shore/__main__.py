@@ -485,6 +485,7 @@ def bump(**args):
       _git.push(_git.current_branch(), tag_name)
 
   if args['publish']:
+    _cache.clear()
     publish([args['publish']])
 
 
