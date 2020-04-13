@@ -409,6 +409,9 @@ class ObjectCache(object):
   def __init__(self):
     self._cache = {}
 
+  def clear(self):
+    self._cache.clear()
+
   def get_or_load(self, filename: str, load_func: Callable[[str], Any]) -> Any:
     filename = os.path.normpath(os.path.abspath(filename))
     if filename not in self._cache:
