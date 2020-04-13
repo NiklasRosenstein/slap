@@ -36,8 +36,11 @@ def add(filenames: List[str]):
   subprocess.check_call(['git', 'add'] + filenames)
 
 
-def commit(message):
-  subprocess.check_call(['git', 'commit', '-m', message])
+def commit(message, allow_empty: bool=False):
+  command = ['git', 'commit', '-m', message]
+  if allow_empty:
+    command.append('--allow-empty')
+  subprocess.check_call(command)
 
 
 def tag(tag_name: str, force: bool=False):
