@@ -27,6 +27,7 @@ from shore.model import Package
 from typing import Iterable
 import os
 import subprocess
+import sys
 
 
 @implements(IPublishTarget)
@@ -55,7 +56,7 @@ class TwinePublishTarget(Struct):
   def publish(self, builds, test, build_directory, skip_existing):
     files = Stream.concat(x.get_build_artifacts() for x in builds)
     files = files.map(lambda x: os.path.join(build_directory, x)).collect()
-    command = ['twine', 'upload']
+    command = [sys.executable, '-m', 'twine', 'upload']
     repo, repo_url = (self.repository, self.repository_url) if not test else \
         (self.test_repository, self.test_repository_url)
     if repo:
