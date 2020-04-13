@@ -24,6 +24,7 @@ requirements:
   - packaging ^20.1
   - PyYAML ^5.1.0
   - termcolor ^1.1.0
+  - twine
 
 entrypoints:
   console_scripts:
