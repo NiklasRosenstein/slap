@@ -3,6 +3,7 @@
 *.egg-info
 /dist
 /build
+__pycache__/
 
 # VSCode
 /.vscode
