@@ -23,7 +23,32 @@ from typing import Iterable, List, Optional
 import collections
 import subprocess
 
+Branch = collections.namedtuple('Branch', 'name,current')
 FileStatus = collections.namedtuple('FileStatus', 'mode,filename')
+
+
+def branches(path: str = None) -> List[Branch]:
+  command = ['git', 'branch']
+  results = []
+  for line in subprocess.check_output(command, cwd=path).decode().splitlines():
+    current = False
+    if line.startswith('*'):
+      line = line[1:]
+      current = True
+    results.append(Branch(line.strip(), current))
+  return results
+
+
+def current_branch(path: str = None) -> str:
+  for branch in branches(path):
+    if branch.current:
+      return branch.name
+  raise RuntimeError('no curent branch ?')
+
+
+def push(*refs, remote='origin', path: str = None):
+  command = ['git', 'push', remote] + list(refs)
+  subprocess.check_call(command, cwd=path)
 
 
 def porcelain() -> Iterable[FileStatus]:
