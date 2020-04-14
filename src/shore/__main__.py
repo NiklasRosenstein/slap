@@ -519,7 +519,7 @@ def status():
     items.extend(sorted(subject.get_packages(), key=lambda x: x.name))
     if not subject.version:
       items.remove(subject)
-  width = max(len(x.name) for x in items)
+  width = max(len(x.local_name) for x in items)
 
   for item in items:
     tag, num_commits = _get_commits_since_last_tag(item)
@@ -529,7 +529,7 @@ def status():
       item_info = colored('no commits', 'green') + ' since "{}"'.format(tag)
     else:
       item_info = colored('{} commit(s)'.format(num_commits), 'yellow') + ' since "{}"'.format(tag)
-    print('{}: {}'.format(item.name.rjust(width), item_info))
+    print('{}: {}'.format(item.local_name.rjust(width), item_info))
 
 
 @cli.command()
