@@ -525,6 +525,10 @@ class Monorepo(BaseObject):
   url = Field(str, default=None)
   tag_format = Field(str, FieldName('tag-format'), default='{version}')
 
+  @property
+  def local_name(self) -> str:
+    return self.name
+
   def get_packages(self) -> Iterable['Package']:
     """ Loads the packages for this mono repository. """
 
@@ -630,6 +634,13 @@ class Package(BaseObject):
   #: "py.typed" file in the source directory and include it in the package
   #: data.
   typed = Field(bool, default=False)
+
+  @property
+  def local_name(self) -> str:
+    if self.monorepo:
+      relpath = os.path.relpath(self.directory, self.monorepo.directory)
+      return os.path.normpath(relpath)
+    return self.name
 
   def _get_inherited_field(self, field_name: str) -> Any:
     value = getattr(self, field_name)
