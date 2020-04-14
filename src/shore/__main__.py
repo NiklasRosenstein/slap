@@ -517,6 +517,8 @@ def status():
   items = [subject]
   if isinstance(subject, Monorepo):
     items.extend(sorted(subject.get_packages(), key=lambda x: x.name))
+    if not subject.version:
+      items.remove(subject)
   width = max(len(x.name) for x in items)
 
   for item in items:
