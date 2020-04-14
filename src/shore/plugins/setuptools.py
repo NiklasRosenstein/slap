@@ -317,7 +317,7 @@ class SetuptoolsRenderer:
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
       src_directory=package.source_directory,
       exclude_packages=exclude_packages,
-      include_package_data=False,#package.package_data != [],
+      include_package_data=True,#package.package_data != [],
       data_files=data_files,
       entry_points=self._render_entrypoints(package.entrypoints),
       cmdclass = '{' + ', '.join('{!r}: {}'.format(k, v) for k, v in cmdclass.items()) + '}',
