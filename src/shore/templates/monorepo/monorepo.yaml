@@ -1,0 +1,6 @@
+name: "{{name}}"
+version: null
+mono-versioning: false
+{% if author %}author: "{{author}}"
+{% endif %}license: "{{license or "MIT"}}"
+description: "{{name}} Monorepo"
