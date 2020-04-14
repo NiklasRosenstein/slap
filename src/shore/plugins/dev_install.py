@@ -54,8 +54,10 @@ class DevInstallRenderer:
 
     def write_script(_current, fp):
       template = resource_string('shore', 'templates/dev_install/dev-install').decode('utf8')
-      fp.write(template.replace('{{shore_version}}', __version__))
-      fp.write(template.replace('{{package_def}}', package_def))
+      content = (template
+        .replace('{{shore_version}}', __version__)
+        .replace('{{package_def}}', package_def))
+      fp.write(content)
 
     yield FileToRender(monorepo.directory,
       self.config.filename, write_script).with_chmod('+x')
