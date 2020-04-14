@@ -197,16 +197,19 @@ def new(**args):
   def _render_namespace_file(fp):
     fp.write("__path__ = __import__('pkgutil').extend_path(__path__, __name__)\n")
 
-  def _get_files() -> Iterable[FileToRender]:
+  def _get_template_files(template_path) -> Iterable[FileToRender]:
     # Render the template files to the target directory.
-    for source_filename in walk_package_resources('shore', 'templates/new'):
+    for source_filename in walk_package_resources('shore', template_path):
       # Expand variables in the filename.
       filename = _render_template(source_filename, name=name_on_disk.replace('.', '/'))
       dest = os.path.join(args['directory'], filename)
       yield FileToRender(
         None,
         os.path.normpath(dest),
-        lambda _, fp: _render_file(fp, 'templates/new/' + source_filename))
+        lambda _, fp: _render_file(fp, template_path + '/' + source_filename))
+
+  def _get_package_files() -> Iterable[FileToRender]:
+    yield from _get_template_files('templates/package')
 
     # Render namespace supporting files.
     parts = []
@@ -220,7 +223,15 @@ def new(**args):
 
     # TODO (@NiklasRosenstein): Render the license file if it does not exist.
 
-  for file in _get_files():
+  def _get_monorepo_files() -> Iterable[FileToRender]:
+    yield from _get_template_files('templates/monorepo')
+
+  if args['monorepo']:
+    files = _get_monorepo_files()
+  else:
+    files = _get_package_files()
+
+  for file in files:
     if os.path.isfile(file.name) and not args['force']:
       print(colored('Skip ' + file.name, 'yellow'))
       continue
