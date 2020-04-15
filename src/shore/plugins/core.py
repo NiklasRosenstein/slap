@@ -67,11 +67,11 @@ class CorePlugin:
     if package.get_author() and data.author != str(package.get_author()):
       yield CheckResult(package, 'ERROR',
         'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
-          data.author, package.get_entry_file(), str(package.get_author())))
+          str(package.get_author()), package.get_entry_file(), data.author))
     if package.get_version() and data.version != str(package.get_version()):
       yield CheckResult(package, 'ERROR',
         'Inconsistent package version (package.yaml: {!r} != {}: {!r})'.format(
-          data.version, package.get_entry_file(), str(package.get_version())))
+          str(package.get_version()), package.get_entry_file(), data.version))
 
     classifiers = get_classifiers()
     unknown_classifiers = [x for x in package.classifiers if x not in classifiers]
