@@ -1,4 +1,4 @@
-# automatically created by shore 0.0.5
+# automatically created by shore 0.0.6
 
 import io
 import re
