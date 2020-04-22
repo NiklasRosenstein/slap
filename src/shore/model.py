@@ -709,6 +709,11 @@ class Package(BaseObject):
     raise ValueError('Entry file for package "{}" could not be determined'
                      .format(self.name))
 
+  def is_single_module(self) -> bool:
+    return ((
+      self.modulename or self.name).count('.') == 0 and
+      os.path.basename(self.get_entry_file()) != '__init__.py')
+
   def get_entry_file_abs(self) -> str:
     return os.path.normpath(os.path.join(self.directory, self.get_entry_file()))
 

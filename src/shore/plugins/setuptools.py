@@ -279,6 +279,13 @@ class SetuptoolsRenderer:
       exclude_packages.append(pkg)
       exclude_packages.append(pkg + '.*')
 
+    if package.is_single_module():
+      packages_args = '  py_modules = [{!r}],'.format(package.modulename or package.name)
+    else:
+      packages_args = '  packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),\n'.format(
+        src_directory=package.source_directory,
+        exclude_packages=exclude_packages)
+
     # Write the setup function.
     fp.write(textwrap.dedent('''
       setuptools.setup(
@@ -291,7 +298,7 @@ class SetuptoolsRenderer:
         long_description_content_type = {long_description_content_type!r},
         url = {url!r},
         license = {license!r},
-        packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),
+      {packages_args}
         package_dir = {{'': {src_directory!r}}},
         include_package_data = {include_package_data!r},
         install_requires = requirements,
@@ -306,6 +313,7 @@ class SetuptoolsRenderer:
       )
     ''').format(
       package=package,
+      packages_args=packages_args,
       author_name=package.get_author().name if package.get_author() else None,
       author_email=package.get_author().email if package.get_author() else None,
       url=package.get_url(),
@@ -316,7 +324,6 @@ class SetuptoolsRenderer:
       tests_require=tests_require,
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
       src_directory=package.source_directory,
-      exclude_packages=exclude_packages,
       include_package_data=True,#package.package_data != [],
       data_files=data_files,
       entry_points=self._render_entrypoints(package.entrypoints),
