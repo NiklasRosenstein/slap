@@ -357,18 +357,19 @@ class PluginConfig(Struct):
   def _deserialize(cls, mapper, node):
     if isinstance(node.value, str):
       plugin_name = node.value
-      config = {}
+      config = None
     elif isinstance(node.value, dict):
-      if len(node.value) != 1:
-        raise ValueError('expected only one key')
-      plugin_name, config = next(iter(node.value.items()))
+      if 'type' not in node.value:
+        node.value_error('missing "type" key')
+      config = node.value.copy()
+      plugin_name = config.pop('type')
     else:
       raise TypeError('expected str or dict')
     try:
       plugin_cls = load_plugin(plugin_name)
     except PluginNotFound as exc:
       raise ValueError('plugin "{}" not found'.format(exc))
-    if plugin_cls.Config is not None:
+    if plugin_cls.Config is not None and config is not None:
       config = mapper.deserialize_node(node.make_child(plugin_name, plugin_cls.Config, config))
     elif plugin_cls.Config is None and config:
       raise TypeError('plugin {} expects no configuration'.format(plugin_name))
