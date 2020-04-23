@@ -1,3 +1,4 @@
 # Auto-generated with shore. Do not edit. {
+include src/shore/templates/dev_install/dev-install
 recursive-include src/shore/templates *.yaml *.py *.md
 # }
