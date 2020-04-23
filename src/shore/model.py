@@ -21,6 +21,7 @@
 
 from nr.databind.core import Field, Struct, FieldName, Collect
 from nr.databind.json import JsonDefault, JsonSerializer, JsonMixin
+from nr.interface import implements
 from nr.pylang.utils import classdef
 from nr.stream import Stream
 from shore.core.plugins import (
@@ -549,6 +550,54 @@ class Monorepo(BaseObject):
   def get_tag(self, version: str) -> str:
     tag_format = self.get_tag_format()
     return tag_format.format(name=self.name, version=version)
+
+  def get_build_targets(self) -> Dict[str, IBuildTarget]:
+    """
+    Returns the publish targets for the monorepo. This includes the targets for
+    packages in the monorepo.
+    """
+
+    targets = super().get_build_targets()
+    for package in self.get_packages():
+      for key, publisher in package.get_build_targets().items():
+        targets[package.name + ':' + key] = self._BuildTargetWrapper(package.name, publisher)
+    return targets
+
+  def get_publish_targets(self) -> Dict[str, IPublishTarget]:
+    """
+    Returns the publish targets for the monorepo. If #mono_versioning is enabled,
+    this includes the targets of child packages.
+    """
+
+    targets = super().get_publish_targets()
+    for package in self.get_packages():
+      for key, publisher in package.get_publish_targets().items():
+        targets[package.name + ':' + key] = self._PublishTargetWrapper(package.name, publisher)
+    return targets
+
+  @implements(IBuildTarget)
+  class _BuildTargetWrapper:
+    def __init__(self, prefix, target):
+      self.prefix = prefix
+      self.target = target
+    def get_name(self):
+      return self.prefix + ':' + self.target.get_name()
+    def get_build_artifacts(self):
+      return self.target.get_build_artifacts()
+    def build(self, build_directory):
+      return self.target.build(build_directory)
+
+  @implements(IPublishTarget)
+  class _PublishTargetWrapper:
+    def __init__(self, prefix, target):
+      self.prefix = prefix
+      self.target = target
+    def get_name(self):
+      return self.prefix + ':' + self.target.get_name()
+    def get_build_selectors(self):
+      return [self.prefix + ':' + k for k in self.target.get_build_selectors()]
+    def publish(self, builds, test, build_directory, skip_existing):
+      return self.target.publish(builds, test, build_directory, skip_existing)
 
 
 class Package(BaseObject):
