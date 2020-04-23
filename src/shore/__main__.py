@@ -621,9 +621,12 @@ def publish(**args):
       exit(1)
 
   if args['list']:
-    print('Publish targets for', colored(subject.name, 'blue'))
-    for target in publishers:
-      print('  ' + colored(target, 'yellow'))
+    if publishers:
+      print('Publish targets for', colored(subject.name, 'blue') + ':')
+      for target in publishers:
+        print('  ' + colored(target, 'yellow'))
+    else:
+      print('No publish targets for', colored(subject.name, 'blue') + '.')
     exit(0)
 
   if not publishers or (not args['target'] and not args['all']):
