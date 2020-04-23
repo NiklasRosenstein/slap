@@ -614,6 +614,10 @@ def publish(**args):
   builds = subject.get_build_targets()
   publishers = subject.get_publish_targets()
 
+  if args['all'] and isinstance(subject, Monorepo) and not subject.mono_versioning:
+    logger.error('publish -a,--all not allowed for Monorepo without mono-versioning')
+    exit(1)
+
   if args['target']:
     publishers = _filter_targets(publishers, args['target'])
     if not publishers:
