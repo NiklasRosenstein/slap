@@ -141,6 +141,11 @@ class IBasePlugin(Interface):
 
   @default
   @classmethod
+  def get_default_config(cls):
+    return cls.Config()
+
+  @default
+  @classmethod
   def new_instance(cls, config: 'Config') -> 'IBasePlugin':
     """ Create a new instance of the plugin. The default implementation
     assumes that the constructor does not accept any arguments and the
@@ -149,9 +154,12 @@ class IBasePlugin(Interface):
     if cls.Config is None and config is not None:
       raise ValueError('{} does not expect a config, got {}'.format(
         cls.__name__, type(config).__name__))
-    elif cls.Config and not isinstance(config, cls.Config):
-      raise ValueError('{} expects a config of type {}, got {}'.format(
-        cls.__name__, cls.Config.__name__, type(config).__name__))
+    elif cls.Config is not None:
+      if config is None:
+        config = cls.get_default_config()
+      elif not isinstance(config, cls.Config):
+        raise ValueError('{} expects a config of type {}, got {}'.format(
+          cls.__name__, cls.Config.__name__, type(config).__name__))
 
     instance = cls()
     instance.config = config
