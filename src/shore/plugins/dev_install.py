@@ -79,8 +79,6 @@ class DevInstallRenderer:
         'extra_requires': {}
       }
 
-    print(package_name_mapping)
-
     def _flatten_reqs(dst, reqs):
       for req in reqs.required if reqs else ():
         if req.package in package_name_mapping:
