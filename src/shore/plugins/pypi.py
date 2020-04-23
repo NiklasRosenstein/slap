@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 def _resolve_envvars(s):
-  if s.startswith('$'):
+  if s and s.startswith('$'):
     value = os.getenv(s[1:])
     if not value:
       raise RuntimeError('environment variable {} is not set.'.format(s))
