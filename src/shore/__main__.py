@@ -30,7 +30,8 @@ from shore.core.plugins import (
   IPackagePlugin,
   VersionRef,
   write_to_disk)
-from shore.model import Monorepo, ObjectCache, Package
+from shore.model import Monorepo, ObjectCache, Package, VersionSelector
+from shore.plugins.core import get_monorepo_interdependency_version_refs
 from shore.util import git as _git
 from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
@@ -478,6 +479,23 @@ def bump(**args):
       contents = contents[:ref.start] + str(new_version) + contents[ref.end:]
       with open(ref.filename, 'w') as fp:
         fp.write(contents)
+
+  # For monorepos using mono-versioning, we may need to bump cross-package references.
+  if isinstance(subject, Monorepo) and subject.mono_versioning:
+    version_sel_refs = list(get_monorepo_interdependency_version_refs(subject, new_version))
+    logger.info('bumping %d monorepo inter-dependency requirement(s)', len(version_sel_refs))
+    for group_key, refs in Stream.groupby(version_sel_refs, lambda r: r.filename, collect=list):
+      logger.info('  %s:', os.path.relpath(group_key))
+      with open(group_key) as fp:
+        content = fp.read()
+      offset = 0
+      for ref in refs:
+        logger.info('    %s %s -> %s', ref.package, ref.sel, ref.new_sel)
+        content = content[:ref.start - offset] + ref.new_sel + content[ref.end - offset:]
+        offset += len(ref.sel) - len(ref.new_sel)
+      if not args['dry']:
+        with open(group_key, 'w') as fp:
+          fp.write(content)
 
   if args['tag']:
     if any(f.mode == 'A' for f in _git.porcelain()):

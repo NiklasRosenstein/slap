@@ -34,8 +34,8 @@ from shore.core.plugins import (
   PluginNotFound)
 from shore.mapper import mapper
 from shore.util.ast import load_module_members
-from shore.util.version import Version
-from typing import Any, Callable, Dict, Iterable, Optional, List, Type
+from shore.util.version import bump_version, Version
+from typing import Any, Callable, Dict, Iterable, Optional, List, Type, Union
 import ast
 import collections
 import copy
@@ -100,6 +100,22 @@ class VersionSelector(object):
         max_version[i] = '0'
       return '>={},<{}'.format(match.group(1), '.'.join(max_version))
     return re.sub(regex, sub, self._string)
+
+  def is_semver_selector(self) -> bool:
+    return self._string and self._string[0] in '^~' and ',' not in self._string
+
+  def matches(self, version: Union[Version, str]) -> bool:
+    if not self.is_semver_selector():
+      # TODO (@NiklasRosenstein): Match setuptools version selectors.
+      return False
+    min_version = Version(self._string[1:])
+    if self._string[0] == '^':
+      max_version = bump_version(min_version, 'major')
+    elif self._string[0] == '~':
+      max_version = bump_version(min_version, 'minor')
+    else:
+      raise RuntimeError('invalid semver selector string {!r}'.format(self._string))
+    return min_version <= Version(version) < max_version
 
 
 VersionSelector.ANY = VersionSelector('*')

@@ -20,13 +20,19 @@
 # IN THE SOFTWARE.
 
 from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin, IMonorepoPlugin, VersionRef
-from shore.model import BaseObject, Monorepo, Package
+from shore.model import BaseObject, Monorepo, Package, VersionSelector
 from shore.plugins._util import find_readme_file
 from shore.util.classifiers import get_classifiers
+from shore.util.version import Version
 from nr.interface import implements, override
 from typing import Iterable, Optional
+import collections
+import logging
 import os
 import re
+
+logger = logging.getLogger(__name__)
+VersionSelectorRef = collections.namedtuple('VersionSelectorRef', 'filename,start,end,package,sel,new_sel')
 
 
 @implements(IPackagePlugin, IMonorepoPlugin)
@@ -126,3 +132,33 @@ class CorePlugin:
       if match:
         return VersionRef(filename, match.start(1), match.end(1), match.group(1))
     return None
+
+
+def get_monorepo_interdependency_version_refs(monorepo: Monorepo, new_version: Version) -> Iterable[VersionSelectorRef]:
+  """
+  Generates #VersionSelectorRef#s for every dependency between packages in *monorepo*
+  that needs to be updated.
+  """
+
+  regex = re.compile(r'^\s*- +([A-z0-9\.\-_]+) *([^\n:]+)?$', re.M)
+  packages = list(monorepo.get_packages())
+  package_names = set(p.modulename or p.name for p in packages)
+
+  for package in packages:
+    with open(package.filename) as fp:
+      content = fp.read()
+      for match in regex.finditer(content):
+        package_name, version_selector = match.groups()
+        if version_selector:
+          version_selector = VersionSelector(version_selector)
+        new_version_selector = None
+        if package_name in package_names and version_selector:
+          if not version_selector.matches(new_version):
+            if version_selector.is_semver_selector():
+              new_version_selector = VersionSelector(str(version_selector)[0] + str(new_version))
+            else:
+              logger.warning('%s: %s %s does not match version %s of monorepo %s and cannot be automatically bumped.',
+                package.filename, name, version_selector, new_version, subject.name)
+        if new_version_selector:
+          yield VersionSelectorRef(package.filename, match.start(2), match.end(2),
+            package_name, str(version_selector), str(new_version_selector))
