@@ -597,7 +597,9 @@ def build(**args):
 
 
 @cli.command()
-@click.argument('target')
+@click.argument('target', required=False)
+@click.option('-l', '--list', is_flag=True)
+@click.option('-a', '--all', is_flag=True)
 @click.option('--build-dir', default='build',
   help='Override the build directory. Defaults to ./build')
 @click.option('--test', is_flag=True,
@@ -618,8 +620,15 @@ def publish(**args):
       logger.error('no publish targets matched "%s"', args['target'])
       exit(1)
 
-  if not publishers:
+  if args['list']:
+    print('Publish targets for', colored(subject.name, 'blue'))
+    for target in publishers:
+      print('  ' + colored(target, 'yellow'))
+    exit(0)
+
+  if not publishers or (not args['target'] and not args['all']):
     logging.info('no publish targets')
+    exit(1)
 
   def _needs_build(build):
     for filename in build.get_build_artifacts():
