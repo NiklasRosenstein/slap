@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from fnmatch import fnmatch
 from nr.proxy import proxy_decorator
 from nr.stream import Stream
 from shore import __version__
@@ -565,9 +566,11 @@ def git(args):
 
 
 def _filter_targets(targets: Dict[str, Any], target: str) -> Dict[str, Any]:
-  return {
-    k: v for k, v in targets.items()
-    if target == k or k.startswith(target + ':')}
+  result = {}
+  for key, value in targets.items():
+    if fnmatch(key, target) or fnmatch(key, target + ':*'):
+      result[key] = value
+  return result
 
 
 @cli.command()
