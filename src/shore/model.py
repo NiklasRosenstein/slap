@@ -558,7 +558,7 @@ class Package(BaseObject):
 
   #: A private package will be prevented from being published with the
   #: "shore publish" command.
-  private = Field(bool, default=False)
+  private = Field(bool, default=None)
 
   #: The version number of the package.
   version = Field(Version, default=None)
@@ -582,7 +582,7 @@ class Package(BaseObject):
   description = Field(str)
 
   #: The default "use" field is populated with setuptools and pypi.
-  use = Field([PluginConfig], JsonDefault(['setuptools', 'pypi']))
+  use = Field([PluginConfig], default=list)
 
   #: The long description of the package. If this is not defined, the
   #: setuptools plugin will load the README file.
@@ -674,6 +674,13 @@ class Package(BaseObject):
     if self.monorepo and self.monorepo.packages_use:
       plugins.extend(x for x in self.monorepo.packages_use
         if not self.has_plugin(x.name))
+
+    # Make sure there exists a setuptools and pypi target.
+    if not any(x.name == 'setuptools' for x in plugins):
+      plugins.append(mapper.deserialize('setuptools', PluginConfig))
+    if not self.get_private():
+      if not any(x.name == 'pypi' for x in plugins):
+        plugins.append(mapper.deserialize('pypi', PluginConfig))
 
     return plugins
 
