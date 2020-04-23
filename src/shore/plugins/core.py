@@ -142,7 +142,7 @@ def get_monorepo_interdependency_version_refs(monorepo: Monorepo, new_version: V
 
   regex = re.compile(r'^\s*- +([A-z0-9\.\-_]+) *([^\n:]+)?$', re.M)
   packages = list(monorepo.get_packages())
-  package_names = set(p.modulename or p.name for p in packages)
+  package_names = set(p.get_modulename() for p in packages)
 
   for package in packages:
     with open(package.filename) as fp:
