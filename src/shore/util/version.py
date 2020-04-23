@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 from packaging.version import Version as _Version
+from typing import Union
 import re
 
 
@@ -28,7 +29,11 @@ class Version(_Version):
   commit-distance and commit SHA suffix in the format of `-X-gY` (where
   X is the distance and Y is the lowercase 7-character SHA sum). """
 
-  def __init__(self, s: str):
+  def __init__(self, s: Union['Version', str]):
+    if isinstance(s, Version):
+      s = str(s)
+    elif not isinstance(s, str):
+      raise TypeError('expected Version or str, got {}'.format(type(s).__name__))
     match = re.match(r'(.*)-(\d+)-g([0-9a-f]{7})', s)
     if match:
       s = match.group(1)
