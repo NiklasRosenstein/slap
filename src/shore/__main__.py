@@ -342,8 +342,8 @@ def verify(tag, expect_tag):
           yield file.name
 
   def _tag_matcher(subject) -> Iterable[Union[Monorepo, Package]]:
-    if isinstance(subject, Monorepo):
-      # Shore does not support tagging workflows for monorepos yet.
+    if isinstance(subject, Monorepo) and not subject.mono_versioning:
+      # Tagging workflows on mono-repos without mono-versioning are not supported.
       return; yield
     if subject.get_tag(subject.version) == tag:
       yield subject
@@ -371,7 +371,7 @@ def verify(tag, expect_tag):
       # TODO (@NiklasRosenstein): If we matched the {name} portion of the
       #   tag_format (if present) we could find which package (or monorepo)
       #   the tag was intended for.
-      logger.error('❌ unexpected tag: %s', tag)
+      logger.error('❌ tag %s did not match any of the available subjects', tag)
       status = 1
     elif len(matches) > 1:
       logger.error('❌ tag matches multiple subjects: %s', tag)
