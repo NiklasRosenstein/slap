@@ -47,7 +47,7 @@ def _resolve(result, pkg_names, extras=(), visited=None):
     result.append(pkg_name)
 
 install_packages = []
-_resolve(install_packages, (args.packages or (x['name'] for x in package_def)), args.extras.split(','))
+_resolve(install_packages, (args.packages or (x['name'] for x in package_def)), list(filter(bool, args.extras.split(','))))
 
 python = os.getenv('PYTHON', 'python')
 command = [python, '-m', 'pip', 'uninstall' if args.uninstall else 'install']
