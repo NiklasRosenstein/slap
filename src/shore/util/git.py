@@ -27,6 +27,11 @@ Branch = collections.namedtuple('Branch', 'name,current')
 FileStatus = collections.namedtuple('FileStatus', 'mode,filename')
 
 
+def add(files: List[str], path: str = None):
+  command = ['git', 'add', '--'] + files
+  subprocess.check_call(command, cwd=path)
+
+
 def branches(path: str = None) -> List[Branch]:
   command = ['git', 'branch']
   results = []
