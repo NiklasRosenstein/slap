@@ -717,6 +717,9 @@ class Package(BaseObject):
   def get_private(self) -> bool:
     return self._get_inherited_field('private')
 
+  def get_modulename(self) -> str:
+    return self.modulename or self.name
+
   def get_version(self) -> str:
     version: str = self._get_inherited_field('version')
     if version is None:
@@ -772,7 +775,7 @@ class Package(BaseObject):
     """ Returns the filename of the entry file that contains package metadata
     such as `__version__` and `__author__`. """
 
-    name = (self.modulename or self.name).replace('-', '_')
+    name = self.get_modulename().replace('-', '_')
     parts = name.split('.')
     prefix = os.sep.join(parts[:-1])
     for filename in [parts[-1] + '.py', os.path.join(parts[-1], '__init__.py')]:
@@ -783,8 +786,8 @@ class Package(BaseObject):
                      .format(self.name))
 
   def is_single_module(self) -> bool:
-    return ((
-      self.modulename or self.name).count('.') == 0 and
+    return (
+      self.get_modulename().count('.') == 0 and
       os.path.basename(self.get_entry_file()) != '__init__.py')
 
   def get_entry_file_abs(self) -> str:
