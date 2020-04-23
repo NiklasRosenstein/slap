@@ -282,7 +282,7 @@ class SetuptoolsRenderer:
     if package.is_single_module():
       packages_args = '  py_modules = [{!r}],'.format(package.modulename or package.name)
     else:
-      packages_args = '  packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),\n'.format(
+      packages_args = '  packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),'.format(
         src_directory=package.source_directory,
         exclude_packages=exclude_packages)
 

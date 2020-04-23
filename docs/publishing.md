@@ -34,7 +34,7 @@ use:
 Then from CI checks you can do
 
 ```
-- pipx install shore-release-tool
+- pipx install nr.shore
 - shore --version
 - shore publish pypi --test
 - shore publish pypi

@@ -20,7 +20,7 @@ __Installation__
 
 Shore can be installed from PyPI.
 
-    $ pip install shore-release-tool
+    $ pip install nr.shore
     $ shore --version
 
 __Configuring a Python package__
