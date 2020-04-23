@@ -604,8 +604,8 @@ def build(**args):
   help='Override the build directory. Defaults to ./build')
 @click.option('--test', is_flag=True,
   help='Publish to a test repository instead.')
-@click.option('--rebuild/--no-rebuild', default=True,
-  help='Rebuild or not rebuild existing build artifacts. Defaults to rebuild.')
+@click.option('--build/--no-build', default=True,
+  help='Always build artifacts before publishing. Enabled by default.')
 @click.option('--skip-existing', is_flag=True)
 def publish(**args):
   """ Publish a source distribution to PyPI. """
@@ -655,7 +655,7 @@ def publish(**args):
         required_builds.update(selector_builds)
 
       for target_id, build in required_builds.items():
-        if not args['rebuild'] and not _needs_build(build):
+        if not args['build'] and not _needs_build(build):
           logger.info('skipping target %s', colored(target_id, 'blue'))
         else:
           logger.info('building target %s', colored(target_id, 'blue'))
