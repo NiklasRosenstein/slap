@@ -319,8 +319,8 @@ def update(skip_checks, dry):
 
 
 @cli.command('verify')
-@click.option('--tag', '-t')
-@click.option('--expect-tag', '-e', is_flag=True)
+@click.option('--tag', '-t', help='Specify the tag from CI checks to match with the tag produced by shore.')
+@click.option('--expect-tag', '-e', is_flag=True, help='Assert that a tag is expected (otherwise --tag allows an empty string).')
 def verify(tag, expect_tag):
   """ Check whether "update" would change any files. """
 
