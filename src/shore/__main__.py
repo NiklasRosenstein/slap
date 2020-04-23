@@ -403,6 +403,7 @@ def _get_version_refs(subject) -> List[VersionRef]:
 @click.option('--skip-checks', is_flag=True)
 @click.option('--force', '-f', is_flag=True)
 @click.option('--push', is_flag=True)
+@click.option('--update', is_flag=True)
 @click.option('--publish')
 def bump(**args):
   """ Modify version numbers in package files. """
@@ -503,12 +504,15 @@ def bump(**args):
 
     if args['tag'] and version_sel_refs:
       logger.warning('bump requires an update in order to automatically tag')
-      _cache.clear()
-      try:
-        update(['--stage'])
-      except SystemExit as exc:
-        if exc.code != 0:
-          raise
+      args['update'] = True
+
+  if args['update']:
+    _cache.clear()
+    try:
+      update(['--stage'])
+    except SystemExit as exc:
+      if exc.code != 0:
+        raise
 
   if args['tag']:
     if any(f.mode == 'A' for f in _git.porcelain()):
