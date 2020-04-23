@@ -299,7 +299,8 @@ def checks(treat_warnings_as_errors):
 @cli.command('update')
 @click.option('--skip-checks', is_flag=True)
 @click.option('--dry', is_flag=True)
-def update(skip_checks, dry):
+@click.option('--stage', is_flag=True, help='Stage changed files in Git.')
+def update(skip_checks, dry, stage):
   """ (Re-)render files managed shore. """
 
   def _collect_files(subject):
@@ -317,6 +318,9 @@ def update(skip_checks, dry):
     logger.info('  %s', os.path.relpath(file.name))
     if not dry:
       write_to_disk(file)
+
+  if stage:
+    _git.add([f.name for f in files])
 
 
 @cli.command('verify')
@@ -496,6 +500,15 @@ def bump(**args):
       if not args['dry']:
         with open(group_key, 'w') as fp:
           fp.write(content)
+
+    if args['tag'] and version_sel_refs:
+      logger.warning('bump requires an update in order to automatically tag')
+      _cache.clear()
+      try:
+        update(['--stage'])
+      except SystemExit as exc:
+        if exc.code != 0:
+          raise
 
   if args['tag']:
     if any(f.mode == 'A' for f in _git.porcelain()):
