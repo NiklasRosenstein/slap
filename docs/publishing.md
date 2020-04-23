@@ -17,9 +17,12 @@ When adding the `pypi` plugin manually, the defaults do not apply unless you spe
 `defaults: true`. If the package is marked as `private`, the default `pypi` plugin configuration
 will not be added to the package.
 
-Example configuration for publishing from CI checks:
+### Automate publishing in CI checls
 
-```
+You can specify the username and password in the config as environment variables. Most CI systems
+allow you to securely store a secret as an environment variable.
+
+```yml
 name: my-package
 # ...
 use:
@@ -31,11 +34,27 @@ use:
   test_password: '$PYPI_TEST_TOKEN'
 ```
 
-Then from CI checks you can do
+When you're ready to publish from the CI checks, make it run the following commands:
 
-```
-- pipx install nr.shore
+```yml
+- pip install nr.shore
 - shore --version
-- shore publish pypi --test
+- shore verify -et "$CI_TAG"
 - shore publish pypi
 ```
+
+It is also recommended that you add a trial-publish step. Note that we do not pass `-e` to
+`shore verify` as most commits during development won't be tagged (so we do not _expect_ a tag
+to be present).
+
+```yml
+- pip install nr.shore
+- shore --version
+- shore verify -t "$CI_TAG"
+- shore bump
+- shore publish pypi --test
+```
+
+> __Work in progress__: The `shore bump git` command allows you to bump to a version number
+> that describes the commit distance since the last tagged version, but the version number
+> format is not PEP440 compliant.
