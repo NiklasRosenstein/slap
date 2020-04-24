@@ -96,11 +96,12 @@ def _commit_distance_version(subject: [Monorepo, Package]) -> Version:
     version = subject.version
     distance = len(_git.rev_list(tag + '..HEAD', subject.directory))
   else:
+    logger.warning('tag "%s" does not exist', tag)
     version = Version('0.0.0')
     distance = len(_git.rev_list('HEAD', subject.directory))
 
   rev = _git.rev_parse('HEAD')
-  return parse_version(str(version) + '-{}-g{}'.format(distance, rev[:7]))
+  return parse_version(str(version) + '+{}.g{}'.format(distance, rev[:7]))
 
 
 def _load_subject() -> Union[Monorepo, Package, None]:
@@ -397,7 +398,12 @@ def _get_version_refs(subject) -> List[VersionRef]:
 
 
 @cli.command('bump')
-@click.argument('version')
+@click.argument('version', required=False)
+@click.option('--major', is_flag=True)
+@click.option('--minor', is_flag=True)
+@click.option('--patch', is_flag=True)
+@click.option('--post', is_flag=True)
+@click.option('--snapshot', is_flag=True)
 @click.option('--tag', is_flag=True)
 @click.option('--dry', is_flag=True)
 @click.option('--skip-checks', is_flag=True)
@@ -406,9 +412,28 @@ def _get_version_refs(subject) -> List[VersionRef]:
 @click.option('--update', is_flag=True)
 @click.option('--publish')
 def bump(**args):
-  """ Modify version numbers in package files. """
+  """ Bump version numbers. Either supply a target "version" (may require --force
+  if the specified version is lower than the current) or specify one of the --major,
+  --minor, --patch, --post or --snapshot flags.
+
+  The "version" argument can also be one of the strings "major", "minor", "patch",
+  "post" or "git" which is only for backwards compatibility and will be removed in a
+  future version of shore.
+  """
 
   subject = _load_subject()
+
+  bump_flags = ('major', 'minor', 'patch', 'post', 'snapshot')
+  bump_args = ['--' + k for k in bump_flags if args[k]]
+  if args['version']:
+    bump_args.insert(0, '<version>')
+  if len(bump_args) > 1:
+    logger.error('incompatible arguments: ' + ', '.join(bump_args))
+    exit(1)
+  elif not bump_args:
+    flags = ', '.join('--' + k for k in bump_flags)
+    logger.error('missing arguments: specify a <version> or one of ' + flags)
+    exit(1)
 
   if not args['skip_checks']:
     _run_checks(subject, True)
@@ -441,16 +466,17 @@ def bump(**args):
 
   current_version = subject.version
   pep440_version = True
-  if args['version'] == 'post':
+  if args['version'] == 'post' or args['post']:
     new_version = bump_version(current_version, 'post')
-  elif args['version'] == 'patch':
+  elif args['version'] == 'patch' or args['patch']:
     new_version = bump_version(current_version, 'patch')
-  elif args['version'] == 'minor':
+  elif args['version'] == 'minor' or args['minor']:
     new_version = bump_version(current_version, 'minor')
-  elif args['version'] == 'major':
+  elif args['version'] == 'major' or args['major']:
     new_version = bump_version(current_version, 'major')
-  elif args['version'] == 'git':
+  elif args['version'] == 'git' or args['snapshot']:
     new_version = _commit_distance_version(subject)
+    args['force'] = True
   else:
     new_version = parse_version(args['version'])
 
