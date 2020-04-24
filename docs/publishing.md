@@ -51,10 +51,6 @@ to be present).
 - pip install nr.shore
 - shore --version
 - shore verify -t "$CI_TAG"
-- shore bump
+- shore bump --snapshot
 - shore publish pypi --test
 ```
-
-> __Work in progress__: The `shore bump git` command allows you to bump to a version number
-> that describes the commit distance since the last tagged version, but the version number
-> format is not PEP440 compliant.
