@@ -51,7 +51,7 @@ install_packages = []
 _resolve(install_packages, (args.packages or (x['name'] for x in package_def)), list(filter(bool, args.extras.split(','))))
 
 python = os.getenv('PYTHON', 'python')
-pip = shlex.split(os.getenv('PYTHON_PIP', '"{0}" -m pip'.format(python)))
+pip = shlex.split(os.getenv('PYTHON_PIP', '"{0}" -m pip'.format(python)).replace('$PYTHON', python))
 command = pip + ['uninstall' if args.uninstall else 'install']
 for pkgname in install_packages:
   if not args.no_develop and not args.uninstall:
