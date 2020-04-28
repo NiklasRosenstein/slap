@@ -16,6 +16,7 @@ parser.add_argument('--no-develop', action='store_true', help='Perform a normal 
 parser.add_argument('--uninstall', action='store_true', help='Uninstall the packages instead.')
 parser.add_argument('--type', choices=('install', 'develop'), help='Alternative for using or not using --no-develop.')
 parser.add_argument('-v', '--verbose', action='store_true', help='Print the Pip command that is run.')
+parser.add_argument('-q', '--quiet', action='store_true', help='Capture Pip output.')
 parser.add_argument('--extras', default='', help='Comma-separated extras to install.')
 args = parser.parse_args()
 
@@ -62,9 +63,18 @@ if args.uninstall:
 
 project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+stdout, stderr = None, None
 if args.verbose:
   command.append('-v')
   print('Running command in working directory', project_dir)
   print('$', ' '.join(command))
+elif args.quiet:
+  stdout = subprocess.PIPE
+  stderr = subprocess.STDOUT
+  print('Installing', ' '.join(args.packages))
 
-sys.exit(subprocess.call(command, cwd=project_dir))
+proc = subprocess.Popen(command, cwd=project_dir, stdout=stdout, stderr=stderr)
+stdout, _ = proc.communicate()
+if args.quiet and proc.returncode != 0:
+  print(stdout, file=sys.stderr)
+sys.exit(proc.returncode)
