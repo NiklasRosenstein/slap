@@ -22,11 +22,11 @@
 from pkg_resources import resource_string
 from shore import __version__
 from shore.core.plugins import FileToRender, IMonorepoPlugin
-from shore.model import Monorepo, Package
-from nr.algo.graph.toposort import toposort
+from shore.model import Monorepo, Package, Requirements
 from nr.databind.core import Field, Struct
 from nr.interface import implements, override
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
+import networkx as nx
 import json
 import os
 
@@ -45,14 +45,14 @@ class DevInstallRenderer:
 
   @override
   def get_monorepo_files(self, monorepo: Monorepo) -> Iterable[FileToRender]:
-    nodes = self._get_interpackage_dependencies(monorepo)
-    pkg_order = list(toposort(sorted(nodes.keys()), lambda x: nodes[x]['requires']))
+    graph = self._get_interpackage_dependencies(monorepo)
+    pkg_order = list(nx.algorithms.dag.topological_sort(graph))
     package_def = '[\n'
     for pkgname in pkg_order:
       package = {
         'name': pkgname,
-        'requires': nodes[pkgname]['requires'],
-        'extra_requires': nodes[pkgname]['extra_requires']}
+        'requires': graph.nodes[pkgname]['requires'],
+        'extra_requires': graph.nodes[pkgname]['extra_requires']}
       package_def += '  ' + json.dumps(package, sort_keys=True) + ',\n'
     package_def += ']'
 
@@ -66,28 +66,51 @@ class DevInstallRenderer:
     yield FileToRender(monorepo.directory,
       self.config.filename, write_script).with_chmod('+x')
 
-  def _get_interpackage_dependencies(self, monorepo: Monorepo) -> Dict[str, Dict]:
-    nodes = {}
-    package_name_mapping = {}
+  def _get_interpackage_dependencies(self, monorepo: Monorepo) -> nx.DiGraph:
+    """
+    Constructs a directed graph of the dependencies between the packages in
+    *monorepo*. The nodes in the graph are the directory names of the packages.
+    """
 
     packages = list(monorepo.get_packages())
-    for package in packages:
-      package_name_mapping[package.name] = _dirname(package)
-      nodes[_dirname(package)] = {
-        'directory': os.path.basename(package.directory),
-        'requires': [],
-        'extra_requires': {}
-      }
+    package_name_mapping = {}
+    graph = nx.DiGraph()
 
-    def _flatten_reqs(dst, reqs):
+    # Initialize graph nodes.
+    for package in packages:
+      node_id = _dirname(package)
+      package_name_mapping[package.name] = node_id
+      node = graph.add_node(
+        node_id,
+        directory=os.path.basename(package.directory),
+        requires=[],
+        extra_requires={})
+
+    # Helper function to get just the deps that we need.
+    def _flatten_reqs(dst: List[str], reqs: Requirements) -> List[str]:
       for req in reqs.required if reqs else ():
         if req.package in package_name_mapping:
           dst.append(package_name_mapping[req.package])
+      return dst
 
+    # Process requirements and create edges.
     for package in packages:
-      _flatten_reqs(nodes[_dirname(package)]['requires'], package.requirements)
-      _flatten_reqs(nodes[_dirname(package)].setdefault('test', []), package.requirements.test)
-      for extra, reqs in package.requirements.extra.items():
-        _flatten_reqs(nodes[_dirname(package)].setdefault(extra, []), reqs)
+      node_id = package_name_mapping[package.name]
+      extras = graph.nodes[node_id]['extra_requires']
+      total_deps = _flatten_reqs([], package.requirements)
+      graph.nodes[node_id]['requires'] += total_deps
 
-    return nodes
+      test = _flatten_reqs([], package.requirements.test)
+      if test:
+        total_deps += test
+        extras['test'] = test
+
+      for extra, reqs in package.requirements.extra.items():
+        extra_reqs = _flatten_reqs([], reqs)
+        if extra_reqs:
+          total_deps += extra_reqs
+          extras[extra] = extra_reqs
+
+      [graph.add_edge(o, node_id) for o in total_deps]
+
+    return graph
