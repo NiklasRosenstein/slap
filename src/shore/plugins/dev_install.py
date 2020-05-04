@@ -72,7 +72,7 @@ class DevInstallRenderer:
     *monorepo*. The nodes in the graph are the directory names of the packages.
     """
 
-    packages = list(monorepo.get_packages())
+    packages = sorted(monorepo.get_packages(), key=lambda x: x.name, reverse=True)
     package_name_mapping = {}
     graph = nx.DiGraph()
 
