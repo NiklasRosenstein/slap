@@ -13,7 +13,7 @@ steps:
   - shore status
   - shore verify --tag "$DRONE_TAG" --update-check=ignore
   - shore bump git
-  - shore build setuptools
+  - shore publish pypi --test
 
 - name: publish
   image: python:3.7
