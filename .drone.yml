@@ -10,7 +10,7 @@ steps:
     TEST_PYPI_TOKEN: {from_secret: TEST_PYPI_TOKEN}
   commands:
   - git fetch
-  - pip install twine pytest -e .
+  - pip install twine pytest -e . -q
   - pytest
   - shore status
   - shore verify --tag "$DRONE_TAG" --update-check=ignore
@@ -25,7 +25,7 @@ steps:
     PYPI_TOKEN: {from_secret: PYPI_TOKEN}
   commands:
   - git checkout .
-  - pip install twine -e .
+  - pip install twine -e . -q
   - shore verify --tag "$DRONE_TAG" --tag-check=require --update-check=ignore
   - git diff
   - echo "[pypi]\nusername = __token__\npassword = $PYPI_TOKEN\n" >> ~/.pypirc
