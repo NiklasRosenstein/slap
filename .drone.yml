@@ -6,6 +6,8 @@ name: default
 steps:
 - name: build
   image: python:3.7
+  environment:
+    TEST_PYPI_TOKEN: {from_secret: test_pypi_token}
   commands:
   - git fetch
   - pip install twine pytest -e .
@@ -13,19 +15,17 @@ steps:
   - shore status
   - shore verify --tag "$DRONE_TAG" --update-check=ignore
   - shore bump git
+  - echo "[testpypi]\nusername = __token__\npassword = $TEST_PYPI_TOKEN\n" >> ~/.pypirc
   - shore publish pypi --test
 
 - name: publish
   image: python:3.7
   environment:
-    TEST_PYPI_TOKEN: {from_secret: test_pypi_token}
     PYPI_TOKEN: {from_secret: pypi_token}
   commands:
   - git checkout .
   - pip install twine -e .
   - shore verify --tag "$DRONE_TAG" --tag-check=require
-  - echo "[testpypi]\nusername = __token__\npassword = $TEST_PYPI_TOKEN\n" >> ~/.pypirc
-  - shore publish pypi --test --skip-existing
   - echo "[pypi]\nusername = __token__\npassword = $PYPI_TOKEN\n" >> ~/.pypirc
   - shore publish pypi
   depends_on:
