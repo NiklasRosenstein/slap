@@ -326,8 +326,9 @@ def update(skip_checks, dry, stage):
 
 @cli.command('verify')
 @click.option('--tag', '-t', help='Specify the tag from CI checks to match with the tag produced by shore.')
-@click.option('--expect-tag', '-e', is_flag=True, help='Assert that a tag is expected (otherwise --tag allows an empty string).')
-def verify(tag, expect_tag):
+@click.option('--tag-check', type=click.Choice(['require', 'if-present', 'skip', 'ignore']), default='do-if-present')
+@click.option('--update-check', type=click.Choice(['require', 'skip', 'ignore']), default='require')
+def verify(tag, tag_check, update_check):
   """ Check whether "update" would change any files. """
 
   def _virtual_update(subject) -> Iterable[str]:
@@ -352,35 +353,41 @@ def verify(tag, expect_tag):
   status = 0
 
   subject = _load_subject()
-  files = _run_for_subject(subject, _virtual_update)
-  files = Stream.concat(files).collect()
-  if files:
-    logger.warning('❌ %s file(s) would be changed by an update.', len(files))
-    status = 1
-  else:
-    logger.info('✔ no files would be changed by an update.')
-  for file in files:
-    logger.warning('  %s', os.path.relpath(file))
 
-  if expect_tag and not tag:
-    logger.error('❌ the specified tag is an empty string')
-    status = 1
-  elif tag:
-    matches = _run_for_subject(subject, _tag_matcher)
-    matches = Stream.concat(matches).collect()
-    if len(matches) == 0:
-      # TODO (@NiklasRosenstein): If we matched the {name} portion of the
-      #   tag_format (if present) we could find which package (or monorepo)
-      #   the tag was intended for.
-      logger.error('❌ tag %s did not match any of the available subjects', tag)
-      status = 1
-    elif len(matches) > 1:
-      logger.error('❌ tag matches multiple subjects: %s', tag)
-      for match in matches:
-        logger.error('  %s', match.name)
-      status = 1
+  if update_check != 'skip':
+    files = _run_for_subject(subject, _virtual_update)
+    files = Stream.concat(files).collect()
+    if files:
+      logger.warning('❌ %s file(s) would be changed by an update.', len(files))
+      if update_check != 'ignore':
+        status = 1
     else:
-      logger.info('✔ tag %s matches %s', tag, matches[0].name)
+      logger.info('✔ no files would be changed by an update.')
+    for file in files:
+      logger.warning('  %s', os.path.relpath(file))
+
+  if tag_check != 'skip':
+    if tag_check == 'require' and not tag:
+      logger.error('❌ the specified tag is an empty string')
+      status = 1
+    elif tag:
+      matches = _run_for_subject(subject, _tag_matcher)
+      matches = Stream.concat(matches).collect()
+      if len(matches) == 0:
+        # TODO (@NiklasRosenstein): If we matched the {name} portion of the
+        #   tag_format (if present) we could find which package (or monorepo)
+        #   the tag was intended for.
+        logger.error('❌ tag %s did not match any of the available subjects', tag)
+        if tag_check != 'ignore':
+          status = 1
+      elif len(matches) > 1:
+        logger.error('❌ tag matches multiple subjects: %s', tag)
+        for match in matches:
+          logger.error('  %s', match.name)
+        if tag_check != 'ignore':
+          status = 1
+      else:
+        logger.info('✔ tag %s matches %s', tag, matches[0].name)
 
   exit(status)
 
