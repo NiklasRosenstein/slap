@@ -11,7 +11,7 @@ steps:
   - pip install twine pytest -e .
   - pytest
   - shore status
-  - shore verify -t "$DRONE_TAG"
+  - shore verify --tag "$DRONE_TAG" --update-check=ignore || true
   - shore bump git
   - shore build setuptools
 
@@ -23,7 +23,7 @@ steps:
   commands:
   - git checkout .
   - pip install twine -e .
-  - shore verify -et "$DRONE_TAG"
+  - shore verify --tag "$DRONE_TAG" --tag-check=require
   - echo "[testpypi]\nusername = __token__\npassword = $TEST_PYPI_TOKEN\n" >> ~/.pypirc
   - shore publish pypi --test --skip-existing
   - echo "[pypi]\nusername = __token__\npassword = $PYPI_TOKEN\n" >> ~/.pypirc
