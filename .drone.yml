@@ -11,7 +11,7 @@ steps:
   - pip install twine pytest -e .
   - pytest
   - shore status
-  - shore verify --tag "$DRONE_TAG" --update-check=ignore || true
+  - shore verify --tag "$DRONE_TAG" --update-check=ignore
   - shore bump git
   - shore build setuptools
 

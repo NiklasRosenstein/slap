@@ -326,7 +326,7 @@ def update(skip_checks, dry, stage):
 
 @cli.command('verify')
 @click.option('--tag', '-t', help='Specify the tag from CI checks to match with the tag produced by shore.')
-@click.option('--tag-check', type=click.Choice(['require', 'if-present', 'skip', 'ignore']), default='do-if-present')
+@click.option('--tag-check', type=click.Choice(['require', 'if-present', 'skip', 'ignore']), default='if-present')
 @click.option('--update-check', type=click.Choice(['require', 'skip', 'ignore']), default='require')
 def verify(tag, tag_check, update_check):
   """ Check whether "update" would change any files. """
