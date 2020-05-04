@@ -20,9 +20,9 @@
 # IN THE SOFTWARE.
 
 from pkg_resources import resource_string
-from shore import __version__
 from shore.core.plugins import FileToRender, IMonorepoPlugin
 from shore.model import Monorepo, Package, Requirements
+from shore.static import GENERATED_FILE_REMARK
 from nr.databind.core import Field, Struct
 from nr.interface import implements, override
 from typing import Dict, Iterable, List
@@ -59,8 +59,8 @@ class DevInstallRenderer:
     def write_script(_current, fp):
       template = resource_string('shore', 'templates/dev_install/dev-install').decode('utf8')
       content = (template
-        .replace('{{shore_version}}', __version__)
-        .replace('{{package_def}}', package_def))
+        .replace('{{package_def}}', package_def)
+        .replace('{{generated_file_remark}}', GENERATED_FILE_REMARK))
       fp.write(content)
 
     yield FileToRender(monorepo.directory,

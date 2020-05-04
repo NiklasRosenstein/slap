@@ -19,9 +19,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore import __version__
 from shore.core.plugins import FileToRender, IPackagePlugin
 from shore.model import Package
+from shore.static import GENERATED_FILE_REMARK
 from nr.interface import implements, override
 from typing import Dict, Iterable
 import json
@@ -34,7 +34,7 @@ class RequirementsFileRenderer:
   @override
   def get_package_files(self, package: Package) -> Iterable[FileToRender]:
     def _render_requirements(_current, fp):
-      fp.write('# automatically created by shore {}\n'.format(__version__))
+      fp.write(GENERATED_FILE_REMARK + '\n')
       for req in package.requirements.required:
         fp.write(req.to_setuptools() + '\n')
     yield FileToRender(package.directory, 'requirements.txt', _render_requirements)

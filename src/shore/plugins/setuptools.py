@@ -24,7 +24,6 @@ plugin is used by default in packages. """
 
 from ._util import find_readme_file, Readme
 from nr.interface import implements, override
-from shore import __version__
 from shore.core.plugins import (
   BuildResult,
   CheckResult,
@@ -33,6 +32,7 @@ from shore.core.plugins import (
   IPackagePlugin,
   VersionRef)
 from shore.model import Package
+from shore.static import GENERATED_FILE_REMARK
 from typing import Iterable, Optional
 import contextlib
 import json
@@ -173,7 +173,7 @@ class SetuptoolsRenderer:
     has_develop_hooks = any(x.event in ('before-develop', 'develop') for x in package.install_hooks)
 
     # Write the header/imports.
-    fp.write('# automatically created by shore {}\n\n'.format(__version__))
+    fp.write(GENERATED_FILE_REMARK + '\n')
     if has_hooks or has_install_hooks:
       fp.write('from setuptools.command.install import install as _install_command\n')
     if has_hooks or has_develop_hooks:
