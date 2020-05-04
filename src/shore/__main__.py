@@ -442,6 +442,14 @@ def bump(**args):
     logger.error('missing arguments: specify a <version> or one of ' + flags)
     exit(1)
 
+  # Warn for deprecated behavior.
+  if args['version'] in ('post', 'patch', 'minor', 'major', 'git'):
+    use_flag = '--' + args['version']
+    if use_flag == '--git':
+      use_flag = '--snapshot'
+    logger.warning('Support for the %r argument is deprecated and will be removed in a '
+      'future version of Shore. Please use the %s flag instead.', args['version'], use_flag)
+
   if not args['skip_checks']:
     _run_checks(subject, True)
 
