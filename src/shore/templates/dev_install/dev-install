@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# automatically created by shore {{shore_version}}
+#####################
+{{generated_file_remark}}
 
 from __future__ import print_function
 import argparse
