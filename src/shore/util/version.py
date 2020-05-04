@@ -134,6 +134,8 @@ def get_commit_distance_version(repo_dir: str, version: Version, latest_tag: str
     Todo: We could try to find the previous tag for this subject and use that.
   """
 
+  dirty = _git.has_diff(repo_dir)
+
   if _git.rev_parse(latest_tag):
     distance = len(_git.rev_list(latest_tag + '..HEAD', repo_dir))
   else:
@@ -142,11 +144,10 @@ def get_commit_distance_version(repo_dir: str, version: Version, latest_tag: str
     distance = len(_git.rev_list('HEAD', repo_dir))
 
   if distance == 0:
+    if dirty:
+      return parse_version(str(version) + '+dirty')
     return None
 
-  suffix = ''
-  if _git.has_diff(repo_dir):
-    suffix = '.dirty'
-
   rev = _git.rev_parse('HEAD', repo_dir)
-  return parse_version(str(version) + '+{}.g{}{}'.format(distance, rev[:7], suffix))
+  local = '+{}.g{}{}'.format(distance, rev[:7], '.dirty' if dirty else '')
+  return parse_version(str(version) + local)

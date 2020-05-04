@@ -385,6 +385,7 @@ def _get_version_refs(subject) -> List[VersionRef]:
 @click.option('--dry', is_flag=True)
 @click.option('--skip-checks', is_flag=True)
 @click.option('--force', '-f', is_flag=True)
+@click.option('--allow-lower', is_flag=True)
 @click.option('--push', is_flag=True)
 @click.option('--update', is_flag=True)
 @click.option('--publish')
@@ -461,14 +462,14 @@ def bump(**args):
     new_version = bump_version(current_version, 'major')
   elif args['version'] == 'git' or args['snapshot']:
     new_version = _commit_distance_version(subject)
-    args['force'] = True
+    args['allow_lower'] = True
   else:
     new_version = parse_version(args['version'])
 
   if not new_version.pep440_compliant:
     logger.warning('version "{}" is not PEP440 compliant.'.format(new_version))
 
-  if new_version < current_version and not args['force']:
+  if new_version < current_version and not (args['force'] or args['allow_lower']):
     logger.error('version {} is lower than current version {}'.format(
       new_version, current_version))
     exit(1)
