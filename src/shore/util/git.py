@@ -78,10 +78,10 @@ def tag(tag_name: str, force: bool=False):
   subprocess.check_call(command)
 
 
-def rev_parse(rev: str) -> Optional[str]:
+def rev_parse(rev: str, path: str = None) -> Optional[str]:
   command = ['git', 'rev-parse', rev]
   try:
-    return subprocess.check_output(command, stderr=subprocess.STDOUT).decode().strip()
+    return subprocess.check_output(command, stderr=subprocess.STDOUT, cwd=path).decode().strip()
   except subprocess.CalledProcessError:
     return None
 
@@ -94,3 +94,13 @@ def rev_list(rev: str, path: str = None) -> List[str]:
   if revlist == ['']:
     revlist = []
   return revlist
+
+
+def has_diff(path: str = None) -> bool:
+  try:
+    subprocess.check_call(['git', 'diff', '--exit-code'], stdout=subprocess.PIPE)
+    return False
+  except subprocess.CalledProcessError as exc:
+    if exc.returncode == 1:
+      return True
+    raise
