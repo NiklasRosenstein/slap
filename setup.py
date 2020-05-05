@@ -35,6 +35,7 @@ setuptools.setup(
   entry_points = {
     'console_scripts': [
       'shore = shore.__main__:_entry_point',
+      'shore-conda-forge = shore.tools.conda_forge:main',
     ],
     'shore.core.plugins': [
       'core = shore.plugins.core:CorePlugin',
