@@ -36,12 +36,14 @@ def _dirname(package: Package):
 
 
 @implements(IMonorepoPlugin)
-class DevInstallRenderer:
-  """ Renders a "bin/dev-install" shell script for a monorepo that installs
-  Pip packages in the order, respecting their inter-dependencies. """
+class InstallScriptRenderer:
+  """
+  Renders a self-contained Python script for a monorepo that installs Pip packages
+  in order, respecting their inter-dependencies.
+  """
 
   class Config(Struct):
-    filename = Field(str, default='bin/dev-install')
+    filename = Field(str, default='bin/install')
 
   @override
   def get_monorepo_files(self, monorepo: Monorepo) -> Iterable[FileToRender]:
@@ -57,7 +59,7 @@ class DevInstallRenderer:
     package_def += ']'
 
     def write_script(_current, fp):
-      template = resource_string('shore', 'templates/dev_install/dev-install').decode('utf8')
+      template = resource_string('shore', 'templates/install_script/install').decode('utf8')
       content = (template
         .replace('{{package_def}}', package_def)
         .replace('{{generated_file_remark}}', GENERATED_FILE_REMARK))
