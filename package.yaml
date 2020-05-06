@@ -38,5 +38,5 @@ entrypoints:
     - setuptools = shore.plugins.setuptools:SetuptoolsRenderer
 
 manifest:
-  - include src/shore/templates/dev_install/dev-install
+  - include src/shore/templates/install_script/install
   - recursive-include src/shore/templates *.yaml *.py *.md
