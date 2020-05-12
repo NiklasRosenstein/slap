@@ -1,3 +1,3 @@
 
-__version__ = '0.0.31.post1'
+__version__ = '0.0.32'
 __author__ = 'Niklas Rosenstein <rosensteinniklas@gmail.com>'
