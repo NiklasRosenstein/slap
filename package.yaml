@@ -39,4 +39,4 @@ entrypoints:
 
 manifest:
   - include src/shore/templates/install_script/install
-  - recursive-include src/shore/templates *.yaml *.py *.md
+  - recursive-include src/shore/templates *.yaml *.py *.md .gitignore
