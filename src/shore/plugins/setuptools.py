@@ -100,10 +100,11 @@ class SetuptoolsBuildTarget:
   @override
   def build(self, build_directory: str) -> BuildResult:
     # TODO: Can we change the distribution output directory with an option?
+    python = os.getenv('PYTHON', sys.executable)
     dist_directory = os.path.join(self.package.directory, 'dist')
     dist_exists = os.path.exists(dist_directory)
     res = subprocess.call([
-        'python',
+        python,
         'setup.py',
         self.build_type,
         '--formats', ','.join(self.formats)
