@@ -187,13 +187,18 @@ def new(**args):
 
     # Render namespace supporting files.
     parts = []
-    for item in name_on_disk.split('.')[:-1]:
+    for item in name_on_disk.replace('-', '_').split('.')[:-1]:
       parts.append(item)
       dest = os.path.join(args['directory'], 'src', *parts, '__init__.py')
       yield FileToRender(
         None,
         os.path.normpath(dest),
         lambda _, fp: _render_namespace_file(fp))
+      dest = os.path.join(args['directory'], 'src', 'test', *parts, '__init__.py')
+      yield FileToRender(
+        None,
+        os.path.normpath(dest),
+        lambda _, fp: fp.write('pass\n'))
 
     # TODO (@NiklasRosenstein): Render the license file if it does not exist.
 
