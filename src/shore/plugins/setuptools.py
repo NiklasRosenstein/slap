@@ -175,12 +175,14 @@ class SetuptoolsRenderer:
 
     # Write the header/imports.
     fp.write(GENERATED_FILE_REMARK + '\n')
+    fp.write('from __future__ import print_function\n')
     if has_hooks or has_install_hooks:
       fp.write('from setuptools.command.install import install as _install_command\n')
     if has_hooks or has_develop_hooks:
       fp.write('from setuptools.command.develop import develop as _develop_command\n')
     fp.write(textwrap.dedent('''
       import io
+      import os
       import re
       import setuptools
       import sys
@@ -241,8 +243,13 @@ class SetuptoolsRenderer:
     readme = find_readme_file(package.directory)
     if readme:
       fp.write(textwrap.dedent('''
-        with io.open({readme!r}, encoding='utf8') as fp:
-          long_description = fp.read()
+        readme_file = {readme!r}
+        if os.path.isfile(readme_file):
+          with io.open(readme_file, encoding='utf8') as fp:
+            long_description = fp.read()
+        else:
+          print("warning: file \\"{{}}\\" does not exist.".format(readme_file), file=sys.stderr)
+          long_description = None
       ''').format(readme=readme.file))
     else:
       fp.write(textwrap.dedent('''
