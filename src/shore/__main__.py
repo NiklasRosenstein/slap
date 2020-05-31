@@ -174,7 +174,8 @@ def new(**args):
     # Render the template files to the target directory.
     for source_filename in walk_package_resources('shore', template_path):
       # Expand variables in the filename.
-      filename = _render_template(source_filename, name=name_on_disk.replace('.', '/'))
+      name = name_on_disk.replace('-', '_').replace('.', '/')
+      filename = _render_template(source_filename, name=name)
       dest = os.path.join(args['directory'], filename)
       yield FileToRender(
         None,
