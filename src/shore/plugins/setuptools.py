@@ -80,22 +80,23 @@ class SetuptoolsBuildTarget:
     'tar': '.tar'
   }
 
-  def __init__(self, build_type: str, package: Package):
+  def __init__(self, name: str, build_type: str, package: Package):
+    self.name = name
     self.build_type = build_type
     self.formats = ['gztar']
     self.package = package
 
   @override
   def get_name(self) -> str:
-    return self.build_type
+    return self.name
 
   @override
   def get_build_artifacts(self) -> Iterable[str]:
-    for f in self.formats:
-      yield '{}-{}{}'.format(
-        self.package.name,
-        self.package.version,
-        self._FORMATS_MAP[f])
+    if self.build_type == 'bdist_wheel':
+      yield '{}-{}-py2.py3-none-any.whl'.format(self.package.name, self.package.version)
+    else:
+      for f in self.formats:
+        yield '{}-{}{}'.format(self.package.name, self.package.version, self._FORMATS_MAP[f])
 
   @override
   def build(self, build_directory: str) -> BuildResult:
@@ -103,13 +104,10 @@ class SetuptoolsBuildTarget:
     python = os.getenv('PYTHON', sys.executable)
     dist_directory = os.path.join(self.package.directory, 'dist')
     dist_exists = os.path.exists(dist_directory)
-    res = subprocess.call([
-        python,
-        'setup.py',
-        self.build_type,
-        '--formats', ','.join(self.formats)
-      ],
-      cwd=self.package.directory)
+    command = [python, 'setup.py', self.build_type]
+    if self.build_type != 'bdist_wheel':
+      command += ['--formats', ','.join(self.formats)]
+    res = subprocess.call(command, cwd=self.package.directory)
     if res != 0:
       return BuildResult.FAILURE
 
@@ -149,7 +147,8 @@ class SetuptoolsRenderer:
 
   @override
   def get_package_build_targets(self, package: Package) -> Iterable[IBuildTarget]:
-    yield SetuptoolsBuildTarget('sdist', package)
+    yield SetuptoolsBuildTarget('sdist', 'sdist', package)
+    yield SetuptoolsBuildTarget('wheel', 'bdist_wheel', package)
 
   _BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
   _END_SECTION = '# }'
@@ -318,6 +317,11 @@ class SetuptoolsRenderer:
         cmdclass = {cmdclass},
         keywords = {keywords!r},
         classifiers = {classifiers!r},
+        options = {{
+          'bdist_wheel': {{
+            'universal': True,
+          }},
+        }},
       )
     ''').format(
       package=package,
