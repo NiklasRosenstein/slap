@@ -49,6 +49,7 @@ import logging
 import nr.fs
 import os
 import pkg_resources
+import re
 import shlex
 import subprocess
 import sys
@@ -77,6 +78,16 @@ def _commit_distance_version(subject: [Monorepo, Package]) -> Version:
     subject.directory,
     subject.version,
     subject.get_tag(subject.version)) or subject.version
+
+
+def _md_term_stylize(text: str) -> str:
+  def _code(m):
+    return colored(m.group(1), 'cyan')
+  def _issue_ref(m):
+    return colored(m.group(0), 'yellow', attrs=['bold'])
+  text = re.sub(r'`([^`]+)`', _code, text)
+  text = re.sub(r'#\d+', _issue_ref, text)
+  return text
 
 
 def _editor_open(filename: str):
@@ -824,12 +835,15 @@ def changelog(**args):
     if not manager.unreleased.entries:
       print('No entries in the unreleased changelog.')
     else:
-      for component, entries in Stream.groupby(manager.unreleased.entries, lambda x: x.component):
-        print(colored(component or 'No Component', 'yellow'))
+      entries = sorted(manager.unreleased.entries, key=lambda x: x.component)
+      for component, entries in Stream.groupby(entries, lambda x: x.component, collect=list):
+        maxw = max(len(x.type) for x in entries)
+        print(colored(component or 'No Component', 'red', attrs=['bold', 'underline']))
         for entry in entries:
           lines = entry.description.splitlines()
-          lines[1:] = [' ' * (len(entry.type) + 4) + x for x in lines[1:]]
-          print('  {}: {}'.format(entry.type, '\n'.join(lines)))
+          print('  {}'.format(colored((entry.type + ':').ljust(maxw+1), attrs=['bold'])), _md_term_stylize(lines[0]))
+          for line in lines[1:]:
+            print('  {}{}'.format(' ' * (maxw+2), _md_term_stylize(line)))
 
 
 _entry_point = lambda: sys.exit(cli())
