@@ -427,6 +427,7 @@ def bump(**args):
   """
 
   subject = _load_subject()
+  changelog_manager = ChangelogManager(subject.changelog_directory, mapper)
 
   bump_flags = ('major', 'minor', 'patch', 'post', 'snapshot')
   bump_args = ['--' + k for k in bump_flags if args[k]]
@@ -534,7 +535,7 @@ def bump(**args):
         content = fp.read()
       offset = 0
       for ref in refs:
-        logger.info('    %s %s -> %s', ref.package, ref.sel, ref.new_sel)
+        logger.info('    %s %s → %s', ref.package, ref.sel, ref.new_sel)
         content = content[:ref.start - offset] + ref.new_sel + content[ref.end - offset:]
         offset += len(ref.sel) - len(ref.new_sel)
       if not args['dry']:
@@ -544,6 +545,15 @@ def bump(**args):
     if args['tag'] and version_sel_refs:
       logger.warning('bump requires an update in order to automatically tag')
       args['update'] = True
+
+  # Rename the unreleased changelog if it exists.
+  if changelog_manager.unreleased.exists():
+    if args['dry']:
+      changelog = changelog_manager.version(new_version)
+    else:
+      changelog = changelog_manager.release(new_version)
+    logger.info('release staged changelog (%s → %s)', changelog_manager.unreleased.filename,
+      changelog.filename)
 
   if args['update']:
     _cache.clear()
@@ -793,7 +803,7 @@ def changelog(**args):
         sys.exit(1)
     if not entry.component:
       logger.error('no component provided.')
-    created = not os.path.isfile(manager.unreleased.filename)
+    created = not manager.unreleased.exists()
     manager.unreleased.add_entry(entry)
     manager.unreleased.save(create_directory=True)
     message = ('Created' if created else 'Updated') + ' "{}"'.format(manager.unreleased.filename)
