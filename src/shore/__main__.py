@@ -784,6 +784,7 @@ def publish(**args):
 
 
 @cli.command()
+@click.argument('version', type=parse_version, required=False)
 @click.option('-n', '--new', metavar='type',
   help='Create a new entry. The argument for this option is the changelog type. '
        '(usually one of {}).'.format(', '.join(ChangelogManager.TYPES)))
@@ -832,35 +833,37 @@ def changelog(**args):
       sys.exit(1)
     sys.exit(_editor_open(manager.unreleased.filename))
   else:
-    if not manager.unreleased.entries:
-      print('No entries in the unreleased changelog.')
-    else:
-      def _fmt_issue(i):
-        if str(i).isdigit():
-          return '#' + str(i)
-        return i
-      def _fmt_issues(entry):
-        if not entry.issues:
-          return None
-        return '(' + ', '.join(colored(_fmt_issue(i), 'yellow', attrs=['underline']) for i in entry.issues) + ')'
-      def _fmt_flags(entry):
-        if not entry.flags:
-          return None
-        return '(' + ', '.join(colored(f, 'blue', attrs=['underline']) for f in entry.flags) + ')'
-      entries = sorted(manager.unreleased.entries, key=lambda x: x.component)
-      for component, entries in Stream.groupby(entries, lambda x: x.component, collect=list):
-        maxw = max(len(x.type) for x in entries)
-        print(colored(component or 'No Component', 'red', attrs=['bold', 'underline']))
-        for entry in entries:
-          lines = entry.description.splitlines()
-          suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_flags(entry))))
-          if len(lines) > 1 and suffix_fmt:
-            lines.append(suffix_fmt)
-          elif len(lines) == 1 and suffix_fmt:
-            lines[0] += ' ' + suffix_fmt
-          print('  {}'.format(colored((entry.type + ':').ljust(maxw+1), attrs=['bold'])), _md_term_stylize(lines[0]))
-          for line in lines[1:]:
-            print('  {}{}'.format(' ' * (maxw+2), _md_term_stylize(line)))
+    changelog = manager.version(args['version']) if args['version'] else manager.unreleased
+    if not changelog.exists():
+      print('No changelog for {}.'.format(colored(str(args['version'] or 'unreleased'), 'yellow')))
+      sys.exit(0)
+
+    def _fmt_issue(i):
+      if str(i).isdigit():
+        return '#' + str(i)
+      return i
+    def _fmt_issues(entry):
+      if not entry.issues:
+        return None
+      return '(' + ', '.join(colored(_fmt_issue(i), 'yellow', attrs=['underline']) for i in entry.issues) + ')'
+    def _fmt_flags(entry):
+      if not entry.flags:
+        return None
+      return '(' + ', '.join(colored(f, 'blue', attrs=['underline']) for f in entry.flags) + ')'
+    entries = sorted(changelog.entries, key=lambda x: x.component)
+    for component, entries in Stream.groupby(entries, lambda x: x.component, collect=list):
+      maxw = max(len(x.type) for x in entries)
+      print(colored(component or 'No Component', 'red', attrs=['bold', 'underline']))
+      for entry in entries:
+        lines = entry.description.splitlines()
+        suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_flags(entry))))
+        if len(lines) > 1 and suffix_fmt:
+          lines.append(suffix_fmt)
+        elif len(lines) == 1 and suffix_fmt:
+          lines[0] += ' ' + suffix_fmt
+        print('  {}'.format(colored((entry.type + ':').ljust(maxw+1), attrs=['bold'])), _md_term_stylize(lines[0]))
+        for line in lines[1:]:
+          print('  {}{}'.format(' ' * (maxw+2), _md_term_stylize(line)))
 
 
 _entry_point = lambda: sys.exit(cli())
