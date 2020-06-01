@@ -567,7 +567,7 @@ def bump(**args):
 
   # Rename the unreleased changelog if it exists.
   if changelog_manager.unreleased.exists():
-    changed_files.append(changed_files.unreleased.filename)
+    changed_files.append(changelog_manager.unreleased.filename)
     if args['dry']:
       changelog = changelog_manager.version(new_version)
     else:
