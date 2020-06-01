@@ -448,6 +448,10 @@ class BaseObject(Struct):
   #: Plugins for this object.
   use = Field([PluginConfig])
 
+  #: Directory where the "shore changelog" command stores the changelog
+  #: YAML files.
+  changelog_directory = Field(str, default='.changelog')
+
   #: A hidden attribute that is not deserialized but set during
   #: deserialization from file to know the file that the data was
   #: loaded from.

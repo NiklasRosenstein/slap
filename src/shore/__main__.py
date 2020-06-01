@@ -30,9 +30,11 @@ from shore.core.plugins import (
   IPackagePlugin,
   VersionRef,
   write_to_disk)
+from shore.mapper import mapper
 from shore.model import Monorepo, ObjectCache, Package, VersionSelector
 from shore.plugins.core import get_monorepo_interdependency_version_refs
 from shore.util import git as _git
+from shore.util.changelog import ChangelogEntry, ChangelogManager
 from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
@@ -44,10 +46,13 @@ import io
 import jinja2
 import json
 import logging
+import nr.fs
 import os
 import pkg_resources
+import shlex
 import subprocess
 import sys
+import yaml
 
 _cache = ObjectCache()
 logger = logging.getLogger(__name__)
@@ -74,7 +79,23 @@ def _commit_distance_version(subject: [Monorepo, Package]) -> Version:
     subject.get_tag(subject.version)) or subject.version
 
 
-def _load_subject() -> Union[Monorepo, Package, None]:
+def _edit_text(text: str) -> str:
+  """
+  Opens an editor for the user to modify *text*.
+  """
+
+  editor = shlex.split(os.getenv('EDITOR', 'vim'))
+  with nr.fs.tempfile('.yml', dir=os.getcwd(), text=True) as fp:
+    fp.write(text)
+    fp.close()
+    res = subprocess.call(editor + [fp.name])
+    if res != 0:
+      sys.exit(res)
+    with open(fp.name) as src:
+      return src.read()
+
+
+def _load_subject(allow_none: bool = False) -> Union[Monorepo, Package, None]:
   package, monorepo = None, None
   if os.path.isfile('package.yaml'):
     package = Package.load('package.yaml', _cache)
@@ -83,7 +104,7 @@ def _load_subject() -> Union[Monorepo, Package, None]:
   if package and monorepo:
     raise RuntimeError('found package.yaml and monorepo.yaml in the same '
       'directory')
-  if not package and not monorepo:
+  if not allow_none and not package and not monorepo:
     logger.error('no package.yaml or monorepo.yaml in current directory')
     exit(1)
   return package or monorepo
@@ -214,7 +235,7 @@ def new(**args):
     if os.path.isfile(file.name) and not args['force']:
       print(colored('Skip ' + file.name, 'yellow'))
       continue
-    print(colored('Write ' + file.name, 'blue'))
+    print(colored('Write ' + file.name, 'cyan'))
     if not args['dry']:
       write_to_disk(file)
 
@@ -648,7 +669,7 @@ def build(**args):
 
   os.makedirs(args['build_dir'], exist_ok=True)
   for target_id, target in targets.items():
-    logger.info('building target %s', colored(target_id, 'blue'))
+    logger.info('building target %s', colored(target_id, 'cyan'))
     target.build(args['build_dir'])
 
 
@@ -682,11 +703,11 @@ def publish(**args):
 
   if args['list']:
     if publishers:
-      print('Publish targets for', colored(subject.name, 'blue') + ':')
+      print('Publish targets for', colored(subject.name, 'cyan') + ':')
       for target in publishers:
         print('  ' + colored(target, 'yellow'))
     else:
-      print('No publish targets for', colored(subject.name, 'blue') + '.')
+      print('No publish targets for', colored(subject.name, 'cyan') + '.')
     exit(0)
 
   if not publishers or (not args['target'] and not args['all']):
@@ -712,9 +733,9 @@ def publish(**args):
 
       for target_id, build in required_builds.items():
         if not args['build'] and not _needs_build(build):
-          logger.info('skipping target %s', colored(target_id, 'blue'))
+          logger.info('skipping target %s', colored(target_id, 'cyan'))
         else:
-          logger.info('building target %s', colored(target_id, 'blue'))
+          logger.info('building target %s', colored(target_id, 'cyan'))
           os.makedirs(args['build_dir'], exist_ok=True)
           build.build(args['build_dir'])
 
@@ -736,6 +757,57 @@ def publish(**args):
   logger.debug('exit with status code %s', status)
   exit(status)
 
+
+@cli.command()
+@click.option('-n', '--new', metavar='type',
+  help='Create a new entry. The argument for this option is the changelog type. '
+       '(usually one of {}).'.format(', '.join(ChangelogManager.TYPES)))
+@click.option('-m', '--message', metavar='text',
+  help='The changelog entry description. Only with --new. If this is not provided, the EDITOR '
+       'will be opened to allow editing the changelog entry.')
+@click.option('-c', '--component', metavar='name', help='The component for the changelog entry.')
+@click.option('-F', '--flags', metavar='flag,…',
+  help='Comma separated list of flags for the changelog entry.')
+@click.option('--commit', is_flag=True, help='Commit the changelog entry after creation.')
+def changelog(**args):
+  """
+  Show or create changelog entries.
+  """
+
+  subject = _load_subject(allow_none=True)
+  if subject:
+    manager = ChangelogManager(subject.changelog_directory, mapper)
+  else:
+    manager = ChangelogManager(Package.changelog_directory.default, mapper)
+
+  if args['new']:
+    if args['new'] not in manager.TYPES:
+      logger.warning('"%s" is not a well-known changelog entry type.', args['new'])
+    flags = list(filter(bool, map(str.strip, (args['flags'] or '').split(','))))
+    entry = ChangelogEntry(args['new'], args['component'] or '', flags, args['message'] or '')
+    if not entry.description:
+      serialized = yaml.safe_dump(mapper.serialize(entry, ChangelogEntry), sort_keys=False)
+      entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogEntry)
+      if not entry.description:
+        logger.error('no entry description provided.')
+        sys.exit(1)
+    if not entry.component:
+      logger.error('no component provided.')
+    created = not os.path.isfile(manager.unreleased.filename)
+    manager.unreleased.add_entry(entry)
+    manager.unreleased.save(create_directory=True)
+    message = ('Created' if created else 'Updated') + ' "{}"'.format(manager.unreleased.filename)
+    print(colored(message, 'cyan'))
+  else:
+    if not manager.unreleased.entries:
+      print('No entries in the unreleased changelog.')
+    else:
+      for component, entries in Stream.groupby(manager.unreleased.entries, lambda x: x.component):
+        print(colored(component or 'No Component', 'yellow'))
+        for entry in entries:
+          lines = entry.description.splitlines()
+          lines[1:] = [' ' * (len(entry.type) + 4) + x for x in lines[1:]]
+          print('  {}: {}'.format(entry.type, '\n'.join(lines)))
 
 
 _entry_point = lambda: sys.exit(cli())
