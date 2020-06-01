@@ -27,10 +27,9 @@ import yaml
 
 
 class ChangelogEntry(Struct):
-  type = Field(str)
-  component = Field(str)
-  flags = Field([str], default=list)
+  types = Field([str])
   issues = Field([(str, int)], default=list)
+  components = Field([str])
   description = Field(str)
 
 
@@ -55,7 +54,7 @@ class Changelog:
       os.makedirs(os.path.dirname(self.filename), exist_ok=True)
     data = self.mapper.serialize(self.entries, [ChangelogEntry])
     with open(self.filename, 'w') as fp:
-      yaml.safe_dump(data, fp)
+      yaml.safe_dump(data, fp, sort_keys=False)
 
   def add_entry(self, entry: ChangelogEntry) -> None:
     self.entries.append(entry)

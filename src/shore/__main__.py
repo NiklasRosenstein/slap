@@ -788,23 +788,24 @@ def publish(**args):
 
 @cli.command()
 @click.argument('version', type=parse_version, required=False)
-@click.option('-n', '--new', metavar='type',
-  help='Create a new entry. The argument for this option is the changelog type. '
-       '(usually one of {}).'.format(', '.join(ChangelogManager.TYPES)))
+@click.option('--reformat', is_flag=True, help='Reformat the changelog.')
+@click.option('-n', '--new', metavar='type,…',
+  help='Create a new entry. The argument for this option is the changelog type(s). '
+       '(usually a subset of {}).'.format(', '.join(ChangelogManager.TYPES)))
 @click.option('-m', '--message', metavar='text',
   help='The changelog entry description. Only with --new. If this is not provided, the EDITOR '
        'will be opened to allow editing the changelog entry.')
-@click.option('-c', '--component', metavar='name', help='The component for the changelog entry.')
-@click.option('-F', '--flags', metavar='flag,…',
-  help='Comma separated list of flags for the changelog entry.')
+@click.option('-c', '--components', metavar='name', help='The component for the changelog entry.')
+@click.option('-i', '--issues', metavar='issue,…', help='Issues related to this changelog.')
 @click.option('-e', '--edit', is_flag=True, help='Edit the staged changelog file in EDITOR.')
-@click.option('--commit', is_flag=True,
-  help='Always edit the new entry, or without other arguments, open the stage changelog '
-       'in EDITOR.')
 def changelog(**args):
   """
   Show or create changelog entries.
   """
+
+  if (args['version'] or args['reformat']) and args['new']:
+    logger.error('unsupported combination of arguments')
+    sys.exit(1)
 
   subject = _load_subject(allow_none=True)
   if subject:
@@ -812,61 +813,90 @@ def changelog(**args):
   else:
     manager = ChangelogManager(Package.changelog_directory.default, mapper)
 
+  def _split(s: Optional[str]) -> List[str]:
+    return list(filter(bool, map(str.strip, (s or '').split(','))))
+
   if args['new']:
-    if args['new'] not in manager.TYPES:
-      logger.warning('"%s" is not a well-known changelog entry type.', args['new'])
-    flags = list(filter(bool, map(str.strip, (args['flags'] or '').split(','))))
-    entry = ChangelogEntry(args['new'], args['component'] or '', flags, args['message'] or '')
+
+    # Warn about bad changelog types.
+    for entry_type in _split(args['new']):
+      if entry_type not in manager.TYPES:
+        logger.warning('"%s" is not a well-known changelog entry type.', entry_type)
+
+    entry = ChangelogEntry(
+      _split(args['new']),
+      _split(args['issues']),
+      _split(args['components']),
+      args['message'] or '')
+
+    # Allow the user to edit the entry if no description is provided or the
+    # -e,--edit option was set.
     if not entry.description or args['edit']:
       serialized = yaml.safe_dump(mapper.serialize(entry, ChangelogEntry), sort_keys=False)
       entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogEntry)
-      if not entry.description:
-        logger.error('no entry description provided.')
-        sys.exit(1)
-    if not entry.component:
-      logger.error('no component provided.')
+
+    print(entry)
+    # Validate the entry contents (need a description and at least one type and component).
+    if not entry.types or not entry.description or not entry.components:
+      logger.error('changelog entries need at least one type and component and a description')
+      sys.exit(1)
+
     created = not manager.unreleased.exists()
     manager.unreleased.add_entry(entry)
     manager.unreleased.save(create_directory=True)
     message = ('Created' if created else 'Updated') + ' "{}"'.format(manager.unreleased.filename)
     print(colored(message, 'cyan'))
-  elif args['edit']:
+    sys.exit(0)
+
+  if args['edit']:
     if not manager.unreleased.exists():
       logger.error('no staged changelog')
       sys.exit(1)
     sys.exit(_editor_open(manager.unreleased.filename))
-  else:
-    changelog = manager.version(args['version']) if args['version'] else manager.unreleased
-    if not changelog.exists():
-      print('No changelog for {}.'.format(colored(str(args['version'] or 'unreleased'), 'yellow')))
-      sys.exit(0)
 
-    def _fmt_issue(i):
-      if str(i).isdigit():
-        return '#' + str(i)
-      return i
-    def _fmt_issues(entry):
-      if not entry.issues:
-        return None
-      return '(' + ', '.join(colored(_fmt_issue(i), 'yellow', attrs=['underline']) for i in entry.issues) + ')'
-    def _fmt_flags(entry):
-      if not entry.flags:
-        return None
-      return '(' + ', '.join(colored(f, 'blue', attrs=['underline']) for f in entry.flags) + ')'
-    entries = sorted(changelog.entries, key=lambda x: x.component)
-    for component, entries in Stream.groupby(entries, lambda x: x.component, collect=list):
-      maxw = max(len(x.type) for x in entries)
-      print(colored(component or 'No Component', 'red', attrs=['bold', 'underline']))
-      for entry in entries:
-        lines = entry.description.splitlines()
-        suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_flags(entry))))
-        if len(lines) > 1 and suffix_fmt:
-          lines.append(suffix_fmt)
-        elif len(lines) == 1 and suffix_fmt:
-          lines[0] += ' ' + suffix_fmt
-        print('  {}'.format(colored((entry.type + ':').ljust(maxw+1), attrs=['bold'])), _md_term_stylize(lines[0]))
-        for line in lines[1:]:
-          print('  {}{}'.format(' ' * (maxw+2), _md_term_stylize(line)))
+  # Load the changelog for the specified version or the current staged entries.
+  changelog = manager.version(args['version']) if args['version'] else manager.unreleased
+  if not changelog.exists():
+    print('No changelog for {}.'.format(colored(str(args['version'] or 'unreleased'), 'yellow')))
+    sys.exit(0)
+
+  if args['reformat']:
+    changelog.save()
+    sys.exit(0)
+
+  def _fmt_issue(i):
+    if str(i).isdigit():
+      return '#' + str(i)
+    return i
+
+  def _fmt_issues(entry):
+    if not entry.issues:
+      return None
+    return '(' + ', '.join(colored(_fmt_issue(i), 'yellow', attrs=['underline']) for i in entry.issues) + ')'
+
+  def _fmt_types(entry):
+    return ', '.join(colored(f, attrs=['bold']) for f in entry.types)
+
+  # Explode entries by component.
+  entries = ((c, entry) for entry in changelog.entries for c in entry.components)
+  entries = sorted(entries, key=lambda x: x[0])
+
+  for component, items in Stream.groupby(entries, lambda x: x[0], collect=list):
+    entries = [x[1] for x in items]
+
+    maxw = max(len(', '.join(x.types)) for x in entries)
+    print(colored(component or 'No Component', 'red', attrs=['bold', 'underline']))
+    for entry in entries:
+      lines = entry.description.splitlines()
+      suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry),)))
+      if len(lines) > 1 and suffix_fmt:
+        lines.append(suffix_fmt)
+      elif len(lines) == 1 and suffix_fmt:
+        lines[0] += ' ' + suffix_fmt
+      delta = maxw - len(', '.join(entry.types))
+      print('  {}'.format(colored((_fmt_types(entry) + ':') + ' ' * delta, attrs=['bold'])), _md_term_stylize(lines[0]))
+      for line in lines[1:]:
+        print('  {}{}'.format(' ' * (maxw+2), _md_term_stylize(line)))
 
 
 _entry_point = lambda: sys.exit(cli())
