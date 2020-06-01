@@ -51,8 +51,10 @@ import os
 import pkg_resources
 import re
 import shlex
+import shutil
 import subprocess
 import sys
+import textwrap
 import yaml
 
 _cache = ObjectCache()
@@ -877,22 +879,25 @@ def changelog(**args):
   def _fmt_types(entry):
     return ', '.join(colored(f, attrs=['bold']) for f in entry.types)
 
-  # Explode entries by component.
-  entries = ((c, entry) for entry in changelog.entries for c in entry.components)
-  entries = sorted(entries, key=lambda x: x[0])
+  def _fmt_components(entry):
+    if len(entry.components) <= 1:
+      return None
+    return '(' + ', '.join(colored(f, 'red', attrs=['bold', 'underline']) for f in entry.components[1:]) + ')'
 
-  for component, items in Stream.groupby(entries, lambda x: x[0], collect=list):
-    entries = [x[1] for x in items]
+  if hasattr(shutil, 'get_terminal_size'):
+    width = shutil.get_terminal_size((80, 23))[0]
+  else:
+    width = 80
+
+  # Explode entries by component.
+  for component, entries in Stream.groupby(changelog.entries, lambda x: x.components[0], collect=list):
 
     maxw = max(len(', '.join(x.types)) for x in entries)
     print(colored(component or 'No Component', 'red', attrs=['bold', 'underline']))
     for entry in entries:
-      lines = entry.description.splitlines()
-      suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry),)))
-      if len(lines) > 1 and suffix_fmt:
-        lines.append(suffix_fmt)
-      elif len(lines) == 1 and suffix_fmt:
-        lines[0] += ' ' + suffix_fmt
+      lines = textwrap.wrap(entry.description, width - (maxw + 4))
+      suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_components(entry))))
+      lines[-1] += ' ' + suffix_fmt
       delta = maxw - len(', '.join(entry.types))
       print('  {}'.format(colored((_fmt_types(entry) + ':') + ' ' * delta, attrs=['bold'])), _md_term_stylize(lines[0]))
       for line in lines[1:]:
