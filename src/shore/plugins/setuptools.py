@@ -317,13 +317,7 @@ class SetuptoolsRenderer:
         cmdclass = {cmdclass},
         keywords = {keywords!r},
         classifiers = {classifiers!r},
-        options = {{
-          'bdist_wheel': {{
-            'universal': True,
-          }},
-        }},
-      )
-    ''').format(
+    ''').rstrip().format(
       package=package,
       packages_args=packages_args,
       author_name=package.get_author().name if package.get_author() else None,
@@ -343,6 +337,16 @@ class SetuptoolsRenderer:
       keywords = package.keywords,
       classifiers = package.classifiers,
     ))
+
+    if package.is_universal():
+      fp.write(textwrap.dedent('''
+          options = {
+            'bdist_wheel': {
+              'universal': True,
+            },
+          },
+        )
+      '''))
 
   def _render_entrypoints(self, entrypoints):
     if not entrypoints:
