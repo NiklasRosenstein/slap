@@ -41,6 +41,9 @@ class Changelog:
     self.mapper = mapper
     self.entries = []
 
+  def exists(self) -> bool:
+    return os.path.isfile(self.filename)
+
   def load(self) -> None:
     with open(self.filename) as fp:
       data = yaml.safe_load(fp)
@@ -67,7 +70,7 @@ class ChangelogManager:
     self._cache = {}
 
   def _get(self, name: str, version: Optional[str]) -> Changelog:
-    key = (name, version)
+    key = (name, str(version))
     if key in self._cache:
       return self._cache[key]
     changelog = Changelog(os.path.join(self.directory, name), version, self.mapper)
@@ -82,3 +85,13 @@ class ChangelogManager:
 
   def version(self, version: Version) -> Changelog:
     return self._get(str(version) + '.yml', version)
+
+  def release(self, version: Version) -> Changelog:
+    """
+    Renames the unreleased changelog to the file name for the specified *version*.
+    """
+
+    unreleased = self.unreleased
+    os.rename(unreleased.filename, self.version(version).filename)
+    self._cache.clear()
+    return self.version(version)
