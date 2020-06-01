@@ -1,6 +1,22 @@
-- component: cli
+- types:
+  - fix
+  issues: []
+  components:
+  - cli
   description: '`shore bump` now adds the changelog files to the commit when using
     the `--tag` option.'
-  flags: []
+- types:
+  - refactor
   issues: []
-  type: fix
+  components:
+  - changelog
+  - cli
+  description: Updated changelog format (removed "flags" field, replace "component"
+    with "components" (list) and "type" with "types" (list)), updated `shore changelog`
+    command to reflect that change
+- types:
+  - change
+  issues: []
+  components:
+  - changelog
+  description: changelog entries are now saved without key-sorting

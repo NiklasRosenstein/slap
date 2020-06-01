@@ -1,29 +1,38 @@
-- component: cli
+- types:
+  - feature
+  issues: []
+  components:
+  - cli
   description: 'Added a new `shore changelog` command that manages files in the .changelog
     directory.
 
     The `shore bump` command now renames the _unreleased.yml to the appropriate filename
     for the new version.'
-  flags: []
-  type: feature
-- component: plugins
+- types:
+  - feature
+  issues:
+  - 19
+  components:
+  - setuptools
   description: '`setuptools` plugin now exposes a new `wheel` build target'
-  issues: [19]
-  flags: []
-  type: feature
-- component: cli
+- types:
+  - feature
+  issues: []
+  components:
+  - cli
   description: '`shore new` now bootstraps a `test/` directory.'
-  flags: []
-  type: feature
-- component: cli
+- types:
+  - fix
+  issues:
+  - 21
+  components:
+  - cli
   description: '`shore new` command now correctly replaces hyphens when bootstrapping
     the Python package file layout'
-  issues: [21]
-  flags: []
-  type: fix
-- component: plugins
+- types:
+  - change
+  issues: []
+  components:
+  - setuptools
   description: Generated setup.py files no longer error when the README file does
     not exist.
-  flags:
-  - setuptools
-  type: change
