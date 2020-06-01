@@ -1,0 +1,6 @@
+- component: cli
+  description: '`shore bump` now adds the changelog files to the commit when using
+    the `--tag` option.'
+  flags: []
+  issues: []
+  type: fix

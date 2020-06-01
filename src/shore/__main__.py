@@ -561,12 +561,16 @@ def bump(**args):
       logger.warning('bump requires an update in order to automatically tag')
       args['update'] = True
 
+  changed_files = [x.filename for x in version_refs]
+
   # Rename the unreleased changelog if it exists.
   if changelog_manager.unreleased.exists():
+    changed_files.append(changed_files.unreleased.filename)
     if args['dry']:
       changelog = changelog_manager.version(new_version)
     else:
       changelog = changelog_manager.release(new_version)
+    changed_files.append(changelog.filename)
     logger.info('release staged changelog (%s → %s)', changelog_manager.unreleased.filename,
       changelog.filename)
 
@@ -587,7 +591,6 @@ def bump(**args):
     logger.info('tagging %s', tag_name)
 
     if not args['dry']:
-      changed_files = [x.filename for x in version_refs]
       _git.add(changed_files)
       _git.commit('({}) bump version to {}'.format(subject.name, new_version), allow_empty=True)
       _git.tag(tag_name, force=args['force'])
