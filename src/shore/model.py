@@ -836,3 +836,18 @@ class Package(BaseObject):
         author = '<Non-literal expression>'
 
     return self.EntryMetadata(author, version)
+
+  def is_universal(self) -> bool:
+    """
+    Checks if the package is a universal Python package (i.e. it is Python 2 and 3 compatible)
+    by testing the `$.requirements.python` version selector. If none is specified, the package
+    is also considered universal.
+    """
+
+    if not self.requirements.python:
+      return True
+    # TODO (@NiklasRosenstein): This method of detecting if the version selector
+    #   selects a Python 2 and 3 version is very suboptimal.
+    has_2 = re.search(r'\b2\b|\b2\.\b', str(self.requirements.python))
+    has_3 = re.search(r'\b3\b|\b3\.\b', str(self.requirements.python))
+    return bool(has_2 and has_3)
