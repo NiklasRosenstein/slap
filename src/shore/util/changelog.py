@@ -30,6 +30,7 @@ class ChangelogEntry(Struct):
   type = Field(str)
   component = Field(str)
   flags = Field([str], default=list)
+  issues = Field([(str, int)], default=list)
   description = Field(str)
 
 
