@@ -1,0 +1,8 @@
+- component: cli
+  description: 'Added a new `shore changelog` command that manages files in the .changelog
+    directory.
+
+    The `shore bump` command now renames the _unreleased.yml to the appropriate filename
+    for the new version.'
+  flags: []
+  type: feature
