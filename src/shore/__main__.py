@@ -79,16 +79,20 @@ def _commit_distance_version(subject: [Monorepo, Package]) -> Version:
     subject.get_tag(subject.version)) or subject.version
 
 
+def _editor_open(filename: str):
+  editor = shlex.split(os.getenv('EDITOR', 'vim'))
+  return subprocess.call(editor + [filename])
+
+
 def _edit_text(text: str) -> str:
   """
   Opens an editor for the user to modify *text*.
   """
 
-  editor = shlex.split(os.getenv('EDITOR', 'vim'))
   with nr.fs.tempfile('.yml', dir=os.getcwd(), text=True) as fp:
     fp.write(text)
     fp.close()
-    res = subprocess.call(editor + [fp.name])
+    res = _editor_open(fp.name)
     if res != 0:
       sys.exit(res)
     with open(fp.name) as src:
@@ -778,7 +782,10 @@ def publish(**args):
 @click.option('-c', '--component', metavar='name', help='The component for the changelog entry.')
 @click.option('-F', '--flags', metavar='flag,…',
   help='Comma separated list of flags for the changelog entry.')
-@click.option('--commit', is_flag=True, help='Commit the changelog entry after creation.')
+@click.option('-e', '--edit', is_flag=True, help='Edit the staged changelog file in EDITOR.')
+@click.option('--commit', is_flag=True,
+  help='Always edit the new entry, or without other arguments, open the stage changelog '
+       'in EDITOR.')
 def changelog(**args):
   """
   Show or create changelog entries.
@@ -795,7 +802,7 @@ def changelog(**args):
       logger.warning('"%s" is not a well-known changelog entry type.', args['new'])
     flags = list(filter(bool, map(str.strip, (args['flags'] or '').split(','))))
     entry = ChangelogEntry(args['new'], args['component'] or '', flags, args['message'] or '')
-    if not entry.description:
+    if not entry.description or args['edit']:
       serialized = yaml.safe_dump(mapper.serialize(entry, ChangelogEntry), sort_keys=False)
       entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogEntry)
       if not entry.description:
@@ -808,6 +815,11 @@ def changelog(**args):
     manager.unreleased.save(create_directory=True)
     message = ('Created' if created else 'Updated') + ' "{}"'.format(manager.unreleased.filename)
     print(colored(message, 'cyan'))
+  elif args['edit']:
+    if not manager.unreleased.exists():
+      logger.error('no staged changelog')
+      sys.exit(1)
+    sys.exit(_editor_open(manager.unreleased.filename))
   else:
     if not manager.unreleased.entries:
       print('No entries in the unreleased changelog.')
