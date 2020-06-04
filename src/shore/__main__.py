@@ -598,7 +598,7 @@ def bump(**args):
       _git.tag(tag_name, force=args['force'])
 
     if not args['dry'] and args['push']:
-      _git.push(_git.current_branch(), tag_name)
+      _git.push(_git.current_branch(), tag_name, force=args['force'])
 
   if args['publish']:
     _cache.clear()

@@ -51,8 +51,10 @@ def current_branch(path: str = None) -> str:
   raise RuntimeError('no curent branch ?')
 
 
-def push(*refs, remote='origin', path: str = None):
+def push(*refs, remote='origin', force: bool = False, path: str = None):
   command = ['git', 'push', remote] + list(refs)
+  if force:
+    command.insert(2, '-f')
   subprocess.check_call(command, cwd=path)
 
 
