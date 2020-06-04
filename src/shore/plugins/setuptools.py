@@ -347,6 +347,8 @@ class SetuptoolsRenderer:
           },
         )
       '''))
+    else:
+      fp.write('\n)\n')
 
   def _render_entrypoints(self, entrypoints):
     if not entrypoints:
