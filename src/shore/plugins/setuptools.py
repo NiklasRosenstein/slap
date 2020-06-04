@@ -93,7 +93,8 @@ class SetuptoolsBuildTarget:
   @override
   def get_build_artifacts(self) -> Iterable[str]:
     if self.build_type == 'bdist_wheel':
-      yield '{}-{}-py2.py3-none-any.whl'.format(self.package.name, self.package.version)
+      py = 'py2.py3' if self.package.is_universal() else ('py' + sys.version[0])
+      yield '{}-{}-{}-none-any.whl'.format(self.package.name.replace('-', '_'), self.package.version, py)
     else:
       for f in self.formats:
         yield '{}-{}{}'.format(self.package.name, self.package.version, self._FORMATS_MAP[f])
