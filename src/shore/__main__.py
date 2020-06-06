@@ -82,16 +82,6 @@ def _commit_distance_version(subject: [Monorepo, Package]) -> Version:
     subject.get_tag(subject.version)) or subject.version
 
 
-def _md_term_stylize(text: str) -> str:
-  def _code(m):
-    return colored(m.group(1), 'cyan')
-  def _issue_ref(m):
-    return colored(m.group(0), 'yellow', attrs=['bold'])
-  text = re.sub(r'`([^`]+)`', _code, text)
-  text = re.sub(r'#\d+', _issue_ref, text)
-  return text
-
-
 def _editor_open(filename: str):
   editor = shlex.split(os.getenv('EDITOR', 'vim'))
   return subprocess.call(editor + [filename])
@@ -790,22 +780,19 @@ def publish(**args):
 
 @cli.command()
 @click.argument('version', type=parse_version, required=False)
-@click.option('--reformat', is_flag=True, help='Reformat the changelog.')
-@click.option('-n', '--new', metavar='type,…',
-  help='Create a new entry. The argument for this option is the changelog type(s). '
-       '(usually a subset of {}).'.format(', '.join(ChangelogManager.TYPES)))
-@click.option('-m', '--message', metavar='text',
-  help='The changelog entry description. Only with --new. If this is not provided, the EDITOR '
-       'will be opened to allow editing the changelog entry.')
-@click.option('-c', '--components', metavar='name', help='The component for the changelog entry.')
-@click.option('-i', '--issues', metavar='issue,…', help='Issues related to this changelog.')
-@click.option('-e', '--edit', is_flag=True, help='Edit the staged changelog file in EDITOR.')
+@click.option('--reformat', is_flag=True, help='reformat the changelog')
+@click.option('--add', metavar='type,…', help='create a new changelog entry')
+@click.option('--for', metavar='component,…', help='components for the new changelog entry')
+@click.option('--fixes', metavar='issue,…', help='issues that this changelog entry fixes')
+@click.option('-m', '--message', metavar='text', help='changelog entry description')
+@click.option('-e', '--edit', is_flag=True, help='edit the changelog entry or file')
+@click.option('--markdown', is_flag=True, help='render the changelog as markdown')
 def changelog(**args):
   """
-  Show or create changelog entries.
+  Show changelogs or create new entries.
   """
 
-  if (args['version'] or args['reformat']) and args['new']:
+  if (args['version'] or args['reformat']) and args['add']:
     logger.error('unsupported combination of arguments')
     sys.exit(1)
 
@@ -818,17 +805,17 @@ def changelog(**args):
   def _split(s: Optional[str]) -> List[str]:
     return list(filter(bool, map(str.strip, (s or '').split(','))))
 
-  if args['new']:
+  if args['add']:
 
     # Warn about bad changelog types.
-    for entry_type in _split(args['new']):
+    for entry_type in _split(args['add']):
       if entry_type not in manager.TYPES:
         logger.warning('"%s" is not a well-known changelog entry type.', entry_type)
 
     entry = ChangelogEntry(
-      _split(args['new']),
-      _split(args['issues']),
-      _split(args['components']),
+      _split(args['add']),
+      _split(args['fixes']),
+      _split(args['for']),
       args['message'] or '')
 
     # Allow the user to edit the entry if no description is provided or the
@@ -866,42 +853,11 @@ def changelog(**args):
     changelog.save()
     sys.exit(0)
 
-  def _fmt_issue(i):
-    if str(i).isdigit():
-      return '#' + str(i)
-    return i
-
-  def _fmt_issues(entry):
-    if not entry.issues:
-      return None
-    return '(' + ', '.join(colored(_fmt_issue(i), 'yellow', attrs=['underline']) for i in entry.issues) + ')'
-
-  def _fmt_types(entry):
-    return ', '.join(colored(f, attrs=['bold']) for f in entry.types)
-
-  def _fmt_components(entry):
-    if len(entry.components) <= 1:
-      return None
-    return '(' + ', '.join(colored(f, 'red', attrs=['bold', 'underline']) for f in entry.components[1:]) + ')'
-
-  if hasattr(shutil, 'get_terminal_size'):
-    width = shutil.get_terminal_size((80, 23))[0]
+  if args['markdown']:
+    changelog_format = 'markdown'
   else:
-    width = 80
-
-  # Explode entries by component.
-  for component, entries in Stream.groupby(changelog.entries, lambda x: x.components[0], collect=list):
-
-    maxw = max(len(', '.join(x.types)) for x in entries)
-    print(colored(component or 'No Component', 'red', attrs=['bold', 'underline']))
-    for entry in entries:
-      lines = textwrap.wrap(entry.description, width - (maxw + 4))
-      suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_components(entry))))
-      lines[-1] += ' ' + suffix_fmt
-      delta = maxw - len(', '.join(entry.types))
-      print('  {}'.format(colored((_fmt_types(entry) + ':') + ' ' * delta, attrs=['bold'])), _md_term_stylize(lines[0]))
-      for line in lines[1:]:
-        print('  {}{}'.format(' ' * (maxw+2), _md_term_stylize(line)))
+    changelog_format = 'terminal'
+  changelog.render_as(sys.stdout, changelog_format)
 
 
 _entry_point = lambda: sys.exit(cli())

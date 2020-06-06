@@ -1,0 +1,8 @@
+- types:
+  - change
+  issues: []
+  components:
+  - cli
+  - changelog
+  description: Updates the `shore changelog` CLI and adds a --markdown option for
+    formatting
