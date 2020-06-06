@@ -824,7 +824,6 @@ def changelog(**args):
       serialized = yaml.safe_dump(mapper.serialize(entry, ChangelogEntry), sort_keys=False)
       entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogEntry)
 
-    print(entry)
     # Validate the entry contents (need a description and at least one type and component).
     if not entry.types or not entry.description or not entry.components:
       logger.error('changelog entries need at least one type and component and a description')
