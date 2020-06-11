@@ -847,7 +847,7 @@ def changelog(**args):
     sys.exit(_editor_open(manager.unreleased.filename))
 
   changelogs = []
-  if args['version']:
+  if args['version'] or not args['all']:
     if args['all']:
       sys.exit('error: incompatible arguments: <version> and -a,--all')
     changelog = manager.version(args['version']) if args['version'] else manager.unreleased
