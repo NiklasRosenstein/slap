@@ -23,7 +23,7 @@ from nr.databind.core import Field, ObjectMapper, Struct
 from nr.stream import Stream
 from shore.util.version import Version
 from termcolor import colored
-from typing import Optional, TextIO
+from typing import Iterable, List, Optional, TextIO
 import os
 import re
 import shutil
@@ -66,13 +66,10 @@ class Changelog:
   def add_entry(self, entry: ChangelogEntry) -> None:
     self.entries.append(entry)
 
-  def render_as(self, fp: TextIO, format: str) -> None:
-    self.RENDERERS[format](fp, self)
-
 
 class ChangelogManager:
 
-  TYPES = frozenset(['fix', 'improvement', 'docs', 'change', 'refactor', 'feature'])
+  TYPES = frozenset(['fix', 'improvement', 'docs', 'change', 'refactor', 'feature', 'enhancement'])
 
   def __init__(self, directory: str, mapper: ObjectMapper) -> None:
     self.directory = directory
@@ -106,13 +103,27 @@ class ChangelogManager:
     self._cache.clear()
     return self.version(version)
 
+  def all(self) -> Iterable[Changelog]:
+    """
+    Yields all changelogs.
+    """
+
+    for name in os.listdir(self.directory):
+      if not name.endswith('.yml'):
+        continue
+      if name == '_unreleased.yml':
+        yield self.unreleased
+      else:
+        version = Version(name[:-4])
+        yield self.version(version)
+
 
 def _group_entries_by_component(entries):
   key = lambda x: x.components[0]
   return list(Stream.sortby(entries, key).groupby(key, collect=list))
 
 
-def render_changelog_for_terminal(fp: TextIO, changelog: Changelog) -> None:
+def render_changelogs_for_terminal(fp: TextIO, changelogs: List[Changelog]) -> None:
   """
   Renders a #Changelog for the terminal to *fp*.
   """
@@ -150,20 +161,23 @@ def render_changelog_for_terminal(fp: TextIO, changelog: Changelog) -> None:
     width = 80
 
   # Explode entries by component.
-  for component, entries in _group_entries_by_component(changelog.entries):
-    maxw = max(len(', '.join(x.types)) for x in entries)
-    fp.write(colored(component or 'No Component', 'red', attrs=['bold', 'underline']) + '\n')
-    for entry in entries:
-      lines = textwrap.wrap(entry.description, width - (maxw + 4))
-      suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_components(entry))))
-      lines[-1] += ' ' + suffix_fmt
-      delta = maxw - len(', '.join(entry.types))
-      fp.write('  {} {}\n'.format(colored((_fmt_types(entry) + ':') + ' ' * delta, attrs=['bold']), _md_term_stylize(lines[0])))
-      for line in lines[1:]:
-        fp.write('  {}{}\n'.format(' ' * (maxw+2), _md_term_stylize(line)))
+  for changelog in changelogs:
+    fp.write(colored(changelog.version or 'Unreleased', 'blue', attrs=['bold', 'underline']) + '\n')
+    for component, entries in _group_entries_by_component(changelog.entries):
+      maxw = max(len(', '.join(x.types)) for x in entries)
+      fp.write('  ' + colored(component or 'No Component', 'red', attrs=['bold', 'underline']) + '\n')
+      for entry in entries:
+        lines = textwrap.wrap(entry.description, width - (maxw + 6))
+        suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_components(entry))))
+        lines[-1] += ' ' + suffix_fmt
+        delta = maxw - len(', '.join(entry.types))
+        fp.write('    {} {}\n'.format(colored((_fmt_types(entry) + ':') + ' ' * delta, attrs=['bold']), _md_term_stylize(lines[0])))
+        for line in lines[1:]:
+          fp.write('    {}{}\n'.format(' ' * (maxw+2), _md_term_stylize(line)))
+    fp.write('\n')
 
 
-def render_changelog_as_markdown(fp: TextIO, changelog: Changelog) -> None:
+def render_changelogs_as_markdown(fp: TextIO, changelogs: List[Changelog]) -> None:
 
   def _fmt_issue(i):
     if str(i).isdigit():
@@ -175,20 +189,33 @@ def render_changelog_as_markdown(fp: TextIO, changelog: Changelog) -> None:
       return None
     return '(' + ', '.join(_fmt_issue(i) for i in entry.issues) + ')'
 
-  fp.write('## {}\n\n'.format(changelog.version or 'unreleased'))
-  for component, entries in _group_entries_by_component(changelog.entries):
-    fp.write('* __{}__\n'.format(component))
-    for entry in entries:
-      description ='**' + ', '.join(entry.types) + '**: ' + entry.description
-      if entry.issues:
-        description += ' ' + _fmt_issues(entry)
-      lines = textwrap.wrap(description, 80)
-      fp.write('  * {}\n'.format(lines[0]))
-      for line in lines[1:]:
-        fp.write('    {}\n'.format(line))
+  for changelog in changelogs:
+    fp.write('## {}\n\n'.format(changelog.version or 'Unreleased'))
+    for component, entries in _group_entries_by_component(changelog.entries):
+      fp.write('* __{}__\n'.format(component))
+      for entry in entries:
+        description ='**' + ', '.join(entry.types) + '**: ' + entry.description
+        if entry.issues:
+          description += ' ' + _fmt_issues(entry)
+        lines = textwrap.wrap(description, 80)
+        fp.write('    * {}\n'.format(lines[0]))
+        for line in lines[1:]:
+          fp.write('      {}\n'.format(line))
+    fp.write('\n')
+
+
+def render_changelogs(fp: TextIO, format: str, changelogs: List[Changelog]) -> None:
+  changelogs = list(changelogs)
+  unreleased = next((x for x in changelogs if not x.version), None)
+  if unreleased:
+    changelogs.remove(unreleased)
+  changelogs.sort(key=lambda x: x.version, reverse=True)
+  if unreleased:
+    changelogs.insert(0, unreleased)
+  Changelog.RENDERERS[format](fp, changelogs)
 
 
 Changelog.RENDERERS.update({
-  'terminal': render_changelog_for_terminal,
-  'markdown': render_changelog_as_markdown,
+  'terminal': render_changelogs_for_terminal,
+  'markdown': render_changelogs_as_markdown,
 })
