@@ -6,3 +6,10 @@
   - changelog
   description: Updates the `shore changelog` CLI and adds a --markdown option for
     formatting
+- types:
+  - fix
+  issues: []
+  components:
+  - general
+  description: add "wheel" dependency to ensure that "setup.py bdist_wheel" can be
+    used when building a package
