@@ -34,7 +34,7 @@ from shore.mapper import mapper
 from shore.model import Monorepo, ObjectCache, Package, VersionSelector
 from shore.plugins.core import get_monorepo_interdependency_version_refs
 from shore.util import git as _git
-from shore.util.changelog import ChangelogEntry, ChangelogManager
+from shore.util.changelog import ChangelogEntry, ChangelogManager, render_changelogs
 from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
@@ -787,6 +787,7 @@ def publish(**args):
 @click.option('-m', '--message', metavar='text', help='changelog entry description')
 @click.option('-e', '--edit', is_flag=True, help='edit the changelog entry or file')
 @click.option('--markdown', is_flag=True, help='render the changelog as markdown')
+@click.option('-a', '--all', is_flag=True, help='show the changelog for all versions.')
 def changelog(**args):
   """
   Show changelogs or create new entries.
@@ -806,6 +807,9 @@ def changelog(**args):
     return list(filter(bool, map(str.strip, (s or '').split(','))))
 
   if args['add']:
+
+    if not args['for']:
+      args['for'] = 'general'
 
     # Warn about bad changelog types.
     for entry_type in _split(args['add']):
@@ -842,21 +846,30 @@ def changelog(**args):
       sys.exit(1)
     sys.exit(_editor_open(manager.unreleased.filename))
 
-  # Load the changelog for the specified version or the current staged entries.
-  changelog = manager.version(args['version']) if args['version'] else manager.unreleased
-  if not changelog.exists():
-    print('No changelog for {}.'.format(colored(str(args['version'] or 'unreleased'), 'yellow')))
-    sys.exit(0)
+  changelogs = []
+  if args['version']:
+    if args['all']:
+      sys.exit('error: incompatible arguments: <version> and -a,--all')
+    changelog = manager.version(args['version']) if args['version'] else manager.unreleased
+    # Load the changelog for the specified version or the current staged entries.
+    if not changelog.exists():
+      print('No changelog for {}.'.format(colored(str(args['version'] or 'unreleased'), 'yellow')))
+      sys.exit(0)
+    changelogs.append(changelog)
+  else:
+    changelogs = list(manager.all())
 
   if args['reformat']:
-    changelog.save()
+    for changelog in changelogs:
+      changelog.save()
     sys.exit(0)
 
   if args['markdown']:
     changelog_format = 'markdown'
   else:
     changelog_format = 'terminal'
-  changelog.render_as(sys.stdout, changelog_format)
+
+  render_changelogs(sys.stdout, changelog_format, changelogs)
 
 
 _entry_point = lambda: sys.exit(cli())

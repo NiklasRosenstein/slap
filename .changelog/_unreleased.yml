@@ -1,0 +1,12 @@
+- types:
+  - enhancement
+  issues: []
+  components:
+  - changelog
+  description: '"shore changelog" can now render multiple changelogs'
+- types:
+  - enhancement
+  issues: []
+  components:
+  - changelog
+  description: add "enhancement" as a known changelog type
