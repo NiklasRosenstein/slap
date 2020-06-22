@@ -1,6 +1,5 @@
-- types:
-  - change
-  issues: []
-  components:
-  - cli
-  description: "`shore bump --force --push` now also passes the force option to `git push`."
+- type: change
+  component: cli
+  description: '`shore bump --force --push` now also passes the force option to `git
+    push`.'
+  fixes: []
