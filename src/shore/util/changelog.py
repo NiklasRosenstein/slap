@@ -19,11 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, ObjectMapper, Struct
+from nr.databind.core import Field, FieldName, ObjectMapper, Struct
 from nr.stream import Stream
 from shore.util.version import Version
 from termcolor import colored
 from typing import Iterable, List, Optional, TextIO
+import enum
 import os
 import re
 import shutil
@@ -31,11 +32,42 @@ import textwrap
 import yaml
 
 
-class ChangelogEntry(Struct):
+class ChangelogEntryV1(Struct):
   types = Field([str])
   issues = Field([(str, int)], default=list)
   components = Field([str])
   description = Field(str)
+
+  def as_v2(self) -> 'ChangelogEntryV2':
+    try:
+      type_ = ChangelogTypeV2[self.types[0].strip().lower()]
+    except KeyError:
+      type_ = ChangelogTypeV2.change
+    return ChangelogEntryV2(
+      type_,
+      self.components[0],
+      self.description,
+      list(map(str, self.issues)))
+
+
+class ChangelogTypeV2(enum.Enum):
+  fix = 0
+  improvement = 1
+  change = 3
+  refactor = 4
+  feature = 5
+  docs = 6
+  tests = 7
+
+
+class ChangelogEntryV2(Struct):
+  type_ = Field(ChangelogTypeV2, FieldName('type'))
+  component = Field(str)
+  description = Field(str)
+  fixes = Field([str])
+
+  def as_v2(self) -> 'ChangelogEntryV2':
+    return self
 
 
 class Changelog:
@@ -54,16 +86,18 @@ class Changelog:
   def load(self) -> None:
     with open(self.filename) as fp:
       data = yaml.safe_load(fp)
-    self.entries = self.mapper.deserialize(data, [ChangelogEntry], filename=self.filename)
+    datatype = [(ChangelogEntryV2, ChangelogEntryV1)]
+    self.entries = self.mapper.deserialize(data, datatype, filename=self.filename)
+    self.entries = [x.as_v2() for x in self.entries]
 
   def save(self, create_directory: bool = False) -> None:
     if create_directory:
       os.makedirs(os.path.dirname(self.filename), exist_ok=True)
-    data = self.mapper.serialize(self.entries, [ChangelogEntry])
+    data = self.mapper.serialize(self.entries, [ChangelogEntryV2])
     with open(self.filename, 'w') as fp:
       yaml.safe_dump(data, fp, sort_keys=False)
 
-  def add_entry(self, entry: ChangelogEntry) -> None:
+  def add_entry(self, entry: ChangelogEntryV2) -> None:
     self.entries.append(entry)
 
 
@@ -119,7 +153,7 @@ class ChangelogManager:
 
 
 def _group_entries_by_component(entries):
-  key = lambda x: x.components[0]
+  key = lambda x: x.component
   return list(Stream.sortby(entries, key).groupby(key, collect=list))
 
 
@@ -143,17 +177,12 @@ def render_changelogs_for_terminal(fp: TextIO, changelogs: List[Changelog]) -> N
     return i
 
   def _fmt_issues(entry):
-    if not entry.issues:
+    if not entry.fixes:
       return None
-    return '(' + ', '.join(colored(_fmt_issue(i), 'yellow', attrs=['underline']) for i in entry.issues) + ')'
+    return '(' + ', '.join(colored(_fmt_issue(i), 'yellow', attrs=['underline']) for i in entry.fixes) + ')'
 
   def _fmt_types(entry):
-    return ', '.join(colored(f, attrs=['bold']) for f in entry.types)
-
-  def _fmt_components(entry):
-    if len(entry.components) <= 1:
-      return None
-    return '(' + ', '.join(colored(f, 'red', attrs=['bold', 'underline']) for f in entry.components[1:]) + ')'
+    return colored(entry.type_.name, attrs=['bold'])
 
   if hasattr(shutil, 'get_terminal_size'):
     width = shutil.get_terminal_size((80, 23))[0]
@@ -164,13 +193,13 @@ def render_changelogs_for_terminal(fp: TextIO, changelogs: List[Changelog]) -> N
   for changelog in changelogs:
     fp.write(colored(changelog.version or 'Unreleased', 'blue', attrs=['bold', 'underline']) + '\n')
     for component, entries in _group_entries_by_component(changelog.entries):
-      maxw = max(len(', '.join(x.types)) for x in entries)
+      maxw = max(map(lambda x: len(x.type_.name), entries))
       fp.write('  ' + colored(component or 'No Component', 'red', attrs=['bold', 'underline']) + '\n')
       for entry in entries:
         lines = textwrap.wrap(entry.description, width - (maxw + 6))
-        suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry), _fmt_components(entry))))
+        suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry),)))
         lines[-1] += ' ' + suffix_fmt
-        delta = maxw - len(', '.join(entry.types))
+        delta = maxw - len(entry.type_.name)
         fp.write('    {} {}\n'.format(colored((_fmt_types(entry) + ':') + ' ' * delta, attrs=['bold']), _md_term_stylize(lines[0])))
         for line in lines[1:]:
           fp.write('    {}{}\n'.format(' ' * (maxw+2), _md_term_stylize(line)))
@@ -185,17 +214,17 @@ def render_changelogs_as_markdown(fp: TextIO, changelogs: List[Changelog]) -> No
     return i
 
   def _fmt_issues(entry):
-    if not entry.issues:
+    if not entry.fixes:
       return None
-    return '(' + ', '.join(_fmt_issue(i) for i in entry.issues) + ')'
+    return '(' + ', '.join(_fmt_issue(i) for i in entry.fixes) + ')'
 
   for changelog in changelogs:
     fp.write('## {}\n\n'.format(changelog.version or 'Unreleased'))
     for component, entries in _group_entries_by_component(changelog.entries):
       fp.write('* __{}__\n'.format(component))
       for entry in entries:
-        description ='**' + ', '.join(entry.types) + '**: ' + entry.description
-        if entry.issues:
+        description ='**' + entry.type_.name + '**: ' + entry.description
+        if entry.fixes:
           description += ' ' + _fmt_issues(entry)
         lines = textwrap.wrap(description, 80)
         fp.write('    * {}\n'.format(lines[0]))
