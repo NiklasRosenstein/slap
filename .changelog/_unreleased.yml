@@ -1,0 +1,6 @@
+- types:
+  - improvement
+  issues: []
+  components:
+  - general
+  description: Replace `shore.utils.git` with `nr.utils.git` module
