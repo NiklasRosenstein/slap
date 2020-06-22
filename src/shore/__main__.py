@@ -789,6 +789,8 @@ def publish(**args):
 @click.option('-e', '--edit', is_flag=True, help='edit the changelog entry or file')
 @click.option('--markdown', is_flag=True, help='render the changelog as markdown')
 @click.option('-a', '--all', is_flag=True, help='show the changelog for all versions')
+@click.option('-s', '--stage', is_flag=True, help='stage the created/updated changelog file with git')
+@click.option('-c', '--commit', is_flag=True, help='commit the created/updated changelog file with git, together with other currently staged files')
 def changelog(**args):
   """
   Show changelogs or create new entries.
@@ -840,6 +842,17 @@ def changelog(**args):
     manager.unreleased.save(create_directory=True)
     message = ('Created' if created else 'Updated') + ' "{}"'.format(manager.unreleased.filename)
     print(colored(message, 'cyan'))
+
+    if args['stage'] or args['commit']:
+      _git.add([manager.unreleased.filename])
+    if args['commit']:
+      commit_message = entry.description
+      if isinstance(subject, Package) and subject.monorepo:
+        commit_message = '{}({}): '.format(entry.type_.name, package.name) + commit_message
+      else:
+        commit_message = '{}: '.format(entry.type_.name) + commit_message
+      _git.commit(commit_message)
+
     sys.exit(0)
 
   if args['edit']:

@@ -11,3 +11,7 @@
   description: update changelog entry format (`ChangelogEntryV2`), V1 will be automatically
     converted to V2 on load
   fixes: []
+- type: feature
+  component: cli
+  description: add `-s,--stage` and `-c,--commit` options to `shore changelog` command
+  fixes: []
