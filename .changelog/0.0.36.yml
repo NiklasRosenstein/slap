@@ -1,6 +1,5 @@
-- types:
-  - fix
-  issues: []
-  components:
-  - setuptools
-  description: Fix how the `setuptools:wheel` build target determines the generated wheel filename.
+- type: fix
+  component: setuptools
+  description: Fix how the `setuptools:wheel` build target determines the generated
+    wheel filename.
+  fixes: []

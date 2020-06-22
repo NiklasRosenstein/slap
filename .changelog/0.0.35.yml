@@ -1,7 +1,5 @@
-- types:
-  - fix
-  issues: []
-  components:
-  - setuptools
+- type: fix
+  component: setuptools
   description: '`setup.py` now sets the `bdist_wheel:universal:1` flag only if the
     package looks like it is a universal package (based on `Package.is_universal()`).'
+  fixes: []
