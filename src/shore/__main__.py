@@ -783,7 +783,7 @@ def publish(**args):
 @click.argument('version', type=parse_version, required=False)
 @click.option('--reformat', is_flag=True, help='reformat the changelog')
 @click.option('--add', metavar='type,…', help='create a new changelog entry')
-@click.option('--for', metavar='component,…', help='components for the new changelog entry')
+@click.option('--for', metavar='component,…', help='components for the new changelog entry (default: general)', default='general')
 @click.option('--fixes', metavar='issue,…', help='issues that this changelog entry fixes')
 @click.option('-m', '--message', metavar='text', help='changelog entry description')
 @click.option('-e', '--edit', is_flag=True, help='edit the changelog entry or file')
