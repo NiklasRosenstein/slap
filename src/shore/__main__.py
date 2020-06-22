@@ -22,6 +22,7 @@
 from fnmatch import fnmatch
 from nr.proxy import proxy_decorator
 from nr.stream import Stream
+from nr.utils.git import Git
 from shore import __version__
 from shore.core.plugins import (
   CheckResult,
@@ -33,7 +34,6 @@ from shore.core.plugins import (
 from shore.mapper import mapper
 from shore.model import Monorepo, ObjectCache, Package, VersionSelector
 from shore.plugins.core import get_monorepo_interdependency_version_refs
-from shore.util import git as _git
 from shore.util.changelog import ChangelogEntry, ChangelogManager, render_changelogs
 from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
@@ -57,6 +57,7 @@ import sys
 import textwrap
 import yaml
 
+_git = Git()
 _cache = ObjectCache()
 logger = logging.getLogger(__name__)
 
@@ -588,7 +589,7 @@ def bump(**args):
       _git.tag(tag_name, force=args['force'])
 
     if not args['dry'] and args['push']:
-      _git.push(_git.current_branch(), tag_name, force=args['force'])
+      _git.push('origin', _git.get_current_branch_name(), tag_name, force=args['force'])
 
   if args['publish']:
     _cache.clear()

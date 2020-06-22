@@ -20,6 +20,7 @@ requirements:
   - nr.fs ^1.5.0
   - nr.pylang.utils ^0.0.1
   - nr.proxy ^0.0.1
+  - nr.utils.git ~0.1.3
   - requests ^2.22.0
   - packaging ^20.1
   - PyYAML ^5.1.0

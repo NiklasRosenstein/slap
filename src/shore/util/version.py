@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 from packaging.version import Version as _Version
-from shore.util import git as _git
+from nr.utils.git import Git
 from typing import Optional, Union
 import re
 
@@ -134,20 +134,21 @@ def get_commit_distance_version(repo_dir: str, version: Version, latest_tag: str
     Todo: We could try to find the previous tag for this subject and use that.
   """
 
-  dirty = _git.has_diff(repo_dir)
+  git = Git(repo_dir)
+  dirty = git.has_diff()
 
-  if _git.rev_parse(latest_tag):
-    distance = len(_git.rev_list(latest_tag + '..HEAD', repo_dir))
+  if git.rev_parse(latest_tag):
+    distance = len(git.rev_list(latest_tag + '..HEAD'))
   else:
     logger.warning('tag "%s" does not exist', latest_tag)
     version = Version('0.0.0')
-    distance = len(_git.rev_list('HEAD', repo_dir))
+    distance = len(git.rev_list('HEAD'))
 
   if distance == 0:
     if dirty:
       return parse_version(str(version) + '+dirty')
     return None
 
-  rev = _git.rev_parse('HEAD', repo_dir)
+  rev = git.rev_parse('HEAD')
   local = '+{}.g{}{}'.format(distance, rev[:7], '.dirty' if dirty else '')
   return parse_version(str(version) + local)
