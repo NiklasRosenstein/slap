@@ -4,3 +4,9 @@
   components:
   - general
   description: Replace `shore.utils.git` with `nr.utils.git` module
+- types:
+  - change
+  issues: []
+  components:
+  - cli
+  description: default value for `shore changelog --for` option is now `general`
