@@ -1,12 +1,13 @@
-- types:
-  - improvement
-  issues: []
-  components:
-  - general
+- type: improvement
+  component: general
   description: Replace `shore.utils.git` with `nr.utils.git` module
-- types:
-  - change
-  issues: []
-  components:
-  - cli
+  fixes: []
+- type: change
+  component: cli
   description: default value for `shore changelog --for` option is now `general`
+  fixes: []
+- type: change
+  component: changelog
+  description: update changelog entry format (`ChangelogEntryV2`), V1 will be automatically
+    converted to V2 on load
+  fixes: []

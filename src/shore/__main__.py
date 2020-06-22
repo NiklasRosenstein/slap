@@ -34,7 +34,7 @@ from shore.core.plugins import (
 from shore.mapper import mapper
 from shore.model import Monorepo, ObjectCache, Package, VersionSelector
 from shore.plugins.core import get_monorepo_interdependency_version_refs
-from shore.util.changelog import ChangelogEntry, ChangelogManager, render_changelogs
+from shore.util.changelog import ChangelogEntryV2, ChangelogTypeV2, ChangelogManager, render_changelogs
 from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
@@ -782,13 +782,13 @@ def publish(**args):
 @cli.command()
 @click.argument('version', type=parse_version, required=False)
 @click.option('--reformat', is_flag=True, help='reformat the changelog')
-@click.option('--add', metavar='type,…', help='create a new changelog entry')
-@click.option('--for', metavar='component,…', help='components for the new changelog entry (default: general)', default='general')
+@click.option('--add', metavar='type', help='create a new changelog entry')
+@click.option('--for', metavar='component', help='components for the new changelog entry (default: general)', default='general')
 @click.option('--fixes', metavar='issue,…', help='issues that this changelog entry fixes')
 @click.option('-m', '--message', metavar='text', help='changelog entry description')
 @click.option('-e', '--edit', is_flag=True, help='edit the changelog entry or file')
 @click.option('--markdown', is_flag=True, help='render the changelog as markdown')
-@click.option('-a', '--all', is_flag=True, help='show the changelog for all versions.')
+@click.option('-a', '--all', is_flag=True, help='show the changelog for all versions')
 def changelog(**args):
   """
   Show changelogs or create new entries.
@@ -812,16 +812,17 @@ def changelog(**args):
     if not args['for']:
       args['for'] = 'general'
 
-    # Warn about bad changelog types.
-    for entry_type in _split(args['add']):
-      if entry_type not in manager.TYPES:
-        logger.warning('"%s" is not a well-known changelog entry type.', entry_type)
+    try:
+      type_ = ChangelogTypeV2[args['add']]
+    except KeyError:
+      logger.error('invalid changelog type: %r', args['add'])
+      sys.exit(1)
 
-    entry = ChangelogEntry(
-      _split(args['add']),
-      _split(args['fixes']),
-      _split(args['for']),
-      args['message'] or '')
+    entry = ChangelogEntryV2(
+      type_,
+      args['for'],
+      args['message'] or '',
+      _split(args['fixes']))
 
     # Allow the user to edit the entry if no description is provided or the
     # -e,--edit option was set.
@@ -830,7 +831,7 @@ def changelog(**args):
       entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogEntry)
 
     # Validate the entry contents (need a description and at least one type and component).
-    if not entry.types or not entry.description or not entry.components:
+    if not entry.description or not entry.component:
       logger.error('changelog entries need at least one type and component and a description')
       sys.exit(1)
 
