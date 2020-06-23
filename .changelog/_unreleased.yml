@@ -19,3 +19,9 @@
   component: cli
   description: add help to options in `shore bump` command
   fixes: []
+- type: change
+  component: cli
+  description: remove backwards comatibility for old `shore bump` syntax, a relative
+    version bump can now only be controlled via the respective options and no longer
+    via a positional argument
+  fixes: []
