@@ -427,13 +427,11 @@ def _get_version_refs(subject) -> List[VersionRef]:
 @click.option('--update', is_flag=True, help='run "shore update" after the bump')
 @click.option('--publish', metavar='target', help='run "shore publish" for the specified target after the bump')
 def bump(**args):
-  """ Bump version numbers. Either supply a target "version" (may require --force
-  if the specified version is lower than the current) or specify one of the --major,
-  --minor, --patch, --post or --snapshot flags.
+  """
+  Bump the version of the package, and any known files that reference the same version.
 
-  The "version" argument can also be one of the strings "major", "minor", "patch",
-  "post" or "git" which is only for backwards compatibility and will be removed in a
-  future version of shore.
+  An explicit version number can be specified as a positional argument. Alternatively, one
+  of the relative bump options can be used (like --major, or --snapshot).
   """
 
   subject = _load_subject()
@@ -450,14 +448,6 @@ def bump(**args):
     flags = ', '.join('--' + k for k in bump_flags)
     logger.error('missing arguments: specify a <version> or one of ' + flags)
     exit(1)
-
-  # Warn for deprecated behavior.
-  if args['version'] in ('post', 'patch', 'minor', 'major', 'git'):
-    use_flag = '--' + args['version']
-    if use_flag == '--git':
-      use_flag = '--snapshot'
-    logger.warning('Support for the %r argument is deprecated and will be removed in a '
-      'future version of Shore. Please use the %s flag instead.', args['version'], use_flag)
 
   if not args['skip_checks']:
     _run_checks(subject, True)
