@@ -848,7 +848,7 @@ def changelog(**args):
     if args['commit']:
       commit_message = entry.description
       if isinstance(subject, Package) and subject.monorepo:
-        commit_message = '{}({}): '.format(entry.type_.name, package.name) + commit_message
+        commit_message = '{}({}): '.format(entry.type_.name, subject.name) + commit_message
       else:
         commit_message = '{}: '.format(entry.type_.name) + commit_message
       _git.commit(commit_message)
