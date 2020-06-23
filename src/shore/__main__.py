@@ -411,19 +411,21 @@ def _get_version_refs(subject) -> List[VersionRef]:
 
 @cli.command('bump')
 @click.argument('version', required=False)
-@click.option('--major', is_flag=True)
-@click.option('--minor', is_flag=True)
-@click.option('--patch', is_flag=True)
-@click.option('--post', is_flag=True)
-@click.option('--snapshot', is_flag=True)
-@click.option('--tag', is_flag=True)
-@click.option('--dry', is_flag=True)
-@click.option('--skip-checks', is_flag=True)
-@click.option('--force', '-f', is_flag=True)
-@click.option('--allow-lower', is_flag=True)
-@click.option('--push', is_flag=True)
-@click.option('--update', is_flag=True)
-@click.option('--publish')
+@click.option('--major', is_flag=True, help='bump the major version number')
+@click.option('--minor', is_flag=True, help='bump the minor version number')
+@click.option('--patch', is_flag=True, help='bump the patch version number')
+@click.option('--post', is_flag=True, help='bump the post-release version number')
+@click.option('--snapshot', is_flag=True, help='add the Git commit distance and shasum to the version number')
+@click.option('--tag', is_flag=True, help='create a commit and Git tag after bumping the version')
+@click.option('--push', is_flag=True, help='push the new commit and tag to the Git "origin" remote')
+@click.option('--dry', is_flag=True, help='dry run -- do not write changes to files')
+@click.option('--skip-checks', is_flag=True, help='skip running "shore check" before the bump')
+@click.option('--force', '-f', is_flag=True, help='force the version number change '
+  '(allows you to bump to the same or a lower version number). also passes the --force flag '
+  'to Git when using the --tag and --push option.')
+@click.option('--allow-lower', is_flag=True, help='allows bumping to the same or lower version number')
+@click.option('--update', is_flag=True, help='run "shore update" after the bump')
+@click.option('--publish', metavar='target', help='run "shore publish" for the specified target after the bump')
 def bump(**args):
   """ Bump version numbers. Either supply a target "version" (may require --force
   if the specified version is lower than the current) or specify one of the --major,

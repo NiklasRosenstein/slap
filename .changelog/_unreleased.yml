@@ -15,3 +15,7 @@
   component: cli
   description: add `-s,--stage` and `-c,--commit` options to `shore changelog` command
   fixes: []
+- type: docs
+  component: cli
+  description: add help to options in `shore bump` command
+  fixes: []
