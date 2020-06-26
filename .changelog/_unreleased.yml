@@ -1,0 +1,5 @@
+- type: fix
+  component: changelog
+  description: fix `NameError` when using `shore changelog --add` but without specifying
+    `-m,--message` or when specifying `-e,--edit`
+  fixes: []
