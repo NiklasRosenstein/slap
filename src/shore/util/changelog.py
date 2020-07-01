@@ -187,8 +187,12 @@ class ChangelogManager:
     """
 
     unreleased = self.unreleased
+    unreleased.release_date = datetime.date.today()
+    unreleased.save()
+
     os.rename(unreleased.filename, self.version(version).filename)
     self._cache.clear()
+
     return self.version(version)
 
   def all(self) -> Iterable[Changelog]:
