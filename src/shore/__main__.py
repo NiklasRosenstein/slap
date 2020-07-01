@@ -34,7 +34,7 @@ from shore.core.plugins import (
 from shore.mapper import mapper
 from shore.model import Monorepo, ObjectCache, Package, VersionSelector
 from shore.plugins.core import get_monorepo_interdependency_version_refs
-from shore.util.changelog import ChangelogEntryV2, ChangelogTypeV2, ChangelogManager, render_changelogs
+from shore.util.changelog import ChangelogV3, ChangelogManager, render_changelogs
 from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
@@ -807,12 +807,12 @@ def changelog(**args):
       args['for'] = 'general'
 
     try:
-      type_ = ChangelogTypeV2[args['add']]
+      type_ = ChangelogV3.Type[args['add']]
     except KeyError:
       logger.error('invalid changelog type: %r', args['add'])
       sys.exit(1)
 
-    entry = ChangelogEntryV2(
+    entry = ChangelogV3.Entry(
       type_,
       args['for'],
       args['message'] or '',
@@ -821,8 +821,8 @@ def changelog(**args):
     # Allow the user to edit the entry if no description is provided or the
     # -e,--edit option was set.
     if not entry.description or args['edit']:
-      serialized = yaml.safe_dump(mapper.serialize(entry, ChangelogEntryV2), sort_keys=False)
-      entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogEntryV2)
+      serialized = yaml.safe_dump(mapper.serialize(entry, ChangelogV3.Entry), sort_keys=False)
+      entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogV3.Entry)
 
     # Validate the entry contents (need a description and at least one type and component).
     if not entry.description or not entry.component:
