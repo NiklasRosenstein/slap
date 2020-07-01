@@ -19,11 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, FieldName, ObjectMapper, Struct
+from nr.databind.core import Collection, Field, FieldName, ObjectMapper, Struct
 from nr.stream import Stream
 from shore.util.version import Version
 from termcolor import colored
 from typing import Iterable, List, Optional, TextIO
+import datetime
 import enum
 import os
 import re
@@ -32,25 +33,36 @@ import textwrap
 import yaml
 
 
-class ChangelogEntryV1(Struct):
+## changelog v1
+
+class ChangelogV1Entry(Struct):
   types = Field([str])
   issues = Field([(str, int)], default=list)
   components = Field([str])
   description = Field(str)
 
-  def as_v2(self) -> 'ChangelogEntryV2':
+  def to_v3(self) -> 'ChangelogV3Entry':
     try:
-      type_ = ChangelogTypeV2[self.types[0].strip().lower()]
+      type_ = ChangelogV3Type[self.types[0].strip().lower()]
     except KeyError:
-      type_ = ChangelogTypeV2.change
-    return ChangelogEntryV2(
+      type_ = ChangelogV3Type.change
+    return ChangelogV3Entry(
       type_,
       self.components[0],
       self.description,
       list(map(str, self.issues)))
 
 
-class ChangelogTypeV2(enum.Enum):
+class ChangelogV1(Collection, list):
+  item_type = ChangelogV1Entry
+
+  def to_v3(self) -> 'ChangelogV3':
+    return ChangelogV3(None, [x.to_v3() for x in self])
+
+
+## changelog v2
+
+class ChangelogV2Type(enum.Enum):
   fix = 0
   improvement = 1
   change = 3
@@ -60,45 +72,83 @@ class ChangelogTypeV2(enum.Enum):
   tests = 7
 
 
-class ChangelogEntryV2(Struct):
-  type_ = Field(ChangelogTypeV2, FieldName('type'))
+class ChangelogV2Entry(Struct):
+  type_ = Field(ChangelogV2Type, FieldName('type'))
   component = Field(str)
   description = Field(str)
   fixes = Field([str])
 
-  def as_v2(self) -> 'ChangelogEntryV2':
-    return self
 
+class ChangelogV2(Collection, list):
+  item_type = ChangelogV2Entry
+
+  def to_v3(self) -> 'ChangelogV3':
+    return ChangelogV3(None, list(self))
+
+
+## changelog v3
+
+ChangelogV3Type = ChangelogV2Type
+ChangelogV3Entry = ChangelogV2Entry
+
+
+class ChangelogV3(Struct):
+  release_date = Field(datetime.date, default=None)
+  changes = Field([ChangelogV3Entry])
+
+  Type = ChangelogV3Type
+  Entry = ChangelogV3Entry
+
+
+## public API
 
 class Changelog:
+  """
+  Represents a changelog on disk.
+  """
 
+  #: A mapping for the changelog renderers that are available. The default
+  #: renderer implementations are "terminal" and "markdown".
   RENDERERS = {}
 
   def __init__(self, filename: str, version: Optional[Version], mapper: ObjectMapper) -> None:
     self.filename = filename
     self.version = version
     self.mapper = mapper
-    self.entries = []
+    self.data = ChangelogV3(changes=[])
 
   def exists(self) -> bool:
+    " Returns #True if the changelog file exists. "
+
     return os.path.isfile(self.filename)
 
   def load(self) -> None:
+    " Loads the data from the file of this changelog. "
+
     with open(self.filename) as fp:
-      data = yaml.safe_load(fp)
-    datatype = [(ChangelogEntryV2, ChangelogEntryV1)]
-    self.entries = self.mapper.deserialize(data, datatype, filename=self.filename)
-    self.entries = [x.as_v2() for x in self.entries]
+      raw_data = yaml.safe_load(fp)
+
+    datatype = (ChangelogV1, ChangelogV2, ChangelogV3)
+    data = self.mapper.deserialize(raw_data, datatype, filename=self.filename)
+    if isinstance(data, (ChangelogV1, ChangelogV2)):
+      data = data.to_v3()
+
+    self.data = data
 
   def save(self, create_directory: bool = False) -> None:
+    " Saves the changelog. It will always save the changelog in the newest supported format. "
+
     if create_directory:
       os.makedirs(os.path.dirname(self.filename), exist_ok=True)
-    data = self.mapper.serialize(self.entries, [ChangelogEntryV2])
+    data = self.mapper.serialize(self.data, ChangelogV3)
     with open(self.filename, 'w') as fp:
       yaml.safe_dump(data, fp, sort_keys=False)
 
-  def add_entry(self, entry: ChangelogEntryV2) -> None:
-    self.entries.append(entry)
+  def set_release_date(self, date: datetime.date) -> None:
+    self.data.release_date = date
+
+  def add_entry(self, entry: ChangelogV2Entry) -> None:
+    self.data.entries.append(entry)
 
 
 class ChangelogManager:
@@ -150,6 +200,9 @@ class ChangelogManager:
       else:
         version = Version(name[:-4])
         yield self.version(version)
+
+
+## changelog renderers
 
 
 def _group_entries_by_component(entries):
