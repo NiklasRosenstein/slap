@@ -187,7 +187,7 @@ class ChangelogManager:
     """
 
     unreleased = self.unreleased
-    unreleased.release_date = datetime.date.today()
+    unreleased.data.release_date = datetime.date.today()
     unreleased.save()
 
     os.rename(unreleased.filename, self.version(version).filename)
