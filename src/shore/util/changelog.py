@@ -117,6 +117,10 @@ class Changelog:
     self.mapper = mapper
     self.data = ChangelogV3(changes=[])
 
+  @property
+  def entries(self):
+    return self.data.changes
+
   def exists(self) -> bool:
     " Returns #True if the changelog file exists. "
 
@@ -148,7 +152,7 @@ class Changelog:
     self.data.release_date = date
 
   def add_entry(self, entry: ChangelogV2Entry) -> None:
-    self.data.entries.append(entry)
+    self.data.changes.append(entry)
 
 
 class ChangelogManager:
@@ -244,7 +248,8 @@ def render_changelogs_for_terminal(fp: TextIO, changelogs: List[Changelog]) -> N
 
   # Explode entries by component.
   for changelog in changelogs:
-    fp.write(colored(changelog.version or 'Unreleased', 'blue', attrs=['bold', 'underline']) + '\n')
+    fp.write(colored(changelog.version or 'Unreleased', 'blue', attrs=['bold', 'underline']))
+    fp.write(' ({})\n'.format(changelog.data.release_date or 'no release date'))
     for component, entries in _group_entries_by_component(changelog.entries):
       maxw = max(map(lambda x: len(x.type_.name), entries))
       fp.write('  ' + colored(component or 'No Component', 'red', attrs=['bold', 'underline']) + '\n')
@@ -272,7 +277,8 @@ def render_changelogs_as_markdown(fp: TextIO, changelogs: List[Changelog]) -> No
     return '(' + ', '.join(_fmt_issue(i) for i in entry.fixes) + ')'
 
   for changelog in changelogs:
-    fp.write('## {}\n\n'.format(changelog.version or 'Unreleased'))
+    fp.write('## {}'.format(changelog.version or 'Unreleased'))
+    fp.write(' ({})\n\n'.format(changelog.data.release_date or 'no release date'))
     for component, entries in _group_entries_by_component(changelog.entries):
       fp.write('* __{}__\n'.format(component))
       for entry in entries:
