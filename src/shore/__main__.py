@@ -139,10 +139,10 @@ def license(output_type, license_name):
 
   data = get_license_metadata(license_name)
   if output_type == 'json':
-    print(json.dumps(data(), sort_keys=True))
+    print(json.dumps(data, sort_keys=True))
   elif output_type == 'text':
     print(wrap_license_text(data['license_text']))
-  elif ouutput_type == 'notice':
+  elif output_type == 'notice':
     print(wrap_license_text(data['standard_notice'] or data['license_text']))
   else:
     raise RuntimeError(output_type)

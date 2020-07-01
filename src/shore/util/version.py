@@ -22,7 +22,10 @@
 from packaging.version import Version as _Version
 from nr.utils.git import Git
 from typing import Optional, Union
+import logging
 import re
+
+logger = logging.getLogger(__name__)
 
 
 class Version(_Version):
