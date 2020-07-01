@@ -1,3 +1,5 @@
+release_date: null
+changes:
 - type: fix
   component: cli
   description: '`shore bump` now adds the changelog files to the commit when using

@@ -1,3 +1,5 @@
+release_date: null
+changes:
 - type: change
   component: changelog
   description: '"shore changelog" can now render multiple changelogs'

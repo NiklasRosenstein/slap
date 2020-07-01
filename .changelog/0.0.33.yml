@@ -1,3 +1,5 @@
+release_date: null
+changes:
 - type: feature
   component: cli
   description: 'Added a new `shore changelog` command that manages files in the .changelog

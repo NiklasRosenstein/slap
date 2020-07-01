@@ -1,3 +1,5 @@
+release_date: null
+changes:
 - type: fix
   component: changelog
   description: fix `NameError` when using `shore changelog --add` but without specifying

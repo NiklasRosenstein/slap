@@ -1,3 +1,5 @@
+release_date: null
+changes:
 - type: change
   component: cli
   description: '`shore bump --force --push` now also passes the force option to `git

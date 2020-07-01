@@ -1,3 +1,5 @@
+release_date: null
+changes:
 - type: fix
   component: setuptools
   description: Fix how the `setuptools:wheel` build target determines the generated

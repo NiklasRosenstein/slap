@@ -1,3 +1,5 @@
+release_date: null
+changes:
 - type: change
   component: cli
   description: Updates the `shore changelog` CLI and adds a --markdown option for
