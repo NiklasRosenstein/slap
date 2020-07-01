@@ -43,6 +43,7 @@ setuptools.setup(
     'console_scripts': [
       'shore = shore.__main__:_entry_point',
       'shore-conda-forge = shore.tools.conda_forge:main',
+      'shut = shore.commands:shut',
     ],
     'shore.core.plugins': [
       'core = shore.plugins.core:CorePlugin',
