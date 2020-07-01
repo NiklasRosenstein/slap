@@ -20,48 +20,32 @@
 # IN THE SOFTWARE.
 
 """
-This package implements the Shut CLI.
+List or search package classifiers on PyPI.
 """
 
-from nr.proxy import Proxy
-
+from . import shut
+from shore.util.classifiers import get_classifiers
 import click
-import logging
-
-context = Proxy(lambda: click.get_current_context().obj)
 
 
-@click.group()
-@click.option('-v', '--verbose', count=True, help='Increase the log verbosity.')
-@click.option('-q', '--quiet', is_flag=True, help='Quiet mode, wins over --verbose.')
-def shut(verbose, quiet):
-  """
-  Shut is a tool to manage the lifecycle of pure Python packages. It automates tasks such
-  as bootstrapping a project, bumping version numbers, managing changelogs and publishing
-  packages to PyPI all the while performing sanity checks.
-
-  Shut makes strong assumptions on the project structure and assumes that the source-control
-  system of choice is Git.
-  """
-
-  ctx = click.get_current_context()
-  ctx.ensure_object(dict)
-  context['quiet'] = quiet
-
-  if quiet:
-    level = logging.CRITICAL
-  elif verbose >= 2:
-    level = logging.DEBUG
-  elif verbose >= 1:
-    level = logging.INFO
-  else:
-    level = logging.WARNING
-
-  logging.basicConfig(
-    format='[%(levelname)s|%(asctime)s|%(name)s]: %(message)s',
-    level=level,
-  )
+@shut.group(help=__doc__)
+def classifiers():
+  pass
 
 
-from . import classifiers
-from . import license
+@classifiers.command()
+def ls():
+  " List all classifiers. "
+
+  for classifier in get_classifiers():
+    print(classifier)
+
+
+@classifiers.command()
+@click.option('-q', '--term', help='The substring that will be used to filter classifiers.')
+def search(term):
+  " Search for package classifiers. "
+
+  for classifier in get_classifiers():
+    if not term or term.strip().lower() in classifier.lower():
+      print(classifier)

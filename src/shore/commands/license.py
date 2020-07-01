@@ -20,48 +20,32 @@
 # IN THE SOFTWARE.
 
 """
-This package implements the Shut CLI.
+Get license information from DejaCode.
 """
 
-from nr.proxy import Proxy
-
+from . import shut
+from shore.util.license import get_license_metadata, wrap_license_text
 import click
-import logging
-
-context = Proxy(lambda: click.get_current_context().obj)
+import json
 
 
-@click.group()
-@click.option('-v', '--verbose', count=True, help='Increase the log verbosity.')
-@click.option('-q', '--quiet', is_flag=True, help='Quiet mode, wins over --verbose.')
-def shut(verbose, quiet):
-  """
-  Shut is a tool to manage the lifecycle of pure Python packages. It automates tasks such
-  as bootstrapping a project, bumping version numbers, managing changelogs and publishing
-  packages to PyPI all the while performing sanity checks.
-
-  Shut makes strong assumptions on the project structure and assumes that the source-control
-  system of choice is Git.
-  """
-
-  ctx = click.get_current_context()
-  ctx.ensure_object(dict)
-  context['quiet'] = quiet
-
-  if quiet:
-    level = logging.CRITICAL
-  elif verbose >= 2:
-    level = logging.DEBUG
-  elif verbose >= 1:
-    level = logging.INFO
-  else:
-    level = logging.WARNING
-
-  logging.basicConfig(
-    format='[%(levelname)s|%(asctime)s|%(name)s]: %(message)s',
-    level=level,
-  )
+@shut.group(help=__doc__)
+def license():
+  pass
 
 
-from . import classifiers
-from . import license
+@license.command()
+@click.option('--name', help='The name of the license to retrieve.')
+@click.option('--long', 'format_', flag_value='long', default=True)
+@click.option('--short', 'format_', flag_value='short')
+@click.option('--json', 'format_', flag_value='json')
+def get(name, format_):
+  " Retrieve the license text or a JSON description of the license. "
+
+  data = get_license_metadata(name)
+  if format_ == 'json':
+    print(json.dumps(data, sort_keys=True))
+  elif format_ == 'long':
+    print(wrap_license_text(data['license_text']))
+  elif format_ == 'short':
+    print(wrap_license_text(data['standard_notice'] or data['license_text']))
