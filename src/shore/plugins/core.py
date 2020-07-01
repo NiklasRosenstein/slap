@@ -157,8 +157,14 @@ def get_monorepo_interdependency_version_refs(monorepo: Monorepo, new_version: V
             if version_selector.is_semver_selector():
               new_version_selector = VersionSelector(str(version_selector)[0] + str(new_version))
             else:
-              logger.warning('%s: %s %s does not match version %s of monorepo %s and cannot be automatically bumped.',
-                package.filename, name, version_selector, new_version, subject.name)
+              logger.warning(
+                '%s: "%s %s" does not match version %r of monorepo %r and cannot be automatically bumped.',
+                package.filename,
+                package_name,
+                version_selector,
+                new_version,
+                monorepo.name,
+              )
         if new_version_selector:
           yield VersionSelectorRef(package.filename, match.start(2), match.end(2),
             package_name, str(version_selector), str(new_version_selector))
