@@ -25,6 +25,7 @@ from . import pkg
 from shore.core.plugins import FileToRender, write_to_disk
 from shore.model import Author, Package, RootRequirements, VersionSelector
 from shore.util.resources import walk_package_resources
+from shore.util.license import get_license_metadata, wrap_license_text
 from termcolor import colored
 from typing import Iterable, Optional
 import click
