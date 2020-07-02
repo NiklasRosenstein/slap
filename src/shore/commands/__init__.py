@@ -28,15 +28,17 @@ from nr.proxy import Proxy
 
 import click
 import logging
+import os
 
 context = Proxy(lambda: click.get_current_context().obj)
 
 
 @click.group()
+@click.option('-C', '--cwd', metavar='path', help='Run as if shut was started inside the specified directory.')
 @click.option('-v', '--verbose', count=True, help='Increase the log verbosity.')
 @click.option('-q', '--quiet', is_flag=True, help='Quiet mode, wins over --verbose.')
 @click.version_option(__version__)
-def shut(verbose, quiet):
+def shut(cwd, verbose, quiet):
   """
   Shut is a tool to manage the lifecycle of pure Python packages. It automates tasks such
   as bootstrapping a project, bumping version numbers, managing changelogs and publishing
@@ -45,6 +47,9 @@ def shut(verbose, quiet):
   Shut makes strong assumptions on the project structure and assumes that the source-control
   system of choice is Git.
   """
+
+  if cwd:
+    os.chdir(cwd)
 
   ctx = click.get_current_context()
   ctx.ensure_object(dict)
