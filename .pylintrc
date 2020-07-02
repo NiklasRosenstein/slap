@@ -1,0 +1,6 @@
+[MASTER]
+jobs = 0
+
+[MESSAGES CONTROL]
+disable=all
+enable=E,W0611,W0612

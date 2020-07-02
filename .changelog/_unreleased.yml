@@ -4,3 +4,7 @@ changes:
   component: changelog
   description: add Changelog V3 format
   fixes: []
+- type: change
+  component: changelog
+  description: Moved entire Changelog logic to `shut.changelog` and `shut.commands.changelog`
+  fixes: []

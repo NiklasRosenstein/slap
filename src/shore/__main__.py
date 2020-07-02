@@ -34,7 +34,6 @@ from shore.core.plugins import (
 from shore.mapper import mapper
 from shore.model import Monorepo, ObjectCache, Package, VersionSelector
 from shore.plugins.core import get_monorepo_interdependency_version_refs
-from shore.util.changelog import ChangelogV3, ChangelogManager, render_changelogs
 from shore.util.classifiers import get_classifiers
 from shore.util.license import get_license_metadata, wrap_license_text
 from shore.util.resources import walk_package_resources
@@ -771,114 +770,6 @@ def publish(**args):
 
   logger.debug('exit with status code %s', status)
   exit(status)
-
-
-@cli.command()
-@click.argument('version', type=parse_version, required=False)
-@click.option('--reformat', is_flag=True, help='reformat the changelog')
-@click.option('--add', metavar='type', help='create a new changelog entry')
-@click.option('--for', metavar='component', help='components for the new changelog entry (default: general)', default='general')
-@click.option('--fixes', metavar='issue,…', help='issues that this changelog entry fixes')
-@click.option('-m', '--message', metavar='text', help='changelog entry description')
-@click.option('-e', '--edit', is_flag=True, help='edit the changelog entry or file')
-@click.option('--markdown', is_flag=True, help='render the changelog as markdown')
-@click.option('-a', '--all', is_flag=True, help='show the changelog for all versions')
-@click.option('-s', '--stage', is_flag=True, help='stage the created/updated changelog file with git')
-@click.option('-c', '--commit', is_flag=True, help='commit the created/updated changelog file with git, together with other currently staged files')
-def changelog(**args):
-  """
-  Show changelogs or create new entries.
-  """
-
-  if (args['version'] or args['reformat']) and args['add']:
-    logger.error('unsupported combination of arguments')
-    sys.exit(1)
-
-  subject = _load_subject(allow_none=True)
-  if subject:
-    manager = ChangelogManager(subject.changelog_directory, mapper)
-  else:
-    manager = ChangelogManager(Package.changelog_directory.default, mapper)
-
-  def _split(s: Optional[str]) -> List[str]:
-    return list(filter(bool, map(str.strip, (s or '').split(','))))
-
-  if args['add']:
-
-    if not args['for']:
-      args['for'] = 'general'
-
-    try:
-      type_ = ChangelogV3.Type[args['add']]
-    except KeyError:
-      logger.error('invalid changelog type: %r', args['add'])
-      sys.exit(1)
-
-    entry = ChangelogV3.Entry(
-      type_,
-      args['for'],
-      args['message'] or '',
-      _split(args['fixes']))
-
-    # Allow the user to edit the entry if no description is provided or the
-    # -e,--edit option was set.
-    if not entry.description or args['edit']:
-      serialized = yaml.safe_dump(mapper.serialize(entry, ChangelogV3.Entry), sort_keys=False)
-      entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), ChangelogV3.Entry)
-
-    # Validate the entry contents (need a description and at least one type and component).
-    if not entry.description or not entry.component:
-      logger.error('changelog entries need a component and description')
-      sys.exit(1)
-
-    created = not manager.unreleased.exists()
-    manager.unreleased.add_entry(entry)
-    manager.unreleased.save(create_directory=True)
-    message = ('Created' if created else 'Updated') + ' "{}"'.format(manager.unreleased.filename)
-    print(colored(message, 'cyan'))
-
-    if args['stage'] or args['commit']:
-      _git.add([manager.unreleased.filename])
-    if args['commit']:
-      commit_message = entry.description
-      if isinstance(subject, Package) and subject.monorepo:
-        commit_message = '{}({}): '.format(entry.type_.name, subject.name) + commit_message
-      else:
-        commit_message = '{}: '.format(entry.type_.name) + commit_message
-      _git.commit(commit_message)
-
-    sys.exit(0)
-
-  if args['edit']:
-    if not manager.unreleased.exists():
-      logger.error('no staged changelog')
-      sys.exit(1)
-    sys.exit(_editor_open(manager.unreleased.filename))
-
-  changelogs = []
-  if args['version'] or not args['all']:
-    if args['all']:
-      sys.exit('error: incompatible arguments: <version> and -a,--all')
-    changelog = manager.version(args['version']) if args['version'] else manager.unreleased
-    # Load the changelog for the specified version or the current staged entries.
-    if not changelog.exists():
-      print('No changelog for {}.'.format(colored(str(args['version'] or 'unreleased'), 'yellow')))
-      sys.exit(0)
-    changelogs.append(changelog)
-  else:
-    changelogs = list(manager.all())
-
-  if args['reformat']:
-    for changelog in changelogs:
-      changelog.save()
-    sys.exit(0)
-
-  if args['markdown']:
-    changelog_format = 'markdown'
-  else:
-    changelog_format = 'terminal'
-
-  render_changelogs(sys.stdout, changelog_format, changelogs)
 
 
 _entry_point = lambda: sys.exit(cli())
