@@ -54,7 +54,9 @@ def get_license_metadata(license_name):
   license type, standard notice and license text. """
 
   url = BASE_URL.format(license_name.replace(' ', '-').lower())
-  html = requests.get(url).text
+  response = requests.get(url)
+  response.raise_for_status()
+  html = response.text
   soup = bs4.BeautifulSoup(html, 'html.parser')
 
   extract_keys = ['Key', 'Name', 'Short Name', 'Category', 'License type',
