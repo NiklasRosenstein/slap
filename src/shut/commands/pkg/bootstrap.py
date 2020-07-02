@@ -19,16 +19,46 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from shut.utils.io.virtual import VirtualFiles
+
 from . import pkg
 from shore.core.plugins import FileToRender, write_to_disk
+from shore.model import Author, Package, RootRequirements, VersionSelector
 from shore.util.resources import walk_package_resources
 from termcolor import colored
 from typing import Iterable, Optional
 import click
+import datetime
 import jinja2
 import os
 import pkg_resources
 import subprocess
+
+INIT_TEMPLATE = '''
+__author__ = '{{author or "Me <me@me.org>"}}'
+__version__ = '{{version or "0.0.1"}}'
+'''
+
+NAMESPACE_INIT_TEMPLATE = '''
+__path__ = __import__('pkgutil').extend_path(__path__, __name__)
+'''
+
+GITIGNORE_TEMPLATE = '''
+/.venv*/
+/dist
+/build
+*.py[cod]
+*.egg-info
+*.egg
+'''
+
+README_TEMPLATE = '''
+# {{project_name}}
+
+---
+
+<p align="center">Copyright &copy; {{year}} {{author.name}}</p>
+'''
 
 
 def load_author_from_git() -> Optional[str]:
@@ -44,16 +74,19 @@ def load_author_from_git() -> Optional[str]:
     return None
   if not name and not email:
     return None
-  return '{} <{}>'.format(name, email)
+  return Author(name, email)
 
 
 @pkg.command()
 @click.argument('target_directory', required=False)
 @click.option('--project-name', metavar='name', required=True, help='The name of the project as it would appear on PyPI.')
 @click.option('--module-name', metavar='fqn', help='The name of the main Python module (this may be a dotted module name). Defaults to the package name (hyphens replaced with underscores).')
-@click.option('--author', metavar='"name <mail>"', help='The name of the author to write into the package configuration file. Defaults to the name and email from the Git config.')
+@click.option('--author', metavar='"name <mail>"', type=Author.parse, help='The name of the author to write into the package configuration file. Defaults to the name and email from the Git config.')
 @click.option('--version', metavar='x.y.z', help='The version number to start counting from. Defaults to "0.0.0" (stands for "unreleased").')
 @click.option('--license', metavar='name', help='The name of the license to use for the project. A LICENSE.txt file will be created.')
+@click.option('--description', metavar='text', help='A short summary of the project.')
+@click.option('--universal', is_flag=True, help='Mark the package as universal (Python 2 and 3 compatible).')
+@click.option('--suffix', type=click.Choice(['yaml', 'yml']), help='The suffix for YAML files. Defaults to "yml".', default='yml')
 @click.option('--dry', is_flag=True, help='Do not write files to disk.')
 @click.option('-f', '--force', is_flag=True, help='Overwrite files if they already exist.')
 def bootstrap(
@@ -63,6 +96,9 @@ def bootstrap(
   author,
   version,
   license,
+  description,
+  universal,
+  suffix,
   dry,
   force,
 ):
@@ -70,78 +106,106 @@ def bootstrap(
   Create files for a new Python package. If the *target_directory* is specified, the files will
   be written to that directory. Otherwise the value of the --project-name argument will be used
   as the target directory.
+
+  The following project layout will be created:
+
+    \b
+    project_name/
+      .gitignore
+      LICENSE.txt
+      package.yml
+      README.md
+      src/
+        module_name/
+          __init__.py
+
+  If the "module_name" represents a namespace package (that is, if it contains any dots),
+  package namespace files will be automatically created. [1]
+
+  ---
+
+  Footnotes:
+
+  \b
+  [1]: Package namespace files are "__init__.py" files that contain a single line, allowing
+    the Python import machinery to discover other packages in the same namespace. Shut assumes
+    pkgutil-style namespace packages. For more information on such files, check out out the
+    Python Packaging Guide (https://packaging.python.org/guides/packaging-namespace-packages/).
   """
 
   if not target_directory:
     target_directory = project_name
   if not author:
-    author = load_author_from_git()
+    author = load_author_from_git() or Author('Unknown', '<unknown@example.org>')
+  if not module_name:
+    module_name = project_name.replace('-', '_')
 
-  env_vars = {
-    'name': project_name,
+  package_manifest = Package(
+    name=project_name,
+    modulename=module_name,
+    version=version,
+    author=author,
+    license=license,
+    description=description or 'Package description here.',
+    requirements=RootRequirements(
+      python=VersionSelector('^2.7|^3.5' if universal else '^3.5'),
+    ),
+  )
+  print(package_manifest)
+
+  template_vars = {
+    'project_name': project_name,
     'version': version,
     'author': author,
-    'license': license,
-    'modulename': module_name,
-    'name_on_disk': module_name or project_name,
+    'year': datetime.date.today().year,
   }
 
-  name_on_disk = module_name or project_name
+  def _render_template(fp, template_string):
+    for data in jinja2.Template(template_string).stream(**template_vars):
+      fp.write(data)
 
-  def _render_template(template_string, **kwargs):
-    assert isinstance(template_string, str), type(template_string)
-    return jinja2.Template(template_string).render(**(kwargs or env_vars))
+  files = VirtualFiles()
 
-  def _render_file(fp, filename):
-    content = pkg_resources.resource_string('shore', filename).decode()
-    fp.write(_render_template(content))
+  files.add_static(
+    '.gitignore',
+    GITIGNORE_TEMPLATE,
+  )
 
-  def _render_namespace_file(fp):
-    fp.write("__path__ = __import__('pkgutil').extend_path(__path__, __name__)\n")
+  files.add_dynamic(
+    'README.md',
+    _render_template,
+    README_TEMPLATE,
+  )
 
-  def _get_template_files(template_path) -> Iterable[FileToRender]:
-    # Render the template files to the target directory.
-    for source_filename in walk_package_resources('shore', template_path):
-      # Expand variables in the filename.
-      name = name_on_disk.replace('-', '_').replace('.', '/')
-      filename = _render_template(source_filename, name=name)
-      dest = os.path.join(target_directory, filename)
-      yield FileToRender(
-        None,
-        os.path.normpath(dest),
-        lambda _, fp: _render_file(fp, template_path + '/' + source_filename))
+  files.add_dynamic(
+    'src/{}/__init__.py'.format(module_name.replace('.', '/')),
+    _render_template,
+    INIT_TEMPLATE,
+  )
 
-  def _get_package_files() -> Iterable[FileToRender]:
-    yield from _get_template_files('templates/package')
+  parts = []
+  for item in module_name.split('.')[:-1]:
+    parts.append(item)
+    files.add_static(
+      os.path.join('src', *parts, '__init__.py'),
+      NAMESPACE_INIT_TEMPLATE,
+    )
 
-    # Render namespace supporting files.
-    parts = []
-    for item in name_on_disk.replace('-', '_').split('.')[:-1]:
-      parts.append(item)
-      dest = os.path.join(target_directory, 'src', *parts, '__init__.py')
-      yield FileToRender(
-        None,
-        os.path.normpath(dest),
-        lambda _, fp: _render_namespace_file(fp))
-      dest = os.path.join(target_directory, 'src', 'test', *parts, '__init__.py')
-      yield FileToRender(
-        None,
-        os.path.normpath(dest),
-        lambda _, fp: fp.write('pass\n'))
+  files.add_dynamic(
+    'package.' + suffix,
+    lambda fp: package_manifest.dump(fp),
+  )
 
-    # TODO (@NiklasRosenstein): Render the license file if it does not exist.
+  if license:
+    files.add_dynamic(
+      'LICENSE.txt',
+      lambda fp: fp.write(wrap_license_text(get_license_metadata(license)['license_text'])),
+    )
 
-  def _get_monorepo_files() -> Iterable[FileToRender]:
-    yield from _get_template_files('templates/monorepo')
-
-  #if args['monorepo']:
-  #  files = _get_monorepo_files()
-  files = _get_package_files()
-
-  for file in files:
-    if os.path.isfile(file.name) and not force:
-      print(colored('Skip ' + file.name, 'yellow'))
-      continue
-    print(colored('Write ' + file.name, 'cyan'))
-    if not dry:
-      write_to_disk(file)
+  files.write_all(
+    target_directory,
+    on_write=lambda fn: print(colored('Write ' + fn, 'cyan')),
+    on_skip=lambda fn: print(colored('Skip ' + fn, 'yellow')),
+    overwrite=force,
+    dry=dry,
+  )
