@@ -20,7 +20,10 @@
 # IN THE SOFTWARE.
 
 from .. import shut
+from shore.model import Package, ObjectCache
 import click
+
+_cache = ObjectCache()
 
 
 @shut.group(help=__doc__)
@@ -28,4 +31,10 @@ def pkg():
   pass
 
 
+def load_package_manifest() -> Package:
+  filename = 'package.yaml'
+  return Package.load(filename, _cache)
+
+
 from . import bootstrap
+from . import sanity
