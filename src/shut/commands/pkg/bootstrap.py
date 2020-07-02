@@ -77,7 +77,7 @@ def load_author_from_git() -> Optional[str]:
   return Author(name, email)
 
 
-@pkg.command()
+@pkg.command(no_args_is_help=True)
 @click.argument('target_directory', required=False)
 @click.option('--project-name', metavar='name', required=True, help='The name of the project as it would appear on PyPI.')
 @click.option('--module-name', metavar='fqn', help='The name of the main Python module (this may be a dotted module name). Defaults to the package name (hyphens replaced with underscores).')
