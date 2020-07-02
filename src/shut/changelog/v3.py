@@ -19,12 +19,25 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from . import mono, load_monorepo_manifest
-from ..commons.status import print_status
+"""
+The V2 of changelogs.
+"""
+
+from . import _ChangelogBase, v2
+from nr.databind.core import Field, Struct
+import datetime
 
 
-@mono.command(help="""
-  Show which packages have been modified since their last release.
-  """ + print_status.__doc__)
-def status():
-  print_status(load_monorepo_manifest())
+class Changelog(_ChangelogBase, Struct):
+  Supersedes = v2.Changelog  # _ChangelogBase
+  Entry = v2.Entry
+
+  release_date = Field(datetime.date, default=None)
+  changes = Field([v2.Entry])
+
+  @classmethod
+  def adapt(cls, v2_changelog: v2.Changelog) -> 'Changelog':
+    return cls(
+      release_date=None,
+      changes=list(v2_changelog),
+    )

@@ -19,9 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from shore.model import Monorepo
+from shore.core.plugins import CheckResult
+
 from . import pkg, load_package_manifest
 from nr.stream import Stream
-from shore.core.plugins import CheckResult
 from termcolor import colored
 import click
 import logging

@@ -19,12 +19,52 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from . import mono, load_monorepo_manifest
-from ..commons.status import print_status
+"""
+The V3 of changelogs.
+"""
+
+from . import _ChangelogBase, v1
+from nr.databind.core import Collection, Field, FieldName, Struct
+import enum
 
 
-@mono.command(help="""
-  Show which packages have been modified since their last release.
-  """ + print_status.__doc__)
-def status():
-  print_status(load_monorepo_manifest())
+class Type(enum.Enum):
+  fix = 0
+  improvement = 1
+  change = 3
+  refactor = 4
+  feature = 5
+  docs = 6
+  tests = 7
+
+
+class Entry(Struct):
+  Type = Type
+
+  type_ = Field(Type, FieldName('type'))
+  component = Field(str)
+  description = Field(str)
+  fixes = Field([str])
+
+  @classmethod
+  def from_v1(cls, v1_entry: v1.Entry) -> 'Entry':
+    try:
+      type_ = Type[v1_entry.types[0].strip().lower()]
+    except KeyError:
+      type_ = Type.change
+    return cls(
+      type_=type_,
+      component=v1_entry.components[0],
+      description=v1_entry.description,
+      fixes=list(map(str, v1_entry.issues)),
+    )
+
+
+class Changelog(_ChangelogBase, Collection, list):
+  Supersedes = v1.Changelog  # _ChangelogBase
+  item_type = Entry  # Collection
+  Entry = Entry
+
+  @classmethod
+  def adapt(cls, v1_changelog: v1.Changelog) -> 'Changelog':
+    return cls(map(Entry.from_v1, v1_changelog))

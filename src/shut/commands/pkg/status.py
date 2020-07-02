@@ -21,7 +21,6 @@
 
 from . import pkg, load_package_manifest
 from ..commons.status import print_status
-import click
 
 
 @pkg.command(help="""
