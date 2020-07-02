@@ -435,7 +435,6 @@ def bump(**args):
   """
 
   subject = _load_subject()
-  changelog_manager = ChangelogManager(subject.changelog_directory, mapper)
 
   bump_flags = ('major', 'minor', 'patch', 'post', 'snapshot')
   bump_args = ['--' + k for k in bump_flags if args[k]]
@@ -549,15 +548,18 @@ def bump(**args):
   changed_files = [x.filename for x in version_refs]
 
   # Rename the unreleased changelog if it exists.
-  if changelog_manager.unreleased.exists():
-    changed_files.append(changelog_manager.unreleased.filename)
-    if args['dry']:
-      changelog = changelog_manager.version(new_version)
-    else:
-      changelog = changelog_manager.release(new_version)
-    changed_files.append(changelog.filename)
-    logger.info('release staged changelog (%s → %s)', changelog_manager.unreleased.filename,
-      changelog.filename)
+  def _release_changelogs(subject):
+    changelog_manager = ChangelogManager(os.path.join(subject.directory, subject.changelog_directory), mapper)
+    if changelog_manager.unreleased.exists():
+      changed_files.append(changelog_manager.unreleased.filename)
+      if args['dry']:
+        changelog = changelog_manager.version(new_version)
+      else:
+        changelog = changelog_manager.release(new_version)
+      changed_files.append(changelog.filename)
+      logger.info('release staged changelog (%s → %s)', changelog_manager.unreleased.filename,
+        changelog.filename)
+  _run_for_subject(subject, _release_changelogs)
 
   if args['update']:
     _cache.clear()
