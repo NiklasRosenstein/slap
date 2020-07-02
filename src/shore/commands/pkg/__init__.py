@@ -28,7 +28,9 @@ _cache = ObjectCache()
 
 @shut.group(help=__doc__)
 def pkg():
-  pass
+  """
+  Manage the Python package in the current directory.
+  """
 
 
 def load_package_manifest() -> Package:
