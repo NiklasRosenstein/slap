@@ -19,22 +19,15 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
-from shore.model import Package
-import click
+from shore.model import ObjectCache
+import os
+
+object_cache = ObjectCache()
 
 
-@shut.group(help=__doc__)
-def pkg():
-  """
-  Manage the Python package in the current directory.
-  """
-
-
-def load_package_manifest() -> Package:
-  return commons.load_manifest(('package.yaml', 'package.yml'), Package)
-
-
-from . import bootstrap
-from . import sanity
-from . import status
+def load_manifest(filename_choices, cls):
+  filename_choices = tuple(filename_choices)
+  for filename in filename_choices:
+    if os.path.isfile(filename):
+      return cls.load(filename, object_cache)
+  raise RuntimeError('file not found: ' + repr(filename_choices))

@@ -72,4 +72,5 @@ def shut(cwd, verbose, quiet):
 
 from . import classifiers
 from . import license
+from . import mono
 from . import pkg

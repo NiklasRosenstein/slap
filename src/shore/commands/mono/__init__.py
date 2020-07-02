@@ -20,21 +20,19 @@
 # IN THE SOFTWARE.
 
 from .. import shut, commons
-from shore.model import Package
+from shore.model import Monorepo
 import click
 
 
 @shut.group(help=__doc__)
-def pkg():
+def mono():
   """
-  Manage the Python package in the current directory.
+  Manage the current mono repository.
   """
 
 
-def load_package_manifest() -> Package:
-  return commons.load_manifest(('package.yaml', 'package.yml'), Package)
+def load_monorepo_manifest() -> Monorepo:
+  return commons.load_manifest(('monorepo.yaml', 'monorepo.yml'), Monorepo)
 
 
-from . import bootstrap
-from . import sanity
 from . import status

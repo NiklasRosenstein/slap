@@ -19,22 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
-from shore.model import Package
+from . import mono, load_monorepo_manifest
+from ..commons.status import print_status
 import click
 
 
-@shut.group(help=__doc__)
-def pkg():
-  """
-  Manage the Python package in the current directory.
-  """
-
-
-def load_package_manifest() -> Package:
-  return commons.load_manifest(('package.yaml', 'package.yml'), Package)
-
-
-from . import bootstrap
-from . import sanity
-from . import status
+@mono.command()
+def status():
+  print_status(load_monorepo_manifest())
