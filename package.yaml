@@ -15,8 +15,8 @@ requirements:
   - click ^7.0
   - jinja2 ^2.11.1
   - networkx ^2.4
-  - nr.databind.core ~0.0.1
-  - nr.databind.json ~0.0.1
+  - nr.databind.core ~0.0.20
+  - nr.databind.json ~0.0.13
   - nr.fs ^1.5.0
   - nr.pylang.utils ^0.0.1
   - nr.proxy ^0.0.1
