@@ -36,7 +36,9 @@ def get_commits_since_last_tag(subject: Union[Monorepo, Package]):
 
 def print_status(subject: Union[Monorepo, Package]) -> None:
   """
-  Prints the release status of a package or the packages in a monorepo.
+  The latest version is taken from the current version number in the package
+  configuration file. Git is then queried for the tag and the commit distance
+  to the current revision.
   """
 
   items = [subject]

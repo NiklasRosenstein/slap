@@ -24,6 +24,8 @@ from ..commons.status import print_status
 import click
 
 
-@mono.command()
+@mono.command(help="""
+  Show which packages have been modified since their last release.
+  """ + print_status.__doc__)
 def status():
   print_status(load_monorepo_manifest())

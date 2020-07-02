@@ -24,6 +24,8 @@ from ..commons.status import print_status
 import click
 
 
-@pkg.command()
+@pkg.command(help="""
+  Shows whether the package was modified since the last release.
+  """ + print_status.__doc__)
 def status():
   print_status(load_package_manifest())
