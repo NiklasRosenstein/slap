@@ -51,7 +51,7 @@ GITIGNORE_TEMPLATE = '''
 *.py[cod]
 *.egg-info
 *.egg
-'''
+'''.lstrip()
 
 README_TEMPLATE = '''
 # {{project_name}}
@@ -59,7 +59,7 @@ README_TEMPLATE = '''
 ---
 
 <p align="center">Copyright &copy; {{year}} {{author.name}}</p>
-'''
+'''.lstrip()
 
 
 def load_author_from_git() -> Optional[str]:
@@ -163,19 +163,13 @@ def bootstrap(
   def _render_template(fp, template_string):
     for data in jinja2.Template(template_string).stream(**template_vars):
       fp.write(data)
+    fp.write('\n')
 
   files = VirtualFiles()
 
-  files.add_static(
-    '.gitignore',
-    GITIGNORE_TEMPLATE,
-  )
-
-  files.add_dynamic(
-    'README.md',
-    _render_template,
-    README_TEMPLATE,
-  )
+  files.add_static('.gitignore', GITIGNORE_TEMPLATE)
+  files.add_dynamic('README.md', _render_template, README_TEMPLATE)
+  files.add_dynamic('package.' + suffix, lambda fp: package_manifest.dump(fp))
 
   files.add_dynamic(
     'src/{}/__init__.py'.format(module_name.replace('.', '/')),
@@ -191,16 +185,10 @@ def bootstrap(
       NAMESPACE_INIT_TEMPLATE,
     )
 
-  files.add_dynamic(
-    'package.' + suffix,
-    lambda fp: package_manifest.dump(fp),
-  )
-
   if license:
-    files.add_dynamic(
-      'LICENSE.txt',
-      lambda fp: fp.write(wrap_license_text(get_license_metadata(license)['license_text'])),
-    )
+    license_text = 'Copyright (c) {year} {author.name}\n\n'.format(**template_vars)
+    license_text += wrap_license_text(get_license_metadata(license)['license_text'])
+    files.add_static('LICENSE.txt', license_text)
 
   files.write_all(
     target_directory,
