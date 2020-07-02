@@ -24,7 +24,7 @@ from shore.model import Package
 import click
 
 
-@shut.group(help=__doc__)
+@shut.group()
 def pkg():
   """
   Manage the Python package in the current directory.
