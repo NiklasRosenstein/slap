@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, Struct, FieldName, Collect
+from nr.databind.core import Field, Struct, FieldName, Collect, SkipDefaults
 from nr.databind.json import JsonDefault, JsonSerializer, JsonMixin
 from nr.interface import implements
 from nr.pylang.utils import classdef
@@ -35,7 +35,7 @@ from shore.core.plugins import (
 from shore.mapper import mapper
 from shore.util.ast import load_module_members
 from shore.util.version import bump_version, Version
-from typing import Any, Callable, Dict, Iterable, Optional, List, Type, Union
+from typing import Any, Callable, Dict, Iterable, Optional, List, TextIO, Type, Union
 import ast
 import collections
 import copy
@@ -162,7 +162,7 @@ class Requirement(object):
     return Requirement.parse(node.value)
 
 
-@JsonSerializer(deserialize='_deserialize')
+@JsonSerializer(deserialize='_deserialize', serialize='_serialize')
 class Requirements(object):
   """ Represents package requirements, consisting of a #RequirementsList *any*
   that is comprised of requirements that always need to be present, and
@@ -205,10 +205,10 @@ class Requirements(object):
 
   classdef.repr('python,required,platforms')
 
-  def __init__(self):
-    self.python = None
-    self.required = []
-    self.platforms = {}
+  def __init__(self, python=None, required=None, platforms=None):
+    self.python = python
+    self.required = required or []
+    self.platforms = platforms or {}
 
   def __bool__(self):
     return bool(self.python or self.required or self.platforms)
@@ -222,6 +222,18 @@ class Requirements(object):
     for index, item in enumerate(items):
       self._extract_from_item(mapper, node.make_child(index, None, item))
     return self
+
+  @classmethod
+  def _serialize(cls, mapper, node):
+    self = node.value
+    result = []
+    if self.python:
+      result.append('python ' + str(self.python))
+    for item in self.required:
+      result.append(str(item))
+    for platform_name, reqs in self.platforms.items():
+      result.append({platform_name: mapper.serialize_node(node.make_child(platform_name, type(reqs), reqs))})
+    return result
 
   def _extract_from_item(self, mapper, node):
     item = node.value
@@ -245,10 +257,10 @@ class RootRequirements(Requirements):
 
   classdef.repr(Requirements.__repr_properties__ + ['test', 'extra',])
 
-  def __init__(self):
-    super(RootRequirements, self).__init__()
-    self.test = None
-    self.extra = {}
+  def __init__(self, python=None, required=None, platforms=None, test=None, extra=None):
+    super(RootRequirements, self).__init__(python, required, platforms)
+    self.test = test
+    self.extra = extra or []
 
   def _extract_from_item(self, mapper, node):
     item = node.value
@@ -270,17 +282,25 @@ class Author(Struct):
 
   AUTHOR_EMAIL_REGEX = re.compile(r'([^<]+)<([^>]+)>')
 
+  @classmethod
+  def parse(cls, string: str) -> 'Author':
+    match = Author.AUTHOR_EMAIL_REGEX.match(string)
+    if not match:
+      raise ValueError('not a valid author string: {!r}'.format(s))
+    author = match.group(1).strip()
+    email = match.group(2).strip()
+    return cls(author, email)
+
   def __str__(self):
     return '{} <{}>'.format(self.name, self.email)
 
   @classmethod
   def _deserialize(cls, mapper, node):
     if isinstance(node.value, str):
-      match = Author.AUTHOR_EMAIL_REGEX.match(node.value)
-      if match:
-        author = match.group(1).strip()
-        email = match.group(2).strip()
-        return Author(author, email)
+      try:
+        return cls.parse(node.value)
+      except ValueError:
+        pass
     raise NotImplementedError
 
 
@@ -514,6 +534,14 @@ class BaseObject(Struct):
       return obj
 
     return cache.get_or_load(filename, _load)
+
+  def dump(self, file_: Union[str, TextIO]) -> None:
+    if isinstance(file_, str):
+      with open(file_, 'w') as fp:
+        self.dump(fp)
+    else:
+      data = mapper.serialize(self, type(self), filename=file_.name, decorations=[SkipDefaults()])
+      yaml.safe_dump(data, file_)
 
   def on_load_hook(self):
     """ Called after the object was loaded with #load(). """
