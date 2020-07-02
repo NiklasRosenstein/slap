@@ -23,6 +23,7 @@
 This package implements the Shut CLI.
 """
 
+from shore import __version__
 from nr.proxy import Proxy
 
 import click
@@ -34,6 +35,7 @@ context = Proxy(lambda: click.get_current_context().obj)
 @click.group()
 @click.option('-v', '--verbose', count=True, help='Increase the log verbosity.')
 @click.option('-q', '--quiet', is_flag=True, help='Quiet mode, wins over --verbose.')
+@click.version_option(__version__)
 def shut(verbose, quiet):
   """
   Shut is a tool to manage the lifecycle of pure Python packages. It automates tasks such
