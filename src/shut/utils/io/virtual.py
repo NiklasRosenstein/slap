@@ -63,6 +63,11 @@ class VirtualFiles:
     create_directories: bool=True,
     dry: bool=False,
   ) -> None:
+    """
+    Writes all files to disk. Relative files will be written relative to the
+    *parent_directory*.
+    """
+
     for file_ in self._files:
       filename = os.path.normpath(os.path.join(parent_directory or '.', file_['filename']))
       exists = os.path.isfile(filename)
