@@ -65,3 +65,4 @@ def shut(verbose, quiet):
 
 from . import classifiers
 from . import license
+from . import pkg
