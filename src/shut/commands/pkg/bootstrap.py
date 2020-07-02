@@ -151,7 +151,6 @@ def bootstrap(
       python=VersionSelector('^2.7|^3.5' if universal else '^3.5'),
     ),
   )
-  print(package_manifest)
 
   template_vars = {
     'project_name': project_name,
