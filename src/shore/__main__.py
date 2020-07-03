@@ -549,7 +549,8 @@ def bump(**args):
 
   # Rename the unreleased changelog if it exists.
   def _release_changelogs(subject):
-    changelog_manager = ChangelogManager(os.path.join(subject.directory, subject.changelog_directory), mapper)
+    from shut.changelog.manager import ChangelogManager
+    changelog_manager = ChangelogManager(os.path.join(subject.directory, subject.changelog_directory))
     if changelog_manager.unreleased.exists():
       changed_files.append(changelog_manager.unreleased.filename)
       if args['dry']:
