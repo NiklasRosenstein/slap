@@ -755,7 +755,7 @@ class Package(BaseObject):
     return self._get_inherited_field('private')
 
   def get_modulename(self) -> str:
-    return self.modulename or self.name
+    return self.modulename or self.name.replace('-', '_')
 
   def get_version(self) -> str:
     version: str = self._get_inherited_field('version')
@@ -812,7 +812,7 @@ class Package(BaseObject):
     """ Returns the filename of the entry file that contains package metadata
     such as `__version__` and `__author__`. """
 
-    name = self.get_modulename().replace('-', '_')
+    name = self.get_modulename()
     parts = name.split('.')
     prefix = os.sep.join(parts[:-1])
     for filename in [parts[-1] + '.py', os.path.join(parts[-1], '__init__.py')]:
