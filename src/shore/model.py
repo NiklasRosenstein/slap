@@ -541,7 +541,7 @@ class BaseObject(Struct):
         self.dump(fp)
     else:
       data = mapper.serialize(self, type(self), filename=file_.name, decorations=[SkipDefaults()])
-      yaml.safe_dump(data, file_)
+      yaml.safe_dump(data, file_, sort_keys=False)
 
   def on_load_hook(self):
     """ Called after the object was loaded with #load(). """

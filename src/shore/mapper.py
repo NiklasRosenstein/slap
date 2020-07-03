@@ -19,9 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import ObjectMapper, IDeserializer
+from nr.databind.core import ObjectMapper, IDeserializer, ISerializer
 from nr.databind.json import JsonModule
 from shore.util.version import parse_version, Version
 
 mapper = ObjectMapper(JsonModule())
 mapper.register(Version, IDeserializer(lambda _m, n: parse_version(n.value)))
+mapper.register(Version, ISerializer(lambda _m, n: str(n.value)))
