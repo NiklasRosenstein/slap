@@ -150,7 +150,8 @@ class SetuptoolsRenderer:
   @override
   def get_package_build_targets(self, package: Package) -> Iterable[IBuildTarget]:
     yield SetuptoolsBuildTarget('sdist', 'sdist', package)
-    yield SetuptoolsBuildTarget('wheel', 'bdist_wheel', package)
+    if package.wheel:
+      yield SetuptoolsBuildTarget('wheel', 'bdist_wheel', package)
 
   _BEGIN_SECTION = '# Auto-generated with shore. Do not edit. {'
   _END_SECTION = '# }'
