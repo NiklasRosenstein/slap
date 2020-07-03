@@ -738,6 +738,9 @@ class Package(BaseObject):
   #: data.
   typed = Field(bool, default=False)
 
+  #: Advertise a "setuptools:wheel" build target for the package. Defaults to True.
+  wheel = Field(bool, default=True)
+
   @property
   def local_name(self) -> str:
     if self.monorepo:
