@@ -25,6 +25,7 @@ from nr.stream import Stream
 from nr.utils.git import Git
 from shore import __version__
 from shore.core.plugins import (
+  BuildResult,
   CheckResult,
   FileToRender,
   IMonorepoPlugin,
@@ -751,7 +752,11 @@ def publish(**args):
         else:
           logger.info('building target %s', colored(target_id, 'cyan'))
           os.makedirs(args['build_dir'], exist_ok=True)
-          build.build(args['build_dir'])
+          result = build.build(args['build_dir'])
+          if result != BuildResult.SUCCESS:
+            logger.error('target %s could not be built (%s)', colored(target_id, 'cyan'),
+              colored(result.name, 'red'))
+            sys.exit(1)
 
       publisher.publish(
         required_builds.values(),
@@ -759,7 +764,7 @@ def publish(**args):
         args['build_dir'],
         args['skip_existing'])
       return True
-    except:
+    except Exception:
       logger.exception('error while running publisher "%s"', name)
       return False
 
