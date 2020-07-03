@@ -22,7 +22,8 @@
 """ A plugin that generates setuptools files (setup.py, MANIFEST.in). This
 plugin is used by default in packages. """
 
-from ._util import find_readme_file, Readme
+from ._util import find_readme_file, readme_content_type
+from nr.fs import issub as issubpath
 from nr.interface import implements, override
 from shore.core.plugins import (
   BuildResult,
@@ -211,7 +212,9 @@ class SetuptoolsRenderer:
                 command.insert(0, sys.executable)
               env = os.environ.copy()
               env['SHORE_INSTALL_HOOK_EVENT'] = event
-              subprocess.call(command, env=env)
+              res = subprocess.call(command, env=env)
+              if res != 0:
+                raise RuntimeError('command {!r} returned exit code {}'.format(command, res))
       '''))
     if has_install_hooks:
       fp.write(textwrap.dedent('''
@@ -240,22 +243,40 @@ class SetuptoolsRenderer:
     ''').format(entrypoint_file=_normpath(entry_file)))
 
     # Write the part that reads the readme for the long description.
-    readme = find_readme_file(package.directory)
+    if package.readme:
+      rel_readme = package.readme
+      abs_readme = os.path.abspath(os.path.join(package.directory, rel_readme))
+      if issubpath(os.path.relpath(abs_readme, package.directory)):
+        rel_readme, readme = None, rel_readme
+      else:
+        readme = os.path.basename(rel_readme)
+    else:
+      rel_readme = None
+      readme = find_readme_file(package.directory)
+
     if readme:
+      fp.write('\nreadme_file = {!r}\n'.format(readme))
+      if rel_readme:
+        # Copy the relative README file if it exists.
+        fp.write(textwrap.dedent('''
+          source_readme_file = {!r}
+          if not os.path.isfile(readme_file) and os.path.isfile(source_readme_file):
+            import shutil; shutil.copyfile(source_readme_file, readme_file)
+            import atexit; atexit.register(lambda: os.remove(readme_file))
+        ''').format(rel_readme).lstrip())
       fp.write(textwrap.dedent('''
-        readme_file = {readme!r}
         if os.path.isfile(readme_file):
           with io.open(readme_file, encoding='utf8') as fp:
             long_description = fp.read()
         else:
-          print("warning: file \\"{{}}\\" does not exist.".format(readme_file), file=sys.stderr)
+          print("warning: file \\"{}\\" does not exist.".format(readme_file), file=sys.stderr)
           long_description = None
-      ''').format(readme=readme.file))
+      '''))
     else:
       fp.write(textwrap.dedent('''
         long_description = {long_description!r}
       '''.format(long_description=package.long_description)))
-      readme = Readme(None, 'text/plain')
+      readme = None
 
     # Write the install requirements.
     fp.write('\n')
@@ -326,7 +347,10 @@ class SetuptoolsRenderer:
       url=package.get_url(),
       license=package.get_license(),
       description=package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
-      long_description_content_type=readme.content_type,
+      long_description_content_type=(
+        package.long_description_content_type or
+          (readme_content_type(readme) if readme else 'text/plain')
+      ),
       extras_require=extras_require,
       tests_require=tests_require,
       python_requires=package.requirements.python.to_setuptools() if package.requirements.python else None,
