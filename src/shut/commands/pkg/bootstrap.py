@@ -23,6 +23,7 @@ from shut.utils.io.virtual import VirtualFiles
 
 from . import pkg
 from shore.model import Author, Package, RootRequirements, VersionSelector
+from shore.util.version import Version
 from shore.util.license import get_license_metadata, wrap_license_text
 from termcolor import colored
 from typing import Optional
@@ -133,14 +134,16 @@ def bootstrap(
 
   if not target_directory:
     target_directory = project_name
-  if not author:
-    author = load_author_from_git() or Author('Unknown', '<unknown@example.org>')
   if not module_name:
     module_name = project_name.replace('-', '_')
+  if not author:
+    author = load_author_from_git() or Author('Unknown', '<unknown@example.org>')
+  if not version:
+    version = version or Version('0.0.0')
 
   package_manifest = Package(
     name=project_name,
-    modulename=module_name,
+    modulename=None if module_name == project_name.replace('-', '_') else module_name,
     version=version,
     author=author,
     license=license,
