@@ -19,26 +19,28 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from nr.fs import getsuffix
+from typing import Optional
 import ast
 import collections
 import os
 
-Readme = collections.namedtuple('Readme', 'file,content_type')
 
-
-def find_readme_file(directory):
-  preferred = {
-    'README.md': 'text/markdown',
-    'README.rst': 'text/x-rst',
-    'README.txt': 'text/plain',
-    'README': 'text/plain'
-  }
+def find_readme_file(directory: str) -> Optional[str]:
+  preferred = set(['README.md', 'README.rst', 'README.txt', 'README'])
   choices = []
-  for name in os.listdir(directory):
+  for name in sorted(os.listdir(directory)):
     if name in preferred:
-      return Readme(name, preferred[name])
+      return name
     if name.startswith('README.'):
       choices.append(name)
   if choices:
-    return Readme(sorted(choices)[0], 'text/plain')
+    return choices[0]
   return None
+
+
+def readme_content_type(filename: str) -> str:
+  return {
+    'md': 'text/markdown',
+    'rst': 'text/x-rst',
+  }.get(getsuffix(filename), 'text/plain')

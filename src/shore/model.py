@@ -682,6 +682,11 @@ class Package(BaseObject):
   #: The default "use" field is populated with setuptools and pypi.
   use = Field([PluginConfig], default=list)
 
+  #: Path to the README file. If the file points to a directory outside of the
+  #: directory of the package manifest, this file will be copied to the package
+  #: directory temporarily by the `setup.py` script.
+  readme = Field(str, default=None)
+
   #: The long description of the package. If this is not defined, the
   #: setuptools plugin will load the README file.
   long_description = Field(str, FieldName('long-description'), default=None)
