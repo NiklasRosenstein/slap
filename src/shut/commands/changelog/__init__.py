@@ -81,11 +81,12 @@ def changelog(**args):
       logger.error('invalid changelog type: %r', args['add'])
       sys.exit(1)
 
+    fixes = ['#' + f if f.isdigit() else f for f in _split(args['fixes'])]
     entry = v3.Changelog.Entry(
       type_,
       args['for'],
       args['message'] or '',
-      _split(args['fixes']))
+      fixes)
 
     # Allow the user to edit the entry if no description is provided or the
     # -e,--edit option was set.
@@ -112,6 +113,8 @@ def changelog(**args):
         commit_message = '{}({}): '.format(entry.type_.name, subject.name) + commit_message
       else:
         commit_message = '{}: '.format(entry.type_.name) + commit_message
+      if fixes:
+        commit_message += '\n\nfixes ' + ', '.join(fixes)
       _git.commit(commit_message)
 
     sys.exit(0)
