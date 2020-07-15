@@ -46,7 +46,7 @@ class CorePlugin:
   def check_package(self, package: Package) -> Iterable[CheckResult]:
     yield from self._unhandled_keys(package)
 
-    if not find_readme_file(package.directory):
+    if not package.get_readme():
       yield CheckResult(package, 'WARNING', 'No README file found.')
 
     if not package.get_author():

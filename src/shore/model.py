@@ -41,6 +41,7 @@ import collections
 import copy
 import logging
 import os
+import nr.fs
 import re
 import shlex
 import yaml
@@ -741,6 +742,8 @@ class Package(BaseObject):
   #: Advertise a "setuptools:wheel" build target for the package. Defaults to True.
   wheel = Field(bool, default=True)
 
+  _PackageReadme = collections.namedtuple('PackageReadme', 'path,is_inside')
+
   @property
   def local_name(self) -> str:
     if self.monorepo:
@@ -802,6 +805,16 @@ class Package(BaseObject):
   def get_tag(self, version: str) -> str:
     tag_format = self.get_tag_format()
     return tag_format.format(name=self.name, version=version)
+
+  def get_readme(self) -> Optional[_PackageReadme]:
+    if self.readme:
+      abs_path = os.path.abspath(os.path.join(self.directory, self.readme))
+      is_inside = nr.fs.issub(os.path.relpath(abs_path, self.directory))
+      return Package._PackageReadme(self.readme, is_inside)
+    filename = find_readme_file(package.directory)
+    if filename:
+      return Package._PackageReadme(filename, True)
+    return None
 
   def on_load_hook(self):
     """ Called when the package is loaded. Attempts to find the Monorepo that
