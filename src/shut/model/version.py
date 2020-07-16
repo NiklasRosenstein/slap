@@ -19,26 +19,17 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
-from shut.model import Project, PackageModel
-import click
+from nr.databind.json import JsonSerializer
+from shore.util.version import parse_version, Version as _Version
 
 
-@shut.group()
-def pkg():
-  """
-  Manage the Python package in the current directory.
-  """
+@JsonSerializer(serialize='_serialize', deserialize='_deserialize')
+class Version(_Version):
 
+  @classmethod
+  def _serialize(cls, mapper, node) -> str:
+    return str(node.value)
 
-def load_package_manifest() -> PackageModel:
-  project = Project()
-  project.load('.')
-  print(project.subject)
-  assert isinstance(project.subject, PackageModel)
-  return project.subject
-
-
-from . import bootstrap
-from . import sanity
-from . import status
+  @classmethod
+  def _deserialize(cls, mapper, node) -> 'Version':
+    return Version(parse_version(node.value))
