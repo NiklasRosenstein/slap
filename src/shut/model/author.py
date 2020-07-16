@@ -19,26 +19,44 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
-from shut.model import Project, PackageModel
-import click
+from nr.databind.core import Field, Struct
+from nr.databind.json import JsonSerializer
+import re
 
 
-@shut.group()
-def pkg():
+@JsonSerializer(serialize='_serialize', deserialize='_deserialize')
+class Author(Struct):
   """
-  Manage the Python package in the current directory.
+  Represents information about an author. Can be deserialized from a string of
+  the form `Name <user@domain.name>`
   """
 
+  AUTHOR_EMAIL_REGEX = re.compile(r'([^<]+)<([^>]+)>')
 
-def load_package_manifest() -> PackageModel:
-  project = Project()
-  project.load('.')
-  print(project.subject)
-  assert isinstance(project.subject, PackageModel)
-  return project.subject
+  name = Field(str)
+  email = Field(str)
 
+  @classmethod
+  def parse(cls, string: str) -> 'Author':
+    match = Author.AUTHOR_EMAIL_REGEX.match(string)
+    if not match:
+      raise ValueError('not a valid author string: {!r}'.format(s))
+    author = match.group(1).strip()
+    email = match.group(2).strip()
+    return cls(author, email)
 
-from . import bootstrap
-from . import sanity
-from . import status
+  def __str__(self):
+    return '{} <{}>'.format(self.name, self.email)
+
+  @classmethod
+  def _serialize(cls, mapper, node) -> str:
+    return str(node.value)
+
+  @classmethod
+  def _deserialize(cls, mapper, node) -> 'Author':
+    if isinstance(node.value, str):
+      try:
+        return cls.parse(node.value)
+      except ValueError:
+        pass
+    raise NotImplementedError

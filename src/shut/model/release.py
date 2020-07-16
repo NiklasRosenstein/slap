@@ -19,26 +19,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
-from shut.model import Project, PackageModel
-import click
+from nr.databind.core import Field, FieldName, Struct
 
 
-@shut.group()
-def pkg():
-  """
-  Manage the Python package in the current directory.
-  """
+class ReleaseConfiguration(Struct):
+  private = Field(bool, default=False)
+  tag_format = Field(str, FieldName('tag-format'), default='{version}')
 
 
-def load_package_manifest() -> PackageModel:
-  project = Project()
-  project.load('.')
-  print(project.subject)
-  assert isinstance(project.subject, PackageModel)
-  return project.subject
-
-
-from . import bootstrap
-from . import sanity
-from . import status
+class MonorepoReleaseConfiguration(Struct):
+  single_version = Field(bool, FieldName('single-version'), default=False)

@@ -19,26 +19,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
-from shut.model import Project, PackageModel
-import click
+from nr.databind.core import Field, FieldName, Struct
 
 
-@shut.group()
-def pkg():
-  """
-  Manage the Python package in the current directory.
-  """
-
-
-def load_package_manifest() -> PackageModel:
-  project = Project()
-  project.load('.')
-  print(project.subject)
-  assert isinstance(project.subject, PackageModel)
-  return project.subject
-
-
-from . import bootstrap
-from . import sanity
-from . import status
+class ChangelogConfiguration(Struct):
+  directory = Field(str, default='.changelog')
