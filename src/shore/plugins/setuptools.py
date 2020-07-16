@@ -22,7 +22,7 @@
 """ A plugin that generates setuptools files (setup.py, MANIFEST.in). This
 plugin is used by default in packages. """
 
-from ._util import find_readme_file, readme_content_type
+from ._util import readme_content_type
 from nr.interface import implements, override
 from shore.core.plugins import (
   BuildResult,
