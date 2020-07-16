@@ -33,6 +33,7 @@ from shore.core.plugins import (
   load_plugin,
   PluginNotFound)
 from shore.mapper import mapper
+from shore.plugins._util import find_readme_file
 from shore.util.ast import load_module_members
 from shore.util.version import bump_version, Version
 from typing import Any, Callable, Dict, Iterable, Optional, List, TextIO, Type, Union
@@ -811,7 +812,7 @@ class Package(BaseObject):
       abs_path = os.path.abspath(os.path.join(self.directory, self.readme))
       is_inside = nr.fs.issub(os.path.relpath(abs_path, self.directory))
       return Package._PackageReadme(self.readme, is_inside)
-    filename = find_readme_file(package.directory)
+    filename = find_readme_file(self.directory)
     if filename:
       return Package._PackageReadme(filename, True)
     return None

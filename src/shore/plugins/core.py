@@ -21,7 +21,6 @@
 
 from shore.core.plugins import CheckResult, FileToRender, IPackagePlugin, IMonorepoPlugin, VersionRef
 from shore.model import BaseObject, Monorepo, Package, VersionSelector
-from shore.plugins._util import find_readme_file
 from shore.util.classifiers import get_classifiers
 from shore.util.version import Version
 from nr.interface import implements, override
