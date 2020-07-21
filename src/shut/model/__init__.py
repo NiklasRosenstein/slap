@@ -19,10 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import List, Type, TypeVar
+from typing import List, Type, TypeVar, Union
 
-from nr.databind.core import ObjectMapper
+from nr.databind.core import ObjectMapper, NodeCollector
 from nr.databind.json import JsonModule
+from nr.stream import Stream
 import yaml
 
 import os
@@ -51,13 +52,17 @@ class Project:
   package_filenames = ['package.yml', 'package.yaml']
 
   def __init__(self, mapper: ObjectMapper = None):
-    self._cache = {}
+    self._cache: Dict[str, Union[MonorepoModel, PackageModel]] = {}
     self.mapper = mapper or ObjectMapper(JsonModule())
     self.subject: Union[MonorepoModel, PackageModel] = None
     self.monorepo: MonorepoModel = None
     self.packages: List[PackageModel] = []
 
-  def load(self, directory: str) -> None:
+  def load(
+    self,
+    directory: str = '.',
+    expect: Type[Union[MonorepoModel, PackageModel]] = None,
+  ) -> Union[MonorepoModel, PackageModel]:
     """
     Loads all project information from *directory*. This searches in all parent directories
     for a package or monorepo configuration, then loads all resources that belong to the
@@ -85,6 +90,12 @@ class Project:
     if package_fn:
       self.subject = self._load_package(package_fn)
 
+    if expect and not isinstance(self.subject, expect):
+      raise TypeError('expected {!r} at {!r}, got {!r}'.format(
+                      expect.__name__, directory, type(self.subject).__name__))
+
+    return self.subject
+
   def _load_object(self, filename: str, type_: Type[T]) -> T:
     filename = os.path.normpath(os.path.abspath(filename))
     if filename in self._cache:
@@ -94,8 +105,13 @@ class Project:
       return obj
     with open(filename) as fp:
       data = yaml.safe_load(fp)
-    # TODO(NiklasRosenstein): Store unknown keys
-    obj = self._cache[filename] = self.mapper.deserialize(data, type_, filename=filename)
+    node_collector = NodeCollector()
+    obj = self._cache[filename] = self.mapper.deserialize(
+      data, type_, filename=filename, decorations=[node_collector])
+    obj.filename = filename
+    obj.unknown_keys = list(Stream.concat(
+        (x.locator.append(k) for k in x.unknowns)
+        for x in node_collector.nodes))
     return obj
 
   def _load_monorepo(self, filename: str) -> MonorepoModel:

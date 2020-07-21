@@ -19,12 +19,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from . import pkg, load_package_manifest
-from ..commons.status import print_status
+from shut.commands.commons.status import print_status
+from shut.commands.pkg import pkg, project
+from shut.model import PackageModel
 
 
 @pkg.command(help="""
   Shows whether the package was modified since the last release.
   """ + print_status.__doc__)
 def status():
-  print_status(load_package_manifest())
+  print_status(project.load(expect=PackageModel))

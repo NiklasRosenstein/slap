@@ -19,24 +19,24 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
+from shut.commands import shut, commons
 from shut.model import Project, PackageModel
+
+from nr.proxy import Proxy
 import click
+
+project = Proxy(lambda: click.get_current_context().obj['project'])
 
 
 @shut.group()
-def pkg():
+@click.pass_context
+def pkg(ctx):
   """
   Manage the Python package in the current directory.
   """
 
-
-def load_package_manifest() -> PackageModel:
-  project = Project()
-  project.load('.')
-  print(project.subject)
-  assert isinstance(project.subject, PackageModel)
-  return project.subject
+  ctx.ensure_object(dict)
+  ctx.obj['project'] = Project()
 
 
 from . import bootstrap
