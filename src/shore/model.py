@@ -262,7 +262,7 @@ class RootRequirements(Requirements):
   def __init__(self, python=None, required=None, platforms=None, test=None, extra=None):
     super(RootRequirements, self).__init__(python, required, platforms)
     self.test = test
-    self.extra = extra or []
+    self.extra = extra or {}
 
   def _extract_from_item(self, mapper, node):
     item = node.value

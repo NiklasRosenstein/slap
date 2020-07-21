@@ -19,30 +19,106 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.model import Monorepo
-from shore.core.plugins import CheckResult
+from shore.util.classifiers import get_classifiers
 
-from . import pkg, load_package_manifest
+from shut.commands.pkg import pkg, project
+from shut.model import PackageModel, Project
+
 from nr.stream import Stream
 from termcolor import colored
+from typing import Iterable, Union
 import click
+import enum
 import logging
+import os
 import sys
 
 logger = logging.getLogger(__name__)
 
 
-def _run_for_subject(subject, func):  # type: (Union[Package, Monorepo], func) -> List[Any]
-  if isinstance(subject, Monorepo):
-    subjects = [subject] + sorted(subject.get_packages(), key=lambda x: x.name)
-    return [func(x) for x in subjects]
+class CheckResult:
+  """
+  Represents a sanity check result.
+  """
+
+  class Level(enum.IntEnum):
+    INFO = 0
+    WARNING = 1
+    ERROR = 2
+
+  def __init__(self, on: PackageModel, level: Union[str, Level], message: str):
+    if isinstance(level, str):
+      level = self.Level[level]
+    assert isinstance(level, self.Level)
+    self.on = on
+    self.level = level
+    self.message = message
+
+  def __repr__(self):
+    return 'CheckResult(on={!r}, level={}, message={!r})'.format(
+      self.on, self.level, self.message)
+
+
+def sanity_check_package(project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  for path in package.unknown_keys:
+    yield CheckResult(package, CheckResult.Level.WARNING, 'unknown key {}'.format(path))
+
+  if not package.get_readme():
+    yield CheckResult(package, 'WARNING', 'No README file found.')
+
+  classifiers = get_classifiers()
+  unknown_classifiers = [x for x in package.data.classifiers if x not in classifiers]
+  if unknown_classifiers:
+    yield CheckResult(package, 'WARNING',
+      'unknown $.classifiers: {}'.format(unknown_classifiers))
+
+  if not package.data.author:
+    yield CheckResult(package, 'WARNING', 'missing $.package.author')
+  if not package.data.license: #and not package.get_private():
+    yield CheckResult(package, 'WARNING', 'missing $.license')
+  if not package.data.url:
+    yield CheckResult(package, 'WARNING', 'missing $.url')
+
+  if package.data.license and project.monorepo and project.monorepo.license \
+      and project.monorepo.license != package.data.license:
+    yield CheckResult(package, 'ERROR', '$.license ({!r}) is inconsistent '
+      'with monorepo license ({!r})'.format(package.license, package.monorepo.license))
+
+  if package.data.license:
+    for name in ('LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'):
+      filename = os.path.join(os.path.dirname(package.filename), name)
+      if os.path.isfile(filename):
+        break
+    else:
+      yield CheckResult(package, 'WARNING', 'No LICENSE file found.')
+
+  metadata = package.get_python_package_metadata()
+  if package.data.author and metadata.author != str(package.data.author):
+    yield CheckResult(package, 'ERROR',
+      'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
+        str(package.data.author), metadata.filename, metadata.author))
+  if package.data.version and metadata.version != str(package.data.version):
+    yield CheckResult(package, 'ERROR',
+      'Inconsistent package version (package.yaml: {!r} != {}: {!r})'.format(
+        str(package.data.version), metadata.filename, metadata.version))
+
+  try:
+    py_typed_file = os.path.join(metadata.package_directory, 'py.typed')
+  except ValueError:
+    if package.data.typed:
+      yield CheckResult(package, 'WARNING', '$.package.typed only works with packages, but this is a module')
   else:
-    return [func(subject)]
+    if os.path.isfile(py_typed_file) and not package.data.typed:
+      yield CheckResult(package, 'WARNING', 'file "py.typed" exists but $.typed is not set')
 
 
-def run_checks(package, warnings_as_errors):  # type: (Package, bool) -> bool
-  package_name_c = colored(package.name, 'yellow')
-  checks = list(Stream.concat(x.get_checks(package) for x in package.get_plugins()))
+def print_package_checks(project: Project, package: PackageModel, warnings_as_errors: bool = False) -> bool:
+  """
+  Formats the checks created with #sanity_check_package().
+  """
+
+  package_name_c = colored(package.data.name, 'yellow')
+  checks = list(sanity_check_package(project, package))
   if not checks:
     print('✔ no checks triggered on package {}'.format(package_name_c))
     return True
@@ -79,7 +155,7 @@ def sanity(warnings_as_errors):
   on the package configuration and entrypoint definition.
   """
 
-  package = load_package_manifest()
-  result = run_checks(package, warnings_as_errors)
+  package = project.load(expect=PackageModel)
+  result = print_package_checks(project, package, warnings_as_errors)
   if not result:
     sys.exit(1)

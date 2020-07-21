@@ -23,10 +23,12 @@ from .author import Author
 from .version import Version
 from .release import MonorepoReleaseConfiguration
 from nr.databind.core import Field, FieldName, Struct
+from typing import List
 
 
 class MonorepoModel(Struct):
   filename = Field(str, hidden=True, default=None)
+  unknown_keys = Field(List[str], hidden=True, default=list)
   name = Field(str)
   version = Field(Version, default=None)
   author = Field(Author, default=None)
