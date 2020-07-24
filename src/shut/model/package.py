@@ -20,7 +20,6 @@
 # IN THE SOFTWARE.
 
 from shore.util.ast import load_module_members
-from shore.plugins._util import find_readme_file
 
 from .author import Author
 from .changelog import ChangelogConfiguration
@@ -29,9 +28,29 @@ from .release import ReleaseConfiguration
 from .requirements import Requirement
 from .version import Version
 from nr.databind.core import Field, FieldName, Struct
-from typing import Dict, List, Optional
+from typing import Dict, Iterable, List, Optional
 import ast
 import os
+
+
+def _get_file_in_directory(directory: str, prefix: str, preferred: List[str]) -> Optional[str]:
+  """
+  Returns a file in *directory* that is either in the *preferred* list or starts with
+  specified *prefix*.
+  """
+
+  choices = []
+  for name in sorted(os.listdir(directory)):
+    if name in preferred:
+      break
+    if name.startswith(prefix):
+      choices.append(name)
+  else:
+    if choices:
+      return choices[0]
+    return None
+
+  return os.path.join(directory, name)
 
 
 class PackageData(Struct):
@@ -79,6 +98,12 @@ class PackageModel(Struct):
   release = Field(ReleaseConfiguration, default=Field.DEFAULT_CONSTRUCT)
 
   def get_python_package_metadata(self) -> 'PythonPackageMetadata':
+    """
+    Returns a #PythonPackageMetadata object for this #PackageModel. This object can be
+    used to inspect the author and version information that is defined in the package
+    source code.
+    """
+
     return PythonPackageMetadata(
       os.path.join(os.path.dirname(self.filename), self.data.source_directory),
       self.data.get_modulename())
@@ -88,15 +113,32 @@ class PackageModel(Struct):
     Returns the absolute path to the README for this package.
     """
 
-    directory = os.path.dirname(__file__)
+    directory = os.path.dirname(self.filename)
 
     if self.data.readme:
       return os.path.abspath(os.path.join(directory, self.readme))
 
-    return find_readme_file(directory)
+    return _get_file_in_directory(
+      directory=directory,
+      prefix='README.',
+      preferred=['README.md', 'README.rst', 'README.txt', 'README'])
+
+
+  def get_license(self) -> Optional[str]:
+    """
+    Returns the absolute path to the LICENSE file for this package.
+    """
+
+    return _get_file_in_directory(
+      directory=os.path.dirname(self.filename),
+      prefix='LICENSE.',
+      preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'])
 
 
 class PythonPackageMetadata:
+  """
+  Represents the metadata of a Python package on disk.
+  """
 
   def __init__(self, source_directory: str, modulename: str) -> None:
     self.source_directory = source_directory

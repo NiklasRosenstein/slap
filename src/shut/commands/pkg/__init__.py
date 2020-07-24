@@ -40,5 +40,5 @@ def pkg(ctx):
 
 
 from . import bootstrap
-from . import sanity
+from . import checks
 from . import status
