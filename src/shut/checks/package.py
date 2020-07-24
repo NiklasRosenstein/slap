@@ -21,16 +21,14 @@
 
 from shore.util.classifiers import get_classifiers
 
-from shut.model import Project
-from shut.model.checks import CheckResult, CheckStatus, Checker, check, register_checker
-from shut.model.monorepo import MonorepoModel
-from shut.model.package import PackageModel
+from .core import CheckResult, CheckStatus, Checker, check, register_checker
+from shut.model import MonorepoModel, PackageModel, Project
 from typing import Iterable, Optional
 
 import os
 
 
-class SetuptoolsChecker(Checker[PackageModel]):
+class PackageChecker(Checker[PackageModel]):
 
   @check('readme')
   def _check_readme(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
@@ -102,4 +100,4 @@ class SetuptoolsChecker(Checker[PackageModel]):
           'file "py.typed" exists but $.typed is not set')
 
 
-register_checker(SetuptoolsChecker, PackageModel)
+register_checker(PackageChecker, PackageModel)

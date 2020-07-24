@@ -19,5 +19,23 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-__author__ = 'Niklas Rosenstein <rosensteinniklas@gmail.com>'
-__version__ = '0.1.0'
+from .core import CheckResult, CheckStatus, Checker, check, register_checker
+from shut.model import MonorepoModel, PackageModel, Project
+from typing import Iterable, Optional, Union
+
+
+class BasicChecker(Checker):
+
+  @check('unknown-config')
+  def _check_unknown_keys(
+    self,
+    project: 'Project',
+    obj: Union['MonorepoModel', 'PackageModel'],
+  ) -> Iterable[CheckResult]:
+    yield CheckResult(
+      CheckStatus.WARNING if obj.unknown_keys else CheckStatus.PASSED,
+      ', '.join(map(str, obj.unknown_keys)) if obj.unknown_keys else None)
+
+
+register_checker(BasicChecker, MonorepoModel)
+register_checker(BasicChecker, PackageModel)
