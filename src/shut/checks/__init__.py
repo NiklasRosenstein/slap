@@ -19,4 +19,5 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from . import setuptools
+from . import basic, package
+from .core import CheckStatus, get_checks

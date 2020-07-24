@@ -19,9 +19,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from shut.checks import CheckStatus, get_checks
 from shut.commands.pkg import pkg, project
 from shut.model import PackageModel, Project
-from shut.model.checks import CheckStatus, get_checks
 
 from nr.stream import Stream
 from termcolor import colored

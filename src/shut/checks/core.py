@@ -92,22 +92,3 @@ def get_checks(project: 'Project', obj: T) -> Iterable[Check]:
 
   for checker in registry.get(type(obj), []):
     yield from checker().get_checks(project, obj)
-
-
-class BasicChecker(Checker):
-
-  @check('unknown-config')
-  def _check_unknown_keys(
-    self,
-    project: 'Project',
-    obj: Union['MonorepoModel', 'PackageModel'],
-  ) -> Iterable[CheckResult]:
-    yield CheckResult(
-      CheckStatus.WARNING if obj.unknown_keys else CheckStatus.PASSED,
-      ', '.join(map(str, obj.unknown_keys)) if obj.unknown_keys else None)
-
-
-from shut.model import MonorepoModel, PackageModel, Project
-
-register_checker(BasicChecker, MonorepoModel)
-register_checker(BasicChecker, PackageModel)
