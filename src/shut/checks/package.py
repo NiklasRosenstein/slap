@@ -37,7 +37,10 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('license')
   def _check_license(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
-    if package.data.license and not package.get_license():
+    if not package.data.license:
+      yield CheckResult(CheckStatus.WARNING, 'not specified')
+
+    elif package.data.license and not package.get_license():
       yield CheckResult('license', CheckStatus.WARNING, 'No LICENSE file found.')
 
     monorepo = project.monorepo
@@ -52,17 +55,19 @@ class PackageChecker(Checker[PackageModel]):
     classifiers = get_classifiers()
     unknown_classifiers = [x for x in package.data.classifiers if x not in classifiers]
     if unknown_classifiers:
-      yield CheckResult('classifiers', CheckStatus.WARNING,
+      yield CheckResult(
+        CheckStatus.WARNING,
         'Unknown classifiers: ' + ', '.join(unknown_classifiers))
 
-  @check('package-config')
-  def _check_metadata_completeness(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  @check('author')
+  def _check_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     if not package.data.author:
-      yield CheckResult('metadata-completeness', CheckStatus.WARNING, 'no $.package.author')
-    if not package.data.license: #and not package.get_private():
-      yield CheckResult('metadata-completeness', CheckStatus.WARNING, 'no $.package.license')
+      yield CheckResult(CheckStatus.WARNING, 'missing')
+
+  @check('url')
+  def _check_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     if not package.data.url:
-      yield CheckResult('metadata-completeness', CheckStatus.WARNING, 'no $.package.url')
+      yield CheckResult(CheckStatus.WARNING, 'missing')
 
   @check('consistent-author')
   def _check_consistent_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
@@ -92,11 +97,13 @@ class PackageChecker(Checker[PackageModel]):
       py_typed_file = os.path.join(metadata.package_directory, 'py.typed')
     except ValueError:
       if package.data.typed:
-        yield CheckResult('typed', CheckStatus.WARNING,
+        yield CheckResult(
+          CheckStatus.WARNING,
           '$.package.typed only works with packages, but this is a module')
     else:
       if os.path.isfile(py_typed_file) and not package.data.typed:
-        yield CheckResult('typed', CheckStatus.WARNING,
+        yield CheckResult(
+          CheckStatus.WARNING,
           'file "py.typed" exists but $.typed is not set')
 
 

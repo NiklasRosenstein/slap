@@ -22,21 +22,12 @@
 from shut.commands import shut, commons
 from shut.model import Project, PackageModel
 
-from nr.proxy import Proxy
-import click
-
-project = Proxy(lambda: click.get_current_context().obj['project'])
-
 
 @shut.group()
-@click.pass_context
-def pkg(ctx):
+def pkg():
   """
   Manage the Python package in the current directory.
   """
-
-  ctx.ensure_object(dict)
-  ctx.obj['project'] = Project()
 
 
 from . import bootstrap
