@@ -19,19 +19,21 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import List, Type, TypeVar, Union
+from typing import List, Tuple, Type, TypeVar, Union
 
-from nr.databind.core import ObjectMapper, NodeCollector
+from nr.databind.core import ObjectMapper, NodeCollector, SerializationError
 from nr.databind.json import JsonModule
 from nr.stream import Stream
 import yaml
 
 import os
+import sys
 
 from .monorepo import MonorepoModel
 from .package import PackageModel
 
 T = TypeVar('T')
+ExcInfo = Tuple
 
 
 def get_existing_file(directory: str, choices: List[str]) -> bool:
@@ -57,6 +59,7 @@ class Project:
     self.subject: Union[MonorepoModel, PackageModel] = None
     self.monorepo: MonorepoModel = None
     self.packages: List[PackageModel] = []
+    self.invalid_packages: List[Tuple[str, ExcInfo]] = []
 
   def load(
     self,
@@ -119,10 +122,13 @@ class Project:
 
     # Load packages in that monorepo.
     directory = os.path.dirname(filename)
-    for item_name in os.path.listdir(directory):
+    for item_name in os.listdir(directory):
       package_fn = get_existing_file(os.path.join(directory, item_name), self.package_filenames)
       if package_fn:
-        self._load_package(package_fn)
+        try:
+          self._load_package(package_fn)
+        except SerializationError as exc:
+          self.invalid_packages.append((item_name, sys.exc_info()))
 
     return self.monorepo
 

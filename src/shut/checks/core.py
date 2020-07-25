@@ -39,6 +39,7 @@ class CheckStatus(enum.IntEnum):
 
 CheckResult = namedtuple('CheckResult', 'status,message')
 Check = namedtuple('Check', 'name,result')
+SkipCheck = namedtuple('SkipCheck', '')
 
 
 def check(name: str) -> Callable[[Callable], Callable]:
@@ -69,7 +70,8 @@ class Checker(Generic[T]):
       if isinstance(check_value, types.FunctionType) and hasattr(check_value, '__check_name__'):
         index = None
         for index, result in enumerate(value(project, subject)):
-          yield Check(value.__check_name__, result)
+          if not isinstance(result, SkipCheck):
+            yield Check(value.__check_name__, result)
         if index is None:
           yield Check(value.__check_name__, CheckResult(CheckStatus.PASSED, None))
 
@@ -84,7 +86,6 @@ def register_checker(checker: Type[Checker[T]], t: Type[T]) -> Type[Checker]:
   registry.setdefault(t, []).append(checker)
 
 
-
 def get_checks(project: 'Project', obj: T) -> Iterable[Check]:
   """
   Returns all checks from the checkers registered for the type of *obj*.
@@ -92,3 +93,12 @@ def get_checks(project: 'Project', obj: T) -> Iterable[Check]:
 
   for checker in registry.get(type(obj), []):
     yield from checker().get_checks(project, obj)
+
+
+__all__ = [
+  'CheckStatus',
+  'CheckResult',
+  'Check',
+  'register_checker',
+  'get_checks',
+]

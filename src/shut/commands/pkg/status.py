@@ -19,8 +19,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from shut.commands import project
 from shut.commands.commons.status import print_status
-from shut.commands.pkg import pkg, project
+from shut.commands.pkg import pkg
 from shut.model import PackageModel
 
 

@@ -22,8 +22,8 @@
 from shut.checks import CheckStatus, get_checks
 from shut.commands import project
 from shut.commands.commons.checks import print_checks, get_checks_status
-from shut.commands.pkg import pkg
-from shut.model import PackageModel, Project
+from shut.commands.mono import mono
+from shut.model import MonorepoModel, Project
 
 from nr.stream import Stream
 from termcolor import colored
@@ -39,7 +39,7 @@ import time
 logger = logging.getLogger(__name__)
 
 
-@pkg.command()
+@mono.command()
 @click.option('-w', '--warnings-as-errors', is_flag=True)
 def checks(warnings_as_errors):
   """
@@ -50,16 +50,16 @@ def checks(warnings_as_errors):
   """
 
   start_time = time.perf_counter()
-  package = project.load(expect=PackageModel)
-  checks = sorted(get_checks(project, package), key=lambda c: c.name)
+  monorepo = project.load(expect=MonorepoModel)
+  checks = sorted(get_checks(project, monorepo), key=lambda c: c.name)
   seconds = time.perf_counter() - start_time
 
-  package_name = termcolor.colored(package.data.name, 'yellow')
+  monorepo_name = termcolor.colored(monorepo.name, 'yellow')
 
   print()
   print_checks(checks, prefix='  ')
   print()
-  print('run', len(checks), 'checks for package', package_name, 'in {:.3f}s'.format(seconds))
+  print('run', len(checks), 'checks for repository', monorepo_name, 'in {:.3f}s'.format(seconds))
   print()
 
   sys.exit(get_checks_status(checks, warnings_as_errors))

@@ -35,4 +35,5 @@ def load_monorepo_manifest() -> Monorepo:
   return commons.load_manifest(('monorepo.yaml', 'monorepo.yml'), Monorepo)
 
 
+from . import checks
 from . import status

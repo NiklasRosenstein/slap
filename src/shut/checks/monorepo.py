@@ -19,5 +19,25 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .core import *
-from . import basic, monorepo, package
+from .core import Check, CheckStatus, CheckResult, Checker, SkipCheck, check, register_checker
+from shut.model import MonorepoModel
+
+
+class MonorepoChecker(Checker[MonorepoModel]):
+
+  @check('invalid-package')
+  def _check_no_invalid_packages(self, project, monorepo):
+    for package_name, exc_info in project.invalid_packages:
+      yield CheckResult(CheckStatus.ERROR, package_name)
+
+  @check('inconsistent-single-version')
+  def _check_consistent_mono_version(self, project, monorepo):
+    if monorepo.release.single_version and project.packages:
+      for package in project.packages:
+        if package.data.version is not None and package.data.version != monorepo.version:
+          yield CheckResult(CheckStatus.ERROR, package.data.name)
+    else:
+      yield SkipCheck()
+
+
+register_checker(MonorepoChecker, MonorepoModel)
