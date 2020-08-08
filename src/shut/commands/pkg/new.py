@@ -19,12 +19,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from shore.util.license import get_license_metadata, wrap_license_text
+
+from shut.model import dump
+from shut.model.author import Author
+from shut.model.package import PackageModel, PackageData
+from shut.model.requirements import Requirement, VersionSelector
+from shut.model.version import Version
 from shut.utils.io.virtual import VirtualFiles
 
 from . import pkg
-from shore.model import Author, Package, RootRequirements, VersionSelector
-from shore.util.version import Version
-from shore.util.license import get_license_metadata, wrap_license_text
 from termcolor import colored
 from typing import Optional
 import click
@@ -78,7 +82,7 @@ def load_author_from_git() -> Optional[str]:
 
 @pkg.command(no_args_is_help=True)
 @click.argument('target_directory', required=False)
-@click.option('--project-name', metavar='name', required=True, help='The name of the project as it would appear on PyPI.')
+@click.option('--project-name', '--name', metavar='name', required=True, help='The name of the project as it would appear on PyPI.')
 @click.option('--module-name', metavar='fqn', help='The name of the main Python module (this may be a dotted module name). Defaults to the package name (hyphens replaced with underscores).')
 @click.option('--author', metavar='"name <mail>"', type=Author.parse, help='The name of the author to write into the package configuration file. Defaults to the name and email from the Git config.')
 @click.option('--version', metavar='x.y.z', help='The version number to start counting from. Defaults to "0.0.0" (stands for "unreleased").')
@@ -88,7 +92,7 @@ def load_author_from_git() -> Optional[str]:
 @click.option('--suffix', type=click.Choice(['yaml', 'yml']), help='The suffix for YAML files. Defaults to "yml".', default='yml')
 @click.option('--dry', is_flag=True, help='Do not write files to disk.')
 @click.option('-f', '--force', is_flag=True, help='Overwrite files if they already exist.')
-def bootstrap(
+def new(
   target_directory,
   project_name,
   module_name,
@@ -141,15 +145,17 @@ def bootstrap(
   if not version:
     version = version or Version('0.0.0')
 
-  package_manifest = Package(
-    name=project_name,
-    modulename=None if module_name == project_name.replace('-', '_') else module_name,
-    version=version,
-    author=author,
-    license=license,
-    description=description or 'Package description here.',
-    requirements=RootRequirements(
-      python=VersionSelector('^2.7|^3.5' if universal else '^3.5'),
+  package_manifest = PackageModel(
+    data=PackageData(
+      name=project_name,
+      modulename=None if module_name == project_name.replace('-', '_') else module_name,
+      version=version,
+      author=author,
+      license=license,
+      description=description or 'Package description here.',
+      requirements=[
+        Requirement('python', VersionSelector('^2.7|^3.5' if universal else '^3.5')),
+      ],
     ),
   )
 
@@ -169,7 +175,7 @@ def bootstrap(
 
   files.add_static('.gitignore', GITIGNORE_TEMPLATE)
   files.add_dynamic('README.md', _render_template, README_TEMPLATE)
-  files.add_dynamic('package.' + suffix, lambda fp: package_manifest.dump(fp))
+  files.add_dynamic('package.' + suffix, lambda fp: dump(package_manifest, fp))
 
   files.add_dynamic(
     'src/{}/__init__.py'.format(module_name.replace('.', '/')),

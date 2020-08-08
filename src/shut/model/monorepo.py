@@ -19,19 +19,20 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from typing import List, Optional
+from databind.core import datamodel, field
 from .author import Author
 from .version import Version
 from .release import MonorepoReleaseConfiguration
-from nr.databind.core import Field, FieldName, Struct
-from typing import List
 
 
-class MonorepoModel(Struct):
-  filename = Field(str, hidden=True, default=None)
-  unknown_keys = Field(List[str], hidden=True, default=list)
-  name = Field(str)
-  version = Field(Version, default=None)
-  author = Field(Author, default=None)
-  license = Field(str, default=None)
-  url = Field(str, default=None)
-  release = Field(MonorepoReleaseConfiguration, default=Field.DEFAULT_CONSTRUCT)
+@datamodel
+class MonorepoModel:
+  filename: Optional[str] = field(derived=True, default=None)
+  unknown_keys: List[str] = field(derived=True, default_factory=list)
+  name: str
+  version: Optional[Version] = None
+  author: Optional[Author] = None
+  license: str = None
+  url: str = None
+  release: MonorepoReleaseConfiguration = field(default_factory=MonorepoReleaseConfiguration)

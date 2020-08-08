@@ -19,9 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, FieldName, Struct
+from databind.core import datamodel
 
 
-class LinterConfiguration(Struct):
+@datamodel
+class LinterConfiguration:
   # TODO
   pass

@@ -67,12 +67,12 @@ class Version(_Version):
     return other < self and other != self
 
   def __eq__(self, other):
-    if super().__eq__(other):
+    if super().__eq__(other) is True:
       return (self.commit_distance, self.sha) == (other.commit_distance, other.sha)
     return False
 
   def __ne__(self, other):
-    return not self == other
+    return not (self == other)
 
   @property
   def pep440_compliant(self):

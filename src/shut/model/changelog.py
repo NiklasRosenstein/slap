@@ -19,8 +19,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, FieldName, Struct
+from databind.core import datamodel
 
 
-class ChangelogConfiguration(Struct):
-  directory = Field(str, default='.changelog')
+@datamodel
+class ChangelogConfiguration:
+  directory: str = '.changelog'
