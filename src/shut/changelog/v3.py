@@ -23,17 +23,19 @@
 The V2 of changelogs.
 """
 
-from . import _ChangelogBase, v2
-from nr.databind.core import Field, Struct
 import datetime
+from typing import List, Optional
+from databind.core import datamodel, field
+from . import _ChangelogBase, v2
 
 
-class Changelog(_ChangelogBase, Struct):
+@datamodel
+class Changelog(_ChangelogBase):
   Supersedes = v2.Changelog  # _ChangelogBase
   Entry = v2.Entry
 
-  release_date = Field(datetime.date, default=None)
-  changes = Field([v2.Entry])
+  release_date: Optional[datetime.date] = field(default=None)
+  changes: List[v2.Entry]
 
   @classmethod
   def adapt(cls, v2_changelog: v2.Changelog) -> 'Changelog':

@@ -23,28 +23,30 @@
 The V3 of changelogs.
 """
 
-from . import _ChangelogBase, v1
-from nr.databind.core import Collection, Field, FieldName, Struct
 import enum
+from typing import List, Generic, T
+from databind.core import datamodel, field
+from . import _ChangelogBase, v1
 
 
 class Type(enum.Enum):
-  fix = 0
-  improvement = 1
-  change = 3
-  refactor = 4
-  feature = 5
-  docs = 6
-  tests = 7
+  fix = enum.auto()
+  improvement = enum.auto()
+  change = enum.auto()
+  refactor = enum.auto()
+  feature = enum.auto()
+  docs = enum.auto()
+  tests = enum.auto()
 
 
-class Entry(Struct):
+@datamodel
+class Entry:
   Type = Type
 
-  type_ = Field(Type, FieldName('type'))
-  component = Field(str)
-  description = Field(str)
-  fixes = Field([str])
+  type_: Type = field(altname='type')
+  component: str
+  description: str
+  fixes: List[str]
 
   @classmethod
   def from_v1(cls, v1_entry: v1.Entry) -> 'Entry':
@@ -60,11 +62,12 @@ class Entry(Struct):
     )
 
 
-class Changelog(_ChangelogBase, Collection, list):
+class ChangelogType(Generic[T], _ChangelogBase):
   Supersedes = v1.Changelog  # _ChangelogBase
-  item_type = Entry  # Collection
-  Entry = Entry
 
   @classmethod
   def adapt(cls, v1_changelog: v1.Changelog) -> 'Changelog':
     return cls(map(Entry.from_v1, v1_changelog))
+
+
+Changelog = ChangelogType[Entry]

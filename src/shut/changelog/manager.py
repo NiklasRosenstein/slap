@@ -19,33 +19,31 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.util.version import Version
 
-from . import v1, v2, v3
-from nr.databind.core import ObjectMapper, SkipDefaults
-from nr.databind.json import JsonModule
-from typing import Iterable, Optional
 import datetime
 import os
+from typing import Iterable, Optional, Union
+
+from databind.core import datamodel, field
+from databind.json import from_json, to_json
 import yaml
 
-mapper = ObjectMapper(JsonModule())
-supported_changelog_types = (
-  v3.Changelog,
-  v2.Changelog,
-  v1.Changelog,
-)
+from shut.model import registry
+from shut.model.version import Version
+from . import v1, v2, v3
+
+AllChangelogTypes = Union[v3.Changelog, v2.Changelog, v1.Changelog]
 
 
+@datamodel
 class Changelog:
   """
   Represents a changelog on disk.
   """
 
-  def __init__(self, filename: str, version: Optional[Version]) -> None:
-    self.filename = filename
-    self.version = version
-    self.data = v3.Changelog(changes=[])
+  filename: Optional[str] = field(derived=True, default=None)
+  version: Optional[Version]
+  data: v3.Changelog = field(default_factory=lambda: v3.Changelog(changes=[]))
 
   @property
   def entries(self):
@@ -62,7 +60,7 @@ class Changelog:
     with open(self.filename) as fp:
       raw_data = yaml.safe_load(fp)
 
-    data = mapper.deserialize(raw_data, supported_changelog_types, filename=self.filename)
+    data = from_json(AllChangelogTypes, raw_data, registry=registry)
     if not isinstance(data, v3.Changelog):
       data = v3.Changelog.migrate(data)
 
@@ -73,7 +71,7 @@ class Changelog:
 
     if create_directory:
       os.makedirs(os.path.dirname(self.filename), exist_ok=True)
-    data = mapper.serialize(self.data, v3.Changelog)
+    data = to_json(self.data, v3.Changelog)
     with open(self.filename, 'w') as fp:
       yaml.safe_dump(data, fp, sort_keys=False)
 

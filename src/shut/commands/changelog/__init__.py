@@ -23,6 +23,7 @@ import logging
 import sys
 from typing import List, Optional
 
+from databind.json import from_json, to_json
 from nr.utils.git import Git
 from termcolor import colored
 import click
@@ -31,8 +32,9 @@ import yaml
 from shore.__main__ import _edit_text, _editor_open
 from .. import shut, commons, project
 from shut.changelog import v3
-from shut.changelog.manager import mapper, ChangelogManager
+from shut.changelog.manager import ChangelogManager
 from shut.changelog.render import render as render_changelogs
+from shut.model import registry
 from shut.model.version import parse_version
 from shut.model.package import PackageModel
 
@@ -96,8 +98,8 @@ def changelog(**args):
     # Allow the user to edit the entry if no description is provided or the
     # -e,--edit option was set.
     if not entry.description or args['edit']:
-      serialized = yaml.safe_dump(mapper.serialize(entry, v3.Changelog.Entry), sort_keys=False)
-      entry = mapper.deserialize(yaml.safe_load(_edit_text(serialized)), v3.Changelog.Entry)
+      serialized = yaml.safe_dump(to_json(entry, v3.Changelog.Entry, registry=registry), sort_keys=False)
+      entry = from_json(v3.Changelog.Entry, yaml.safe_load(_edit_text(serialized)), registry=registry)
 
     # Validate the entry contents (need a description and at least one type and component).
     if not entry.description or not entry.component:
