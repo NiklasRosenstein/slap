@@ -19,19 +19,17 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import os
 from typing import List, Optional
 from databind.core import datamodel, field
-from .author import Author
-from .abstract import AbstractProjectModel
-from .version import Version
-from .release import MonorepoReleaseConfiguration
+from .changelog import ChangelogConfiguration
 
 
 @datamodel
-class MonorepoModel(AbstractProjectModel):
-  name: str
-  version: Optional[Version] = None
-  author: Optional[Author] = None
-  license: str = None
-  url: str = None
-  release: MonorepoReleaseConfiguration = field(default_factory=MonorepoReleaseConfiguration)
+class AbstractProjectModel:
+  filename: Optional[str] = field(derived=True, default=None)
+  unknown_keys: List[str] = field(derived=True, default_factory=list)
+  changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
+
+  def get_changelog_directory(self) -> str:
+    return os.path.join(os.path.dirname(self.filename), self.changelog.directory)

@@ -23,7 +23,7 @@ import os
 import sys
 from typing import Any, List, T, TextIO, Tuple, Type, TypeVar, Union
 
-from databind.core import datamodel, field, Registry
+from databind.core import ConversionError, datamodel, field, Registry
 from databind.json import from_json, to_json, registry as json_registry
 from nr.stream import Stream
 import yaml
@@ -125,7 +125,7 @@ class Project:
       if package_fn:
         try:
           self._load_package(package_fn)
-        except SerializationError as exc:
+        except ConversionError as exc:
           self.invalid_packages.append((item_name, sys.exc_info()))
 
     return self.monorepo
