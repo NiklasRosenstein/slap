@@ -19,13 +19,15 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.core import Field, FieldName, Struct
+from databind.core import datamodel, field
 
 
-class ReleaseConfiguration(Struct):
-  private = Field(bool, default=False)
-  tag_format = Field(str, FieldName('tag-format'), default='{version}')
+@datamodel
+class ReleaseConfiguration:
+  private: bool = False
+  tag_format: str = field(altname='tag-format', default='{version}')
 
 
-class MonorepoReleaseConfiguration(Struct):
-  single_version = Field(bool, FieldName('single-version'), default=False)
+@datamodel
+class MonorepoReleaseConfiguration:
+  single_version: bool  = field(altname='single-version', default=False)

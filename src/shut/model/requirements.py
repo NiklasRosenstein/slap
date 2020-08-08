@@ -19,10 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .version import Version
-from nr.databind.json import JsonSerializer
-from typing import Union
 import re
+from typing import Union
+from databind.core import datamodel
+from .version import Version
 
 
 class VersionSelector(object):
@@ -102,19 +102,14 @@ class VersionSelector(object):
 VersionSelector.ANY = VersionSelector('*')
 
 
-@JsonSerializer(deserialize='_deserialize')
-class Requirement(object):
+@datamodel
+class Requirement:
   """
   A Requirement is simply combination of a package name and a version selector.
   """
 
-  def __init__(self, package, version):  # type: (str, VersionSelector)
-    if not isinstance(package, str):
-      raise TypeError('expected str for package_name')
-    if not isinstance(version, VersionSelector):
-      raise TypeError('expected VersionSelector for version')
-    self.package = package
-    self.version = version
+  package: str
+  version: VersionSelector
 
   def __str__(self):
     if self.version == VersionSelector.ANY:
@@ -122,7 +117,7 @@ class Requirement(object):
     return '{} {}'.format(self.package, self.version)
 
   def __repr__(self):
-    return repr(str(self))#'Requirement({!r})'.format(str(self))
+    return repr(str(self))
 
   @classmethod
   def parse(cls, requirement_string):
@@ -138,7 +133,10 @@ class Requirement(object):
     return '{} {}'.format(self.package, self.version.to_setuptools())
 
   @classmethod
-  def _deserialize(cls, mapper, node):
-    if not isinstance(node.value, str):
-      raise node.type_error()
-    return Requirement.parse(node.value)
+  def databind_json_load(cls, value, context):
+    if isinstance(value, str):
+      return Requirement.parse(value)
+    return NotImplemented
+
+  def databind_json_dump(self, context):
+    return str(self)

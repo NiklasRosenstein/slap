@@ -19,21 +19,21 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import List, Tuple, Type, TypeVar, Union
+import os
+import sys
+from typing import Any, List, T, TextIO, Tuple, Type, TypeVar, Union
 
-from nr.databind.core import ObjectMapper, NodeCollector, SerializationError
-from nr.databind.json import JsonModule
+from databind.core import datamodel, field, Registry
+from databind.json import from_json, to_json, registry as json_registry
 from nr.stream import Stream
 import yaml
 
-import os
-import sys
+registry = Registry(json_registry)
+registry.set_option(datamodel, 'skip_defaults', True)
+ExcInfo = Tuple
 
 from .monorepo import MonorepoModel
 from .package import PackageModel
-
-T = TypeVar('T')
-ExcInfo = Tuple
 
 
 def get_existing_file(directory: str, choices: List[str]) -> bool:
@@ -53,9 +53,8 @@ class Project:
   monorepo_filenames = ['monorepo.yml', 'monorepo.yaml']
   package_filenames = ['package.yml', 'package.yaml']
 
-  def __init__(self, mapper: ObjectMapper = None):
+  def __init__(self):
     self._cache: Dict[str, Union[MonorepoModel, PackageModel]] = {}
-    self.mapper = mapper or ObjectMapper(JsonModule())
     self.subject: Union[MonorepoModel, PackageModel] = None
     self.monorepo: MonorepoModel = None
     self.packages: List[PackageModel] = []
@@ -108,13 +107,12 @@ class Project:
       return obj
     with open(filename) as fp:
       data = yaml.safe_load(fp)
-    node_collector = NodeCollector()
-    obj = self._cache[filename] = self.mapper.deserialize(
-      data, type_, filename=filename, decorations=[node_collector])
+    #node_collector = NodeCollector()
+    obj = self._cache[filename] = from_json(type_, data, registry=registry)
     obj.filename = filename
-    obj.unknown_keys = list(Stream.concat(
-        (x.locator.append(k) for k in x.unknowns)
-        for x in node_collector.nodes))
+    #obj.unknown_keys = list(Stream.concat(
+    #    (x.locator.append(k) for k in x.unknowns)
+    #    for x in node_collector.nodes))
     return obj
 
   def _load_monorepo(self, filename: str) -> MonorepoModel:
@@ -137,3 +135,12 @@ class Project:
     if package not in self.packages:
       self.packages.append(package)
     return package
+
+
+def dump(obj: Any, file_: Union[str, TextIO]) -> None:
+  if isinstance(file_, str):
+    with open(file_, 'w') as fp:
+      dump(fp, obj)
+  else:
+    data = to_json(obj, registry=registry)
+    yaml.safe_dump(data, file_, sort_keys=False)

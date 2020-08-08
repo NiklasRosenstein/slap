@@ -19,39 +19,17 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from databind.core import datamodel
-from nr.databind.json import JsonSerializer
-import re
+from shut.commands import project
+from shut.commands.pkg import pkg
+from shut.model import PackageModel
+from shut.generate import render_setuptools_files
 
 
-@datamodel
-class Author:
+@pkg.command()
+def update():
   """
-  Represents information about an author. Can be deserialized from a string of the form
-  `Name <user@domain.name>`
+  Update package files generated from the Package configuration.
   """
 
-  AUTHOR_EMAIL_REGEX = re.compile(r'([^<]+)<([^>]+)>')
-  name: str
-  email: str
-
-  @classmethod
-  def parse(cls, string: str) -> 'Author':
-    match = Author.AUTHOR_EMAIL_REGEX.match(string)
-    if not match:
-      raise ValueError('not a valid author string: {!r}'.format(s))
-    author = match.group(1).strip()
-    email = match.group(2).strip()
-    return cls(author, email)
-
-  def __str__(self):
-    return '{} <{}>'.format(self.name, self.email)
-
-  @classmethod
-  def databind_json_load(cls, value, context):
-    if isinstance(value, str):
-      return cls.parse(value)
-    return NotImplemented
-
-  def databind_json_dump(self, context):
-    return str(self)
+  package = project.load(expect=PackageModel)
+  render_setuptools_files(package)

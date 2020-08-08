@@ -19,6 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import ast
+import os
+from typing import Dict, Iterable, List, Optional
+from databind.core import datamodel, field
 from shore.util.ast import load_module_members
 
 from .author import Author
@@ -27,10 +31,6 @@ from .linter import LinterConfiguration
 from .release import ReleaseConfiguration
 from .requirements import Requirement
 from .version import Version
-from nr.databind.core import Field, FieldName, Struct
-from typing import Dict, Iterable, List, Optional
-import ast
-import os
 
 
 def _get_file_in_directory(directory: str, prefix: str, preferred: List[str]) -> Optional[str]:
@@ -53,49 +53,54 @@ def _get_file_in_directory(directory: str, prefix: str, preferred: List[str]) ->
   return os.path.join(directory, name)
 
 
-class PackageData(Struct):
-  name = Field(str)
-  modulename = Field(str, default=None)
-  version = Field(Version, default=None)
-  author = Field(Author)
-  description = Field(str, default=None)
-  license = Field(str, default=None)
-  url = Field(str, default=None)
-  readme = Field(str, default=None)
-  wheel = Field(bool, default=True)
-  universal = Field(bool, default=None)
-  typed = Field(bool, default=False)
-  requirements = Field(List[Requirement], default=list)
-  test_requirements = Field(List[Requirement], FieldName('test-requirements'), default=list)
-  extra_requirements = Field(Dict[str, List[Requirement]], FieldName('extra-requirements'), default=dict)
-  source_directory = Field(str, FieldName('source-directory'), default='src')
-  exclude = Field(List[str], default=lambda: ['test', 'tests', 'docs'])
-  entrypoints = Field(Dict[str, List[str]], default=dict)
-  classifiers = Field(List[str], default=list)
-  keywords = Field(List[str], default=list)
+@datamodel
+class PackageData:
+  name: str
+  modulename: Optional[str] = None
+  version: Optional[Version] = None
+  author: Author
+  description: Optional[str] = None
+  license: Optional[str] = None
+  url: Optional[str] = None
+  readme: Optional[str] = None
+  wheel: Optional[bool] = True
+  universal: Optional[bool] = None
+  typed: Optional[bool] = False
+  requirements: List[Requirement] = field(default_factory=list)
+  test_requirements: List[Requirement] = field(altname='test-requirements', default_factory=list)
+  extra_requirements: Dict[str, List[Requirement]] = field(altname='extra-requirements', default_factory=dict)
+  source_directory: str = field(altname='source-directory', default='src')
+  exclude: List[str] = field(default_factory=lambda: ['test', 'tests', 'docs'])
+  entrypoints: Dict[str, List[str]] = field(default_factory=dict)
+  classifiers: List[str] = field(default_factory=list)
+  keywords: List[str] = field(default_factory=list)
   # TODO: Data files
 
   def get_modulename(self) -> str:
     return self.modulename or self.name.replace('-', '_')
 
 
-class InstallConfiguration(Struct):
-  hooks = Field(dict(
-    before_install=Field(List[str], FieldName('before-install'), default=list),
-    after_install=Field(List[str], FieldName('after-install'), default=list),
-    before_develop=Field(List[str], FieldName('before-develop'), default=list),
-    after_develop=Field(List[str], FieldName('after-develop'), default=list),
-  ), default=Field.DEFAULT_CONSTRUCT)
+@datamodel
+class InstallConfiguration:
+  @datamodel
+  class InstallHooks:
+    before_install: List[str] = field(altname='before-install', default_factory=list)
+    after_install: List[str] = field(altname='after-install', default_factory=list)
+    before_develop: List[str] = field(altname='before-develop', default_factory=list)
+    after_develop: List[str] = field(altname='after-develop', default_factory=list)
+
+  hooks: InstallHooks = field(default_factory=InstallHooks)
 
 
-class PackageModel(Struct):
-  filename = Field(str, hidden=True, default=None)
-  unknown_keys = Field(List[str], hidden=True, default=list)
-  data = Field(PackageData, FieldName('package'))
-  changelog = Field(ChangelogConfiguration, default=Field.DEFAULT_CONSTRUCT)
-  install = Field(InstallConfiguration, default=Field.DEFAULT_CONSTRUCT)
-  linter = Field(LinterConfiguration, default=Field.DEFAULT_CONSTRUCT)
-  release = Field(ReleaseConfiguration, default=Field.DEFAULT_CONSTRUCT)
+@datamodel
+class PackageModel:
+  filename: Optional[str] = field(derived=True, default=None)
+  unknown_keys: List[str] = field(derived=True, default_factory=list)
+  data: PackageData = field(altname='package')
+  changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
+  install: InstallConfiguration = field(default_factory=InstallConfiguration)
+  linter: LinterConfiguration = field(default_factory=LinterConfiguration)
+  release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
 
   def get_python_package_metadata(self) -> 'PythonPackageMetadata':
     """

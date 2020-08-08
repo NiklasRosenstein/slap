@@ -19,17 +19,18 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.databind.json import JsonSerializer
-from shore.util.version import parse_version, Version as _Version
+from databind.core import Context, Converter
+from shore.util.version import parse_version, Version
+from . import registry
 
 
-@JsonSerializer(serialize='_serialize', deserialize='_deserialize')
-class Version(_Version):
+class VersionConverter(Converter):
 
-  @classmethod
-  def _serialize(cls, mapper, node) -> str:
-    return str(node.value)
+  def from_python(self, value, context):
+    return str(value)
 
-  @classmethod
-  def _deserialize(cls, mapper, node) -> 'Version':
-    return Version(parse_version(node.value))
+  def to_python(self, value, context):
+    return parse_version(value)
+
+
+registry.register_converter(Version, VersionConverter())

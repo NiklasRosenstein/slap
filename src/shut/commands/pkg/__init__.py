@@ -30,6 +30,6 @@ def pkg():
   """
 
 
-from . import bootstrap
 from . import checks
+from . import new
 from . import status
