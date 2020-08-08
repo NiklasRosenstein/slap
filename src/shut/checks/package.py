@@ -41,12 +41,12 @@ class PackageChecker(Checker[PackageModel]):
       yield CheckResult(CheckStatus.WARNING, 'not specified')
 
     elif package.data.license and not package.get_license():
-      yield CheckResult('license', CheckStatus.WARNING, 'No LICENSE file found.')
+      yield CheckResult(CheckStatus.WARNING, 'No LICENSE file found.')
 
     monorepo = project.monorepo
     if package.data.license and monorepo and monorepo.license \
         and monorepo.license != package.data.license:
-      yield CheckResult('license-consistency', CheckStatus.ERROR,
+      yield CheckResult(CheckStatus.ERROR,
         'License is not consistent with parent mono repository (package: {}, monorepo: {}).'
           .format(package.license, monorepo.license))
 
