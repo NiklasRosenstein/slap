@@ -23,22 +23,25 @@
 The V1 of changelogs.
 """
 
+from typing import List, Generic, T, Union
+from databind.core import datamodel, field
 from . import _ChangelogBase
-from nr.databind.core import Collection, Field, Struct
 
 
-class Entry(Struct):
+@datamodel
+class Entry:
   """
   Represents a changelog entry in the V1 changelog format.
   """
 
-  types = Field([str])
-  issues = Field([(str, int)], default=list)
-  components = Field([str])
-  description = Field(str)
+  types: List[str]
+  issues: List[Union[str, int]] = field(default_factory=list)
+  components: List[str]
+  description: str
 
 
-class Changelog(_ChangelogBase, Collection, list):
+class ChangelogType(Generic[T], _ChangelogBase):
   Supersedes = None  # _ChangelogBase
-  item_type = Entry  # Collection
-  Entry = Entry
+
+
+Changelog = ChangelogType[Entry]

@@ -33,17 +33,15 @@ This is achieved by assigning a keyword to every changelog, and that keyword ind
 the type of change and whether it is breaking an API.
 """
 
-from typing import Any, Type, TypeVar
-
-T = TypeVar('T')
+from typing import Any, Type, T
 
 
 class _ChangelogBase:
   """
-  Base class for #nr.databind.core.Struct subclasses that represent the deserialized
-  form of a changelog in a specific version. A newer version should reference the
-  predecessor in the #Supersedes class-level attribute and implement the #adapt()
-  method in order to automatically support migrating to the next version.
+  Base class for datamodels subclasses that represent the deserialized form of a changelog in
+  a specific version. A newer version should reference the predecessor in the #Supersedes
+  class-level attribute and implement the #adapt() method in order to automatically support
+  migrating to the next version.
   """
 
   Supersedes: Type[T] = None

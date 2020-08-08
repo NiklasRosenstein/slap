@@ -20,7 +20,6 @@
 # IN THE SOFTWARE.
 
 from databind.core import datamodel
-from nr.databind.json import JsonSerializer
 import re
 
 
