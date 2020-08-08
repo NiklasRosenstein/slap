@@ -25,6 +25,7 @@ from typing import Dict, Iterable, List, Optional
 from databind.core import datamodel, field
 from shore.util.ast import load_module_members
 
+from .abstract import AbstractProjectModel
 from .author import Author
 from .changelog import ChangelogConfiguration
 from .linter import LinterConfiguration
@@ -93,11 +94,8 @@ class InstallConfiguration:
 
 
 @datamodel
-class PackageModel:
-  filename: Optional[str] = field(derived=True, default=None)
-  unknown_keys: List[str] = field(derived=True, default_factory=list)
+class PackageModel(AbstractProjectModel):
   data: PackageData = field(altname='package')
-  changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
   release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
@@ -127,7 +125,6 @@ class PackageModel:
       directory=directory,
       prefix='README.',
       preferred=['README.md', 'README.rst', 'README.txt', 'README'])
-
 
   def get_license(self) -> Optional[str]:
     """

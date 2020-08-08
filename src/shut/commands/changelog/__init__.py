@@ -19,22 +19,24 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.__main__ import _edit_text, _editor_open, _load_subject
-from shore.model import Package
-from shore.util.version import parse_version
+import logging
+import sys
+from typing import List, Optional
 
 from nr.utils.git import Git
+from termcolor import colored
+import click
+import yaml
 
-from .. import shut, commons
+from shore.__main__ import _edit_text, _editor_open
+from .. import shut, commons, project
 from shut.changelog import v3
 from shut.changelog.manager import mapper, ChangelogManager
 from shut.changelog.render import render as render_changelogs
-from termcolor import colored
-from typing import List, Optional
-import click
-import logging
-import sys
-import yaml
+from shut.model.version import parse_version
+from shut.model.package import PackageModel
+
+
 
 _git = Git()
 logger = logging.getLogger(__name__)
@@ -61,14 +63,17 @@ def changelog(**args):
     logger.error('unsupported combination of arguments')
     sys.exit(1)
 
-  subject = _load_subject(allow_none=True)
-  if subject:
-    manager = ChangelogManager(subject.changelog_directory)
-  else:
-    manager = ChangelogManager(Package.changelog_directory.default)
+  project.load()
+  monorepo = project.monorepo
+  package = project.subject if project.subject != monorepo else None
 
   def _split(s: Optional[str]) -> List[str]:
     return list(filter(bool, map(str.strip, (s or '').split(','))))
+
+  manager = ChangelogManager(
+    package.get_changelog_directory() if package
+    else monorepo.get_changelog_directory() if monorepo
+    else '.changelog')
 
   if args['add']:
 
@@ -109,8 +114,8 @@ def changelog(**args):
       _git.add([manager.unreleased.filename])
     if args['commit']:
       commit_message = entry.description
-      if isinstance(subject, Package) and subject.monorepo:
-        commit_message = '{}({}): '.format(entry.type_.name, subject.name) + commit_message
+      if package and monorepo:
+        commit_message = '{}({}): '.format(entry.type_.name, package.data.name) + commit_message
       else:
         commit_message = '{}: '.format(entry.type_.name) + commit_message
       if fixes:
