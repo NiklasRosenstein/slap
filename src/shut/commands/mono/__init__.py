@@ -36,4 +36,5 @@ def load_monorepo_manifest() -> Monorepo:
 
 
 from . import checks
+from . import new
 from . import status
