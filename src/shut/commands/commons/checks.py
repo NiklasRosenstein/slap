@@ -22,6 +22,8 @@
 from shut.checks import Check, CheckStatus
 from typing import List
 import termcolor
+import time
+import sys
 
 
 def print_checks(
@@ -58,6 +60,15 @@ def print_checks(
       print(':', check.result.message)
     else:
       print()
+
+
+def print_checks_all(name: str, checks: List[Check], seconds: float):
+  package_name = termcolor.colored(name, 'yellow')
+  print()
+  print_checks(checks, prefix='  ')
+  print()
+  print('run', len(checks), 'checks for package', package_name, 'in {:.3f}s'.format(seconds))
+  print()
 
 
 def get_checks_status(checks: List[Check], warnings_as_errors: bool = False) -> int:

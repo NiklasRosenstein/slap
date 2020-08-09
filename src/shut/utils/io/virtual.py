@@ -80,7 +80,7 @@ class VirtualFiles:
       if not dry:
         mode = '' if file_['text'] else 'b'
         if create_directories:
-          os.makedirs(os.path.dirname(filename), exist_ok=True)
+          os.makedirs(os.path.dirname(filename) or '.', exist_ok=True)
         if file_['inplace']:
           with open(filename, 'w' + mode) as dst:
             if exists:

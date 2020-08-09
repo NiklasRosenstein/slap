@@ -21,7 +21,7 @@
 
 from shut.checks import CheckStatus, get_checks
 from shut.commands import project
-from shut.commands.commons.checks import print_checks, get_checks_status
+from shut.commands.commons.checks import print_checks_all, get_checks_status
 from shut.commands.mono import mono
 from shut.model import MonorepoModel, Project
 
@@ -53,13 +53,5 @@ def checks(warnings_as_errors):
   monorepo = project.load(expect=MonorepoModel)
   checks = sorted(get_checks(project, monorepo), key=lambda c: c.name)
   seconds = time.perf_counter() - start_time
-
-  monorepo_name = termcolor.colored(monorepo.name, 'yellow')
-
-  print()
-  print_checks(checks, prefix='  ')
-  print()
-  print('run', len(checks), 'checks for repository', monorepo_name, 'in {:.3f}s'.format(seconds))
-  print()
-
+  print_checks_all(monorepo.name, checks, seconds)
   sys.exit(get_checks_status(checks, warnings_as_errors))
