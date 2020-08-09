@@ -86,7 +86,7 @@ def new(
   if not author:
     author = load_author_from_git() or Author('Unknown', '<unknown@example.org>')
   if not version:
-    version = version or Version('0.0.0')
+    version = version or (Version('0.0.0') if single_version else None)
 
   package_manifest = MonorepoModel(
     name=project_name,
