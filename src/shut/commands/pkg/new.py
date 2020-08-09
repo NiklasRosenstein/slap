@@ -21,6 +21,13 @@
 
 from shore.util.license import get_license_metadata, wrap_license_text
 
+from shut.commands.commons.new import (
+  load_author_from_git,
+  render_template,
+  write_files,
+  GITIGNORE_TEMPLATE,
+  README_TEMPLATE,
+)
 from shut.model import dump
 from shut.model.author import Author
 from shut.model.package import PackageModel, PackageData
@@ -45,39 +52,6 @@ __version__ = '{{version or "0.0.1"}}'
 NAMESPACE_INIT_TEMPLATE = '''
 __path__ = __import__('pkgutil').extend_path(__path__, __name__)
 '''
-
-GITIGNORE_TEMPLATE = '''
-/.venv*/
-/dist
-/build
-*.py[cod]
-*.egg-info
-*.egg
-'''.lstrip()
-
-README_TEMPLATE = '''
-# {{project_name}}
-
----
-
-<p align="center">Copyright &copy; {{year}} {{author.name}}</p>
-'''.lstrip()
-
-
-def load_author_from_git() -> Optional[str]:
-  """
-  Returns a string formatted as "name <mail>" from the Git `user.name` and `user.email`
-  configuration values. Returns `None` if Git is not configured.
-  """
-
-  try:
-    name = subprocess.getoutput('git config user.name')
-    email = subprocess.getoutput('git config user.email')
-  except FileNotFoundError:
-    return None
-  if not name and not email:
-    return None
-  return Author(name, email)
 
 
 @pkg.command(no_args_is_help=True)
@@ -166,21 +140,17 @@ def new(
     'year': datetime.date.today().year,
   }
 
-  def _render_template(fp, template_string):
-    for data in jinja2.Template(template_string).stream(**template_vars):
-      fp.write(data)
-    fp.write('\n')
-
   files = VirtualFiles()
 
   files.add_static('.gitignore', GITIGNORE_TEMPLATE)
-  files.add_dynamic('README.md', _render_template, README_TEMPLATE)
+  files.add_dynamic('README.md', render_template, README_TEMPLATE, template_vars)
   files.add_dynamic('package.' + suffix, lambda fp: dump(package_manifest, fp))
 
   files.add_dynamic(
     'src/{}/__init__.py'.format(module_name.replace('.', '/')),
-    _render_template,
+    render_template,
     INIT_TEMPLATE,
+    template_vars,
   )
 
   parts = []
@@ -192,14 +162,6 @@ def new(
     )
 
   if license:
-    license_text = 'Copyright (c) {year} {author.name}\n\n'.format(**template_vars)
-    license_text += wrap_license_text(get_license_metadata(license)['license_text'])
-    files.add_static('LICENSE.txt', license_text)
+    files.add_static('LICENSE.txt', get_license_file_text(license))
 
-  files.write_all(
-    target_directory,
-    on_write=lambda fn: print(colored('Write ' + fn, 'cyan')),
-    on_skip=lambda fn: print(colored('Skip ' + fn, 'yellow')),
-    overwrite=force,
-    dry=dry,
-  )
+  write_files(files, target_directory, force, dry)
