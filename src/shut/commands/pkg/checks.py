@@ -21,7 +21,7 @@
 
 from shut.checks import CheckStatus, get_checks
 from shut.commands import project
-from shut.commands.commons.checks import print_checks, get_checks_status
+from shut.commands.commons.checks import print_checks_all, get_checks_status
 from shut.commands.pkg import pkg
 from shut.model import PackageModel, Project
 
@@ -53,13 +53,5 @@ def checks(warnings_as_errors):
   package = project.load(expect=PackageModel)
   checks = sorted(get_checks(project, package), key=lambda c: c.name)
   seconds = time.perf_counter() - start_time
-
-  package_name = termcolor.colored(package.data.name, 'yellow')
-
-  print()
-  print_checks(checks, prefix='  ')
-  print()
-  print('run', len(checks), 'checks for package', package_name, 'in {:.3f}s'.format(seconds))
-  print()
-
+  print_checks_all(package.data.name, checks, seconds)
   sys.exit(get_checks_status(checks, warnings_as_errors))
