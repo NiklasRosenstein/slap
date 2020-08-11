@@ -22,6 +22,10 @@ package:
 Shut handles all the rest: `setup.py`, `MANIFEST.in`, `py.typed`, package data files, changelog
 management, version number bumping, linter configuration, building and publishing to PyPI, etc.
 
+__Todo__
+
+* [ ] Automatic check for license headers in files / automatically insert license headers
+
 ---
 
 <p align="center">Copyright &copy; 2020, Niklas Rosenstein</p>
