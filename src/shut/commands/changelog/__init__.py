@@ -29,7 +29,6 @@ from termcolor import colored
 import click
 import yaml
 
-from shore.__main__ import _edit_text, _editor_open
 from .. import shut, commons, project
 from shut.changelog import v3
 from shut.changelog.manager import ChangelogManager
@@ -37,7 +36,7 @@ from shut.changelog.render import render as render_changelogs
 from shut.model import registry
 from shut.model.version import parse_version
 from shut.model.package import PackageModel
-
+from shut.utils.cli import editor_open, edit_text
 
 
 _git = Git()

@@ -19,13 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.util.license import get_license_metadata, wrap_license_text  # TODO
-
 import subprocess
 from typing import Optional
 
 import jinja2
 from shut.model.author import Author
+from shut.utils.external.license import get_license_metadata, wrap_license_text
 from shut.utils.io.virtual import VirtualFiles
 from termcolor import colored
 

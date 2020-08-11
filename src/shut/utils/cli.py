@@ -19,33 +19,31 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-"""
-List or search package classifiers on PyPI.
-"""
+import os
+import shlex
+import subprocess
+import sys
 
-import click
-from shut.utils.external.classifiers import get_classifiers
-from . import shut
+import nr.fs
 
-
-@shut.group(help=__doc__)
-def classifiers():
-  pass
+__all__ = ['editor_open', 'edit_text']
 
 
-@classifiers.command()
-def ls():
-  " List all classifiers. "
-
-  for classifier in get_classifiers():
-    print(classifier)
+def editor_open(filename: str):
+  editor = shlex.split(os.getenv('EDITOR', 'vim'))
+  return subprocess.call(editor + [filename])
 
 
-@classifiers.command()
-@click.option('-q', '--term', help='The substring that will be used to filter classifiers.')
-def search(term):
-  " Search for package classifiers. "
+def edit_text(text: str) -> str:
+  """
+  Opens an editor for the user to modify *text*.
+  """
 
-  for classifier in get_classifiers():
-    if not term or term.strip().lower() in classifier.lower():
-      print(classifier)
+  with nr.fs.tempfile('.yml', dir=os.getcwd(), text=True) as fp:
+    fp.write(text)
+    fp.close()
+    res = _editor_open(fp.name)
+    if res != 0:
+      sys.exit(res)
+    with open(fp.name) as src:
+      return src.read()

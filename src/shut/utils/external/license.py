@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-# Copyright (c) 2019 Niklas Rosenstein
+# Copyright (c) 2020 Niklas Rosenstein
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -19,7 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-""" A tiny client for the DejaCode license library. """
+"""
+A tiny client for the [DejaCode license library][1].
+
+  [1]: https://enterprise.dejacode.com/licenses/
+"""
 
 import bs4
 import re

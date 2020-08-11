@@ -23,10 +23,11 @@
 Get license information from DejaCode.
 """
 
-from . import shut
-from shore.util.license import get_license_metadata, wrap_license_text
-import click
 import json
+
+import click
+from shut.utils.external.license import get_license_metadata, wrap_license_text
+from . import shut
 
 
 @shut.group(help=__doc__)

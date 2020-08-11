@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-# Copyright (c) 2019 Niklas Rosenstein
+# Copyright (c) 2020 Niklas Rosenstein
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -23,14 +23,18 @@ import ast
 
 
 def load_module_members(filename):
-  """ Loads members from *filename* as ast nodes. """
+  """
+  Loads members from *filename* as ast nodes.
+  """
 
   with open(filename) as fp:
     module = ast.parse(fp.read(), filename)
+
   members = {}
   for node in module.body:
     if isinstance(node, ast.Assign):
       for target in node.targets:
         if isinstance(target, ast.Name):
           members[target.id] = node.value
+
   return members
