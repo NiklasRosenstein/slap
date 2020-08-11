@@ -32,4 +32,4 @@ from .core import (
   get_checks,
 )
 
-from . import basic, monorepo, package
+from . import generic, monorepo, package

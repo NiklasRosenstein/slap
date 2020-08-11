@@ -25,8 +25,10 @@ and package definition.
 """
 
 from .core import (
-  register_renderer,
   get_files,
+  get_version_refs,
+  register_renderer,
+  VersionRef
 )
 
-from . import setuptools
+from . import generic, setuptools
