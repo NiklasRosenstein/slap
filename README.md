@@ -4,12 +4,15 @@ Shut is an opinionated tool that allows you to configure everything around the P
 packaging and release process from a single source of truth. It is intended to simplify
 the process of publishing Python packages and prevent common pitfalls.
 
+## At a glance
 
+* Bootstrap Python packages: `shut pkg new --name my-package`
+* Install and save dependencies: `shut pkg requirements add <package>`
+* Document changes: ``shut changelog add fix --commit --message "Fixed TypeError in `foo()`"``
+* Bump the version according to changelog: `shut pkg bump`
+* Publish on PyPI: `shut pkg publish`
 
-## Getting started
-
-Use `shore pkg new --project-name my-package` to bootstrap a Python package directory.
-Alternatively you can use the example configuration below.
+## Configuration
 
 **`package.yml`**
 
@@ -29,14 +32,13 @@ package:
     - mycli = my_module.__main__:mycli
 ```
 
-Shut handles all the rest: `setup.py`, `MANIFEST.in`, `py.typed`, package data files, changelog
-management, version number bumping, linter configuration, building and publishing to PyPI, etc.
-
 __Todo__
 
-* [ ] Automatic check for license headers in files / automatically insert license headers
-* [ ] Conda recipe generator and conda-forge helper
+* [ ] bump/build/publish commands
+* [ ] Command to install and save requirements
 * [ ] Package data / data files
+* [ ] Conda recipe generator and conda-forge helper
+* [ ] Automatic check for license headers in files / automatically insert license headers
 
 ---
 
