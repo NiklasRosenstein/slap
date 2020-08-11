@@ -19,7 +19,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.util.license import get_license_metadata, wrap_license_text
+import datetime
+import os
+import subprocess
+from typing import Optional
+
+import click
+import jinja2
+from termcolor import colored
 
 from shut.commands.commons.new import (
   load_author_from_git,
@@ -33,16 +40,9 @@ from shut.model.author import Author
 from shut.model.package import PackageModel, PackageData
 from shut.model.requirements import Requirement, VersionSelector
 from shut.model.version import Version
+from shut.utils.external.license import get_license_metadata, wrap_license_text
 from shut.utils.io.virtual import VirtualFiles
-
 from . import pkg
-from termcolor import colored
-from typing import Optional
-import click
-import datetime
-import jinja2
-import os
-import subprocess
 
 INIT_TEMPLATE = '''
 __author__ = '{{author or "Me <me@me.org>"}}'

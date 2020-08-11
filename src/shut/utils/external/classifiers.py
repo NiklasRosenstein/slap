@@ -23,19 +23,26 @@ from datetime import datetime
 from typing import List
 import logging
 import os
-import requests
 import time
 
-CACHE_FILENAME = os.path.expanduser('~/.local/shore/classifiers-cache.txt')
+import requests
+
+CACHE_FILENAME = os.path.expanduser('~/.local/shut/classifiers-cache.txt')
 CACHE_TTL = 60 * 60 * 24 * 7  # 7 days
 CLASSIFIERS_URL = 'https://pypi.org/pypi?%3Aaction=list_classifiers'
 logger = logging.getLogger(__name__)
 _runtime_cache = None
 
 
-def get_classifiers() -> List[str]:
+def get_classifiers(force_refresh: bool = False) -> List[str]:
+  """
+  Loads the classifiers list from PyPI. Once loaded, the classifiers are cached on disk and
+  in memory. The cache on disk is valid for a maxmium of seven days. Specify the *force_refresh*
+  argument to ignore any caches.
+  """
+
   global _runtime_cache
-  if _runtime_cache is not None:
+  if not force_refresh and _runtime_cache is not None:
     return list(_runtime_cache)
 
   def _load_cachefile():
@@ -44,7 +51,7 @@ def get_classifiers() -> List[str]:
       _runtime_cache = [x.rstrip('\n') for x in fp]
     return list(_runtime_cache)
 
-  has_cachefile = os.path.isfile(CACHE_FILENAME)
+  has_cachefile = not force_frefresh and os.path.isfile(CACHE_FILENAME)
   if has_cachefile and (time.time() - os.path.getmtime(CACHE_FILENAME)) < CACHE_TTL:
     return _load_cachefile()
   try:

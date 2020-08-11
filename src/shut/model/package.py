@@ -22,9 +22,10 @@
 import ast
 import os
 from typing import Dict, Iterable, List, Optional
-from databind.core import datamodel, field
-from shore.util.ast import load_module_members
 
+from databind.core import datamodel, field
+
+from shut.utils.ast import load_module_members
 from .abstract import AbstractProjectModel
 from .author import Author
 from .changelog import ChangelogConfiguration

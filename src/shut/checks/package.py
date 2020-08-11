@@ -19,13 +19,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shore.util.classifiers import get_classifiers
-
-from .core import CheckResult, CheckStatus, Checker, check, register_checker
-from shut.model import MonorepoModel, PackageModel, Project
+import os
 from typing import Iterable, Optional
 
-import os
+from shut.model import MonorepoModel, PackageModel, Project
+from shut.utils.external.classifiers import get_classifiers
+from .core import CheckResult, CheckStatus, Checker, check, register_checker
+
 
 
 class PackageChecker(Checker[PackageModel]):
