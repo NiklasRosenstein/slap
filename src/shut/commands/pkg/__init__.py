@@ -30,6 +30,7 @@ def pkg():
   """
 
 
+from . import bump
 from . import checks
 from . import new
 from . import status

@@ -19,24 +19,33 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shut.checks import CheckStatus, get_checks
-from shut.commands import project
-from shut.commands.commons.checks import print_checks_all, get_checks_status
-from shut.commands.pkg import pkg
-from shut.model import PackageModel, Project
-
-from nr.stream import Stream
-from termcolor import colored
-from typing import Iterable, Union
-import click
 import enum
 import logging
 import os
 import sys
-import termcolor
 import time
+from typing import Iterable, Union
+
+import click
+import termcolor
+from nr.stream import Stream
+from termcolor import colored
+
+from shut.checks import CheckStatus, get_checks
+from shut.commands import project
+from shut.commands.commons.checks import print_checks_all, get_checks_status
+from shut.model import PackageModel, Project
+from . import pkg
 
 logger = logging.getLogger(__name__)
+
+
+def check_package(package: PackageModel, warnings_as_errors: bool = False) -> int:
+  start_time = time.perf_counter()
+  checks = sorted(get_checks(project, package), key=lambda c: c.name)
+  seconds = time.perf_counter() - start_time
+  print_checks_all(package.data.name, checks, seconds)
+  return get_checks_status(checks, warnings_as_errors)
 
 
 @pkg.command()
@@ -49,9 +58,5 @@ def checks(warnings_as_errors):
   on the package configuration and entrypoint definition.
   """
 
-  start_time = time.perf_counter()
   package = project.load(expect=PackageModel)
-  checks = sorted(get_checks(project, package), key=lambda c: c.name)
-  seconds = time.perf_counter() - start_time
-  print_checks_all(package.data.name, checks, seconds)
-  sys.exit(get_checks_status(checks, warnings_as_errors))
+  sys.exit(check_package(package, warnings_as_errors))

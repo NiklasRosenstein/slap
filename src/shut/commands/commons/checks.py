@@ -81,3 +81,4 @@ def get_checks_status(checks: List[Check], warnings_as_errors: bool = False) -> 
     status = 1
   else:
     assert False, max_level
+  return status

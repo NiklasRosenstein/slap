@@ -19,4 +19,29 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .setuptools import render_setuptools_files
+import re
+from typing import Iterable
+
+from shut.model import AbstractProjectModel
+from shut.utils.io.virtual import VirtualFiles
+from .core import Renderer, register_renderer, VersionRef
+
+
+class GenericRenderer(Renderer[AbstractProjectModel]):
+
+  # Renderer[AbstractProjectModel] Overrides
+
+  def get_files(self, files: VirtualFiles, obj: AbstractProjectModel) -> None:
+    pass
+
+  def get_version_refs(self, obj: AbstractProjectModel) -> Iterable[VersionRef]:
+    # Return a reference to the version number in the package or monorepo model.
+    regex = '^\s*version\s*:\s*[\'"]?(.*?)[\'"]?\s*(#.*)?$'
+    with open(obj.filename) as fp:
+      match = re.search(regex, fp.read(), re.S | re.M)
+      if match:
+        yield VersionRef(obj.filename, match.start(1), match.end(1), match.group(1))
+
+
+register_renderer(AbstractProjectModel, GenericRenderer)
+

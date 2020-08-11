@@ -20,10 +20,20 @@
 # IN THE SOFTWARE.
 
 import abc
-from typing import Generic, T, Type
+from typing import Iterable, Generic, T, Type
+
+from databind.core import datamodel
 
 from shut.utils.io.virtual import VirtualFiles
 from shut.utils.type_registry import TypeRegistry
+
+
+@datamodel
+class VersionRef:
+  filename: str
+  start: int
+  end: int
+  value: str
 
 
 class Renderer(Generic[T], metaclass=abc.ABCMeta):
@@ -31,6 +41,9 @@ class Renderer(Generic[T], metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def get_files(self, files: VirtualFiles, obj: T) -> None:
     pass
+
+  def get_version_refs(self, obj: T) -> Iterable[VersionRef]:
+    return; yield
 
 
 registry = TypeRegistry[Type[Renderer]]()
@@ -54,3 +67,12 @@ def get_files(obj: T) -> VirtualFiles:
     renderer().get_files(files, obj)
 
   return files
+
+
+def get_version_refs(obj: T) -> Iterable[VersionRef]:
+  """
+  Gets all version refs returned by registered for type *T*.
+  """
+
+  for renderer in registry.for_type(type(obj)):
+    yield from renderer().get_version_refs(obj)

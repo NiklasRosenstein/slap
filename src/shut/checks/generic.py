@@ -24,7 +24,7 @@ from shut.model import AbstractProjectModel, Project
 from typing import Iterable, Optional, Union
 
 
-class BasicChecker(Checker):
+class GenericChecker(Checker):
 
   @check('unknown-config')
   def _check_unknown_keys(
@@ -37,5 +37,5 @@ class BasicChecker(Checker):
       ', '.join(map(str, obj.unknown_keys)) if obj.unknown_keys else None)
 
 
-register_checker(AbstractProjectModel, BasicChecker)
+register_checker(AbstractProjectModel, GenericChecker)
 
