@@ -264,6 +264,9 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
   @staticmethod
   def _format_reqs(reqs: List[Requirement], level: int = 0) -> List[str]:
     indent = '  ' * (level + 1)
+    reqs = [x for x in reqs if x.package != 'python']
+    if not reqs:
+      return '[]'
     return '[\n' + ''.join(indent + '{!r},\n'.format(x.to_setuptools()) for x in reqs if x.package != 'python') + ']'
 
   def _render_requirements(self, fp: TextIO, target: str, requirements: List[Requirement]):
@@ -293,7 +296,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     # If the readme file is _not_ inside the package directory, the setup.py will
     # temporarily copy it. The filename at setup time is thus just the readme's
     # base filename.
-    is_inside = nr.fs.issub(os.path.relpath(readme, package.get_directory()))
+    is_inside = nr.fs.issub(readme)
     if is_inside:
       readme_relative_path = readme
     else:

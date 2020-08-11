@@ -23,18 +23,18 @@ import click
 
 from shut.commands import project
 from shut.commands.commons.new import write_files
-from shut.commands.pkg import pkg
 from shut.model import PackageModel
 from shut.update import get_files
+from . import pkg
 
 
 @pkg.command()
 @click.option('--dry', is_flag=True)
 def update(dry):
   """
-  Update package files generated from the Package configuration.
+  Update files auto-generated from the configuration file.
   """
 
-  package = project.load(expect=PackageModel)
+  package = project.load_or_exit(expect=PackageModel)
   files = get_files(package)
   write_files(files, package.get_directory(), force=True, dry=dry)
