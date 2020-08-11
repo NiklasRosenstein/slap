@@ -40,4 +40,4 @@ class MonorepoChecker(Checker[MonorepoModel]):
       yield SkipCheck()
 
 
-register_checker(MonorepoChecker, MonorepoModel)
+register_checker(MonorepoModel, MonorepoChecker)

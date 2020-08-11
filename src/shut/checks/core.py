@@ -78,7 +78,7 @@ class Checker(Generic[T]):
 registry = {}
 
 
-def register_checker(checker: Type[Checker[T]], t: Type[T]) -> Type[Checker]:
+def register_checker(t: Type[T], checker: Type[Checker[T]]) -> Type[Checker]:
   """
   Decorator to register a #Checker subclass.
   """

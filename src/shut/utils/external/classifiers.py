@@ -51,7 +51,7 @@ def get_classifiers(force_refresh: bool = False) -> List[str]:
       _runtime_cache = [x.rstrip('\n') for x in fp]
     return list(_runtime_cache)
 
-  has_cachefile = not force_frefresh and os.path.isfile(CACHE_FILENAME)
+  has_cachefile = not force_refresh and os.path.isfile(CACHE_FILENAME)
   if has_cachefile and (time.time() - os.path.getmtime(CACHE_FILENAME)) < CACHE_TTL:
     return _load_cachefile()
   try:

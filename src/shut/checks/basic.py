@@ -37,5 +37,5 @@ class BasicChecker(Checker):
       ', '.join(map(str, obj.unknown_keys)) if obj.unknown_keys else None)
 
 
-register_checker(BasicChecker, MonorepoModel)
-register_checker(BasicChecker, PackageModel)
+register_checker(MonorepoModel, BasicChecker)
+register_checker(PackageModel, BasicChecker)
