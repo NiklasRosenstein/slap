@@ -27,7 +27,6 @@ from shut.utils.external.classifiers import get_classifiers
 from .core import CheckResult, CheckStatus, Checker, check, register_checker
 
 
-
 class PackageChecker(Checker[PackageModel]):
 
   @check('readme')
@@ -107,4 +106,4 @@ class PackageChecker(Checker[PackageModel]):
           'file "py.typed" exists but $.typed is not set')
 
 
-register_checker(PackageChecker, PackageModel)
+register_checker(PackageModel, PackageChecker)

@@ -19,5 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .core import *
+from .core import (
+  CheckStatus,
+  CheckResult,
+  Check,
+  register_checker,
+  get_checks,
+)
+
 from . import basic, monorepo, package
