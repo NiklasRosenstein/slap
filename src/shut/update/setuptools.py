@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import contextlib
 import os
 import textwrap
 from typing import Dict, List, Optional, TextIO, Tuple
@@ -48,6 +49,31 @@ def _get_readme_content_type(filename: str) -> str:
   }.get(nr.fs.getsuffix(filename), 'text/plain')
 
 
+def _split_section(data, begin_marker, end_marker):
+  start = data.find(begin_marker)
+  end = data.find(end_marker, start)
+  if start >= 0 and end >= 0:
+    prefix = data[:start]
+    middle = data[start+len(begin_marker):end]
+    suffix = data[end+len(end_marker)+1:]
+    return prefix, middle, suffix
+  return (data, '', '')
+
+
+@contextlib.contextmanager
+def _rewrite_section(fp, data, begin_marker, end_marker):
+  """
+  Helper to rewrite a section of a file delimited by *begin_marker* and *end_marker*.
+  """
+
+  prefix, suffix = _split_section(data, begin_marker, end_marker)[::2]
+  fp.write(prefix)
+  fp.write(begin_marker + '\n')
+  yield fp
+  fp.write(end_marker + '\n')
+  fp.write(suffix)
+
+
 class SetuptoolsRenderer(Renderer[PackageModel]):
 
   #: Begin an end section for the MANIFEST.in file.
@@ -64,6 +90,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
   def get_files(self, files: VirtualFiles, package: PackageModel) -> None:
     files.add_dynamic('setup.py', self._render_setup, package)
+    files.add_dynamic('MANIFEST.in', self._render_manifest_in, package, inplace=True)
 
     if package.data.typed:
       directory = package.get_python_package_metadata().package_directory
@@ -324,6 +351,25 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     ''').lstrip())
 
     return readme, 'long_description'
+
+  def _render_manifest_in(self, fp: TextIO, current: TextIO, package: PackageModel) -> None:
+    """
+    Modifies a `MANIFEST.in` file in place, ensuring that the automatically generatd content
+    is up to date (or added if it didn't exist before).
+    """
+
+    manifest = [
+      'include ' + os.path.relpath(package.filename, package.get_directory()),
+    ]
+
+    if package.data.typed:
+      directory = package.get_python_package_metadata().package_directory
+      manifest.append('include ' + os.path.join(directory, 'py.typed'))
+
+    markers = (self._BEGIN_SECTION, self._END_SECTION)
+    with _rewrite_section(fp, current.read() if current else '', *markers):
+      for entry in manifest:
+        fp.write('{}\n'.format(entry))
 
 
 register_renderer(PackageModel, SetuptoolsRenderer)
