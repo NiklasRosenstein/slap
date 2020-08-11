@@ -112,8 +112,6 @@ def new(
 
   if not target_directory:
     target_directory = project_name
-  if not module_name:
-    module_name = project_name.replace('-', '_')
   if not author:
     author = load_author_from_git() or Author('Unknown', '<unknown@example.org>')
   if not version:
@@ -122,7 +120,7 @@ def new(
   package_manifest = PackageModel(
     data=PackageData(
       name=project_name,
-      modulename=None if module_name == project_name.replace('-', '_') else module_name,
+      modulename=module_name,
       version=version,
       author=author,
       license=license,
@@ -132,6 +130,8 @@ def new(
       ],
     ),
   )
+
+  module_name = package_manifest.data.get_modulename()
 
   template_vars = {
     'project_name': project_name,
