@@ -185,9 +185,6 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     else:
       extras_require = '{}'
 
-    # TODO(NiklasRosenstein): Data files support
-    data_files = '[]'
-
     exclude_packages = []
     for pkg in data.exclude:
       exclude_packages.append(pkg)
@@ -206,6 +203,10 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       python_requires_expr = repr(python_requirement.version.to_setuptools() if python_requirement else None)
     else:
       python_requires_expr = 'None'
+
+    # TODO: data_files/package_data
+    # TODO: py.typed must be included in package_data (or include_package_data=True)
+    data_files = '[]'
 
     # Write the setup function.
     fp.write(textwrap.dedent('''
@@ -364,6 +365,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     if package.data.typed:
       directory = package.get_python_package_metadata().package_directory
+      directory = os.path.relpath(directory, package.get_directory())
       manifest.append('include ' + os.path.join(directory, 'py.typed'))
 
     markers = (self._BEGIN_SECTION, self._END_SECTION)
