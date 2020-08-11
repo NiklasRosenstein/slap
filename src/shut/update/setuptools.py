@@ -88,7 +88,6 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     fp.write(textwrap.dedent('''
       import io
       import os
-      import re
       import setuptools
       import sys
     ''').lstrip())
@@ -139,13 +138,6 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       '''))
       cmdclass['develop'] = 'develop_command'
 
-    # Write the helper that extracts the version number from the entry file.
-    pkg_metadata_file = os.path.relpath(metadata.filename, package.get_directory())
-    fp.write(textwrap.dedent('''
-      with io.open({entrypoint_file!r}, encoding='utf8') as fp:
-        version = re.search(r"__version__\s*=\s*'(.*)'", fp.read()).group(1)
-    ''').format(entrypoint_file=_normpath(pkg_metadata_file)))
-
     readme_file, long_description_expr = self._render_readme_code(fp, package)
 
     # Write the install requirements.
@@ -192,7 +184,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     fp.write(textwrap.dedent('''
       setuptools.setup(
         name = {name!r},
-        version = version,
+        version = {version!r},
         author = {author_name!r},
         author_email = {author_email!r},
         description = {description!r},
@@ -214,6 +206,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
         classifiers = {classifiers!r},
     ''').rstrip().format(
       name=data.name,
+      version=str(data.version),
       packages_args=packages_args,
       author_name=data.author.name,
       author_email=data.author.email,
