@@ -69,4 +69,5 @@ setuptools.setup(
   cmdclass = {},
   keywords = [],
   classifiers = [],
+  zip_safe = True,
 )

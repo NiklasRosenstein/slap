@@ -1,7 +1,17 @@
-# Shut
+# shut
 
 Shut is an opinionated tool that allows you to configure everything around the Python
-packaging and release process with a single YAML configuration file.
+packaging and release process from a single source of truth. It is intended to simplify
+the process of publishing Python packages and prevent common pitfalls.
+
+
+
+## Getting started
+
+Use `shore pkg new --project-name my-package` to bootstrap a Python package directory.
+Alternatively you can use the example configuration below.
+
+**`package.yml`**
 
 ```yml
 package:
@@ -25,6 +35,8 @@ management, version number bumping, linter configuration, building and publishin
 __Todo__
 
 * [ ] Automatic check for license headers in files / automatically insert license headers
+* [ ] Conda recipe generator and conda-forge helper
+* [ ] Package data / data files
 
 ---
 
