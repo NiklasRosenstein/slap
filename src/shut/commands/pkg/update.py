@@ -29,13 +29,12 @@ from shut.update import get_files
 
 
 @pkg.command()
-@click.option('--force', is_flag=True)
 @click.option('--dry', is_flag=True)
-def update(force, dry):
+def update(dry):
   """
   Update package files generated from the Package configuration.
   """
 
   package = project.load(expect=PackageModel)
   files = get_files(package)
-  write_files(files, package.get_directory(), force=force, dry=dry)
+  write_files(files, package.get_directory(), force=True, dry=dry)
