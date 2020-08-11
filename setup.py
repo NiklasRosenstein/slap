@@ -4,12 +4,8 @@
 from __future__ import print_function
 import io
 import os
-import re
 import setuptools
 import sys
-
-with io.open('src/shut/__init__.py', encoding='utf8') as fp:
-  version = re.search(r"__version__\s*=\s*'(.*)'", fp.read()).group(1)
 
 readme_file = 'README.md'
 if os.path.isfile(readme_file):
@@ -40,7 +36,7 @@ requirements = [
 
 setuptools.setup(
   name = 'shut',
-  version = version,
+  version = '0.1.0',
   author = 'Niklas Rosenstein',
   author_email = 'rosensteinniklas@gmail.com',
   description = 'Automates the heavy lifting of release and distribution management for pure Python packages.',
