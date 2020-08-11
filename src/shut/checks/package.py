@@ -32,7 +32,7 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('readme')
   def _check_readme(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
-    if package.get_readme():
+    if not package.get_readme_file():
       yield CheckResult(CheckStatus.PASSED, 'No README file found.')
 
   @check('license')
@@ -40,7 +40,7 @@ class PackageChecker(Checker[PackageModel]):
     if not package.data.license:
       yield CheckResult(CheckStatus.WARNING, 'not specified')
 
-    elif package.data.license and not package.get_license():
+    elif package.data.license and not package.get_license_file():
       yield CheckResult(CheckStatus.WARNING, 'No LICENSE file found.')
 
     monorepo = project.monorepo

@@ -98,7 +98,6 @@ class PackageModel(AbstractProjectModel):
   data: PackageData = field(altname='package')
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
-  release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
 
   def get_python_package_metadata(self) -> 'PythonPackageMetadata':
     """
@@ -111,7 +110,7 @@ class PackageModel(AbstractProjectModel):
       os.path.join(os.path.dirname(self.filename), self.data.source_directory),
       self.data.get_modulename())
 
-  def get_readme(self) -> Optional[str]:
+  def get_readme_file(self) -> Optional[str]:
     """
     Returns the absolute path to the README for this package.
     """
@@ -126,7 +125,7 @@ class PackageModel(AbstractProjectModel):
       prefix='README.',
       preferred=['README.md', 'README.rst', 'README.txt', 'README'])
 
-  def get_license(self) -> Optional[str]:
+  def get_license_file(self) -> Optional[str]:
     """
     Returns the absolute path to the LICENSE file for this package.
     """
@@ -135,6 +134,14 @@ class PackageModel(AbstractProjectModel):
       directory=os.path.dirname(self.filename),
       prefix='LICENSE.',
       preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'])
+
+  # AbstractProjectModel
+
+  def get_name(self) -> str:
+    return self.data.name
+
+  def get_version(self) -> Optional[Version]:
+    return self.data.version
 
 
 class PythonPackageMetadata:

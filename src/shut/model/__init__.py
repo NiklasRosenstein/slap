@@ -32,6 +32,7 @@ registry = Registry(json_registry)
 registry.set_option(datamodel, 'skip_defaults', True)
 ExcInfo = Tuple
 
+from .abstract import AbstractProjectModel
 from .monorepo import MonorepoModel
 from .package import PackageModel
 
@@ -44,6 +45,16 @@ def get_existing_file(directory: str, choices: List[str]) -> bool:
   return None
 
 
+class Unexpected(Exception):
+
+  def __init__(self, expected, got):
+    self.expected = expected
+    self.got = got
+
+  def __str__(self):
+    return f'expected: {self.expected}, got {self.got}'
+
+
 class Project:
   """
   Loads package and mono repo configuration files and caches them to ensure that
@@ -53,9 +64,11 @@ class Project:
   monorepo_filenames = ['monorepo.yml', 'monorepo.yaml']
   package_filenames = ['package.yml', 'package.yaml']
 
+  Unexpected = Unexpected
+
   def __init__(self):
-    self._cache: Dict[str, Union[MonorepoModel, PackageModel]] = {}
-    self.subject: Union[MonorepoModel, PackageModel] = None
+    self._cache: Dict[str, AbstractProjectModel] = {}
+    self.subject: AbstractProjectModel = None
     self.monorepo: MonorepoModel = None
     self.packages: List[PackageModel] = []
     self.invalid_packages: List[Tuple[str, ExcInfo]] = []
@@ -63,8 +76,8 @@ class Project:
   def load(
     self,
     directory: str = '.',
-    expect: Type[Union[MonorepoModel, PackageModel]] = None,
-  ) -> Union[MonorepoModel, PackageModel]:
+    expect: Type[AbstractProjectModel] = None,
+  ) -> AbstractProjectModel:
     """
     Loads all project information from *directory*. This searches in all parent directories
     for a package or monorepo configuration, then loads all resources that belong to the
@@ -93,10 +106,20 @@ class Project:
       self.subject = self._load_package(package_fn)
 
     if expect and not isinstance(self.subject, expect):
-      raise TypeError('expected {!r} at {!r}, got {!r}'.format(
-                      expect.__name__, directory, type(self.subject).__name__))
+      raise Unexpected(expect, type(self.subject))
 
     return self.subject
+
+  def load_or_exit(self, *args, **kwargs):
+    try:
+      return self.load(*args, **kwargs)
+    except Unexpected as exc:
+      if exc.expected == MonorepoModel:
+        sys.exit('error: not in a mono repository context')
+      elif exc.expected == PackageModel:
+        sys.exit('error: not in a package context')
+      else:
+        raise
 
   def _load_object(self, filename: str, type_: Type[T]) -> T:
     filename = os.path.normpath(os.path.abspath(filename))

@@ -50,7 +50,7 @@ def checks(warnings_as_errors):
   """
 
   start_time = time.perf_counter()
-  monorepo = project.load(expect=MonorepoModel)
+  monorepo = project.load_or_exit(expect=MonorepoModel)
   checks = sorted(get_checks(project, monorepo), key=lambda c: c.name)
   seconds = time.perf_counter() - start_time
   print_checks_all(monorepo.name, checks, seconds)

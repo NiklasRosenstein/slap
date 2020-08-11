@@ -34,4 +34,13 @@ class MonorepoModel(AbstractProjectModel):
   author: Optional[Author] = None
   license: str = None
   url: str = None
+
+  # Overrides
+
   release: MonorepoReleaseConfiguration = field(default_factory=MonorepoReleaseConfiguration)
+
+  def get_name(self) -> str:
+    return self.name
+
+  def get_version(self) -> Optional[Version]:
+    return self.version

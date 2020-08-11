@@ -29,4 +29,5 @@ from shut.model import PackageModel
   Shows whether the package was modified since the last release.
   """ + print_status.__doc__)
 def status():
-  print_status(project.load(expect=PackageModel))
+  project.load_or_exit(expect=PackageModel)
+  print_status(project)
