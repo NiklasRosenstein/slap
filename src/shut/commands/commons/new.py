@@ -19,10 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import os
 import subprocess
 from typing import Optional
 
 import jinja2
+import nr.fs
 from shut.model.author import Author
 from shut.utils.external.license import get_license_metadata, wrap_license_text
 from shut.utils.io.virtual import VirtualFiles
@@ -75,10 +77,15 @@ def render_template(fp, template_string, template_vars):
 
 
 def write_files(files: VirtualFiles, target_directory: str, force: bool = False, dry: bool = False):
+  def _rel(fn: str) -> str:
+    path = os.path.relpath(fn)
+    if nr.fs.issub(path):
+      return path
+    return fn
   files.write_all(
     target_directory,
-    on_write=lambda fn: print(colored('Write ' + fn, 'cyan')),
-    on_skip=lambda fn: print(colored('Skip ' + fn, 'yellow')),
+    on_write=lambda fn: print(colored('Write ' + _rel(fn), 'cyan')),
+    on_skip=lambda fn: print(colored('Skip ' + _rel(fn), 'yellow')),
     overwrite=force,
     dry=dry,
   )

@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 from .core import CheckResult, CheckStatus, Checker, check, register_checker
-from shut.model import MonorepoModel, PackageModel, Project
+from shut.model import AbstractProjectModel, Project
 from typing import Iterable, Optional, Union
 
 
@@ -37,5 +37,5 @@ class BasicChecker(Checker):
       ', '.join(map(str, obj.unknown_keys)) if obj.unknown_keys else None)
 
 
-register_checker(MonorepoModel, BasicChecker)
-register_checker(PackageModel, BasicChecker)
+register_checker(AbstractProjectModel, BasicChecker)
+
