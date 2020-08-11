@@ -28,6 +28,11 @@ from shut.update import get_files
 from . import pkg
 
 
+def update_package(package: PackageModel, dry: bool = False) -> None:
+  files = get_files(package)
+  write_files(files, package.get_directory(), force=True, dry=dry)
+
+
 @pkg.command()
 @click.option('--dry', is_flag=True)
 def update(dry):
@@ -36,5 +41,4 @@ def update(dry):
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  files = get_files(package)
-  write_files(files, package.get_directory(), force=True, dry=dry)
+  update_package(package)
