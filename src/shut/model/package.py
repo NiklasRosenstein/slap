@@ -80,7 +80,15 @@ class PackageData:
   # TODO: Data files
 
   def get_modulename(self) -> str:
-    return self.modulename or self.name.replace('-', '_')
+    if self.modulename:
+      return self.modulename
+
+    # Check for PEP-561 stub packages.
+    # See also https://mypy.readthedocs.io/en/latest/installed_packages.html#making-pep-561-compatible-packages
+    if self.name.endswith('-stubs'):
+      return self.name[:-6].replace('-', '_') + '-stubs'
+
+    return self.name.replace('-', '_')
 
   def get_python_requirement(self) -> Optional[Requirement]:
     return next(filter(lambda x: x.package == 'python', self.requirements), None)
