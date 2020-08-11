@@ -175,7 +175,7 @@ class PackageModel(AbstractProjectModel):
     if not self.data.typed:
       return None
 
-    directory = package.get_python_package_metadata().package_directory
+    directory = self.get_python_package_metadata().package_directory
     return os.path.join(directory, 'py.typed')
 
   # AbstractProjectModel

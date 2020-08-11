@@ -23,9 +23,15 @@ import click
 
 from shut.commands import project
 from shut.commands.commons.new import write_files
+from shut.commands.pkg.update import update_package
 from shut.model import MonorepoModel
 from shut.update import get_files
 from . import mono
+
+
+def update_monorepo(monorepo: MonorepoModel, dry: bool = False) -> None:
+  files = get_files(monorepo)
+  write_files(files, monorepo.get_directory(), force=True, dry=dry)
 
 
 @mono.command()
@@ -37,10 +43,8 @@ def update(all_, dry):
   """
 
   monorepo = project.load_or_exit(expect=MonorepoModel)
-  files = get_files(monorepo)
-  write_files(files, monorepo.get_directory(), force=True, dry=dry)
+  update_monorepo(monorepo, dry)
 
   if all_:
     for package in project.packages:
-      files = get_files(package)
-      write_files(files, package.get_directory(), force=True, dry=dry)
+      update_package(package, dry)
