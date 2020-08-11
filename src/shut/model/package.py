@@ -21,6 +21,7 @@
 
 import ast
 import os
+import re
 from typing import Dict, Iterable, List, Optional
 
 from databind.core import datamodel, field
@@ -81,6 +82,29 @@ class PackageData:
   def get_modulename(self) -> str:
     return self.modulename or self.name.replace('-', '_')
 
+  def get_python_requirement(self) -> Optional[Requirement]:
+    return next(filter(lambda x: x.package == 'python', self.requirements), None)
+
+  def is_universal(self) -> bool:
+    """
+    Checks if the package is a universal Python package (i.e. it is Python 2 and 3 compatible)
+    by testing the `$.requirements.python` version selector. If none is specified, the package
+    is also considered universal.
+    """
+
+    if self.universal is not None:
+      return self.universal
+
+    python_requirement = self.get_python_requirement()
+    if not python_requirement:
+      return True
+
+    # TODO (@NiklasRosenstein): This method of detecting if the version selector
+    #   selects a Python 2 and 3 version is very suboptimal.
+    has_2 = re.search(r'\b2\b|\b2\.\b', str(python_requirement))
+    has_3 = re.search(r'\b3\b|\b3\.\b', str(python_requirement))
+    return bool(has_2 and has_3)
+
 
 @datamodel
 class InstallConfiguration:
@@ -90,6 +114,9 @@ class InstallConfiguration:
     after_install: List[str] = field(altname='after-install', default_factory=list)
     before_develop: List[str] = field(altname='before-develop', default_factory=list)
     after_develop: List[str] = field(altname='after-develop', default_factory=list)
+
+    def any(self):
+      return any((self.before_install, self.after_install, self.before_develop, self.after_develop))
 
   hooks: InstallHooks = field(default_factory=InstallHooks)
 
@@ -190,11 +217,15 @@ class PythonPackageMetadata:
     just a single Python module.
     """
 
-    dirname, basename = os.path.split(self.filename)
-    if basename not in ('__init__.py', '__version__.py'):
+    if self.is_single_module:
       raise ValueError('this package is in module-only form')
 
-    return dirname
+    return os.path.dirname(self.filename) or '.'
+
+  @property
+  def is_single_module(self) -> bool:
+    basename = os.path.basename(self.filename)
+    return basename not in ('__init__.py', '__version__.py')
 
   @property
   def author(self) -> str:

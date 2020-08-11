@@ -33,3 +33,4 @@ def pkg():
 from . import checks
 from . import new
 from . import status
+from . import update

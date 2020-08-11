@@ -28,6 +28,17 @@ from typing import Callable, Iterable, Generic, Type, TypeVar, Union
 import enum
 import types
 
+from shut.model import Project
+from shut.utils.type_registry import TypeRegistry
+
+__all__ = [
+  'CheckStatus',
+  'CheckResult',
+  'Check',
+  'register_checker',
+  'get_checks',
+]
+
 T = TypeVar('T')
 
 
@@ -56,7 +67,7 @@ def check(name: str) -> Callable[[Callable], Callable]:
 
 class Checker(Generic[T]):
 
-  def get_checks(self, project: 'Project', subject: T) -> Iterable[Check]:
+  def get_checks(self, project: Project, subject: T) -> Iterable[Check]:
     """
     Yield #Check objects for the *subject*. By default, all methods decorated with
     #check() are called.
@@ -75,30 +86,22 @@ class Checker(Generic[T]):
         if index is None:
           yield Check(value.__check_name__, CheckResult(CheckStatus.PASSED, None))
 
-registry = {}
+
+registry = TypeRegistry[Type[Checker]]()
 
 
-def register_checker(t: Type[T], checker: Type[Checker[T]]) -> Type[Checker]:
+def register_checker(t: Type[T], checker: Type[Checker[T]]) -> None:
   """
-  Decorator to register a #Checker subclass.
+  Register a *checker* class to run checks for type *t*.
   """
 
-  registry.setdefault(t, []).append(checker)
+  registry.put(t, checker)
 
 
-def get_checks(project: 'Project', obj: T) -> Iterable[Check]:
+def get_checks(project: Project, obj: T) -> Iterable[Check]:
   """
   Returns all checks from the checkers registered for the type of *obj*.
   """
 
-  for checker in registry.get(type(obj), []):
+  for checker in registry.for_type(type(obj)):
     yield from checker().get_checks(project, obj)
-
-
-__all__ = [
-  'CheckStatus',
-  'CheckResult',
-  'Check',
-  'register_checker',
-  'get_checks',
-]

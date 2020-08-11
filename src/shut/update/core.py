@@ -19,23 +19,38 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import click
+import abc
+from typing import Generic, T, Type
 
-from shut.commands import project
-from shut.commands.commons.new import write_files
-from shut.commands.pkg import pkg
-from shut.model import PackageModel
-from shut.update import get_files
+from shut.utils.io.virtual import VirtualFiles
+from shut.utils.type_registry import TypeRegistry
 
 
-@pkg.command()
-@click.option('--force', is_flag=True)
-@click.option('--dry', is_flag=True)
-def update(force, dry):
+class Renderer(Generic[T], metaclass=abc.ABCMeta):
+
+  @abc.abstractmethod
+  def get_files(self, files: VirtualFiles, obj: T) -> None:
+    pass
+
+
+registry = TypeRegistry[Type[Renderer]]()
+
+
+def register_renderer(t: Type[T], renderer: Type[Renderer[T]]) -> None:
   """
-  Update package files generated from the Package configuration.
+  Register the *renderer* implementation to run when creating files for *t*.
   """
 
-  package = project.load(expect=PackageModel)
-  files = get_files(package)
-  write_files(files, package.get_directory(), force=force, dry=dry)
+  registry.put(t, renderer)
+
+
+def get_files(obj: T) -> VirtualFiles:
+  """
+  Gets all the files from the renderers registered to the type of *obj*.
+  """
+
+  files = VirtualFiles()
+  for renderer in registry.for_type(type(obj)):
+    renderer().get_files(files, obj)
+
+  return files
