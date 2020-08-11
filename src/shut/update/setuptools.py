@@ -208,6 +208,10 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     # TODO: py.typed must be included in package_data (or include_package_data=True)
     data_files = '[]'
 
+    # MyPy cannot find PEP-561 compatible packages without zip_safe=False.
+    # See https://mypy.readthedocs.io/en/latest/installed_packages.html#making-pep-561-compatible-packages
+    zip_safe = not data.typed
+
     # Write the setup function.
     fp.write(textwrap.dedent('''
       setuptools.setup(
@@ -232,6 +236,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
         cmdclass = {cmdclass},
         keywords = {keywords!r},
         classifiers = {classifiers!r},
+        zip_safe = {zip_safe!r},
     ''').rstrip().format(
       name=data.name,
       version=str(data.version),
@@ -253,6 +258,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       cmdclass = '{' + ', '.join('{!r}: {}'.format(k, v) for k, v in cmdclass.items()) + '}',
       keywords = data.keywords,
       classifiers = data.classifiers,
+      zip_safe=zip_safe,
     ))
 
     if data.is_universal():
