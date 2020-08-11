@@ -20,7 +20,6 @@
 # IN THE SOFTWARE.
 
 from .. import shut, commons
-from shore.model import Monorepo
 import click
 
 
@@ -29,10 +28,6 @@ def mono():
   """
   Manage the current mono repository.
   """
-
-
-def load_monorepo_manifest() -> Monorepo:
-  return commons.load_manifest(('monorepo.yaml', 'monorepo.yml'), Monorepo)
 
 
 from . import checks

@@ -19,12 +19,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from . import mono, load_monorepo_manifest
+from . import mono
+from .. import project
 from ..commons.status import print_status
+from shut.model.monorepo import MonorepoModel
 
 
 @mono.command(help="""
   Show which packages have been modified since their last release.
   """ + print_status.__doc__)
 def status():
-  print_status(load_monorepo_manifest())
+
+  project.load_or_exit(expect=MonorepoModel)
+  print_status(project)

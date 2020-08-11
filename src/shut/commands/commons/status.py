@@ -19,38 +19,44 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from nr.utils.git import Git
-from shore.model import Monorepo, Package
-from termcolor import colored
+import os
 from typing import Union
 
+from nr.utils.git import Git
+from termcolor import colored
 
-def get_commits_since_last_tag(subject: Union[Monorepo, Package]):
-  tag = subject.get_tag(subject.version)
+from shut.model import AbstractProjectModel, MonorepoModel, Project
+
+
+def get_commits_since_last_tag(subject: AbstractProjectModel):
+  tag = subject.get_tag(subject.get_version())
   ref = Git().rev_parse(tag)
   if not ref:
     return tag, None
   else:
-    return tag, len(Git().rev_list(tag + '..HEAD', subject.directory))
+    return tag, len(Git().rev_list(tag + '..HEAD', subject.get_directory()))
 
 
-def print_status(subject: Union[Monorepo, Package]) -> None:
+def print_status(project: Project) -> None:
   """
   The latest version is taken from the current version number in the package
   configuration file. Git is then queried for the tag and the commit distance
   to the current revision.
   """
 
-  items = [subject]
+  assert project.subject, "No subject"
 
-  if isinstance(subject, Monorepo):
-    items.extend(sorted(subject.get_packages(), key=lambda x: x.name))
-    if not subject.version:
-      items.remove(subject)
+  if isinstance(project.subject, MonorepoModel):
+    monorepo_dir = project.subject.get_directory()
+    items = sorted(project.packages, key=lambda x: x.data.name)
+    names = [os.path.normpath(os.path.relpath(x.get_directory(), monorepo_dir)) for x in items]
+  else:
+    items = [project.subject]
+    names = [project.subject.get_name()]
 
-  width = max(len(x.local_name) for x in items)
+  width = max(map(len, names))
 
-  for item in items:
+  for item, name in zip(items, names):
     tag, num_commits = get_commits_since_last_tag(item)
     if num_commits is None:
       item_info = colored('tag "{}" not found'.format(tag), 'red')
@@ -58,4 +64,4 @@ def print_status(subject: Union[Monorepo, Package]) -> None:
       item_info = colored('no commits', 'green') + ' since "{}"'.format(tag)
     else:
       item_info = colored('{} commit(s)'.format(num_commits), 'yellow') + ' since "{}"'.format(tag)
-    print('{}: {}'.format(item.local_name.rjust(width), item_info))
+    print('{}: {}'.format(name.rjust(width), item_info))

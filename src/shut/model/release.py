@@ -24,10 +24,9 @@ from databind.core import datamodel, field
 
 @datamodel
 class ReleaseConfiguration:
-  private: bool = False
   tag_format: str = field(altname='tag-format', default='{version}')
 
 
 @datamodel
-class MonorepoReleaseConfiguration:
+class MonorepoReleaseConfiguration(ReleaseConfiguration):
   single_version: bool  = field(altname='single-version', default=False)

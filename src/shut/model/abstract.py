@@ -19,17 +19,35 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import abc
 import os
 from typing import List, Optional
 from databind.core import datamodel, field
 from .changelog import ChangelogConfiguration
+from .release import ReleaseConfiguration
+from .version import Version
 
 
 @datamodel
-class AbstractProjectModel:
+class AbstractProjectModel(metaclass=abc.ABCMeta):
   filename: Optional[str] = field(derived=True, default=None)
   unknown_keys: List[str] = field(derived=True, default_factory=list)
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
+  release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
+
+  @abc.abstractmethod
+  def get_name(self) -> str:
+    pass
+
+  @abc.abstractmethod
+  def get_version(self) -> Optional[Version]:
+    pass
+
+  def get_tag(self, version: Version) -> str:
+    return self.release.tag_format.format(name=self.get_name(), version=version)
+
+  def get_directory(self) -> str:
+    return os.path.dirname(self.filename)
 
   def get_changelog_directory(self) -> str:
     return os.path.join(os.path.dirname(self.filename), self.changelog.directory)

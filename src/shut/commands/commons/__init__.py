@@ -18,16 +18,3 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
-
-from shore.model import ObjectCache
-import os
-
-object_cache = ObjectCache()
-
-
-def load_manifest(filename_choices, cls):
-  filename_choices = tuple(filename_choices)
-  for filename in filename_choices:
-    if os.path.isfile(filename):
-      return cls.load(filename, object_cache)
-  raise RuntimeError('file not found: ' + repr(filename_choices))
