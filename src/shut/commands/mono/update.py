@@ -19,18 +19,28 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
 import click
 
+from shut.commands import project
+from shut.commands.commons.new import write_files
+from shut.model import MonorepoModel
+from shut.update import get_files
+from . import mono
 
-@shut.group(help=__doc__)
-def mono():
+
+@mono.command()
+@click.option('--dry', is_flag=True)
+@click.option('-a', '--all', 'all_', is_flag=True, help='Also update any packages in the monorepo.')
+def update(all_, dry):
   """
-  Manage the current mono repository.
+  Update files auto-generated from the configuration file.
   """
 
+  monorepo = project.load_or_exit(expect=MonorepoModel)
+  files = get_files(monorepo)
+  write_files(files, monorepo.get_directory(), force=True, dry=dry)
 
-from . import checks
-from . import new
-from . import status
-from . import update
+  if all_:
+    for package in project.packages:
+      files = get_files(package)
+      write_files(files, package.get_directory(), force=True, dry=dry)
