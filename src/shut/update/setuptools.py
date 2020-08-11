@@ -359,14 +359,18 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     is up to date (or added if it didn't exist before).
     """
 
-    manifest = [
-      'include ' + os.path.relpath(package.filename, package.get_directory()),
+    files = [
+      package.filename,
+      package.get_readme_file(),
+      package.get_license_file(),
+      package.get_py_typed_file(),
     ]
 
-    if package.data.typed:
-      directory = package.get_python_package_metadata().package_directory
-      directory = os.path.relpath(directory, package.get_directory())
-      manifest.append('include ' + os.path.join(directory, 'py.typed'))
+    manifest = [
+      os.path.relpath(f, package.get_directory())
+      for f in files
+      if f
+    ]
 
     markers = (self._BEGIN_SECTION, self._END_SECTION)
     with _rewrite_section(fp, current.read() if current else '', *markers):
