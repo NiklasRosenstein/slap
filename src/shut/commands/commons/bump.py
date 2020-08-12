@@ -119,15 +119,15 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
     # TODO(NiklasRosenstein): Bump based on changelog
     sys.exit('error: missing version argument or bump option')
 
+  version_refs = list(get_version_refs(data.obj))
+  if not version_refs:
+    sys.exit('error: no version refs found')
+
   # Run checks.
   if not args.skip_checks:
     res = data.run_checks()
     if res != 0:
       sys.exit('error: checks failed')
-
-  version_refs = list(get_version_refs(data.obj))
-  if not version_refs:
-    sys.exit('error: no version refs found')
 
   # Ensure the version is the same accross all refs.
   current_version = data.obj.get_version()

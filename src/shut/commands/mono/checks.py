@@ -39,6 +39,14 @@ import time
 logger = logging.getLogger(__name__)
 
 
+def check_monorepo(monorepo: MonorepoModel, warnings_as_errors: bool = False):
+  start_time = time.perf_counter()
+  checks = sorted(get_checks(project, monorepo), key=lambda c: c.name)
+  seconds = time.perf_counter() - start_time
+  print_checks_all(monorepo.name, checks, seconds)
+  return get_checks_status(checks, warnings_as_errors)
+
+
 @mono.command()
 @click.option('-w', '--warnings-as-errors', is_flag=True)
 def checks(warnings_as_errors):
@@ -49,9 +57,5 @@ def checks(warnings_as_errors):
   on the package configuration and entrypoint definition.
   """
 
-  start_time = time.perf_counter()
   monorepo = project.load_or_exit(expect=MonorepoModel)
-  checks = sorted(get_checks(project, monorepo), key=lambda c: c.name)
-  seconds = time.perf_counter() - start_time
-  print_checks_all(monorepo.name, checks, seconds)
-  sys.exit(get_checks_status(checks, warnings_as_errors))
+  sys.exit(check_monorepo(monorepo, warnings_as_errors))

@@ -32,10 +32,6 @@ registry = Registry(json_registry)
 registry.set_option(datamodel, 'skip_defaults', True)
 ExcInfo = Tuple
 
-from .abstract import AbstractProjectModel
-from .monorepo import MonorepoModel
-from .package import PackageModel
-
 
 def get_existing_file(directory: str, choices: List[str]) -> bool:
   for fn in choices:
@@ -67,8 +63,8 @@ class Project:
   Unexpected = Unexpected
 
   def __init__(self):
-    self._cache: Dict[str, AbstractProjectModel] = {}
-    self.subject: AbstractProjectModel = None
+    self._cache: Dict[str, 'AbstractProjectModel'] = {}
+    self.subject: 'AbstractProjectModel' = None
     self.monorepo: MonorepoModel = None
     self.packages: List[PackageModel] = []
     self.invalid_packages: List[Tuple[str, ExcInfo]] = []
@@ -76,8 +72,8 @@ class Project:
   def load(
     self,
     directory: str = '.',
-    expect: Type[AbstractProjectModel] = None,
-  ) -> AbstractProjectModel:
+    expect: Type['AbstractProjectModel'] = None,
+  ) -> 'AbstractProjectModel':
     """
     Loads all project information from *directory*. This searches in all parent directories
     for a package or monorepo configuration, then loads all resources that belong to the
@@ -133,12 +129,13 @@ class Project:
     #node_collector = NodeCollector()
     obj = self._cache[filename] = from_json(type_, data, registry=registry)
     obj.filename = filename
+    obj.project = self
     #obj.unknown_keys = list(Stream.concat(
     #    (x.locator.append(k) for k in x.unknowns)
     #    for x in node_collector.nodes))
     return obj
 
-  def _load_monorepo(self, filename: str) -> MonorepoModel:
+  def _load_monorepo(self, filename: str) -> 'MonorepoModel':
     self.monorepo = self._load_object(filename, MonorepoModel)
 
     # Load packages in that monorepo.
@@ -153,7 +150,7 @@ class Project:
 
     return self.monorepo
 
-  def _load_package(self, filename: str) -> PackageModel:
+  def _load_package(self, filename: str) -> 'PackageModel':
     package = self._load_object(filename, PackageModel)
     if package not in self.packages:
       self.packages.append(package)
@@ -167,3 +164,8 @@ def dump(obj: Any, file_: Union[str, TextIO]) -> None:
   else:
     data = to_json(obj, registry=registry)
     yaml.safe_dump(data, file_, sort_keys=False)
+
+
+from .abstract import AbstractProjectModel
+from .monorepo import MonorepoModel
+from .package import PackageModel

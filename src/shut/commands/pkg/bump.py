@@ -52,6 +52,9 @@ class PackageBumpData(VersionBumpData[PackageModel]):
   def run_checks(self) -> int:
     return check_package(self.obj, self.args.warnings_as_errors)
 
+  def update(self) -> None:
+    update_package(self.obj, dry=self.args.dry)
+
   def get_snapshot_version(self) -> Version:
     project = self.project
     if project.monorepo and project.monorepo.release.single_version:
@@ -61,10 +64,7 @@ class PackageBumpData(VersionBumpData[PackageModel]):
     return get_commit_distance_version(
       subject.directory,
       subject.version,
-      subject.get_tag(subject.version)) or subject.version
-
-  def update(self) -> Version:
-    update_package(self.obj, dry=self.args.dry)
+      subject.get_tag(subject.get_version())) or subject.get_version()
 
 
 pkg.command()(make_bump_command(PackageBumpData, PackageModel))

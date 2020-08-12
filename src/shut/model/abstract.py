@@ -30,6 +30,7 @@ from .version import Version
 
 @datamodel
 class AbstractProjectModel(metaclass=abc.ABCMeta):
+  project: Optional['Project'] = field(derived=True, default=None)
   filename: Optional[str] = field(derived=True, default=None)
   unknown_keys: List[str] = field(derived=True, default_factory=list)
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
@@ -51,3 +52,6 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
 
   def get_changelog_directory(self) -> str:
     return os.path.join(os.path.dirname(self.filename), self.changelog.directory)
+
+
+from . import Project

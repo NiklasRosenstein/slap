@@ -19,32 +19,36 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import re
+import os
+import logging
+import sys
 from typing import Iterable
 
-from shut.model import AbstractProjectModel, MonorepoModel
-from shut.utils.io.virtual import VirtualFiles
-from .core import Renderer, get_version_refs, register_renderer, VersionRef
+import click
+
+from shut.commands.commons.bump import make_bump_command, VersionBumpData, VersionRef
+from shut.model import MonorepoModel, Project
+from shut.model.version import get_commit_distance_version, parse_version, Version
+from . import mono
+from .checks import check_monorepo
+from .update import update_monorepo
+
+logger = logging.getLogger(__name__)
 
 
-class GenericRenderer(Renderer[AbstractProjectModel]):
+class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
 
-  # Renderer[AbstractProjectModel] Overrides
+  def run_checks(self) -> int:
+    return check_monorepo(self.obj, self.args.warnings_as_errors)
 
-  def get_files(self, files: VirtualFiles, obj: AbstractProjectModel) -> None:
-    pass
+  def update(self) -> None:
+    update_monorepo(self.obj, dry=self.args.dry)
 
-  def get_version_refs(self, obj: AbstractProjectModel) -> Iterable[VersionRef]:
-    # Return a reference to the version number in the package or monorepo model.
-    regex = '^\s*version\s*:\s*[\'"]?(.*?)[\'"]?\s*(#.*)?$'
-    with open(obj.filename) as fp:
-      match = re.search(regex, fp.read(), re.S | re.M)
-      if match:
-        yield VersionRef(obj.filename, match.start(1), match.end(1), match.group(1))
-
-    if isinstance(obj, MonorepoModel) and obj.release.single_version:
-      for package in obj.project.packages:
-        yield from get_version_refs(package)
+  def get_snapshot_version(self) -> Version:
+    return get_commit_distance_version(
+      self.obj.directory,
+      self.obj.version,
+      self.obj.get_tag(self.obj.version)) or self.obj.version
 
 
-register_renderer(AbstractProjectModel, GenericRenderer)
+mono.command()(make_bump_command(MonorepoBumpdata, MonorepoModel))
