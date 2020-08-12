@@ -163,7 +163,7 @@ class Project:
 def dump(obj: Any, file_: Union[str, TextIO]) -> None:
   if isinstance(file_, str):
     with open(file_, 'w') as fp:
-      dump(fp, obj)
+      dump(obj, fp)
   else:
     data = to_json(obj, registry=registry)
     yaml.safe_dump(data, file_, sort_keys=False)

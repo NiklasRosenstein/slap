@@ -376,18 +376,6 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       for entry in manifest:
         fp.write('{}\n'.format(entry))
 
-  _ENTRY_VERSION_REGEX = '__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
-
-  def _entry_version_ref(self, filename: str) -> Optional[VersionRef]:
-    if not os.path.isfile(filename):
-      # This should be captured by the package checks as well.
-      return None
-    with open(filename) as fp:
-      match = re.search(self._ENTRY_VERSION_REGEX, fp.read())
-      if match:
-        return VersionRef(filename, match.start(1), match.end(1), match.group(1))
-    return None
-
   # Renderer[PackageModel] Overrides
 
   def get_files(self, files: VirtualFiles, package: PackageModel) -> None:

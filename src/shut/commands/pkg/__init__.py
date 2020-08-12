@@ -33,5 +33,6 @@ def pkg():
 from . import bump
 from . import checks
 from . import new
+from . import requirements
 from . import status
 from . import update
