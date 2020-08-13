@@ -19,32 +19,39 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import click
+import abc
+from fnmatch import fnmatch
 
-from shut.commands import project
-from shut.commands.commons.new import write_files
-from shut.commands.pkg.update import update_package
-from shut.model import MonorepoModel
-from shut.renderers import get_files
-from . import mono
+from databind.core import datamodel
 
 
-def update_monorepo(monorepo: MonorepoModel, dry: bool = False, indent: int = 0) -> None:
-  files = get_files(monorepo)
-  write_files(files, monorepo.get_directory(), force=True, dry=dry, indent=indent)
-
-
-@mono.command()
-@click.option('--dry', is_flag=True)
-@click.option('-a', '--all', 'all_', is_flag=True, help='Also update any packages in the monorepo.')
-def update(all_, dry):
+@datamodel(frozen=True)
+class TargetId:
   """
-  Update files auto-generated from the configuration file.
+  Represents the ID of a target that can be selected on the command line. We use the
+  "target" concept for builds and publishers. A target ID may contain wildcard characters
+  in which case it can be used to match multiple targets with #fnmatch().
   """
 
-  monorepo = project.load_or_exit(expect=MonorepoModel)
-  update_monorepo(monorepo, dry)
+  scope: str
+  name: str
 
-  if all_:
-    for package in project.packages:
-      update_package(package, dry)
+  def __str__(self):
+    return f'{self.scope}:{self.name}'
+
+  @classmethod
+  def parse(cls, s: str, allow_scope_only: bool = False) -> 'TargetId':
+    parts = s.split(':')
+    if allow_scope_only and len(parts) == 1:
+      parts = (parts[0], '*')
+    return cls(*parts)
+
+  def match(self, other_id: 'TargetId') -> bool:
+    return fnmatch(other_id.scope, self.scope) and fnmatch(other_id.name, self.name)
+
+
+class Target(metaclass=abc.ABCMeta):
+
+  @abc.abstractproperty
+  def id(self) -> TargetId:
+    pass

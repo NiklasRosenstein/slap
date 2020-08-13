@@ -19,16 +19,41 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-"""
-The `shut.update` package implements rendering the files that can be produced from a monorepo
-and package definition.
-"""
+import abc
+from typing import Generic, Iterable, List, T, Type
 
-from .core import (
-  get_files,
-  get_version_refs,
-  register_renderer,
-  VersionRef
-)
+from shut.model import AbstractProjectModel
+from shut.model.target import Target, TargetId
+from shut.utils.type_registry import TypeRegistry
 
-from . import generic, setuptools
+__all__ = [
+  'Publisher',
+  'PublisherProvider',
+  'register_publisher_provider',
+  'get_publishers',
+]
+
+
+class Publisher(Target, metaclass=abc.ABCMeta):
+
+  @abc.abstractmethod
+  def publish(self, verbose: bool) -> bool:
+    pass
+
+
+class PublisherProvider(Generic[T], metaclass=abc.ABCMeta):
+
+  @abc.abstractmethod
+  def get_publishers(self) -> List[Publisher]:
+    pass
+
+
+registry = TypeRegistry[PublisherProvider[AbstractProjectModel]]()
+
+
+def register_publisher_provider(type_: Type[T], provider_class: Type[PublisherProvider[T]]) -> None:
+  registry.put(type_, provider_class)
+
+
+def get_publishers(obj: T) -> Iterable[Publisher]:
+  return concat(provider().get_publishers(obj) for provider in registry.for_type(type(obj)))

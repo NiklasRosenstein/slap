@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shut.checks import CheckStatus, get_checks
+from shut.checkers import CheckStatus, get_checks
 from shut.commands import project
 from shut.commands.commons.checks import print_checks_all, get_checks_status
 from shut.commands.mono import mono

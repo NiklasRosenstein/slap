@@ -36,7 +36,7 @@ from shut.changelog.manager import ChangelogManager
 from shut.commands import project
 from shut.model import AbstractProjectModel, Project
 from shut.model.version import bump_version, parse_version, Version
-from shut.update import get_version_refs, VersionRef
+from shut.renderers import get_version_refs, VersionRef
 from shut.utils.text import substitute_ranges
 
 logger = logging.getLogger(__name__)

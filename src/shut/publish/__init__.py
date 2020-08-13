@@ -19,17 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-"""
-The `shut.checks` package implements all the sanity checks that are run over a monoreop and
-package definition to prevent common pitfalls and errors.
-"""
+from .core import *
+from . import warehouse
 
-from .core import (
-  CheckStatus,
-  CheckResult,
-  Check,
-  register_checker,
-  get_checks,
-)
-
-from . import generic, monorepo, package
+__all__ = core.__all__

@@ -19,32 +19,43 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import click
+from typing import Dict, Optional
 
-from shut.commands import project
-from shut.commands.commons.new import write_files
-from shut.commands.pkg.update import update_package
-from shut.model import MonorepoModel
-from shut.renderers import get_files
-from . import mono
+from databind.core import datamodel, field
 
 
-def update_monorepo(monorepo: MonorepoModel, dry: bool = False, indent: int = 0) -> None:
-  files = get_files(monorepo)
-  write_files(files, monorepo.get_directory(), force=True, dry=dry, indent=indent)
+@datamodel
+class WarehouseCredentials:
+  username: Optional[str] = None
+  password: Optional[str] = None
+  test_username: Optional[str] = None
+  test_password: Optional[str] = None
 
 
-@mono.command()
-@click.option('--dry', is_flag=True)
-@click.option('-a', '--all', 'all_', is_flag=True, help='Also update any packages in the monorepo.')
-def update(all_, dry):
-  """
-  Update files auto-generated from the configuration file.
-  """
+@datamodel
+class WarehouseConfiguration(WarehouseCredentials):
+  repository: Optional[str] = None
+  repository_url: Optional[str] = None
+  test_repository: Optional[str] = None
+  test_repository_url: Optional[str] = None
 
-  monorepo = project.load_or_exit(expect=MonorepoModel)
-  update_monorepo(monorepo, dry)
 
-  if all_:
-    for package in project.packages:
-      update_package(package, dry)
+@datamodel
+class PypiConfiguration:
+  #: Whether publishing to PyPI is enabled.
+  enabled: bool = True
+
+  #: The credentials configuration for PyPI. Variables in the from `$(VARNAME)`
+  #: will be substituted from environment variables.
+  credentials: WarehouseCredentials = field(
+    altname='credentials',
+    default_factory=WarehouseCredentials)
+
+
+@datamodel
+class PublishConfiguration:
+  # Configuration for PyPI.
+  pypi: PypiConfiguration = field(default_factory=PypiConfiguration)
+
+  #: Additional warehouse targets to publish to.
+  warehouses: Dict[str, WarehouseConfiguration] = field(default_factory=dict)

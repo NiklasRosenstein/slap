@@ -31,7 +31,7 @@ import termcolor
 from nr.stream import Stream
 from termcolor import colored
 
-from shut.checks import CheckStatus, get_checks
+from shut.checkers import CheckStatus, get_checks
 from shut.commands import project
 from shut.commands.commons.checks import print_checks_all, get_checks_status
 from shut.model import PackageModel, Project

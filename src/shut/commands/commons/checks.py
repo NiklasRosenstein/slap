@@ -19,11 +19,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shut.checks import Check, CheckStatus
-from typing import List
-import termcolor
-import time
 import sys
+import time
+from typing import List
+
+import termcolor
+
+from shut.checkers import Check, CheckStatus
 
 
 def print_checks(
