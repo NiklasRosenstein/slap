@@ -19,26 +19,51 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import sys
+
 import click
+from nr.stream import groupby
+from termcolor import colored
 
-from shut.commands import project
-from shut.commands.commons.new import write_files
+from shut.builders import Builder, get_builders
 from shut.model import PackageModel
-from shut.renderers import get_files
+from shut.model.target import TargetId
 from . import pkg
-
-
-def update_package(package: PackageModel, dry: bool = False, indent: int = 0) -> None:
-  files = get_files(package)
-  write_files(files, package.get_directory(), force=True, dry=dry, indent=indent)
+from .. import project
 
 
 @pkg.command()
-@click.option('--dry', is_flag=True)
-def update(dry):
+@click.argument('target', type=lambda s: TargetId.parse(s, True), required=False)
+@click.option('-l', '--list', 'list_', is_flag=True, help='list available builders')
+@click.option('-b', '--build-dir', default='build', help='build output directory')
+@click.option('-v', '--verbose', is_flag=True, help='show more output')
+def build(target, list_, build_dir, verbose):
   """
-  Update files auto-generated from the configuration file.
+  Produce a build of the package.
   """
 
+  if target and list_:
+    sys.exit('error: conflicting options')
+
   package = project.load_or_exit(expect=PackageModel)
-  update_package(package)
+  builders = list(get_builders(package))
+
+  if list_:
+    print()
+    for scope, builders in groupby(builders, lambda b: b.id.scope):
+      print(f'{colored(scope, "green")}:')
+      for builder in builders:
+        print(f'  {builder.id.name} – {builder.get_description()}')
+    print()
+    return
+
+  if not target:
+    sys.exit('error: no target specified')
+
+  builders = [b for b in builders if target.match(b.id)]
+  if not builders:
+    sys.exit(f'error: no target matches "{target}"')
+
+  for builder in builders:
+    print(colored(f'building {colored(builder.id, "green")}'))
+    builder.build(build_dir, verbose)

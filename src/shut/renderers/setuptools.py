@@ -374,7 +374,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     markers = (self._BEGIN_SECTION, self._END_SECTION)
     with _rewrite_section(fp, current.read() if current else '', *markers):
       for entry in manifest:
-        fp.write('{}\n'.format(entry))
+        fp.write('include {}\n'.format(entry))
 
   # Renderer[PackageModel] Overrides
 

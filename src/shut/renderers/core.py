@@ -27,6 +27,14 @@ from databind.core import datamodel
 from shut.utils.io.virtual import VirtualFiles
 from shut.utils.type_registry import TypeRegistry
 
+__all__ = [
+  'VersionRef',
+  'Renderer',
+  'register_renderer',
+  'get_files',
+  'get_version_refs',
+]
+
 
 @datamodel
 class VersionRef:

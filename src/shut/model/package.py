@@ -31,6 +31,7 @@ from .abstract import AbstractProjectModel
 from .author import Author
 from .changelog import ChangelogConfiguration
 from .linter import LinterConfiguration
+from .publish import PublishConfiguration
 from .release import ReleaseConfiguration
 from .requirements import Requirement
 from .version import Version
@@ -134,6 +135,7 @@ class PackageModel(AbstractProjectModel):
   data: PackageData = field(altname='package')
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
+  publish: PublishConfiguration = field(default_factory=PublishConfiguration)
 
   def get_python_package_metadata(self) -> 'PythonPackageMetadata':
     """

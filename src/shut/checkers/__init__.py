@@ -19,32 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import click
+"""
+The `shut.checkers` package implements all the sanity checks that are run over a monoreop and
+package definition to prevent common pitfalls and errors.
+"""
 
-from shut.commands import project
-from shut.commands.commons.new import write_files
-from shut.commands.pkg.update import update_package
-from shut.model import MonorepoModel
-from shut.renderers import get_files
-from . import mono
+from .core import *
+from . import generic, monorepo, package
 
-
-def update_monorepo(monorepo: MonorepoModel, dry: bool = False, indent: int = 0) -> None:
-  files = get_files(monorepo)
-  write_files(files, monorepo.get_directory(), force=True, dry=dry, indent=indent)
-
-
-@mono.command()
-@click.option('--dry', is_flag=True)
-@click.option('-a', '--all', 'all_', is_flag=True, help='Also update any packages in the monorepo.')
-def update(all_, dry):
-  """
-  Update files auto-generated from the configuration file.
-  """
-
-  monorepo = project.load_or_exit(expect=MonorepoModel)
-  update_monorepo(monorepo, dry)
-
-  if all_:
-    for package in project.packages:
-      update_package(package, dry)
+__all__ = core.__all__
