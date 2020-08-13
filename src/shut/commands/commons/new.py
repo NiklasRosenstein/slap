@@ -76,16 +76,23 @@ def render_template(fp, template_string, template_vars):
   fp.write('\n')
 
 
-def write_files(files: VirtualFiles, target_directory: str, force: bool = False, dry: bool = False):
+def write_files(
+  files: VirtualFiles,
+  target_directory: str,
+  force: bool = False,
+  dry: bool = False,
+  indent: int = 0,
+) -> None:
   def _rel(fn: str) -> str:
     path = os.path.relpath(fn)
     if nr.fs.issub(path):
       return path
     return fn
+  str_indent = '  ' * indent
   files.write_all(
     target_directory,
-    on_write=lambda fn: print(colored('Write ' + _rel(fn), 'cyan')),
-    on_skip=lambda fn: print(colored('Skip ' + _rel(fn), 'yellow')),
+    on_write=lambda fn: print(str_indent + colored('write ' + _rel(fn), 'cyan')),
+    on_skip=lambda fn: print(str_indent + colored('skip ' + _rel(fn), 'yellow')),
     overwrite=force,
     dry=dry,
   )

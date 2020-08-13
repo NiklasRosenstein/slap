@@ -29,9 +29,9 @@ from shut.update import get_files
 from . import mono
 
 
-def update_monorepo(monorepo: MonorepoModel, dry: bool = False) -> None:
+def update_monorepo(monorepo: MonorepoModel, dry: bool = False, indent: int = 0) -> None:
   files = get_files(monorepo)
-  write_files(files, monorepo.get_directory(), force=True, dry=dry)
+  write_files(files, monorepo.get_directory(), force=True, dry=dry, indent=indent)
 
 
 @mono.command()

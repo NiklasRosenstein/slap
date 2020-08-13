@@ -28,9 +28,9 @@ from shut.update import get_files
 from . import pkg
 
 
-def update_package(package: PackageModel, dry: bool = False) -> None:
+def update_package(package: PackageModel, dry: bool = False, indent: int = 0) -> None:
   files = get_files(package)
-  write_files(files, package.get_directory(), force=True, dry=dry)
+  write_files(files, package.get_directory(), force=True, dry=dry, indent=indent)
 
 
 @pkg.command()

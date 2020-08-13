@@ -53,7 +53,7 @@ class PackageBumpData(VersionBumpData[PackageModel]):
     return check_package(self.obj, self.args.warnings_as_errors)
 
   def update(self) -> None:
-    update_package(self.obj, dry=self.args.dry)
+    update_package(self.obj, dry=self.args.dry, indent=1)
 
   def get_snapshot_version(self) -> Version:
     project = self.project

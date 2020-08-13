@@ -36,8 +36,6 @@ __Todo__
 
 * [ ] build/publish commands
 * [ ] Bump version based on changelog
-* [ ] Bump for monorepository
-* [ ] Bump release staged changelog
 * [ ] Command to install and save requirements
 * [ ] Package data / data files
 * [ ] Conda recipe generator and conda-forge helper

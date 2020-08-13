@@ -26,11 +26,13 @@ import sys
 from typing import Iterable, Generic, Optional, T, Type
 
 import click
+import nr.fs
 from databind.core import datamodel
 from nr.stream import Stream
 from nr.utils.git import Git
 from termcolor import colored
 
+from shut.changelog.manager import ChangelogManager
 from shut.commands import project
 from shut.model import AbstractProjectModel, Project
 from shut.model.version import bump_version, parse_version, Version
@@ -92,9 +94,9 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
 
       if len(refs) == 1:
         ref = refs[0]
-        print(f'  {colored(os.path.relpath(ref.filename), "cyan")}: {ref.value} → {target_version}')
+        print(f'  {colored(nr.fs.rel(ref.filename), "cyan")}: {ref.value} → {target_version}')
       else:
-        print(f'  {colored(os.path.relpath(ref.filename), "cyan")}:')
+        print(f'  {colored(nr.fs.rel(ref.filename), "cyan")}:')
         for ref in refs:
           print(f'    {ref.value} → {target_version}')
 
@@ -107,7 +109,22 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
         with open(filename, 'w') as fp:
           fp.write(content)
 
-    return list(set(x.filename for x in version_refs))
+    changed_files = set(x.filename for x in version_refs)
+
+    # Release the staged changelog.
+    manager = ChangelogManager(self.obj.get_changelog_directory())
+    if manager.unreleased.exists():
+      changed_files.add(manager.unreleased.filename)
+      if self.args.dry:
+        changelog = manager.version(target_version)
+      else:
+        changelog = manager.release(target_version)
+      changed_files.add(changelog.filename)
+      print()
+      print('release staged changelog')
+      print(f'  {colored(nr.fs.rel(manager.unreleased.filename), "cyan")} → {nr.fs.rel(changelog.filename)}')
+
+    return changed_files
 
   @abc.abstractmethod
   def update(self) -> None:
@@ -201,12 +218,12 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
     logger.warning(f'new version "{new_version}" is equal to current version')
     exit(0)
 
+  # Bump version numbers in files.
   changed_files = list(data.bump_to_version(new_version))
-
-  # TODO(NiklasRosenstein): Release staged changelogs.
 
   if not args.skip_update:
     print()
+    print('updating files')
     data.update()
 
   if args.tag:
