@@ -39,6 +39,10 @@ class WarehouseConfiguration(WarehouseCredentials):
   test_repository: Optional[str] = None
   test_repository_url: Optional[str] = None
 
+  def with_creds(self, creds: WarehouseCredentials) -> 'WarehouseConfiguration':
+    vars(self).update(vars(creds))
+    return self
+
 
 @datamodel
 class PypiConfiguration:

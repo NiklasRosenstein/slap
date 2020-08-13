@@ -20,14 +20,13 @@
 # IN THE SOFTWARE.
 
 import os
-import subprocess
+import shutil
 import sys
 from typing import Iterable, List, Optional
 
-from termcolor import colored
-
 from shut.model import PackageModel
 from shut.model.target import TargetId
+from shut.utils.io.sp import subprocess_trimmed_call
 from . import Builder, BuilderProvider, register_builder_provider
 
 
@@ -106,18 +105,8 @@ class SetuptoolsBuilder(Builder):
     dist_directory = os.path.join(self.package_directory, 'dist')
     dist_exists = os.path.exists(dist_directory)
     command = [python, 'setup.py', self.build_type] + self.args
-    proc = subprocess.Popen(
-      command,
-      cwd=self.package_directory,
-      stdout=None if verbose else subprocess.PIPE,
-      stderr=None if verbose else subprocess.PIPE)
-    stdout, stderr = proc.communicate()
-    if stderr:
-      for line in stderr.decode().splitlines():
-        if not line:
-          continue
-        print(f'  {colored(line, "red")}')
-    res = proc.wait()
+
+    res = subprocess_trimmed_call(command, cwd=self.package_directory)
     if res != 0:
       return False
 

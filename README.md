@@ -34,9 +34,7 @@ package:
 
 __Todo__
 
-* [ ] build/publish commands
 * [ ] Bump version based on changelog
-* [ ] Command to install and save requirements
 * [ ] Package data / data files
 * [ ] Conda recipe generator and conda-forge helper
 * [ ] Automatic check for license headers in files / automatically insert license headers

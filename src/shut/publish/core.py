@@ -22,6 +22,9 @@
 import abc
 from typing import Generic, Iterable, List, T, Type
 
+from nr.stream import concat
+
+from shut.builders import Builder
 from shut.model import AbstractProjectModel
 from shut.model.target import Target, TargetId
 from shut.utils.type_registry import TypeRegistry
@@ -37,15 +40,30 @@ __all__ = [
 class Publisher(Target, metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
-  def publish(self, verbose: bool) -> bool:
+  def get_description(self) -> str:
     pass
+
+  @abc.abstractmethod
+  def get_build_dependencies(self) -> Iterable[TargetId]:
+    """
+    Return the IDs of build targets that this publisher depends on.
+    """
+
+  @abc.abstractmethod
+  def publish(self, files: List[str], test: bool, verbose: bool) -> bool:
+    """
+    Run the publishing logic. The builders resolved from #get_build_dependencies() are
+    passed to this function. They will already be built when this method is called.
+    """
 
 
 class PublisherProvider(Generic[T], metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
-  def get_publishers(self) -> List[Publisher]:
-    pass
+  def get_publishers(self, obj: T) -> Iterable[Publisher]:
+    """
+    Return the publishers provided by this plugin.
+    """
 
 
 registry = TypeRegistry[PublisherProvider[AbstractProjectModel]]()

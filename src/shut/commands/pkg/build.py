@@ -19,7 +19,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import os
 import sys
+from typing import List
 
 import click
 from nr.stream import groupby
@@ -30,6 +32,19 @@ from shut.model import PackageModel
 from shut.model.target import TargetId
 from . import pkg
 from .. import project
+
+
+def run_builds(builders: List[Builder], build_dir: str, verbose: bool) -> bool:
+  for builder in builders:
+    print(colored(f'building {colored(builder.id, "green")}'))
+    for filename in builder.get_outputs():
+      print(f'  :: {os.path.join(build_dir, filename)}')
+    print()
+    success = builder.build(build_dir, verbose)
+    if not success:
+      print(f'error: building "{builder.id}" failed', file=sys.stderr)
+      return False
+  return True
 
 
 @pkg.command()
@@ -64,6 +79,6 @@ def build(target, list_, build_dir, verbose):
   if not builders:
     sys.exit(f'error: no target matches "{target}"')
 
-  for builder in builders:
-    print(colored(f'building {colored(builder.id, "green")}'))
-    builder.build(build_dir, verbose)
+  success = run_builds(builders, build_dir, verbose)
+  if not success:
+    sys.exit(1)

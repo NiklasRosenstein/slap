@@ -19,43 +19,30 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import abc
-from fnmatch import fnmatch
+import subprocess
 
-from databind.core import datamodel
+from termcolor import colored
 
 
-@datamodel(frozen=True)
-class TargetId:
+def subprocess_trimmed_call(*args, verbose: bool = False, **kwargs) -> int:
   """
-  Represents the ID of a target that can be selected on the command line. We use the
-  "target" concept for builds and publishers. A target ID may contain wildcard characters
-  in which case it can be used to match multiple targets with #fnmatch().
+  Executes a subprocess and only shows stderr in red and indented by 2 spaces if there
+  was any error output. Returns the status code.
+
+  If *verbose* is enabled, the stdout and stderr is not redirected.
   """
 
-  scope: str
-  name: str
+  proc = subprocess.Popen(
+    *args,
+    stdout=None if verbose else subprocess.PIPE,
+    stderr=None if verbose else subprocess.PIPE,
+    **kwargs)
 
-  def __str__(self):
-    return f'{self.scope}:{self.name}'
+  stdout, stderr = proc.communicate()
+  if stderr:
+    for line in stderr.decode().splitlines():
+      if not line:
+        continue
+      print(f'  {colored(line, "red")}')
 
-  @classmethod
-  def parse(cls, s: str, allow_scope_only: bool = False) -> 'TargetId':
-    parts = s.split(':')
-    if allow_scope_only and len(parts) == 1:
-      parts = (parts[0], '*')
-    return cls(*parts)
-
-  def match(self, other_id: 'TargetId', allow_match_name: bool = False) -> bool:
-    if fnmatch(other_id.scope, self.scope) and fnmatch(other_id.name, self.name):
-      return True
-    if allow_match_name and self.name == '*':
-      return self.scope == other_id.name
-    return False
-
-
-class Target(metaclass=abc.ABCMeta):
-
-  @abc.abstractproperty
-  def id(self) -> TargetId:
-    pass
+  return proc.wait()
