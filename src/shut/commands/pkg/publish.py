@@ -19,69 +19,92 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import os
+import sys
 from typing import List
 
 import click
+from nr.stream import groupby, Stream
+from termcolor import colored
 
+from shut.builders import get_builders
 from shut.model import PackageModel
-from shut.publish import Publisher
+from shut.model.target import TargetId
+from shut.publish import Publisher, get_publishers
 from shut.publish.warehouse import WarehousePublisher
 from . import pkg
+from .build import run_builds
 from .. import project
 
 
-def get_publisher(package: PackageModel, target: str) -> Publisher:
-  if target == 'pypi' and package.data.publish.pypi:
-    publisher = WarehousePublisher.pypi_from_credentials(
-      package.data.publish.pypi_credentials)
-  elif target in package.data.publish.warehouses:
-    publisher = WarehousePublisher.from_config(package.data.publish.warehouses[target])
-  else:
-    raise ValueError(f'unknown publish target {target!r}')
-
-  return publisher
-
-
-def get_publisher_names(package: PackageModel) -> List[str]:
-  targets = []
-  if package.data.publish.pypi.enabled:
-    targets.append('pypi')
-  targets.extend(package.data.publish.warehouses.keys())
-  return targets
-
-
 @pkg.command()
-@click.argument('target')
-@click.option('--ls', is_flag=True)
-def publish(target, ls):
+@click.argument('target', type=lambda s: TargetId.parse(s, True), required=False)
+@click.option('-t', '--test', is_flag=True, help='publish to the test repository instead')
+@click.option('-l', '--list', 'list_', is_flag=True, help='list available publishers')
+@click.option('-v', '--verbose', is_flag=True, help='show more output')
+@click.option('-b', '--build-dir', default='build', help='build output directory')
+@click.option('--skip-build', is_flag=True, help='do not build artifacts that are to be published')
+def publish(target, test, list_, verbose, build_dir, skip_build):
   """
   Publish the package to PyPI or another target.
   """
 
-  if ls and target:
+  if list_ and target:
     sys.exit('error: conflicting options')
 
-  if ls:
-    names = get_publisher_names()
-    if not names:
-      print('no publishes configured')
-    else:
-      print('available publishers:')
-      for name in names:
-        print(f'  {name}')
+  package = project.load_or_exit(expect=PackageModel)
+  publishers = list(get_publishers(package))
+
+  if list_:
+    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
+      print(f'{colored(scope, "green")}:')
+      for publisher in publishers:
+        print(f'  {publisher.id.name} – {publisher.get_description()}')
     return
 
-  package = project.load_or_exit(expect=PackageModel)
+  if not target:
+    sys.exit('error: no target specified')
 
-  try:
-    publisher = get_publisher(package, target)
-  except ValueError as exc:
-    sys.exit(f'error: {exc}')
+  publishers = [p for p in publishers if target.match(p.id)]
+  if not publishers:
+    sys.exit(f'error: no target matches "{target}"')
 
-  if isinstance(publisher, WarehousePublisher):
-    build_targets = get_build_targets('setuptools')
-  else:
-    raise RuntimeError
+  # Prepare the builds that need to be built for the publishers.
+  all_builders = list(get_builders(package))
+  builders_for_publisher = {}
+  for publisher in publishers:
+    builders = []
+    for target_id in publisher.get_build_dependencies():
+      matched_builders = [b for b in all_builders if target_id.match(b.id)]
+      if not matched_builders:
+        sys.exit(f'error: publisher "{publisher.id}" depends on build target "{target_id}" '
+                  'which could not be resolved.')
+      builders.extend(b for b in matched_builders if b not in builders)
+    builders_for_publisher[publisher.id] = builders
 
-  run_build_targets(build_targets)
-  publisher.publish(build_targets)
+  # Build all builders that are needed.
+  if not skip_build:
+    built = set()
+    for publisher in publishers:
+      print()
+      builders = builders_for_publisher[publisher.id]
+      success = run_builds([b for b in builders if b not in built], build_dir, verbose)
+      if not success:
+        sys.exit(1)
+
+  # Execute the publishers.
+  for publisher in publishers:
+    print()
+    print(f'publishing {colored(publisher.id, "cyan")}')
+    builders = builders_for_publisher[publisher.id]
+    files = (Stream
+      .concat(b.get_outputs() for b in builders)
+      .map(lambda x: os.path.join(build_dir, x))
+      .collect()
+    )
+    for filename in files:
+      print(f'  :: {filename}')
+    print()
+    success = publisher.publish(files, test, verbose)
+    if not success:
+      sys.exit(1)
