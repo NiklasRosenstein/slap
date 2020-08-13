@@ -19,25 +19,35 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .core import Check, CheckStatus, CheckResult, Checker, SkipCheck, check, register_checker
-from shut.model import MonorepoModel
+import io
+from typing import Iterable, Tuple
+
+SubstRange = Tuple[int, int, str]
 
 
-class MonorepoChecker(Checker[MonorepoModel]):
+def substitute_ranges(text: str, ranges: Iterable[SubstRange], is_sorted: bool = False) -> str:
+  """
+  Replaces parts of *text* using the specified *ranges* and returns the new text. Ranges
+  must not overlap. *is_sorted* can be set to `True` if the input *ranges* are already
+  sorted from lowest to highest starting index to optimize the function.
+  """
 
-  @check('invalid-package')
-  def _check_no_invalid_packages(self, project, monorepo):
-    for package_name, exc_info in project.invalid_packages:
-      yield CheckResult(CheckStatus.ERROR, package_name)
+  if not is_sorted:
+    ranges = sorted(ranges, key=lambda x: x[0])
 
-  @check('inconsistent-single-version')
-  def _check_consistent_mono_version(self, project, monorepo):
-    if monorepo.release.single_version and project.packages:
-      for package in project.packages:
-        if package.data.version is not None and package.data.version != monorepo.version:
-          yield CheckResult(CheckStatus.ERROR, f'{package.data.name} v{package.data.version}, expected v{monorepo.version}')
-    else:
-      yield SkipCheck()
+  out = io.StringIO()
+  max_start_index = 0
+  max_end_index = 0
+  for index, (istart, iend, subst) in enumerate(ranges):
+    if iend < istart:
+      raise ValueError(f'invalid range at index {index}: (istart: {istart!r}, iend: {iend!r})')
+    if istart < max_end_index:
+      raise ValueError(f'invalid range at index {index}: overlap with previous range')
 
+    subst = str(subst)
+    out.write(text[max_end_index:istart])
+    out.write(subst)
+    max_start_index, max_end_index = istart, iend
 
-register_checker(MonorepoModel, MonorepoChecker)
+  out.write(text[max_end_index:])
+  return out.getvalue()

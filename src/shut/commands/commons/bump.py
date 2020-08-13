@@ -27,12 +27,15 @@ from typing import Iterable, Generic, Optional, T, Type
 
 import click
 from databind.core import datamodel
+from nr.stream import Stream
 from nr.utils.git import Git
+from termcolor import colored
 
 from shut.commands import project
 from shut.model import AbstractProjectModel, Project
 from shut.model.version import bump_version, parse_version, Version
 from shut.update import get_version_refs, VersionRef
+from shut.utils.text import substitute_ranges
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +75,39 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def get_snapshot_version(self) -> Version:
     pass
+
+  def bump_to_version(self, target_version: Version) -> Iterable[str]:
+    """
+    Called to bump to the specified *target_version*. The default implementation uses the
+    version refs provided by #get_version_refs() to bump.
+    """
+
+    version_refs = list(get_version_refs(self.obj))
+
+    print()
+    print(f'bumping {len(version_refs)} version reference(s)')
+    for filename, refs in Stream.groupby(version_refs, lambda r: r.filename, collect=list):
+      with open(filename) as fp:
+        content = fp.read()
+
+      if len(refs) == 1:
+        ref = refs[0]
+        print(f'  {colored(os.path.relpath(ref.filename), "cyan")}: {ref.value} → {target_version}')
+      else:
+        print(f'  {colored(os.path.relpath(ref.filename), "cyan")}:')
+        for ref in refs:
+          print(f'    {ref.value} → {target_version}')
+
+      content = substitute_ranges(
+        content,
+        ((ref.start, ref.end, target_version) for ref in refs),
+      )
+
+      if not self.args.dry:
+        with open(filename, 'w') as fp:
+          fp.write(content)
+
+    return list(set(x.filename for x in version_refs))
 
   @abc.abstractmethod
   def update(self) -> None:
@@ -165,26 +201,7 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
     logger.warning(f'new version "{new_version}" is equal to current version')
     exit(0)
 
-  # The substitution logic below does not work if the same file is listed multiple
-  # times so let's check for now that every file is listed only once.
-  n_files = set(os.path.normpath(os.path.abspath(ref.filename))
-                for ref in version_refs)
-  assert len(n_files) == len(version_refs), "multiple version refs in one file is not currently supported."
-
-  # Bump version references.
-  print(f'bumping {len(version_refs)} version reference(s)')
-  for ref in version_refs:
-    print(f'  {os.path.relpath(ref.filename)}: {ref.value} → {new_version}')
-    if not args.dry:
-      with open(ref.filename) as fp:
-        contents = fp.read()
-      contents = contents[:ref.start] + str(new_version) + contents[ref.end:]
-      with open(ref.filename, 'w') as fp:
-        fp.write(contents)
-
-  changed_files = [x.filename for x in version_refs]
-
-  # TODO(NiklasRosenstein): For single-versioned mono repositories, bump inter dependencies.
+  changed_files = list(data.bump_to_version(new_version))
 
   # TODO(NiklasRosenstein): Release staged changelogs.
 

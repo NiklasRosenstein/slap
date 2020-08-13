@@ -31,9 +31,9 @@ from shut.utils.io.virtual import VirtualFiles
 from termcolor import colored
 
 GITIGNORE_TEMPLATE = '''
-/.venv*/
-/dist
-/build
+.venv*/
+dist/
+build/
 *.py[cod]
 *.egg-info
 *.egg
