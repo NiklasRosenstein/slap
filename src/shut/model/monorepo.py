@@ -19,12 +19,25 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import List, Optional
+import re
+from typing import List, Iterable, Optional
+
 from databind.core import datamodel, field
+
 from .author import Author
 from .abstract import AbstractProjectModel
 from .version import Version
+from .requirements import VersionSelector
 from .release import MonorepoReleaseConfiguration
+
+
+@datamodel
+class InterdependencyRef:
+  filename: str
+  package_name: str
+  version_selector: VersionSelector
+  version_start: int
+  version_end: int
 
 
 @datamodel
@@ -35,7 +48,30 @@ class MonorepoModel(AbstractProjectModel):
   license: str = None
   url: str = None
 
-  # Overrides
+  def get_inter_dependencies(self) -> Iterable[InterdependencyRef]:
+    """
+    Returns a dictionary that maps the names of packages in the mono repository to a list
+    of their dependencies on other packages in the same repository. Note that it does so
+    by regex-matching in the package configuration file rather than reading the deserialized
+    package data in order to return start and end index data.
+    """
+
+    regex = re.compile(r'^\s*- +([A-z0-9\.\-_]+) *([^\n:]+)?$', re.M)
+    packages = list(self.project.packages)
+    package_names = set(p.data.name for p in self.project.packages)
+
+    for package in self.project.packages:
+      with open(package.filename) as fp:
+        content = fp.read()
+        for match in regex.finditer(content):
+          package_name, version_selector = match.groups()
+          if package_name not in package_names:
+            continue
+          if version_selector:
+            version_selector = VersionSelector(version_selector)
+          yield InterdependencyRef(package.filename, package_name, version_selector, match.start(2), match.end(2))
+
+  # AbstractProjectModel Overrides
 
   release: MonorepoReleaseConfiguration = field(default_factory=MonorepoReleaseConfiguration)
 
