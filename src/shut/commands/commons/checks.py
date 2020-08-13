@@ -67,7 +67,7 @@ def print_checks_all(name: str, checks: List[Check], seconds: float):
   print()
   print_checks(checks, prefix='  ')
   print()
-  print('run', len(checks), 'checks for package', package_name, 'in {:.3f}s'.format(seconds))
+  print('ran', len(checks), 'checks for package', package_name, 'in {:.3f}s'.format(seconds))
 
 
 def get_checks_status(checks: List[Check], warnings_as_errors: bool = False) -> int:
