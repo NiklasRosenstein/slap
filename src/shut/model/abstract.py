@@ -22,7 +22,9 @@
 import abc
 import os
 from typing import List, Optional
+
 from databind.core import datamodel, field
+
 from .changelog import ChangelogConfiguration
 from .release import ReleaseConfiguration
 from .version import Version
@@ -36,11 +38,9 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
   release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
 
-  @abc.abstractmethod
   def get_name(self) -> str:
     pass
 
-  @abc.abstractmethod
   def get_version(self) -> Optional[Version]:
     pass
 
@@ -48,9 +48,11 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
     return self.release.tag_format.format(name=self.get_name(), version=version)
 
   def get_directory(self) -> str:
+    assert self.filename
     return os.path.dirname(self.filename)
 
   def get_changelog_directory(self) -> str:
+    assert self.filename
     return os.path.join(os.path.dirname(self.filename), self.changelog.directory)
 
 

@@ -28,6 +28,7 @@ from shut.utils.io.virtual import VirtualFiles
 from shut.utils.type_registry import TypeRegistry
 
 T = TypeVar('T')
+T_co = TypeVar('T_co', covariant=True)
 
 __all__ = [
   'VersionRef',
@@ -46,7 +47,7 @@ class VersionRef:
   value: str
 
 
-class Renderer(Generic[T], metaclass=abc.ABCMeta):
+class Renderer(Generic[T_co], metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def get_files(self, files: VirtualFiles, obj: T) -> None:
@@ -56,10 +57,10 @@ class Renderer(Generic[T], metaclass=abc.ABCMeta):
     return; yield
 
 
-registry = TypeRegistry[Type[Renderer]]()
+registry = TypeRegistry[Renderer[T_co]]()
 
 
-def register_renderer(t: Type[T], renderer: Type[Renderer[T]]) -> None:
+def register_renderer(t: Type[T_co], renderer: Type[Renderer[T_co]]) -> None:
   """
   Register the *renderer* implementation to run when creating files for *t*.
   """
@@ -67,7 +68,7 @@ def register_renderer(t: Type[T], renderer: Type[Renderer[T]]) -> None:
   registry.put(t, renderer)
 
 
-def get_files(obj: T) -> VirtualFiles:
+def get_files(obj: T_co) -> VirtualFiles:
   """
   Gets all the files from the renderers registered to the type of *obj*.
   """
@@ -79,9 +80,9 @@ def get_files(obj: T) -> VirtualFiles:
   return files
 
 
-def get_version_refs(obj: T) -> Iterable[VersionRef]:
+def get_version_refs(obj: T_co) -> Iterable[VersionRef]:
   """
-  Gets all version refs returned by registered for type *T*.
+  Gets all version refs returned by registered for type *T_co*.
   """
 
   for renderer in registry.for_type(type(obj)):

@@ -50,7 +50,7 @@ __version__ = '{{version or "0.0.1"}}'
 '''
 
 NAMESPACE_INIT_TEMPLATE = '''
-__path__ = __import__('pkgutil').extend_path(__path__, __name__)
+__path__ = __import__('pkgutil').extend_path(__path__, __name__)  # type: ignore
 '''
 
 
