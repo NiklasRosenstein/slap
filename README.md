@@ -38,6 +38,7 @@ __Todo__
 * [ ] Package data / data files
 * [ ] Conda recipe generator
 * [ ] Automatic check for license headers in files / automatically insert license headers
+* [ ] Dev-install packages from mono repositories
 
 ---
 
