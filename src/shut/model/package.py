@@ -156,7 +156,7 @@ class PackageModel(AbstractProjectModel):
     directory = os.path.dirname(self.filename)
 
     if self.data.readme:
-      return os.path.abspath(os.path.join(directory, self.readme))
+      return os.path.abspath(os.path.join(directory, self.data.readme))
 
     return _get_file_in_directory(
       directory=directory,
