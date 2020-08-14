@@ -19,18 +19,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from typing import Iterable
+
 import click
 
 from shut.commands import project
 from shut.commands.commons.new import write_files
 from shut.model import PackageModel
 from shut.renderers import get_files
+from shut.utils.io.virtual import VirtualFiles
 from . import pkg
 
 
-def update_package(package: PackageModel, dry: bool = False, indent: int = 0) -> None:
+def update_package(package: PackageModel, dry: bool = False, indent: int = 0) -> VirtualFiles:
   files = get_files(package)
   write_files(files, package.get_directory(), force=True, dry=dry, indent=indent)
+  return files
 
 
 @pkg.command()

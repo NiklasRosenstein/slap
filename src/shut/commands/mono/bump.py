@@ -46,7 +46,8 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
     return check_monorepo(self.obj, self.args.warnings_as_errors)
 
   def update(self) -> None:
-    update_monorepo(self.obj, dry=self.args.dry, indent=1)
+    vfiles = update_monorepo(self.obj, dry=self.args.dry, indent=1)
+    return vfiles.abspaths(self.obj.get_directory())
 
   def bump_to_version(self, target_version: Version) -> Iterable[str]:
     changed_files = list(super().bump_to_version(target_version))

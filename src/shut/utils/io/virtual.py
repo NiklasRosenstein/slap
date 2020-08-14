@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import Any, Callable, Union
+from typing import Any, Callable, Iterable, Union
 import os
 
 
@@ -43,8 +43,8 @@ class VirtualFiles:
     filename: str,
     render_func: Callable,
     *args: Any,
-    text: bool=True,
-    inplace: bool=False,
+    text: bool = True,
+    inplace: bool = False,
   ) -> None:
     self._files.append({
       'filename': filename,
@@ -56,20 +56,19 @@ class VirtualFiles:
 
   def write_all(
     self,
-    parent_directory: str=None,
-    on_write: Callable=None,
-    on_skip: Callable=None,
-    overwrite: bool=False,
-    create_directories: bool=True,
-    dry: bool=False,
+    parent_directory: str = None,
+    on_write: Callable = None,
+    on_skip: Callable = None,
+    overwrite: bool = False,
+    create_directories: bool = True,
+    dry: bool = False,
   ) -> None:
     """
     Writes all files to disk. Relative files will be written relative to the
     *parent_directory*.
     """
 
-    for file_ in self._files:
-      filename = os.path.normpath(os.path.join(parent_directory or '.', file_['filename']))
+    for file_, filename in zip(self._files, self.abspaths(parent_directory)):
       exists = os.path.isfile(filename)
       if exists and not overwrite:
         if on_skip:
@@ -91,3 +90,11 @@ class VirtualFiles:
         else:
           with open(filename, 'w' + mode) as dst:
             file_['render_func'](dst, *file_['args'])
+
+  def abspaths(self, parent_directory: str = None) -> Iterable[str]:
+    """
+    Returns all paths in this virtual fileset joined with *parent_directory*.
+    """
+
+    for file_ in self._files:
+      yield os.path.normpath(os.path.join(parent_directory or '.', file_['filename']))

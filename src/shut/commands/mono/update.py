@@ -26,12 +26,14 @@ from shut.commands.commons.new import write_files
 from shut.commands.pkg.update import update_package
 from shut.model import MonorepoModel
 from shut.renderers import get_files
+from shut.utils.io.virtual import VirtualFiles
 from . import mono
 
 
-def update_monorepo(monorepo: MonorepoModel, dry: bool = False, indent: int = 0) -> None:
+def update_monorepo(monorepo: MonorepoModel, dry: bool = False, indent: int = 0) -> VirtualFiles:
   files = get_files(monorepo)
   write_files(files, monorepo.get_directory(), force=True, dry=dry, indent=indent)
+  return files
 
 
 @mono.command()

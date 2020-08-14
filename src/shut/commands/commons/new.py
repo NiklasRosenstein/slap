@@ -82,7 +82,7 @@ def write_files(
   force: bool = False,
   dry: bool = False,
   indent: int = 0,
-) -> None:
+):
   def _rel(fn: str) -> str:
     path = os.path.relpath(fn)
     if nr.fs.issub(path):
