@@ -35,6 +35,7 @@ from .. import project
 
 
 def run_builds(builders: List[Builder], build_dir: str, verbose: bool) -> bool:
+  os.makedirs(build_dir)
   for builder in builders:
     print(colored(f'building {colored(builder.id, "green")}'))
     for filename in builder.get_outputs():

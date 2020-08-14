@@ -127,7 +127,7 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
     return changed_files
 
   @abc.abstractmethod
-  def update(self) -> Iterable[str]:
+  def update(self, new_version: Version) -> Iterable[str]:
     """
     Run the "update" function for the current monorepo or package. A list of the modified files
     must be returned.
@@ -227,7 +227,7 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
   if not args.skip_update:
     print()
     print('updating files')
-    changed_files += data.update()
+    changed_files += data.update(new_version)
 
   if args.tag:
     print()
