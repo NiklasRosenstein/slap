@@ -17,11 +17,11 @@ else:
 
 requirements = [
   'beautifulsoup4 >=4.8.1,<5.0.0',
+  'databind.core >=0.1.0,<1.0.0',
+  'databind.json >=0.1.0,<1.0.0',
   'click >=7.0,<8.0.0',
   'jinja2 >=2.11.1,<3.0.0',
   'networkx >=2.4,<3.0.0',
-  'nr.databind.core >=0.0.21,<0.1.0',
-  'nr.databind.json >=0.0.13,<0.1.0',
   'nr.fs >=1.5.0,<2.0.0',
   'nr.pylang.utils >=0.0.1,<1.0.0',
   'nr.proxy >=0.0.1,<1.0.0',
