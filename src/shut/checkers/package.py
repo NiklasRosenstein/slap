@@ -32,7 +32,7 @@ class PackageChecker(Checker[PackageModel]):
   @check('readme')
   def _check_readme(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     if not package.get_readme_file():
-      yield CheckResult(CheckStatus.PASSED, 'No README file found.')
+      yield CheckResult(CheckStatus.WARNING, 'No README file found.')
 
   @check('license')
   def _check_license(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
