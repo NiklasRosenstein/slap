@@ -22,7 +22,7 @@
 import re
 from typing import Union
 from databind.core import datamodel
-from .version import Version
+from .version import bump_version, Version
 
 
 class VersionSelector(object):

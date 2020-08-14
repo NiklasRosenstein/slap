@@ -98,7 +98,7 @@ def changelog(**args):
     # -e,--edit option was set.
     if not entry.description or args['edit']:
       serialized = yaml.safe_dump(to_json(entry, v3.Changelog.Entry, registry=registry), sort_keys=False)
-      entry = from_json(v3.Changelog.Entry, yaml.safe_load(_edit_text(serialized)), registry=registry)
+      entry = from_json(v3.Changelog.Entry, yaml.safe_load(edit_text(serialized)), registry=registry)
 
     # Validate the entry contents (need a description and at least one type and component).
     if not entry.description or not entry.component:
@@ -129,7 +129,7 @@ def changelog(**args):
     if not manager.unreleased.exists():
       logger.error('no staged changelog')
       sys.exit(1)
-    sys.exit(_editor_open(manager.unreleased.filename))
+    sys.exit(editor_open(manager.unreleased.filename))
 
   changelogs = []
   if args['version'] or not args['all']:
