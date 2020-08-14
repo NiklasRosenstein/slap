@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-# Copyright (c) 2019 Niklas Rosenstein
+# Copyright (c) 2020 Niklas Rosenstein
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -19,29 +19,21 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-"""
-Updates a conda-forge feedstock repository by cloning it, updating the version
-details with data from PyPI and pushing it back to the feedstock. The GitHub PR
-must still be created manually after this.
-
-Todo:
-
-\b
-* Update run requirements and test imports
-"""
-
-from nr.interface import override, implements
-from shore.__main__ import _load_subject
-from termcolor import colored
+import logging
+import re
+import subprocess
+import sys
 from typing import List
 
 import click
-import logging
 import nr.fs
-import re
 import requests
-import subprocess
-import sys
+from nr.utils.git import Git
+from termcolor import colored
+
+from shut.model import PackageModel
+from shut.model.version import parse_version
+from . import project, shut
 
 logger = logging.getLogger(__name__)
 
@@ -54,47 +46,63 @@ def _call(*args, **kwargs):
     sys.exit(proc.returncode)
 
 
-@click.command(help=__doc__)
-@click.option('--update-feedstock', is_flag=True, help='Update the conda-forge feedstock for the current version.')
-def main(update_feedstock):
+@shut.group()
+def conda_forge():
+  """
+  Utility to update conda-forge recipes.
+  """
 
-  if not update_feedstock:
-    logger.error('no operation specified')
-    sys.exit(1)
 
-  subject = _load_subject()
+@conda_forge.command()
+@click.argument('package_name', required=False)
+@click.argument('version', type=parse_version, required=False)
+@click.option('-f', '--force', is_flag=True, help='force push to the Git repository')
+def update_feedstock(package_name, version, force):
+  """
+  Update a conda-forge feedstock from a PyPI release. You can explicitly specify a *package_name*
+  and *version*, or rely on the metadata from the package configuration file in your cwd.
 
-  repo_name = 'conda-forge/{}-feedstock'.format(subject.name)
-  pypi_package_name = subject.name
-  version = str(subject.version)
+  This command will clone the feedstack from the conda-forge organization on GitHub, then
+  update thr version and sha256 reference and push a new branch to the repository.
+  """
+
+  if package_name or version:
+    if not (package_name and version):
+      sys.exit('error: need package_name AND version, OR neither')
+    version = str(version)
+  else:
+    package = project.load_or_exit(expect=PackageModel)
+    package_name, version = package.data.name, str(package.data.version)
+    del package
+
+  repo_name = 'conda-forge/{}-feedstock'.format(package_name)
   clone_url = 'git@github.com:' + repo_name
   branch_name = 'v' + version
 
-  s_repo_name = colored(repo_name, 'blue')
-  s_pypi_package_name = colored(pypi_package_name, 'yellow')
-  s_clone_url = colored(clone_url, 'blue')
+  s_repo_name = colored(repo_name, 'cyan')
+  s_package_name = colored(package_name, 'yellow')
+  s_clone_url = colored(clone_url, 'cyan')
   s_branch_name = colored(branch_name, 'yellow')
 
-  print('Fetching PyPI record for', s_pypi_package_name, '...')
-  url = 'https://pypi.org/pypi/{}/json'.format(pypi_package_name)
+  print(f'Fetching PyPI record for {s_package_name} ...')
+  url = f'https://pypi.org/pypi/{package_name}/json'
   pypi_data = requests.get(url).json()
   if version not in pypi_data['releases']:
-    logger.error('No release on PyPI for %s v%s.', s_pypi_package_name, version)
-    sys.exit(1)
+    sys.exit(f'error: no release on PyPI for {s_package_name} v{version}.')
 
   sdist = next((x for x in pypi_data['releases'][version] if x['packagetype'] == 'sdist'), None)
   if not sdist:
-    logger.error('No sdist on PyPI for %s v%s.', s_pypi_package_name, version)
+    logger.error('No sdist on PyPI for %s v%s.', s_package_name, version)
     sys.exit(1)
   sha256 = sdist['digests']['sha256']
 
-  print('Updating', s_repo_name, 'from PyPI package', s_pypi_package_name + ' v' + version + '.')
+  print(f'Updating {s_repo_name} from PyPI package {s_package_name} v{version}.')
 
   with nr.fs.tempdir() as tmpdir:
 
-    print('Cloning', s_clone_url, '...')
-    _call(['git', 'clone', clone_url, tmpdir.name])
-    _call(['git', 'checkout', '-b', branch_name], cwd=tmpdir.name)
+    print(f'Cloning {s_clone_url} ...')
+    git = Git().clone(tmpdir.name, clone_url)
+    git.create_branch(branch_name)
 
     recipe_path = nr.fs.join(tmpdir.name, 'recipe', 'meta.yaml')
     with open(recipe_path) as fp:
@@ -110,12 +118,11 @@ def main(update_feedstock):
     subprocess.check_call(['git', '--no-pager', 'diff'], cwd=tmpdir.name)
     print()
 
-    _call(['git', 'add', '.'], cwd=tmpdir.name)
-    _call(['git', 'commit', '-m', 'Updating recipe for {} v{}.'.format(
-      pypi_package_name, version)], cwd=tmpdir.name)
+    git.add(['.'])
+    git.commit(f'Updating recipe for {package_name} v{version}.')
 
-    print('Pushing branch', s_branch_name, 'to', s_clone_url, '...')
-    _call(['git', 'push', 'origin', branch_name, '--set-upstream'], cwd=tmpdir.name)
+    print(f'pushing branch {s_branch_name} to {s_clone_url} ...')
+    git.push('origin', branch_name, force=force)
 
 
 if __name__ == '__main__':
