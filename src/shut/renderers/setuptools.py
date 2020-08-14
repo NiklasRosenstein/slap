@@ -382,7 +382,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     readme = self._get_readme_status(package)
     if readme:
-      files.append(readme.runtime_path)
+      files.append(os.path.join(package.get_directory(), readme.runtime_path))
 
     manifest = [
       os.path.relpath(f, package.get_directory())
