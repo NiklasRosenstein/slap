@@ -5,6 +5,7 @@ package:
   url: https://git.niklasrosenstein.com/NiklasRosenstein/shore
   description: Automates the heavy lifting of release and distribution management for pure Python packages.
   author: Niklas Rosenstein <rosensteinniklas@gmail.com>
+  typed: true
 
   requirements:
     - python ^3.6
@@ -18,6 +19,7 @@ package:
     - nr.pylang.utils ^0.0.1
     - nr.proxy ^0.0.1
     - nr.utils.git ~0.1.3
+    - nr.stream
     - requests ^2.22.0
     - packaging ^20.1
     - PyYAML ^5.1.0

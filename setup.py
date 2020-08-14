@@ -26,6 +26,7 @@ requirements = [
   'nr.pylang.utils >=0.0.1,<1.0.0',
   'nr.proxy >=0.0.1,<1.0.0',
   'nr.utils.git >=0.1.3,<0.2.0',
+  'nr.stream',
   'requests >=2.22.0,<3.0.0',
   'packaging >=20.1,<21.0.0',
   'PyYAML >=5.1.0,<6.0.0',
@@ -69,5 +70,5 @@ setuptools.setup(
   cmdclass = {},
   keywords = [],
   classifiers = [],
-  zip_safe = True,
+  zip_safe = False,
 )
