@@ -38,10 +38,10 @@ class Author:
   def parse(cls, string: str) -> 'Author':
     match = Author.AUTHOR_EMAIL_REGEX.match(string)
     if not match:
-      raise ValueError('not a valid author string: {!r}'.format(s))
-    author = match.group(1).strip()
+      raise ValueError('not a valid author string: {!r}'.format(string))
+    name = match.group(1).strip()
     email = match.group(2).strip()
-    return cls(author, email)
+    return cls(name, email)
 
   def __str__(self):
     return '{} <{}>'.format(self.name, self.email)

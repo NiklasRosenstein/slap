@@ -27,7 +27,7 @@ from typing import Iterable, List, Optional
 from shut.model import PackageModel
 from shut.model.target import TargetId
 from shut.utils.io.sp import subprocess_trimmed_call
-from . import Builder, BuilderProvider, register_builder_provider
+from .core import Builder, BuilderProvider, register_builder_provider
 
 
 class SetuptoolsBuilder(Builder):

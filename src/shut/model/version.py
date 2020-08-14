@@ -35,6 +35,8 @@ class Version(_Version):
   commit-distance and commit SHA suffix in the format of `-X-gY` (where
   X is the distance and Y is the lowercase 7-character SHA sum). """
 
+  commit_distance: Optional[int]
+
   def __init__(self, s: Union['Version', str]):
     if isinstance(s, Version):
       s = str(s)
@@ -86,8 +88,7 @@ def parse_version(version_string: str) -> Version:
 
 
 def bump_version(version: Version, kind: str) -> Version:
-  major, minor, patch, post = version.major, version.minor, version.micro, \
-    version.post
+  major, minor, patch, post = version.major, version.minor, version.micro, version.post
   if kind == 'post':
     if post is None:
       post = 1
