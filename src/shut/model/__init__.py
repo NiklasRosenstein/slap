@@ -80,6 +80,7 @@ class Project:
     project.
     """
 
+    directory = os.path.abspath(directory)
     monorepo_fn = None
     package_fn = None
 
