@@ -36,7 +36,7 @@ __Todo__
 
 * [ ] Bump version based on changelog
 * [ ] Package data / data files
-* [ ] Conda recipe generator and conda-forge helper
+* [ ] Conda recipe generator
 * [ ] Automatic check for license headers in files / automatically insert license headers
 
 ---
