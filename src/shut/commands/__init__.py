@@ -75,6 +75,7 @@ def shut(cwd, verbose, quiet):
 
 from . import changelog
 from . import classifiers
+from . import conda_forge
 from . import license
 from . import mono
 from . import pkg
