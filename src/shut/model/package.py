@@ -188,6 +188,12 @@ class PackageModel(AbstractProjectModel):
   def get_version(self) -> Optional[Version]:
     return self.data.version
 
+  def get_tag(self, version: Version) -> str:
+    tag_format = self.release.tag_format
+    if self.project and self.project.monorepo and '{name}' not in tag_format:
+      tag_format = '{name}@' + tag_format
+    return tag_format.format(name=self.data.name, version=version)
+
 
 class PythonPackageMetadata:
   """
