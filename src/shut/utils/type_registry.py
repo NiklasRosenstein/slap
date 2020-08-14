@@ -33,10 +33,10 @@ class TypeRegistry(Generic[T]):
   def __init__(self):
     self._type_map = {}
 
-  def put(self, type_: Type, data: T) -> None:
+  def put(self, type_: Type, data: Type[T]) -> None:
     self._type_map.setdefault(type_, []).append(data)
 
-  def for_type(self, type_: Type) -> Iterable[T]:
+  def for_type(self, type_: Type) -> Iterable[Type[T]]:
     for base in type_.__bases__:
       yield from self.for_type(base)
     yield from self._type_map.get(type_, ())

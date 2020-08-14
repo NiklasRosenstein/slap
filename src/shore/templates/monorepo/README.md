@@ -1,3 +1,0 @@
-# {{name}}
-
-Monorepo description.

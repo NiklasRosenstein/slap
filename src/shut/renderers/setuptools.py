@@ -311,7 +311,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     readme = package.get_readme_file()
     if not readme:
-      return None, 'None'
+      return None
 
     # Make sure the readme is relative (we need it relative either way).
     readme = os.path.relpath(readme, package.get_directory())

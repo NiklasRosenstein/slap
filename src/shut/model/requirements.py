@@ -33,6 +33,8 @@ class VersionSelector(object):
   #to_setuptools()).
   """
 
+  ANY: 'VersionSelector'
+
   def __init__(self, selector):
     if isinstance(selector, VersionSelector):
       selector = selector._string
