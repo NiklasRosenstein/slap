@@ -19,7 +19,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import Iterable, Generic, T, Type
+from typing import Iterable, Generic, Type, TypeVar
+
+T = TypeVar('T')
 
 
 class TypeRegistry(Generic[T]):

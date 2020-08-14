@@ -20,12 +20,14 @@
 # IN THE SOFTWARE.
 
 import abc
-from typing import Iterable, Generic, T, Type
+from typing import Iterable, Generic, Type, TypeVar
 
 from databind.core import datamodel
 
 from shut.utils.io.virtual import VirtualFiles
 from shut.utils.type_registry import TypeRegistry
+
+T = TypeVar('T')
 
 __all__ = [
   'VersionRef',

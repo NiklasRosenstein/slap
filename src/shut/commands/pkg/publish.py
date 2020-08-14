@@ -30,8 +30,8 @@ from termcolor import colored
 from shut.builders import get_builders
 from shut.model import PackageModel
 from shut.model.target import TargetId
-from shut.publish import Publisher, get_publishers
-from shut.publish.warehouse import WarehousePublisher
+from shut.publishers import Publisher, get_publishers
+from shut.publishers.warehouse import WarehousePublisher
 from . import pkg
 from .build import run_builds
 from .. import project

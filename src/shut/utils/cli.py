@@ -42,7 +42,7 @@ def edit_text(text: str) -> str:
   with nr.fs.tempfile('.yml', dir=os.getcwd(), text=True) as fp:
     fp.write(text)
     fp.close()
-    res = _editor_open(fp.name)
+    res = editor_open(fp.name)
     if res != 0:
       sys.exit(res)
     with open(fp.name) as src:

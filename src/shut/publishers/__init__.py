@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from . import core, warehouse
 from .core import *
-from . import warehouse
 
 __all__ = core.__all__
