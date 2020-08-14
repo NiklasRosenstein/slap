@@ -21,7 +21,7 @@
 
 import os
 import sys
-from typing import Any, List, T, TextIO, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, T, TextIO, Tuple, Type, TypeVar, Union
 
 from databind.core import ConversionError, datamodel, field, Registry
 from databind.json import from_json, to_json, registry as json_registry

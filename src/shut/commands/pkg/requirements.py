@@ -22,6 +22,7 @@
 import os
 import shlex
 import subprocess
+import sys
 from typing import Dict, List
 
 import click

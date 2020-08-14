@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 import logging
+import os
 import sys
 from typing import Iterable, List
 from urllib.parse import urlparse

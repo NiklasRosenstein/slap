@@ -123,7 +123,3 @@ def update_feedstock(package_name, version, force):
 
     print(f'pushing branch {s_branch_name} to {s_clone_url} ...')
     git.push('origin', branch_name, force=force)
-
-
-if __name__ == '__main__':
-  main()

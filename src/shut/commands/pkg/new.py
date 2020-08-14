@@ -30,6 +30,7 @@ from termcolor import colored
 
 from shut.commands.commons.new import (
   load_author_from_git,
+  get_license_file_text,
   render_template,
   write_files,
   GITIGNORE_TEMPLATE,
@@ -40,7 +41,6 @@ from shut.model.author import Author
 from shut.model.package import PackageModel, PackageData
 from shut.model.requirements import Requirement, VersionSelector
 from shut.model.version import Version
-from shut.utils.external.license import get_license_metadata, wrap_license_text
 from shut.utils.io.virtual import VirtualFiles
 from . import pkg
 
@@ -162,6 +162,6 @@ def new(
     )
 
   if license:
-    files.add_static('LICENSE.txt', get_license_file_text(license))
+    files.add_dynamic('LICENSE.txt', get_license_file_text, license, template_vars)
 
   write_files(files, target_directory, force, dry)

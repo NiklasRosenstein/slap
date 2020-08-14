@@ -111,5 +111,5 @@ def new(
   files.add_dynamic('README.md', render_template, README_TEMPLATE, template_vars)
   files.add_dynamic('monorepo.' + suffix, lambda fp: dump(package_manifest, fp))
   if license:
-    files.add_static('LICENSE.txt', get_license_file_text(license))
+    files.add_dynamic('LICENSE.txt', get_license_file_text, license, template_vars)
   write_files(files, target_directory, force, dry)

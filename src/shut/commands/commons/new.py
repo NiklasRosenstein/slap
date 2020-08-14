@@ -21,7 +21,7 @@
 
 import os
 import subprocess
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import jinja2
 import nr.fs
@@ -64,7 +64,7 @@ def load_author_from_git() -> Optional[str]:
   return Author(name, email)
 
 
-def get_license_file_text(license: str) -> str:
+def get_license_file_text(license: str, template_vars: Dict[str, Any]) -> str:
   license_text = 'Copyright (c) {year} {author.name}\n\n'.format(**template_vars)
   license_text += wrap_license_text(get_license_metadata(license)['license_text'])
   return license_text

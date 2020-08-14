@@ -20,13 +20,15 @@
 # IN THE SOFTWARE.
 
 import abc
-from typing import Generic, Iterable, List, T, Type
+from typing import Generic, Iterable, List, Type, TypeVar
 
 from nr.stream import concat
 
 from shut.model import AbstractProjectModel
 from shut.model.target import Target, TargetId
 from shut.utils.type_registry import TypeRegistry
+
+T = TypeVar('T')
 
 __all__ = [
   'Builder',
