@@ -36,7 +36,7 @@ def license():
 
 
 @license.command()
-@click.option('--name', help='The name of the license to retrieve.')
+@click.option('--name', help='The name of the license to retrieve.', required=True)
 @click.option('--long', 'format_', flag_value='long', default=True)
 @click.option('--short', 'format_', flag_value='short')
 @click.option('--json', 'format_', flag_value='json')
