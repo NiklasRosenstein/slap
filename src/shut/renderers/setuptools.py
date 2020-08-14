@@ -387,15 +387,19 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       files.add_static(os.path.join(directory, 'py.typed'), '')
 
   def get_version_refs(self, package: PackageModel) -> Iterable[VersionRef]:
-    filename = package.get_python_package_metadata().filename
-    if not filename or not os.path.isfile(filename):
-      return; yield
+    def _regex_refs(filename: Optional[str], regex: str) -> Iterable[VersionRef]:
+      if filename and os.path.isfile(filename):
+        with open(filename) as fp:
+          text = fp.read()
+          match = re.search(regex, text, re.M)
+          if match:
+            yield VersionRef(filename, match.start(1), match.end(1), match.group(1))
 
-    regex = '__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
-    with open(filename) as fp:
-      match = re.search(regex, fp.read())
-      if match:
-        yield VersionRef(filename, match.start(1), match.end(1), match.group(1))
+    filename = os.path.join(package.get_directory(), 'setup.py')
+    yield from _regex_refs(filename, r'^\s*version\s*=\s*[\'"]([^\'"]+)[\'"]')
+
+    filename = package.get_python_package_metadata().filename
+    yield from _regex_refs(filename, r'^__version__\s*=\s*[\'"]([^\'"]+)[\'"]')
 
 
 register_renderer(PackageModel, SetuptoolsRenderer)
