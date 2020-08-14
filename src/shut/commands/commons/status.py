@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 import os
+import sys
 from typing import Union
 
 from nr.utils.git import Git
@@ -48,13 +49,15 @@ def print_status(project: Project) -> None:
 
   if isinstance(project.subject, MonorepoModel):
     monorepo_dir = project.subject.get_directory()
+    if not project.packages:
+      sys.exit('error: monorepo has no packages')
     items = sorted(project.packages, key=lambda x: x.data.name)
     names = [os.path.normpath(os.path.relpath(x.get_directory(), monorepo_dir)) for x in items]
   else:
     items = [project.subject]
     names = [project.subject.get_name()]
 
-  width = max(map(len, names))
+  width = max(map(len, names)) if names else 0
 
   for item, name in zip(items, names):
     tag, num_commits = get_commits_since_last_tag(item)
