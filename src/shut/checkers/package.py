@@ -24,7 +24,7 @@ from typing import Iterable, Optional
 
 from shut.model import MonorepoModel, PackageModel, Project
 from shut.utils.external.classifiers import get_classifiers
-from .core import CheckResult, CheckStatus, Checker, check, register_checker
+from .core import CheckResult, CheckStatus, Checker, SkipCheck, check, register_checker
 
 
 class PackageChecker(Checker[PackageModel]):
@@ -104,6 +104,7 @@ class PackageChecker(Checker[PackageModel]):
         yield CheckResult(
           CheckStatus.WARNING,
           'file "py.typed" exists but $.typed is not set')
+    yield SkipCheck()
 
 
 register_checker(PackageModel, PackageChecker)
