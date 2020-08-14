@@ -52,8 +52,9 @@ class PackageBumpData(VersionBumpData[PackageModel]):
   def run_checks(self) -> int:
     return check_package(self.obj, self.args.warnings_as_errors)
 
-  def update(self) -> None:
-    update_package(self.obj, dry=self.args.dry, indent=1)
+  def update(self) -> Iterable[str]:
+    vfiles = update_package(self.obj, dry=self.args.dry, indent=1)
+    return vfiles.abspaths(self.obj.get_directory())
 
   def get_snapshot_version(self) -> Version:
     project = self.project
