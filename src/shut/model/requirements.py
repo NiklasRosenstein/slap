@@ -123,7 +123,7 @@ class Requirement:
 
   @classmethod
   def parse(cls, requirement_string):
-    match = re.match(r'^\s*([^\s]+)(?:\s+(.+))?$', requirement_string)
+    match = re.match(r'^\s*([\w\d\-\._]+)(?:\s*(.+))?$', requirement_string)
     if not match:
       raise ValueError('invalid requirement: {!r}'.format(requirement_string))
     package, version = match.groups()
