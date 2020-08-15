@@ -82,7 +82,9 @@ class VersionSelector(object):
       for i in range(index+1, 3):
         max_version[i] = '0'
       return '>={},<{}'.format(match.group(1), '.'.join(max_version))
-    return re.sub(regex, sub, self._string)
+
+    s = self._string + '.0' * (3 - self._string.count('.') - 1)
+    return re.sub(regex, sub, s)
 
   def is_semver_selector(self) -> bool:
     return self._string and self._string[0] in '^~' and ',' not in self._string
