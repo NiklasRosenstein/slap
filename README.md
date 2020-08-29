@@ -17,19 +17,18 @@ the process of publishing Python packages and prevent common pitfalls.
 **`package.yml`**
 
 ```yml
-package:
-  name: my-package
-  modulename: my_module
-  version: 0.1.0
-  license: MIT
-  description: My first every package built with Shut
-  author: Me <me@example.org>
-  requirements:
-  - python ^3.5
-  - requests ^2.22.0
-  entrypoints:
-    console_scripts:
-    - mycli = my_module.__main__:mycli
+name: my-package
+modulename: my_module
+version: 0.1.0
+license: MIT
+description: My first every package built with Shut
+author: Me <me@example.org>
+requirements:
+- python ^3.5
+- requests ^2.22.0
+entrypoints:
+  console_scripts:
+  - mycli = my_module.__main__:mycli
 ```
 
 __Todo__
