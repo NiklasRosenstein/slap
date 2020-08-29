@@ -43,6 +43,7 @@ def update_package(
   result = 0
 
   if verify_tag:
+    assert package.version is not None
     expected_tag = package.get_tag(package.version)
     if expected_tag != verify_tag:
       print(f'{colored("error", "red")}: tag "{verify_tag}" does not match expected tag "{expected_tag}"')
