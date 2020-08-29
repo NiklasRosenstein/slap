@@ -40,5 +40,5 @@ class Entry:
   description: str
 
 
-class Changelog(_ChangelogBase[None], list):
+class Changelog(_ChangelogBase[None], List[Entry]):
   Supersedes = None  # _ChangelogBase

@@ -1,0 +1,6 @@
+release_date: null
+changes:
+- type: improvement
+  component: general
+  description: update Changelog typing for databind
+  fixes: []
