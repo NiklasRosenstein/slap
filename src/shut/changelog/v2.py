@@ -24,7 +24,7 @@ The V3 of changelogs.
 """
 
 import enum
-from typing import List, Generic, T
+from typing import List, Generic
 from databind.core import datamodel, field
 from . import _ChangelogBase, v1
 
@@ -41,12 +41,12 @@ class Type(enum.Enum):
 
 @datamodel
 class Entry:
-  Type = Type
-
   type_: Type = field(altname='type')
   component: str
   description: str
   fixes: List[str]
+
+  Type = Type
 
   @classmethod
   def from_v1(cls, v1_entry: v1.Entry) -> 'Entry':
@@ -62,12 +62,9 @@ class Entry:
     )
 
 
-class ChangelogType(Generic[T], _ChangelogBase, list):
+class Changelog(_ChangelogBase[v1.Changelog], list):
   Supersedes = v1.Changelog  # _ChangelogBase
 
   @classmethod
   def adapt(cls, v1_changelog: v1.Changelog) -> 'Changelog':
     return cls(map(Entry.from_v1, v1_changelog))
-
-
-Changelog = ChangelogType[Entry]

@@ -23,9 +23,9 @@
 The V1 of changelogs.
 """
 
-from typing import List, Generic, T, Union
+from typing import List, Generic, Union
 from databind.core import datamodel, field
-from . import _ChangelogBase
+from . import _ChangelogBase, T
 
 
 @datamodel
@@ -40,8 +40,5 @@ class Entry:
   description: str
 
 
-class ChangelogType(Generic[T], _ChangelogBase, list):
+class Changelog(_ChangelogBase[None], list):
   Supersedes = None  # _ChangelogBase
-
-
-Changelog = ChangelogType[Entry]
