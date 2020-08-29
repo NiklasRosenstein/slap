@@ -56,9 +56,19 @@ Release a new version:
 
     tagging 0.2.0
 
+Publish the release to PyPI:
+
     $ shut pkg publish warehouse:pypi
 
-    # ... todo
+        building setuptools:sdist
+        :: build/my.package-0.1.0.tar.gz
+
+        building setuptools:wheel
+        :: build/my.package-0.1.0-py3-none-any.whl
+
+        publishing warehouse:pypi
+        :: build/my.package-0.1.0.tar.gz
+        :: build/my.package-0.1.0-py3-none-any.whl
 
 Shut also makes it easy to publish from within CI jobs. For more information on this,
 check out the [Publishing Guide][0].
