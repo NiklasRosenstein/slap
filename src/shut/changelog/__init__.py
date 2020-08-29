@@ -33,7 +33,9 @@ This is achieved by assigning a keyword to every changelog, and that keyword ind
 the type of change and whether it is breaking an API.
 """
 
-from typing import Any, Type, T
+from typing import Any, Optional, Type, TypeVar
+
+T = TypeVar('T')
 
 
 class _ChangelogBase:
@@ -44,7 +46,7 @@ class _ChangelogBase:
   migrating to the next version.
   """
 
-  Supersedes: Type[T] = None
+  Supersedes: Optional[Type[T]] = None
 
   @classmethod
   def migrate(cls, older_changelog: Any) -> '_ChangelogBase':
