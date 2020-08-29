@@ -40,7 +40,7 @@ class Entry:
   description: str
 
 
-class ChangelogType(Generic[T], _ChangelogBase):
+class ChangelogType(Generic[T], _ChangelogBase, list):
   Supersedes = None  # _ChangelogBase
 
 
