@@ -9,8 +9,8 @@ typed: true
 requirements:
   - python ^3.6
   - beautifulsoup4 ^4.8.1
-  - databind.core ^0.1.0
-  - databind.json ^0.1.0
+  - databind.core ^0.3.0
+  - databind.json ^0.3.0
   - click ^7.0
   - jinja2 ^2.11.1
   - networkx ^2.4
