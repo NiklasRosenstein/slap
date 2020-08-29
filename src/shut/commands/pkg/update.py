@@ -19,9 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import Iterable
+import sys
+from typing import Optional
 
 import click
+from termcolor import colored
 
 from shut.commands import project
 from shut.commands.commons.new import write_files
@@ -31,18 +33,50 @@ from shut.utils.io.virtual import VirtualFiles
 from . import pkg
 
 
-def update_package(package: PackageModel, dry: bool = False, indent: int = 0) -> VirtualFiles:
+def update_package(
+  package: PackageModel,
+  dry: bool = False,
+  indent: int = 0,
+  verify_tag: Optional[str] = None
+) -> VirtualFiles:
+
+  result = 0
+
+  if verify_tag:
+    expected_tag = package.get_tag(package.version)
+    if expected_tag != verify_tag:
+      print(f'{colored("error", "red")}: tag "{verify_tag}" does not match expected tag "{expected_tag}"')
+      result = 1
+
   files = get_files(package)
+
+  if verify_tag:
+    modified_files = files.get_modified_files(package.get_directory())
+    if modified_files:
+      print(f'{colored("error", "red")}: the following files would be modified with an update')
+      for filename in modified_files:
+        print(f'  {filename}')
+      result = 1
+
+  if result != 0:
+    sys.exit(result)
+
+  if verify_tag:
+    return files
+
   write_files(files, package.get_directory(), force=True, dry=dry, indent=indent)
   return files
 
 
 @pkg.command()
 @click.option('--dry', is_flag=True)
-def update(dry):
+@click.option('--verify-tag', help='Verify the integrity of the managed files (asserting that '
+  'they would not change from running this command) and parse the version number from the '
+  'specified tag and assert that the version matches the version in the package.')
+def update(dry, verify_tag):
   """
   Update files auto-generated from the configuration file.
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  update_package(package)
+  update_package(package, verify_tag=verify_tag)
