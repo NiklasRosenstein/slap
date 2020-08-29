@@ -30,6 +30,8 @@ from nr.proxy import Proxy
 import click
 import logging
 import os
+import warnings
+import sys
 
 context = Proxy(lambda: click.get_current_context().obj)
 project = Proxy(lambda: click.get_current_context().obj['project'])
@@ -39,8 +41,9 @@ project = Proxy(lambda: click.get_current_context().obj['project'])
 @click.option('-C', '--cwd', metavar='path', help='Run as if shut was started inside the specified directory.')
 @click.option('-v', '--verbose', count=True, help='Increase the log verbosity.')
 @click.option('-q', '--quiet', is_flag=True, help='Quiet mode, wins over --verbose.')
+@click.option('-W', '--disable-warnings', is_flag=True, help='Disable Python warnings.')
 @click.version_option(__version__)
-def shut(cwd, verbose, quiet):
+def shut(cwd, verbose, quiet, disable_warnings):
   """
   Shut is a tool to manage the lifecycle of pure Python packages. It automates tasks such
   as bootstrapping a project, bumping version numbers, managing changelogs and publishing
@@ -71,6 +74,10 @@ def shut(cwd, verbose, quiet):
     format='[%(levelname)s|%(asctime)s|%(name)s]: %(message)s',
     level=level,
   )
+
+  if not sys.warnoptions and not disable_warnings:
+    warnings.simplefilter("default") # Change the filter in this process
+    os.environ["PYTHONWARNINGS"] = "default" # Also affect subprocesses
 
 
 from . import changelog

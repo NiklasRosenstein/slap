@@ -55,7 +55,7 @@ def print_checks(
 
   for check in checks:
     if emojis:
-      print(prefix, emoji_chars[check.result.status], ' ', check.name, sep='', end='')
+      print(prefix, emoji_chars[check.result.status], '  ', check.name, sep='', end='')
     else:
       print(prefix, colored(check.name, color_names[check.result.status]), sep='', end='')
     if check.result.status != CheckStatus.PASSED:

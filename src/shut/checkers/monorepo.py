@@ -34,8 +34,8 @@ class MonorepoChecker(Checker[MonorepoModel]):
   def _check_consistent_mono_version(self, project, monorepo):
     if monorepo.release.single_version and project.packages:
       for package in project.packages:
-        if package.data.version is not None and package.data.version != monorepo.version:
-          yield CheckResult(CheckStatus.ERROR, f'{package.data.name} v{package.data.version}, expected v{monorepo.version}')
+        if package.version is not None and package.version != monorepo.version:
+          yield CheckResult(CheckStatus.ERROR, f'{package.name} v{package.version}, expected v{monorepo.version}')
     else:
       yield SkipCheck()
 

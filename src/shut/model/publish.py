@@ -49,11 +49,9 @@ class PypiConfiguration:
   #: Whether publishing to PyPI is enabled.
   enabled: bool = True
 
-  #: The credentials configuration for PyPI. Variables in the from `$(VARNAME)`
+  #: The credentials configuration for PyPI. Variables in the from `$VARNAME`
   #: will be substituted from environment variables.
-  credentials: WarehouseCredentials = field(
-    altname='credentials',
-    default_factory=WarehouseCredentials)
+  credentials: WarehouseCredentials = field(default_factory=WarehouseCredentials)
 
 
 @datamodel

@@ -2,8 +2,8 @@
 
 ## Python Packages
 
-Python packages are configured with a `package.yaml` file. Most of the information will be
-rendered into the `setup.py` file when running the `shore update` command.
+Python packages are configured with a `package.yml` file. Most of the information will be
+rendered into the `setup.py` file when running the `shore pkg update` command.
 
 ```yaml
 name: my-package
@@ -21,11 +21,12 @@ entrypoints:
 
 ## Mono Repositories
 
-Monorepositories are configured with a `monorepo.yaml` file. Packages in the repository must be
-in folder directly next to the configuration file.
+Monorepositories are configured with a `monorepo.yml` file. Packages in the repository must be
+in folder directly next to the configuration file. The `shut mono update` command recursively
+runs the update for all packages.
 
 ```yaml
 name: my-monorepo
 version: null  # Only needed for mono-versioning
-mono-versioning: false
+release: false
 ```

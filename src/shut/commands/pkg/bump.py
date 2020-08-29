@@ -53,7 +53,7 @@ class PackageBumpData(VersionBumpData[PackageModel]):
     return check_package(self.obj, self.args.warnings_as_errors)
 
   def update(self, new_version: Version) -> Iterable[str]:
-    self.obj.data.version = new_version
+    self.obj.version = new_version
     vfiles = update_package(self.obj, dry=self.args.dry, indent=1)
     return vfiles.abspaths(self.obj.get_directory())
 

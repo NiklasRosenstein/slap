@@ -116,7 +116,7 @@ def changelog(**args):
     if args['commit']:
       commit_message = entry.description
       if package and monorepo:
-        commit_message = '{}({}): '.format(entry.type_.name, package.data.name) + commit_message
+        commit_message = '{}({}): '.format(entry.type_.name, package.name) + commit_message
       else:
         commit_message = '{}: '.format(entry.type_.name) + commit_message
       if fixes:

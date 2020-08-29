@@ -44,7 +44,7 @@ def check_package(package: PackageModel, warnings_as_errors: bool = False) -> in
   start_time = time.perf_counter()
   checks = sorted(get_checks(project, package), key=lambda c: c.name)
   seconds = time.perf_counter() - start_time
-  print_checks_all(package.data.name, checks, seconds)
+  print_checks_all(package.name, checks, seconds)
   return get_checks_status(checks, warnings_as_errors)
 
 

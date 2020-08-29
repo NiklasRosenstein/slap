@@ -72,7 +72,7 @@ def update_feedstock(package_name, version, force):
     version = str(version)
   else:
     package = project.load_or_exit(expect=PackageModel)
-    package_name, version = package.data.name, str(package.data.version)
+    package_name, version = package.name, str(package.version)
     del package
 
   repo_name = 'conda-forge/{}-feedstock'.format(package_name)

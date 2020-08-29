@@ -69,8 +69,8 @@ class SetuptoolsBuilder(Builder):
     description: str,
     package: PackageModel,
   ) -> 'SetuptoolsBuilder':
-    py = 'py2.py3' if package.data.is_universal() else ('py' + sys.version[0])
-    filename = f'{package.data.name.replace("-", "_")}-{package.data.version}-{py}-none-any.whl'
+    py = 'py2.py3' if package.is_universal() else ('py' + sys.version[0])
+    filename = f'{package.name.replace("-", "_")}-{package.version}-{py}-none-any.whl'
     return cls(id_, description, [filename], package.get_directory(), 'bdist_wheel', [])
 
   @classmethod
@@ -85,7 +85,7 @@ class SetuptoolsBuilder(Builder):
     return cls(
       id_,
       description,
-      [f'{package.data.name}-{package.data.version}{cls._FORMATS_MAP[f]}' for f in formats],
+      [f'{package.name}-{package.version}{cls._FORMATS_MAP[f]}' for f in formats],
       package.get_directory(),
       'sdist',
       ['--format', ','.join(formats)],
@@ -148,7 +148,7 @@ class SetuptoolsBuilderProvider(BuilderProvider[PackageModel]):
       package,
     )
 
-    if package.data.wheel:
+    if package.wheel:
       yield SetuptoolsBuilder.wheel(
         TargetId('setuptools', 'wheel'),
         'Build a Python wheel.',

@@ -51,7 +51,7 @@ def print_status(project: Project) -> None:
     monorepo_dir = project.subject.get_directory()
     if not project.packages:
       sys.exit('error: monorepo has no packages')
-    items = sorted(project.packages, key=lambda x: x.data.name)
+    items = sorted(project.packages, key=lambda x: x.name)
     names = [os.path.normpath(os.path.relpath(x.get_directory(), monorepo_dir)) for x in items]
   else:
     items = [project.subject]
