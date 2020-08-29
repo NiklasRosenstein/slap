@@ -122,7 +122,7 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
       changed_files.add(changelog.filename)
       print()
       print('release staged changelog')
-      print(f'  {colored(nr.fs.rel(manager.unreleased.filename), "cyan")} → {nr.fs.rel(changelog.filename)}')
+      print(f'  {colored(os.path.relpath(manager.unreleased.filename), "cyan")} → {os.path.relpath(changelog.filename)}')
 
     return changed_files
 

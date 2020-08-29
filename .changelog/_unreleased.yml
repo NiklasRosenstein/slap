@@ -4,3 +4,7 @@ changes:
   component: general
   description: update Changelog typing for databind
   fixes: []
+- type: improvement
+  component: general
+  description: update paths printed in `shut ... bump` when changelog is released
+  fixes: []
