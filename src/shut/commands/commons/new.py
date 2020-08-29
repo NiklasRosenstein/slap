@@ -25,10 +25,11 @@ from typing import Any, Dict, Optional
 
 import jinja2
 import nr.fs
+from termcolor import colored
+
 from shut.model.author import Author
 from shut.utils.external.license import get_license_metadata, wrap_license_text
 from shut.utils.io.virtual import VirtualFiles
-from termcolor import colored
 
 GITIGNORE_TEMPLATE = '''
 .venv*/

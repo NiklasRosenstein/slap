@@ -19,8 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from typing import Any, Callable, Iterable, Union
+import contextlib
+import io
 import os
+from typing import Any, Callable, ContextManager, IO, Iterable, Set, Union
 
 
 class VirtualFiles:
@@ -62,11 +64,16 @@ class VirtualFiles:
     overwrite: bool = False,
     create_directories: bool = True,
     dry: bool = False,
+    open_func: Callable[[str, str], ContextManager[IO]] = None,
+
   ) -> None:
     """
     Writes all files to disk. Relative files will be written relative to the
     *parent_directory*.
     """
+
+    if open_func is None:
+      open_func = open
 
     for file_, filename in zip(self._files, self.abspaths(parent_directory)):
       exists = os.path.isfile(filename)
@@ -81,14 +88,15 @@ class VirtualFiles:
         if create_directories:
           os.makedirs(os.path.dirname(filename) or '.', exist_ok=True)
         if file_['inplace']:
-          with open(filename, 'w' + mode) as dst:
+          with open_func(filename, 'w' + mode) as dst:
             if exists:
+              # TODO: This needs to use an atomic file actually..
               with open(filename, 'r' + mode) as src:
                 file_['render_func'](dst, src, *file_['args'])
             else:
               file_['render_func'](dst, None, *file_['args'])
         else:
-          with open(filename, 'w' + mode) as dst:
+          with open_func(filename, 'w' + mode) as dst:
             file_['render_func'](dst, *file_['args'])
 
   def abspaths(self, parent_directory: str = None) -> Iterable[str]:
@@ -98,3 +106,24 @@ class VirtualFiles:
 
     for file_ in self._files:
       yield os.path.normpath(os.path.join(parent_directory or '.', file_['filename']))
+
+  def get_modified_files(self, parent_directory: str) -> Set[str]:
+    """
+    Returns a set of the files that would be modified by writing the virtual files to disk.
+    """
+
+    modified_files = set()
+
+    @contextlib.contextmanager
+    def opener(filename, mode):
+      fp = io.BytesIO() if 'b' in mode else io.StringIO()
+      yield fp
+      if not os.path.isfile(filename):
+        modified_files.add(filename)
+      else:
+        with open(filename, mode.replace('w', 'r')) as src:
+          if fp.getvalue() != src.read():
+            modified_files.add(filename)
+
+    self.write_all(parent_directory, open_func=opener, overwrite=True, dry=False)
+    return {os.path.relpath(f, parent_directory) for f in modified_files}
