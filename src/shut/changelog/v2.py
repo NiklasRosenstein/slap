@@ -62,7 +62,7 @@ class Entry:
     )
 
 
-class ChangelogType(Generic[T], _ChangelogBase):
+class ChangelogType(Generic[T], _ChangelogBase, list):
   Supersedes = v1.Changelog  # _ChangelogBase
 
   @classmethod

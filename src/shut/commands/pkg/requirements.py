@@ -26,7 +26,6 @@ import sys
 from typing import Dict, List
 
 import click
-import yaml
 
 from shut.commands import project
 from shut.model import dump, PackageModel
