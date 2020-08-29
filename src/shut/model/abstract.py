@@ -21,10 +21,12 @@
 
 import abc
 import os
+import warnings
 from typing import List, Optional
 
 from databind.core import datamodel, field
 
+from .author import Author
 from .changelog import ChangelogConfiguration
 from .release import ReleaseConfiguration
 from .version import Version
@@ -32,17 +34,27 @@ from .version import Version
 
 @datamodel
 class AbstractProjectModel(metaclass=abc.ABCMeta):
+  # Derived fields that are not de-serialized per-se, but may be filled during the
+  # deserialization process to track additional metadata.
   project: Optional['Project'] = field(derived=True, default=None)
   filename: Optional[str] = field(derived=True, default=None)
   unknown_keys: List[str] = field(derived=True, default_factory=list)
+
+  name: str
+  version: Optional[Version] = None
+  author: Optional[Author] = None
+  license: str = None
+  url: str = None
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
   release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
 
   def get_name(self) -> str:
-    pass
+    warnings.warn(f'{type(self).__name__}.get_name() is deprecated, use .name instead', DeprecationWarning)
+    return self.name
 
   def get_version(self) -> Optional[Version]:
-    pass
+    warnings.warn(f'{type(self).__name__}.get_version() is deprecated, use .version instead', DeprecationWarning)
+    return self.version
 
   def get_tag(self, version: Version) -> str:
     return self.release.tag_format.format(name=self.get_name(), version=version)

@@ -20,11 +20,10 @@
 # IN THE SOFTWARE.
 
 import re
-from typing import List, Iterable, Optional
+from typing import Iterable, Optional
 
 from databind.core import datamodel, field
 
-from .author import Author
 from .abstract import AbstractProjectModel
 from .version import Version
 from .requirements import VersionSelector
@@ -42,11 +41,6 @@ class InterdependencyRef:
 
 @datamodel
 class MonorepoModel(AbstractProjectModel):
-  name: str
-  version: Optional[Version] = None
-  author: Optional[Author] = None
-  license: str = None
-  url: str = None
 
   def get_inter_dependencies(self) -> Iterable[InterdependencyRef]:
     """
@@ -58,7 +52,7 @@ class MonorepoModel(AbstractProjectModel):
 
     regex = re.compile(r'^\s*- +([A-z0-9\.\-_]+) *([^\n:]+)?$', re.M)
     packages = list(self.project.packages)
-    package_names = set(p.data.name for p in self.project.packages)
+    package_names = set(p.name for p in self.project.packages)
 
     for package in self.project.packages:
       with open(package.filename) as fp:

@@ -1,57 +1,66 @@
-# Welcome to the Shore documentation
+# Welcome to the Shut documentation
 
-Shore is an opinionated release management tool for pure Python packages and mono repositories
-of such. Among it's features is the automatic generation of setuptools files, sanity checks,
-version number bumping and release publishing as well as changelog management.
+Shut is an opinionated release management tool for pure Python packages and mono repositories.
+Among it's features is the automatic generation of setuptools files, sanity checks, version number
+bumping and release publishing as well as changelog management.
 
 ## Installation
 
-Shore can be installed from PyPI:
+Shut can be installed from PyPI:
 
-    $ pip install nr.shore
+    $ pip install shut
 
 ## Typical Usage
 
 Initialize a new Python package:
 
-    $ shore new my.package .
-    Write .gitignore
-    Write package.yaml
-    Write README.md
-    Write src/my/__init__.py
-    Write src/my/package/__init__.py
-    Write src/test/my/__init__.py
-    Write src/test/my/package/__init__.py
-    Write src/test/my/package/test_some.py
+    $ shut pkg new --name my.package .
+    write .gitignore
+    write package.yml
+    write README.md
+    write src/my/__init__.py
+    write src/my/package/__init__.py
 
 Generate setuptools files:
 
-    $ shore update
-    ❌ 2 check(s) triggered
-    WARNING (my.package): missing $.url
-    WARNING (my.package): No LICENSE file found.
-    ⚪ rendering 1 file(s)
-    setup.py
+    $ shut pkg update
+    write setup.py
+    write MANIFEST.in
 
-Release the initial version:
+Create a changelog entry and commit:
 
-    $ shore bump 0.0.1 --force --tag --push --publish pypi
-    bumping 2 version reference(s)
-      package.yaml: 0.0.1 → 0.0.1
-      src/my/package/__init__.py: 0.0.1 → 0.0.1
-    tagging 0.0.1
-    [master f0dd374] (my.package) bump version to 0.0.1
-    ...
+    $ shut changelog --add feature --for cli -cm 'Added some useful options.'
 
-Create a changelog entry:
+Release a new version:
 
-    $ shore changelog --add feature --for cli -m 'Added some useful options.'
+    $ shut pkg bump --minor --tag --push --dry
 
-Release the next version:
+    ✔️ classifiers
+    ✔️ consistent-author
+    ✔️ consistent-version
+    ✔️ license
+    ✔️ readme
+    ✔️ unknown-config
+    ✔️ url
 
-    $ shore bump --minor --tag --push --publish pypi
+    ran 7 checks for package my.package in 0.001s
 
-Shore also makes it easy to publish from within CI jobs. For more information on this,
+    bumping 3 version reference(s)
+    package.yaml: 0.0.0 → 0.1.0
+    setup.py: 0.0.0 → 0.1.0
+    src/my/package/__init__.py: 0.0.0 → 0.1.0
+
+    updating files
+    write setup.py
+    write MANIFEST.in
+
+    tagging 0.2.0
+
+    $ shut pkg publish warehouse:pypi
+
+    # ... todo
+
+Shut also makes it easy to publish from within CI jobs. For more information on this,
 check out the [Publishing Guide][0].
 
   [0]: publishing-guide.md

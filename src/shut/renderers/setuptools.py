@@ -30,7 +30,6 @@ from typing import Dict, Iterable, List, Optional, TextIO, Tuple
 import nr.fs
 
 from shut.model import PackageModel
-from shut.model.package import PackageData, PythonPackageMetadata, InstallConfiguration
 from shut.model.requirements import Requirement
 from shut.utils.io.virtual import VirtualFiles
 from .core import Renderer, register_renderer, VersionRef
@@ -100,7 +99,6 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
   ) -> None:
     metadata = package.get_python_package_metadata()
     install = package.install
-    data = package.data
 
     # Write the header/imports.
     fp.write(GENERATED_FILE_REMARK + '\n')
@@ -166,36 +164,36 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     # Write the install requirements.
     fp.write('\n')
-    self._render_requirements(fp, 'requirements', data.requirements)
+    self._render_requirements(fp, 'requirements', package.requirements)
 
-    if data.test_requirements:
-      self._render_requirements(fp, 'test_requirements', data.test_requirements)
+    if package.test_requirements:
+      self._render_requirements(fp, 'test_requirements', package.test_requirements)
       tests_require = 'test_requirements'
     else:
       tests_require = '[]'
 
-    if data.extra_requirements:
+    if package.extra_requirements:
       fp.write('extra_requirements = {}\n')
-      for key, value in data.extra_requirements.items():
+      for key, value in package.extra_requirements.items():
         self._render_requirements(fp, 'extras_require[{!r}]'.format(key), value)
       extras_require = 'extra_requirements'
     else:
       extras_require = '{}'
 
     exclude_packages = []
-    for pkg in data.exclude:
+    for pkg in package.exclude:
       exclude_packages.append(pkg)
       exclude_packages.append(pkg + '.*')
 
     if metadata.is_single_module:
-      packages_args = '  py_modules = [{!r}],'.format(data.get_modulename())
+      packages_args = '  py_modules = [{!r}],'.format(package.get_modulename())
     else:
       packages_args = '  packages = setuptools.find_packages({src_directory!r}, {exclude_packages!r}),'.format(
-        src_directory=data.source_directory,
+        src_directory=package.source_directory,
         exclude_packages=exclude_packages)
 
     # Find the requirement on Python itself.
-    python_requirement = data.get_python_requirement()
+    python_requirement = package.get_python_requirement()
     if python_requirement:
       python_requires_expr = repr(python_requirement.version.to_setuptools() if python_requirement else None)
     else:
@@ -207,7 +205,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     # MyPy cannot find PEP-561 compatible packages without zip_safe=False.
     # See https://mypy.readthedocs.io/en/latest/installed_packages.html#making-pep-561-compatible-packages
-    zip_safe = not data.typed
+    zip_safe = not package.typed
 
     # Write the setup function.
     fp.write(textwrap.dedent('''
@@ -235,30 +233,30 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
         classifiers = {classifiers!r},
         zip_safe = {zip_safe!r},
     ''').rstrip().format(
-      name=data.name,
-      version=str(data.version),
+      name=package.name,
+      version=str(package.version),
       packages_args=packages_args,
-      author_name=data.author.name,
-      author_email=data.author.email,
-      url=data.url,
-      license=data.license,
-      description=data.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
+      author_name=package.author.name,
+      author_email=package.author.email,
+      url=package.url,
+      license=package.license,
+      description=package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
       long_description_expr=long_description_expr,
       long_description_content_type=_get_readme_content_type(readme_file) if readme_file else None,
       extras_require=extras_require,
       tests_require=tests_require,
       python_requires_expr=python_requires_expr,
-      src_directory=data.source_directory,
+      src_directory=package.source_directory,
       include_package_data=True,#package.package_data != [],
       data_files=data_files,
-      entry_points=self._render_entrypoints(data.entrypoints),
+      entry_points=self._render_entrypoints(package.entrypoints),
       cmdclass = '{' + ', '.join('{!r}: {}'.format(k, v) for k, v in cmdclass.items()) + '}',
-      keywords = data.keywords,
-      classifiers = data.classifiers,
+      keywords = package.keywords,
+      classifiers = package.classifiers,
       zip_safe=zip_safe,
     ))
 
-    if data.is_universal():
+    if package.is_universal():
       fp.write(textwrap.dedent('''
           options = {
             'bdist_wheel': {
@@ -402,7 +400,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     files.add_dynamic('setup.py', self._render_setup, package)
     files.add_dynamic('MANIFEST.in', self._render_manifest_in, package, inplace=True)
 
-    if package.data.typed:
+    if package.typed:
       directory = package.get_python_package_metadata().package_directory
       files.add_static(os.path.join(directory, 'py.typed'), '')
 

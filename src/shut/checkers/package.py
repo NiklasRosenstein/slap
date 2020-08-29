@@ -36,15 +36,15 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('license')
   def _check_license(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
-    if not package.data.license:
+    if not package.license:
       yield CheckResult(CheckStatus.WARNING, 'not specified')
 
-    elif package.data.license and not package.get_license_file():
+    elif package.license and not package.get_license_file():
       yield CheckResult(CheckStatus.WARNING, 'No LICENSE file found.')
 
     monorepo = project.monorepo
-    if package.data.license and monorepo and monorepo.license \
-        and monorepo.license != package.data.license:
+    if package.license and monorepo and monorepo.license \
+        and monorepo.license != package.license:
       yield CheckResult(CheckStatus.ERROR,
         'License is not consistent with parent mono repository (package: {}, monorepo: {}).'
           .format(package.license, monorepo.license))
@@ -52,7 +52,7 @@ class PackageChecker(Checker[PackageModel]):
   @check('classifiers')
   def _check_classifiers(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     classifiers = get_classifiers()
-    unknown_classifiers = [x for x in package.data.classifiers if x not in classifiers]
+    unknown_classifiers = [x for x in package.classifiers if x not in classifiers]
     if unknown_classifiers:
       yield CheckResult(
         CheckStatus.WARNING,
@@ -60,31 +60,31 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('author')
   def _check_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
-    if not package.data.author:
+    if not package.author:
       yield CheckResult(CheckStatus.WARNING, 'missing')
 
   @check('url')
   def _check_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
-    if not package.data.url:
+    if not package.url:
       yield CheckResult(CheckStatus.WARNING, 'missing')
 
   @check('consistent-author')
   def _check_consistent_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     metadata = package.get_python_package_metadata()
-    if package.data.author and metadata.author != str(package.data.author):
+    if package.author and metadata.author != str(package.author):
       yield CheckResult(
         CheckStatus.ERROR,
         'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
-          str(package.data.author), metadata.filename, metadata.author))
+          str(package.author), metadata.filename, metadata.author))
 
   @check('consistent-version')
   def _check_consistent_version(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     metadata = package.get_python_package_metadata()
-    if package.data.version and metadata.version != str(package.data.version):
+    if package.version and metadata.version != str(package.version):
       yield CheckResult(
         CheckStatus.ERROR,
         '{!r} ({}) != {!r} ({})'.format(
-          str(package.data.version),
+          str(package.version),
           os.path.basename(package.filename),
           metadata.version,
           os.path.relpath(metadata.filename)))
@@ -95,12 +95,12 @@ class PackageChecker(Checker[PackageModel]):
     try:
       py_typed_file = os.path.join(metadata.package_directory, 'py.typed')
     except ValueError:
-      if package.data.typed:
+      if package.typed:
         yield CheckResult(
           CheckStatus.WARNING,
           '$.package.typed only works with packages, but this is a module')
     else:
-      if os.path.isfile(py_typed_file) and not package.data.typed:
+      if os.path.isfile(py_typed_file) and not package.typed:
         yield CheckResult(
           CheckStatus.WARNING,
           'file "py.typed" exists but $.typed is not set')

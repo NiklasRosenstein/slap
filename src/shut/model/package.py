@@ -22,17 +22,15 @@
 import ast
 import os
 import re
-from typing import Dict, Iterable, List, Optional
+import warnings
+from typing import Dict, List, Optional
 
 from databind.core import datamodel, field
 
 from shut.utils.ast import load_module_members
 from .abstract import AbstractProjectModel
-from .author import Author
-from .changelog import ChangelogConfiguration
 from .linter import LinterConfiguration
 from .publish import PublishConfiguration
-from .release import ReleaseConfiguration
 from .requirements import Requirement
 from .version import Version
 
@@ -59,13 +57,8 @@ def _get_file_in_directory(directory: str, prefix: str, preferred: List[str]) ->
 
 @datamodel
 class PackageData:
-  name: str
   modulename: Optional[str] = None
-  version: Optional[Version] = None
-  author: Author
   description: Optional[str] = None
-  license: Optional[str] = None
-  url: Optional[str] = None
   readme: Optional[str] = None
   wheel: Optional[bool] = True
   universal: Optional[bool] = None
@@ -131,11 +124,16 @@ class InstallConfiguration:
 
 
 @datamodel
-class PackageModel(AbstractProjectModel):
-  data: PackageData = field(altname='package')
+class PackageModel(PackageData, AbstractProjectModel):
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
   publish: PublishConfiguration = field(default_factory=PublishConfiguration)
+
+  @property
+  def data(self) -> 'PackageModel':
+    warnings.warn('Use of PackageModel.data is deprecated, use the object directly.',
+                  DeprecationWarning, stacklevel=2)
+    return self
 
   def get_python_package_metadata(self) -> 'PythonPackageMetadata':
     """
@@ -145,8 +143,8 @@ class PackageModel(AbstractProjectModel):
     """
 
     return PythonPackageMetadata(
-      os.path.join(os.path.dirname(self.filename), self.data.source_directory),
-      self.data.get_modulename())
+      os.path.join(os.path.dirname(self.filename), self.source_directory),
+      self.get_modulename())
 
   def get_readme_file(self) -> Optional[str]:
     """
@@ -155,8 +153,8 @@ class PackageModel(AbstractProjectModel):
 
     directory = os.path.dirname(self.filename)
 
-    if self.data.readme:
-      return os.path.abspath(os.path.join(directory, self.data.readme))
+    if self.readme:
+      return os.path.abspath(os.path.join(directory, self.readme))
 
     return _get_file_in_directory(
       directory=directory,
@@ -174,7 +172,7 @@ class PackageModel(AbstractProjectModel):
       preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'])
 
   def get_py_typed_file(self) -> Optional[str]:
-    if not self.data.typed:
+    if not self.typed:
       return None
 
     directory = self.get_python_package_metadata().package_directory
@@ -183,16 +181,16 @@ class PackageModel(AbstractProjectModel):
   # AbstractProjectModel
 
   def get_name(self) -> str:
-    return self.data.name
+    return self.name
 
   def get_version(self) -> Optional[Version]:
-    return self.data.version
+    return self.version
 
   def get_tag(self, version: Version) -> str:
     tag_format = self.release.tag_format
     if self.project and self.project.monorepo and '{name}' not in tag_format:
       tag_format = '{name}@' + tag_format
-    return tag_format.format(name=self.data.name, version=version)
+    return tag_format.format(name=self.name, version=version)
 
 
 class PythonPackageMetadata:
@@ -271,13 +269,13 @@ class PythonPackageMetadata:
     if '__version__' in members:
       try:
         version = ast.literal_eval(members['__version__'])
-      except ValueError as exc:
+      except ValueError:
         version = '<Non-literal expression>'
 
     if '__author__' in members:
       try:
         author = ast.literal_eval(members['__author__'])
-      except ValueError as exc:
+      except ValueError:
         author = '<Non-literal expression>'
 
     self._author = author

@@ -68,7 +68,7 @@ def add(packages, test):
     package_versions = get_pip_versions(pip, unscoped_packages)
     scoped_reqs += [Requirement.parse(f'{k} ^{v}') for k, v in package_versions.items()]
 
-  target = package.data.test_requirements if test else package.data.requirements
+  target = package.test_requirements if test else package.requirements
 
   # Update any existing requirements.
   seen = set()
