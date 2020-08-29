@@ -43,8 +43,8 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
   name: str
   version: Optional[Version] = None
   author: Optional[Author] = None
-  license: str = None
-  url: str = None
+  license: Optional[str] = None
+  url: Optional[str] = None
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
   release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
 
