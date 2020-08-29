@@ -8,9 +8,9 @@ the process of publishing Python packages and prevent common pitfalls.
 
 * Bootstrap Python packages: `shut pkg new --name my-package`
 * Install and save dependencies: `shut pkg requirements add <package>`
-* Document changes: ``shut changelog add fix --commit --message "Fixed TypeError in `foo()`"``
-* Bump the version according to changelog: `shut pkg bump`
-* Publish on PyPI: `shut pkg publish`
+* Document changes: ``shut changelog --add fix --commit --message "Fixed `TypeError` in `foo()`"``
+* Bump the version according to changelog: `shut pkg bump --minor --tag --push`
+* Publish on PyPI: `shut pkg publish warehouse:pypi`
 
 ## Configuration
 
