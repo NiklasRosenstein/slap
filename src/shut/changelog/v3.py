@@ -30,7 +30,7 @@ from . import _ChangelogBase, v2
 
 
 @datamodel
-class Changelog(_ChangelogBase):
+class Changelog(_ChangelogBase[v2.Changelog]):
   Supersedes = v2.Changelog  # _ChangelogBase
   Entry = v2.Entry
 

@@ -33,12 +33,13 @@ This is achieved by assigning a keyword to every changelog, and that keyword ind
 the type of change and whether it is breaking an API.
 """
 
-from typing import Any, Optional, Type, TypeVar
+import abc
+from typing import Any, Generic, Optional, Type, TypeVar
 
 T = TypeVar('T')
 
 
-class _ChangelogBase:
+class _ChangelogBase(Generic[T], metaclass=abc.ABCMeta):
   """
   Base class for datamodels subclasses that represent the deserialized form of a changelog in
   a specific version. A newer version should reference the predecessor in the #Supersedes
