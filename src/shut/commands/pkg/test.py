@@ -1,0 +1,123 @@
+# -*- coding: utf8 -*-
+# Copyright (c) 2020 Niklas Rosenstein
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+import os
+import subprocess as sp
+import sys
+
+import click
+from termcolor import colored
+
+from shut.model.package import PackageModel
+from shut.test import Runtime, TestRun, TestStatus, Virtualenv
+from shut.utils.text import indent_text
+from . import pkg, project
+from .install import install
+
+
+def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> TestRun:
+  if not package.test.driver:
+    raise RuntimeError('package has no test driver configured')
+  if isolate:
+    print('Creating temporary virtual environment at .venv-test ...')
+    venv = Virtualenv(os.path.join(package.get_directory(), '.venv-test'))
+    venv.create(Runtime.current())
+    runtime = venv.get_runtime()
+    print(f'Installing package "{package.name}" and test requirements ...')
+    try:
+      install(['--pip', venv.bin('pip'), '--extra', 'test', '-q'], standalone_mode=False, parent=click.get_current_context())
+    except SystemExit as exc:
+      if exc.code != 0:
+        raise
+    test_reqs = [req.to_setuptools() for req in package.test.driver.get_test_requirements()]
+    if test_reqs:
+      sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
+  else:
+    venv = None
+    runtime = Runtime.current()
+  try:
+    return package.test.driver.test_package(package, runtime, capture)
+  finally:
+    if venv:
+      venv.rm()
+
+
+def print_test_run(test_run: TestRun) -> None:
+  if test_run.status == TestStatus.ERROR:
+    print(f'There was an unexpected error when running the tests.')
+    if test_run.error:
+      print()
+      print(colored(indent_text(test_run.error.strip(), 4), 'red'))
+      print()
+    return
+
+  sorted_tests = sorted(test_run.tests, key=lambda t: t.name)
+
+  # Print a summary.
+  n_passed = sum(1 for t in test_run.tests if t.status == TestStatus.PASSED)
+  status_line = (
+    f'Ran {len(test_run.tests)} test(s) in {test_run.duration:.3f}s '
+    f'({n_passed} passed, {len(test_run.tests) - n_passed} failed).')
+  print(status_line)
+  print()
+  for test in sorted_tests:
+    color = 'green' if test.status == TestStatus.PASSED else 'red'
+    print(f'  {colored(test.name, color, attrs=["bold"])} {test.status.name}')
+  print()
+
+  if n_passed == len(test_run.tests):
+    return
+
+  # Print error details.
+  print('Failed test details:')
+  print('====================')
+  for i, test in enumerate(filter(lambda t: t.status != TestStatus.PASSED, sorted_tests)):
+    if test.status == TestStatus.PASSED:
+      continue
+    print()
+    print(f'  {colored(test.name, "red", attrs=["bold"])} ({test.filename}:{test.lineno})')
+    print('  ' + '-' * (len(test.name) + len(test.filename) + len(str(test.lineno)) + 4))
+    print()
+    print(indent_text(test.crash.longrepr, 6))
+    if test.stdout:
+      print('\n  captured stdout:\n')
+      print(indent_text(test.stdout, 6))
+  print()
+
+  print(status_line)
+
+
+@pkg.command()
+@click.option('--isolate/--no-isolate', default=False,
+  help='Isolate all test runs in virtual environments. This greatly increases the duration '
+       'for tests to run as the environment needs to be created and packages installed first, '
+       'but it ensures that the unit tests work for a vanilla installation (default: false)')
+@click.option('--capture/--no-capture', default=True,
+  help='Capture the output of the underlying testing framework. If set to false, the output '
+       'will be routed to stderr (default: true)')
+def test(isolate: bool, capture: bool) -> None:
+  """
+  Run the package's unit tests.
+  """
+
+  package = project.load_or_exit(expect=PackageModel)
+  test_run = test_package(package, isolate, capture)
+  print_test_run(test_run)

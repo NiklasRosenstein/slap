@@ -62,9 +62,10 @@ class Requirement:
 @click.option('--extra', help='Specify one or more extras to install.')
 @click.option('-U', '--upgrade', is_flag=True, help='Upgrade all packages (forwarded to pip install).')
 @click.option('-q', '--quiet', is_flag=True, help='Quiet install')
+@click.option('--pip', help='Override the command to run Pip. Defaults to "python -m pip" or the PIP variable.')
 @click.option('--pip-args', help='Additional arguments to pass to Pip.')
 @click.option('--dry', is_flag=True, help='Print the Pip command to stdout instead of running it.')
-def install(develop, inter_deps, extra, upgrade, quiet, pip_args, dry):
+def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
   """
   Install the package using `python -m pip`. If the package is part of a mono repository,
   inter-dependencies will be installed from the mono repsitory rather than from PyPI.
@@ -98,7 +99,7 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip_args, dry):
       else:
         reqs.insert(0, Requirement(dep.get_directory(), develop))
 
-  pip_bin = shlex.split(os.getenv('PIP', 'python -m pip'))
+  pip_bin = shlex.split(os.getenv('PIP', pip or 'python -m pip'))
   command = pip_bin + ['install'] + list(concat(r.to_args() for r in reqs))
   if upgrade:
     command.append('--upgrade')

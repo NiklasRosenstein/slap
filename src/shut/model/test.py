@@ -19,31 +19,20 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import click
+from typing import List
 
-from shut.commands import shut, commons, project
-from shut.model import Project, PackageModel
+from databind.core import datamodel, field, uniontype
 
-
-@shut.group()
-@click.pass_context
-def pkg(ctx):
-  """
-  Manage the Python package in the current directory.
-  """
-
-  if ctx.invoked_subcommand not in ('new', 'checks'):
-    package = project.load(expect=PackageModel)
-    checks.check_package(package, skip_positive_checks=True, print_stats=False, use_stderr=True)
+from shut.test.pytest import PytestDriver
+from .requirements import Requirement
 
 
-from . import build
-from . import bump
-from . import checks
-from . import install
-from . import new
-from . import publish
-from . import requirements
-from . import status
-from . import test
-from . import update
+@uniontype
+class TestDriver:
+  pytest: PytestDriver
+
+
+@datamodel
+class TestConfiguration:
+  requirements: List[Requirement] = field(default_factory=list)
+  driver: TestDriver = None

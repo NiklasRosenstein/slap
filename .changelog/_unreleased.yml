@@ -25,3 +25,8 @@ changes:
     is universal (i.e. the `python` requirement uses an OR (|) which we cannot currently
     translate to setuptools correctly)
   fixes: []
+- type: feature
+  component: cli
+  description: add `shut pkg test` command which and `PackageModel.test` configuration,
+    the `shore.test` sub-package implements test drivers (currently just `pytest`)
+  fixes: []
