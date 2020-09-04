@@ -41,4 +41,5 @@ from . import bump
 from . import checks
 from . import new
 from . import status
+from . import test
 from . import update
