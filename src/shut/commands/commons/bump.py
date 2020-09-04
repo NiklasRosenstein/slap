@@ -71,10 +71,6 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
     pass
 
   @abc.abstractmethod
-  def run_checks(self) -> int:
-    pass
-
-  @abc.abstractmethod
   def get_snapshot_version(self) -> Version:
     pass
 
@@ -178,12 +174,6 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
   version_refs = list(get_version_refs(data.obj))
   if not version_refs:
     sys.exit('error: no version refs found')
-
-  # Run checks.
-  if not args.skip_checks:
-    res = data.run_checks()
-    if res != 0:
-      sys.exit('error: checks failed')
 
   # Ensure the version is the same accross all refs.
   current_version = data.obj.get_version()

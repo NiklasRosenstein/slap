@@ -14,3 +14,8 @@ changes:
   component: shore.checkers.package
   description: '`package-author` check is now an error level check'
   fixes: []
+- type: change
+  component: cli
+  description: '`shut mono bump` and `shut pkg bump` no longer run checks, the command
+    group already does it'
+  fixes: []

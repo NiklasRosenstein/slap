@@ -49,9 +49,6 @@ class PackageBumpData(VersionBumpData[PackageModel]):
       print('error: cannot bump package version managed by monorepo.', file=sys.stderr)
       exit(1)
 
-  def run_checks(self) -> int:
-    return check_package(self.obj, self.args.warnings_as_errors)
-
   def update(self, new_version: Version) -> Iterable[str]:
     self.obj.version = new_version
     vfiles = update_package(self.obj, dry=self.args.dry, indent=1)

@@ -42,9 +42,6 @@ logger = logging.getLogger(__name__)
 
 class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
 
-  def run_checks(self) -> int:
-    return check_monorepo(self.obj, self.args.warnings_as_errors)
-
   def update(self, new_version: Version) -> None:
     self.obj.version = new_version
     vfiles = update_monorepo(self.obj, dry=self.args.dry, indent=1)
