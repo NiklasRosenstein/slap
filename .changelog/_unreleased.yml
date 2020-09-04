@@ -19,3 +19,9 @@ changes:
   description: '`shut mono bump` and `shut pkg bump` no longer run checks, the command
     group already does it'
   fixes: []
+- type: fix
+  component: shut.renderers.setuptools
+  description: fix rendering of `python_requires` option in `setup.py` if package
+    is universal (i.e. the `python` requirement uses an OR (|) which we cannot currently
+    translate to setuptools correctly)
+  fixes: []
