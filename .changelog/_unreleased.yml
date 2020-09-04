@@ -46,3 +46,7 @@ changes:
   component: shut.model.monorepo
   description: add `Monorepo.get_inter_dependencies_for()` method
   fixes: []
+- type: feature
+  component: cli
+  description: add `shut pkg install` command
+  fixes: []

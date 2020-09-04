@@ -40,6 +40,7 @@ def pkg(ctx):
 from . import build
 from . import bump
 from . import checks
+from . import install
 from . import new
 from . import publish
 from . import requirements
