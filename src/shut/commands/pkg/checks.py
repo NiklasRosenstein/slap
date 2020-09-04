@@ -24,14 +24,14 @@ import logging
 import os
 import sys
 import time
-from typing import Iterable, Union
+from typing import Iterable, List, Union
 
 import click
 import termcolor
 from nr.stream import Stream
 from termcolor import colored
 
-from shut.checkers import CheckStatus, get_checks
+from shut.checkers import CheckStatus, Check, get_checks
 from shut.commands import project
 from shut.commands.commons.checks import print_checks_all, get_checks_status
 from shut.model import PackageModel, Project
@@ -40,9 +40,19 @@ from . import pkg
 logger = logging.getLogger(__name__)
 
 
+def get_package_checks(package: PackageModel) -> List[Check]:
+  checks = list(get_checks(package.project, package))
+  if package.project.monorepo:
+    # Inherit mono-repo checks if the check targets the package specifically.
+    for check in get_checks(package.project, package.project.monorepo):
+      if check.result.subject == package:
+        checks.append(check)
+  return sorted(checks, key=lambda c: c.name)
+
+
 def check_package(package: PackageModel, warnings_as_errors: bool = False) -> int:
   start_time = time.perf_counter()
-  checks = sorted(get_checks(project, package), key=lambda c: c.name)
+  checks = get_package_checks(package)
   seconds = time.perf_counter() - start_time
   print_checks_all(package.name, checks, seconds)
   return get_checks_status(checks, warnings_as_errors)

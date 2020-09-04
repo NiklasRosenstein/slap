@@ -23,12 +23,11 @@
 API for describing sanity checks around a package or monorepo configuration.
 """
 
-from collections import namedtuple
-from typing import Callable, Iterable, Generic, Type, TypeVar, Union
+from typing import Callable, Iterable, Generic, NamedTuple, Optional, Type, TypeVar, Union
 import enum
 import types
 
-from shut.model import Project
+from shut.model import AbstractProjectModel, Project
 from shut.utils.type_registry import TypeRegistry
 
 __all__ = [
@@ -48,9 +47,28 @@ class CheckStatus(enum.IntEnum):
   ERROR = enum.auto()  #: The check has an error, something is in a bad or invalid state.
 
 
-CheckResult = namedtuple('CheckResult', 'status,message')
-Check = namedtuple('Check', 'name,result')
-SkipCheck = namedtuple('SkipCheck', '')
+class CheckResult(NamedTuple):
+  """
+  Yield this from a #@check() decorated method on a #Checker subclass to return a result
+  for the check. Multiple results can be returned from a check.
+  """
+
+  status: CheckStatus
+  message: str
+  subject: Optional[AbstractProjectModel] = None
+
+
+class SkipCheck(NamedTuple):
+  """
+  Yield this from a #@check() decorated method on a #Checker subclass to indicate that the
+  check should be skipped. This is different from not yielding anything as the check will be
+  considered successful in that case.
+  """
+
+
+class Check(NamedTuple):
+  name: str
+  result: CheckResult
 
 
 def check(name: str) -> Callable[[Callable], Callable]:
@@ -59,7 +77,7 @@ def check(name: str) -> Callable[[Callable], Callable]:
   """
 
   def decorator(func: Callable) -> Callable:
-    func.__check_name__ = name
+    func.__check_name__ = name  # type: ignore
     return func
 
   return decorator
@@ -87,7 +105,7 @@ class Checker(Generic[T]):
           yield Check(value.__check_name__, CheckResult(CheckStatus.PASSED, None))
 
 
-registry = TypeRegistry[Type[Checker]]()
+registry = TypeRegistry[Checker]()
 
 
 def register_checker(t: Type[T], checker: Type[Checker[T]]) -> None:

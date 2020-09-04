@@ -26,7 +26,7 @@ from typing import Iterable, Optional, Union
 
 class GenericChecker(Checker):
 
-  @check('unknown-config')
+  @check('unknown-config-options')
   def _check_unknown_keys(
     self,
     project: 'Project',

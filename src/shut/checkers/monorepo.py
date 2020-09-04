@@ -19,8 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .core import Check, CheckStatus, CheckResult, Checker, SkipCheck, check, register_checker
+from pathlib import Path
+
 from shut.model import MonorepoModel
+from .core import Check, CheckStatus, CheckResult, Checker, SkipCheck, check, register_checker
 
 
 class MonorepoChecker(Checker[MonorepoModel]):
@@ -29,6 +31,16 @@ class MonorepoChecker(Checker[MonorepoModel]):
   def _check_no_invalid_packages(self, project, monorepo):
     for package_name, exc_info in project.invalid_packages:
       yield CheckResult(CheckStatus.ERROR, package_name)
+
+  @check('bad-package-directory')
+  def _check_bad_package_directory(self, project, monorepo):
+    for package in project.packages:
+      dirname = Path(package.filename).parent.name
+      if dirname != package.name:
+        yield CheckResult(
+          CheckStatus.ERROR,
+          f'package name is {package.name!r} but directory name is {dirname!r}',
+          subject=package)
 
   @check('inconsistent-single-version')
   def _check_consistent_mono_version(self, project, monorepo):
