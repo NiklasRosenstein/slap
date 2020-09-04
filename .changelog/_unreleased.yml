@@ -1,0 +1,7 @@
+release_date: null
+changes:
+- type: fix
+  component: cli
+  description: fix running "shut pkg install" from inside "shut pkg test --isolate"
+    call
+  fixes: []
