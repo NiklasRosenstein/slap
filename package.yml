@@ -1,7 +1,7 @@
 name: shut
-version: "0.3.0"
+version: "0.4.0"
 license: MIT
-url: https://git.niklasrosenstein.com/NiklasRosenstein/shore
+url: https://github.com/NiklasRosenstein/shut
 description: Automates the heavy lifting of release and distribution management for pure Python packages.
 author: Niklas Rosenstein <rosensteinniklas@gmail.com>
 typed: true
@@ -28,16 +28,4 @@ requirements:
 
 entrypoints:
   console_scripts:
-    - shore = shore.__main__:_entry_point
-    - shore-conda-forge = shore.tools.conda_forge:main
     - shut = shut.commands:shut
-  shore.core.plugins:
-    - core = shore.plugins.core:CorePlugin
-    - install-script = shore.plugins.install_script:InstallScriptRenderer
-    - pypi = shore.plugins.pypi:PypiPublisher
-    - requirements-file = shore.plugins.requirements_file:RequirementsFileRenderer
-    - setuptools = shore.plugins.setuptools:SetuptoolsRenderer
-
-manifest:
-  - include src/shore/templates/install_script/install
-  - recursive-include src/shore/templates *.yaml *.py *.md .gitignore

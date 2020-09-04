@@ -132,11 +132,11 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
               return []
           for hook in install_hooks:
             if not hook['event'] or hook['event'] == event:
-              command = [x.replace('$SHORE_INSTALL_HOOK_EVENT', event) for x in hook['command']]
+              command = hook['command']
               if command[0].endswith('.py') or 'python' in _shebang(command[0]):
                 command.insert(0, sys.executable)
               env = os.environ.copy()
-              env['SHORE_INSTALL_HOOK_EVENT'] = event
+              env['SHUT_INSTALL_HOOK_EVENT'] = event
               res = subprocess.call(command, env=env)
               if res != 0:
                 raise RuntimeError('command {!r} returned exit code {}'.format(command, res))
