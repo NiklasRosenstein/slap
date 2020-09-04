@@ -49,8 +49,7 @@ class MonorepoChecker(Checker[MonorepoModel]):
       for package in project.packages:
         if package.version is not None and package.version != monorepo.version:
           yield CheckResult(CheckStatus.ERROR, f'{package.name} v{package.version}, expected v{monorepo.version}')
-    else:
-      yield SkipCheck()
+    yield SkipCheck()
 
 
 register_checker(MonorepoModel, MonorepoChecker)
