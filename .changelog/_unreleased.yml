@@ -4,3 +4,8 @@ changes:
   component: cli
   description: add `--checks/--no-checks` toggle to `shut pkg` and `shut mono` commands
   fixes: []
+- type: fix
+  component: shut.test.pytest
+  description: Fix parsing of Pytest JSON record for test functions from a `unittest.TestCase`
+    subclass
+  fixes: []
