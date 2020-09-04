@@ -1,0 +1,8 @@
+release_date: null
+changes:
+- type: change
+  component: shut.model.package
+  description: Remove `PackageData` class, merge it's members into `PackageModel`
+    (this does not change the interface of `PackageModel`), Removed `PackageModel.data`
+    property
+  fixes: []
