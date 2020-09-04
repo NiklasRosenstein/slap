@@ -77,7 +77,6 @@ def shut(cwd, verbose, quiet, disable_warnings):
 
   if not sys.warnoptions and not disable_warnings:
     warnings.simplefilter("default") # Change the filter in this process
-    os.environ["PYTHONWARNINGS"] = "default" # Also affect subprocesses
 
 
 from . import changelog

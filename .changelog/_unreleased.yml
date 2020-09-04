@@ -38,3 +38,7 @@ changes:
   component: shut.checkers.generic
   description: rename `unknown-config` check to `unknown-config-options`
   fixes: []
+- type: change
+  component: cli
+  description: no longer set `PYTHONWARNINGS` environment variable
+  fixes: []
