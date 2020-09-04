@@ -34,3 +34,7 @@ changes:
   component: shut.checkers.generic
   description: '`unknown-config-options` check no longer shows if it passes'
   fixes: []
+- type: improvement
+  component: shut.checkers.generic
+  description: rename `unknown-config` check to `unknown-config-options`
+  fixes: []
