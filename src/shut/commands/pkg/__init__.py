@@ -19,15 +19,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from shut.commands import shut, commons
+import click
+
+from shut.commands import shut, commons, project
 from shut.model import Project, PackageModel
 
 
 @shut.group()
-def pkg():
+@click.pass_context
+def pkg(ctx):
   """
   Manage the Python package in the current directory.
   """
+
+  if ctx.invoked_subcommand not in ('new', 'checks'):
+    package = project.load(expect=PackageModel)
+    checks.check_package(package, skip_positive_checks=True, print_stats=False, use_stderr=True)
 
 
 from . import build

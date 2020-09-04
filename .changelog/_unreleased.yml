@@ -21,3 +21,8 @@ changes:
   component: shut.checkers.core
   description: 'Add `CheckResult.subject` member (default: `None`)'
   fixes: []
+- type: change
+  component: cli
+  description: '`shut pkg` and `shut mono` commands will now print failed checks to
+    stderr before executing the requested subcommand.'
+  fixes: []
