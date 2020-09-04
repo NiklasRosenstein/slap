@@ -59,12 +59,12 @@ class Requirement:
   help='Install in develop mode (default: true)')
 @click.option('--inter-deps/--no-inter-deps', default=True,
   help='Install package inter dependencies from inside the same monorepo (default: true)')
-@click.option('--pip-args', help='Additional arguments to pass to Pip.')
-@click.option('--test', help='Install test requirements.')
 @click.option('--extra', help='Specify one or more extras to install.')
 @click.option('-U', '--upgrade', is_flag=True, help='Upgrade all packages (forwarded to pip install).')
+@click.option('-q', '--quiet', is_flag=True, help='Quiet install')
+@click.option('--pip-args', help='Additional arguments to pass to Pip.')
 @click.option('--dry', is_flag=True, help='Print the Pip command to stdout instead of running it.')
-def install(develop, inter_deps, pip_args, test, extra, upgrade, dry):
+def install(develop, inter_deps, extra, upgrade, quiet, pip_args, dry):
   """
   Install the package using `python -m pip`. If the package is part of a mono repository,
   inter-dependencies will be installed from the mono repsitory rather than from PyPI.
@@ -73,7 +73,17 @@ def install(develop, inter_deps, pip_args, test, extra, upgrade, dry):
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  reqs = [Requirement(package.get_directory(), develop, extra)]
+  extras = set((extra or '').split(','))
+  reqs = []
+
+  # Pip does not understand "test" as an extra and does not have an option to
+  # install test requirements.
+  if 'test' in extras:
+    extras.discard('test')
+    extra = ','.join(extras)
+    reqs += [Requirement(x.to_setuptools()) for x in package.test_requirements]
+
+  reqs.append(Requirement(package.get_directory(), develop, extra))
 
   if project.monorepo and inter_deps:
     # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate
@@ -92,6 +102,8 @@ def install(develop, inter_deps, pip_args, test, extra, upgrade, dry):
   command = pip_bin + ['install'] + list(concat(r.to_args() for r in reqs))
   if upgrade:
     command.append('--upgrade')
+  if quiet:
+    command.append('--quiet')
   command += shlex.split(pip_args) if pip_args else []
 
   if dry:
