@@ -46,7 +46,7 @@ def test(isolate: bool, capture: bool) -> None:
   monorepo = project.load_or_exit(expect=MonorepoModel)
   exit_code = 0
   for package in project.packages:
-    if package.test.driver:
+    if package.test_driver:
       print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
       print()
       test_run = test_package(package, isolate, capture)

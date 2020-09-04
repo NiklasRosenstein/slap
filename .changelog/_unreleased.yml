@@ -27,7 +27,7 @@ changes:
   fixes: []
 - type: feature
   component: cli
-  description: add `shut pkg test` command which and `PackageModel.test` configuration,
+  description: add `shut pkg test` command which and `PackageModel.test_driver` configuration,
     the `shore.test` sub-package implements test drivers (currently just `pytest`)
   fixes: []
 - type: feature
