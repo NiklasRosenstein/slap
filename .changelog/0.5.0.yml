@@ -1,4 +1,4 @@
-release_date: null
+release_date: '2020-09-05'
 changes:
 - type: change
   component: shut.model.package

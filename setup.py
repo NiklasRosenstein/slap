@@ -41,7 +41,7 @@ test_requirements = [
 
 setuptools.setup(
   name = 'shut',
-  version = '0.4.0',
+  version = '0.5.0',
   author = 'Niklas Rosenstein',
   author_email = 'rosensteinniklas@gmail.com',
   description = 'Automates the heavy lifting of release and distribution management for pure Python packages.',
