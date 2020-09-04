@@ -196,6 +196,9 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     python_requirement = package.get_python_requirement()
     if python_requirement:
       python_requires_expr = repr(python_requirement.version.to_setuptools() if python_requirement else None)
+      if package.is_universal():
+        # TODO: We still need to find a good way to convert a Requirement using ORs (|) to setuptools format.
+        python_requires_expr = 'None,  # {}'.format(python_requires_expr)
     else:
       python_requires_expr = 'None'
 
