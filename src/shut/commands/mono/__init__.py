@@ -26,13 +26,15 @@ from .. import shut, commons, project
 
 
 @shut.group(help=__doc__)
+@click.option('--checks/--no-checks', 'run_checks', default=True,
+  help='Run checks before executing the subcommand (default: true)')
 @click.pass_context
-def mono(ctx):
+def mono(ctx, run_checks):
   """
   Manage the current mono repository.
   """
 
-  if ctx.invoked_subcommand not in ('new', 'checks'):
+  if run_checks and ctx.invoked_subcommand not in ('new', 'checks'):
     monorepo = project.load(expect=MonorepoModel)
     checks.check_monorepo(monorepo, skip_positive_checks=True, print_stats=False, use_stderr=True)
 
