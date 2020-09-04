@@ -26,13 +26,15 @@ from shut.model import Project, PackageModel
 
 
 @shut.group()
+@click.option('--checks/--no-checks', 'run_checks', default=True,
+  help='Run checks before executing the subcommand (default: true)')
 @click.pass_context
-def pkg(ctx):
+def pkg(ctx, run_checks):
   """
   Manage the Python package in the current directory.
   """
 
-  if ctx.invoked_subcommand not in ('new', 'checks'):
+  if run_checks and ctx.invoked_subcommand not in ('new', 'checks'):
     package = project.load(expect=PackageModel)
     checks.check_package(package, skip_positive_checks=True, print_stats=False, use_stderr=True)
 

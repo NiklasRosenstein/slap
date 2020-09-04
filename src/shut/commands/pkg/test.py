@@ -45,7 +45,7 @@ def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> 
     try:
       orig_cwd = os.getcwd()
       os.chdir(package.get_directory())
-      shut(['pkg', 'install', '--pip', venv.bin('pip'), '--extra', 'test', '-q'], standalone_mode=False)
+      shut(['pkg', '--no-checks', 'install', '--pip', venv.bin('pip'), '--extra', 'test', '-q'], standalone_mode=False)
     except SystemExit as exc:
       os.chdir(orig_cwd)
       if exc.code != 0:

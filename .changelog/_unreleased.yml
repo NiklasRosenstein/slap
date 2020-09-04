@@ -1,0 +1,6 @@
+release_date: null
+changes:
+- type: feature
+  component: cli
+  description: add `--checks/--no-checks` toggle to `shut pkg` and `shut mono` commands
+  fixes: []
