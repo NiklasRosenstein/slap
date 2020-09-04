@@ -23,16 +23,20 @@ requirements = [
   'jinja2 >=2.11.1,<3.0.0',
   'networkx >=2.4.0,<3.0.0',
   'nr.fs >=1.5.0,<2.0.0',
-  'nr.pylang.utils >=0.0.1,<1.0.0',
+  'nr.parsing.date >=0.4.0,<1.0.0',
   'nr.proxy >=0.0.1,<1.0.0',
+  'nr.pylang.utils >=0.0.1,<1.0.0',
   'nr.utils.git >=0.1.3,<0.2.0',
-  'nr.stream',
+  'nr.stream >=0.0.4,<0.1.0',
   'requests >=2.22.0,<3.0.0',
   'packaging >=20.1.0,<21.0.0',
   'PyYAML >=5.1.0,<6.0.0',
   'termcolor >=1.1.0,<2.0.0',
   'twine',
   'wheel',
+]
+test_requirements = [
+  'pytest',
 ]
 
 setuptools.setup(
@@ -50,7 +54,7 @@ setuptools.setup(
   include_package_data = True,
   install_requires = requirements,
   extras_require = {},
-  tests_require = [],
+  tests_require = test_requirements,
   python_requires = '>=3.6.0,<4.0.0',
   data_files = [],
   entry_points = {
