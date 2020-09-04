@@ -1,6 +1,6 @@
 
-from shore.util.version import Version
-from shore.model import VersionSelector
+from shut.model.version import Version
+from shut.model.requirements import VersionSelector
 import pytest
 
 

@@ -6,3 +6,7 @@ changes:
     (this does not change the interface of `PackageModel`), Removed `PackageModel.data`
     property
   fixes: []
+- type: fix
+  component: tests
+  description: fix unit tests
+  fixes: []
