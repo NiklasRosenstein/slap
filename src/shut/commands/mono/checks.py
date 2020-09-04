@@ -39,11 +39,19 @@ import time
 logger = logging.getLogger(__name__)
 
 
-def check_monorepo(monorepo: MonorepoModel, warnings_as_errors: bool = False):
+def check_monorepo(
+  monorepo: MonorepoModel,
+  warnings_as_errors: bool = False,
+  skip_positive_checks: bool = False,
+  print_stats: bool = True,
+  use_stderr: bool = False,
+) -> int:
   start_time = time.perf_counter()
   checks = sorted(get_checks(project, monorepo), key=lambda c: c.name)
   seconds = time.perf_counter() - start_time
-  print_checks_all(monorepo.name, checks, seconds)
+  print_checks_all(monorepo.name, checks, seconds,
+    skip_positive_checks=skip_positive_checks, print_stats=print_stats,
+    use_stderr=use_stderr)
   return get_checks_status(checks, warnings_as_errors)
 
 

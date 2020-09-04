@@ -50,11 +50,19 @@ def get_package_checks(package: PackageModel) -> List[Check]:
   return sorted(checks, key=lambda c: c.name)
 
 
-def check_package(package: PackageModel, warnings_as_errors: bool = False) -> int:
+def check_package(
+  package: PackageModel,
+  warnings_as_errors: bool = False,
+  skip_positive_checks: bool = False,
+  print_stats: bool = True,
+  use_stderr: bool = False,
+) -> int:
   start_time = time.perf_counter()
   checks = get_package_checks(package)
   seconds = time.perf_counter() - start_time
-  print_checks_all(package.name, checks, seconds)
+  print_checks_all(package.name, checks, seconds,
+    skip_positive_checks=skip_positive_checks, print_stats=print_stats,
+    use_stderr=use_stderr)
   return get_checks_status(checks, warnings_as_errors)
 
 

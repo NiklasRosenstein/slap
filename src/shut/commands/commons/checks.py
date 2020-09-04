@@ -19,8 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import builtins
 import sys
 import time
+from functools import partial
 from typing import List
 
 import termcolor
@@ -32,7 +34,10 @@ def print_checks(
   checks: List[Check],
   emojis: bool = True,
   colors: bool = True,
-  prefix: str = '') -> None:
+  prefix: str = '',
+  skip_positive_checks: bool = False,
+  use_stderr: bool = False,
+) -> None:
   """
   Prints the list of *checks* to the terminal.
   """
@@ -53,7 +58,16 @@ def print_checks(
     def colored(s, *a, **kw):
       return str(s)
 
+  out = sys.stderr if use_stderr else sys.stdout
+  print = partial(builtins.print, file=out)
+
+  num_printed = 0
   for check in checks:
+    if skip_positive_checks and check.result.status == CheckStatus.PASSED:
+      continue
+    if num_printed == 0:
+      print()
+    num_printed += 1
     color = color_names[check.result.status]
     if emojis:
       print(prefix, emoji_chars[check.result.status], end='', sep='')
@@ -63,13 +77,21 @@ def print_checks(
     else:
       print()
 
+  if num_printed > 0:
+    print()
 
-def print_checks_all(name: str, checks: List[Check], seconds: float):
+def print_checks_all(
+  name: str,
+  checks: List[Check],
+  seconds: float,
+  skip_positive_checks: bool = False,
+  print_stats: bool = True,
+  use_stderr: bool = False,
+):
   package_name = termcolor.colored(name, 'yellow')
-  print()
-  print_checks(checks, prefix='  ')
-  print()
-  print('ran', len(checks), 'checks for package', package_name, 'in {:.3f}s'.format(seconds))
+  print_checks(checks, prefix='  ', skip_positive_checks=skip_positive_checks, use_stderr=use_stderr)
+  if print_stats:
+    print('ran', len(checks), 'checks for package', package_name, 'in {:.3f}s'.format(seconds))
 
 
 def get_checks_status(checks: List[Check], warnings_as_errors: bool = False) -> int:

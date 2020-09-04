@@ -19,15 +19,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .. import shut, commons
 import click
+
+from shut.model import MonorepoModel
+from .. import shut, commons, project
 
 
 @shut.group(help=__doc__)
-def mono():
+@click.pass_context
+def mono(ctx):
   """
   Manage the current mono repository.
   """
+
+  if ctx.invoked_subcommand not in ('new', 'checks'):
+    monorepo = project.load(expect=MonorepoModel)
+    checks.check_monorepo(monorepo, skip_positive_checks=True, print_stats=False, use_stderr=True)
 
 
 from . import bump
