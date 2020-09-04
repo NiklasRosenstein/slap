@@ -30,9 +30,3 @@ from .requirements import Requirement
 @uniontype
 class TestDriver:
   pytest: PytestDriver
-
-
-@datamodel
-class TestConfiguration:
-  requirements: List[Requirement] = field(default_factory=list)
-  driver: TestDriver = None

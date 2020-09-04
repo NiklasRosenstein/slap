@@ -34,7 +34,7 @@ from .install import install
 
 
 def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> TestRun:
-  if not package.test.driver:
+  if not package.test_driver:
     raise RuntimeError('package has no test driver configured')
   if isolate:
     print('Creating temporary virtual environment at .venv-test ...')
@@ -47,14 +47,14 @@ def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> 
     except SystemExit as exc:
       if exc.code != 0:
         raise
-    test_reqs = [req.to_setuptools() for req in package.test.driver.get_test_requirements()]
+    test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
     if test_reqs:
       sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
   else:
     venv = None
     runtime = Runtime.current()
   try:
-    return package.test.driver.test_package(package, runtime, capture)
+    return package.test_driver.test_package(package, runtime, capture)
   finally:
     if venv:
       venv.rm()
