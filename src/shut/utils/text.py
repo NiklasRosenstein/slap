@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 import io
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Union
 
 SubstRange = Tuple[int, int, str]
 
@@ -51,3 +51,13 @@ def substitute_ranges(text: str, ranges: Iterable[SubstRange], is_sorted: bool =
 
   out.write(text[max_end_index:])
   return out.getvalue()
+
+
+def indent_text(text: str, indent: Union[str, int]) -> str:
+  """
+  Indents the *text* by *indent*.
+  """
+
+  if isinstance(indent, int):
+    indent = ' ' * indent
+  return '\n'.join(indent + l for l in text.splitlines())
