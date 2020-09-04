@@ -58,7 +58,7 @@ def load_report_file(report_file: str) -> TestRun:
   for node in raw['collectors']:
     if node['nodeid'] and node['result']:
       for result in node['result']:
-        if result['type'] == 'Function':
+        if 'lineno' in result:
           testid_to_source[result['nodeid']] = (node['nodeid'], result['lineno'])
     if node['outcome'] != 'passed':
       errors.append(TestError(node['nodeid'], node['longrepr']))
