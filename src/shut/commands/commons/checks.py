@@ -38,13 +38,13 @@ def print_checks(
   """
 
   emoji_chars = {
-    CheckStatus.PASSED: '✔️',
-    CheckStatus.WARNING: '⚠️',
+    CheckStatus.PASSED: '✔️ ',
+    CheckStatus.WARNING: '⚠️ ',
     CheckStatus.ERROR: '❌'}
 
   color_names = {
     CheckStatus.PASSED: 'green',
-    CheckStatus.WARNING: 'magenta',
+    CheckStatus.WARNING: 'yellow',
     CheckStatus.ERROR: 'red'}
 
   if colors:
@@ -54,10 +54,10 @@ def print_checks(
       return str(s)
 
   for check in checks:
+    color = color_names[check.result.status]
     if emojis:
-      print(prefix, emoji_chars[check.result.status], '  ', check.name, sep='', end='')
-    else:
-      print(prefix, colored(check.name, color_names[check.result.status]), sep='', end='')
+      print(prefix, emoji_chars[check.result.status], end='', sep='')
+    print(prefix, colored(check.name, color, attrs=['bold']), sep='', end='')
     if check.result.status != CheckStatus.PASSED:
       print(':', check.result.message)
     else:

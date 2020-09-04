@@ -22,7 +22,8 @@
 import os
 from typing import Iterable, Optional
 
-from shut.model import MonorepoModel, PackageModel, Project
+from shut.model import MonorepoModel, Project
+from shut.model.package import PackageError, PackageModel
 from shut.utils.external.classifiers import get_classifiers
 from .core import CheckResult, CheckStatus, Checker, SkipCheck, check, register_checker
 
@@ -58,35 +59,42 @@ class PackageChecker(Checker[PackageModel]):
         CheckStatus.WARNING,
         'Unknown classifiers: ' + ', '.join(unknown_classifiers))
 
-  @check('author')
-  def _check_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
-    if not package.author:
-      yield CheckResult(CheckStatus.WARNING, 'missing')
-
-  @check('url')
+  @check('package-url')
   def _check_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     if not package.url:
       yield CheckResult(CheckStatus.WARNING, 'missing')
 
-  @check('consistent-author')
+  @check('package-author')
   def _check_consistent_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+    if not package.author:
+      yield CheckResult(CheckStatus.WARNING, 'missing')
     metadata = package.get_python_package_metadata()
-    if package.author and metadata.author != str(package.author):
+    try:
+      author = metadata.author
+    except PackageError as exc:
+      yield CheckResult(CheckStatus.ERROR, str(exc))
+      return
+    if package.author and author != str(package.author):
       yield CheckResult(
         CheckStatus.ERROR,
         'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
-          str(package.author), metadata.filename, metadata.author))
+          str(package.author), metadata.filename, author))
 
-  @check('consistent-version')
+  @check('package-version')
   def _check_consistent_version(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     metadata = package.get_python_package_metadata()
-    if package.version and metadata.version != str(package.version):
+    try:
+      version = metadata.version
+    except PackageError as exc:
+      yield CheckResult(CheckStatus.ERROR, str(exc))
+      return
+    if package.version and version != str(package.version):
       yield CheckResult(
         CheckStatus.ERROR,
         '{!r} ({}) != {!r} ({})'.format(
           str(package.version),
           os.path.basename(package.filename),
-          metadata.version,
+          version,
           os.path.relpath(metadata.filename)))
 
   @check('typed')
@@ -94,7 +102,7 @@ class PackageChecker(Checker[PackageModel]):
     metadata = package.get_python_package_metadata()
     try:
       py_typed_file = os.path.join(metadata.package_directory, 'py.typed')
-    except ValueError:
+    except PackageError as exc:
       if package.typed:
         yield CheckResult(
           CheckStatus.WARNING,

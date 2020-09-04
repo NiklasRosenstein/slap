@@ -35,6 +35,10 @@ from .requirements import Requirement
 from .version import Version
 
 
+class PackageError(Exception):
+  pass
+
+
 def _get_file_in_directory(directory: str, prefix: str, preferred: List[str]) -> Optional[str]:
   """
   Returns a file in *directory* that is either in the *preferred* list or starts with
@@ -228,8 +232,8 @@ class PythonPackageMetadata:
         self._filename = filename
         return filename
 
-    raise ValueError('Entry file for package "{}" could not be determined'
-                     .format(self.modulename))
+    raise PackageError('Entry file for package "{}" could not be determined'
+                       .format(self.modulename))
 
   @property
   def package_directory(self) -> str:
