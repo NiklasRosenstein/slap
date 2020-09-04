@@ -30,3 +30,7 @@ changes:
   component: shut.checkers.monorepo
   description: include error message in `invalid-package` check result
   fixes: []
+- type: improvement
+  component: shut.checkers.generic
+  description: '`unknown-config-options` check no longer shows if it passes'
+  fixes: []
