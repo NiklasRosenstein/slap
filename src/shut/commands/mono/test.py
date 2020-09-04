@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 import sys
+import time
 
 import click
 from termcolor import colored
@@ -44,14 +45,37 @@ def test(isolate: bool, capture: bool) -> None:
   """
 
   monorepo = project.load_or_exit(expect=MonorepoModel)
+  packages = list(filter(lambda p: p.test_driver, project.packages))
+
+  print(f'Going to test {len(packages)} package(s):')
+  for package in packages:
+    print(f'  {colored(package.name, "yellow")}')
+  print()
+
   exit_code = 0
-  for package in project.packages:
-    if package.test_driver:
-      print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
+  all_tests = []
+  all_errors = []
+  tstart = time.perf_counter()
+
+  for i, package in enumerate(packages):
+    if i > 0:
       print()
-      test_run = test_package(package, isolate, capture)
-      print_test_run(test_run)
-      if test_run.status != TestStatus.PASSED:
-        exit_code = 1
+    print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
+    print()
+    test_run = test_package(package, isolate, capture)
+    all_tests += test_run.tests
+    all_errors += test_run.errors
+    print_test_run(test_run)
+    if test_run.status != TestStatus.PASSED:
+      exit_code = 1
+
+  n_passed = sum(1 for t in all_tests if t.status == TestStatus.PASSED)
+  duration = time.perf_counter() - tstart
+
+  print()
+  print(colored('Monorepo summary:', attrs=['bold', 'underline']))
+  print()
+  print(f'  Ran {len(all_tests)} test(s) in {duration:.3f}s ({n_passed} passed, '
+        f'{len(all_tests) - n_passed} failed, {len(all_errors)} error(s)).')
 
   sys.exit(exit_code)

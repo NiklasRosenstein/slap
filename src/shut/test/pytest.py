@@ -32,7 +32,7 @@ from nr.parsing.date import timezone
 
 from shut.model.requirements import Requirement
 from .base import (BaseTestDriver, Runtime, StackTrace, TestCase, TestCrashReport,
-  TestEnvironment, TestRun, TestStatus)
+  TestEnvironment, TestError, TestRun, TestStatus)
 
 if TYPE_CHECKING:
   from shut.model.package import PackageModel
@@ -50,6 +50,7 @@ def load_report_file(report_file: str) -> TestRun:
   duration = raw['duration']
   status = TestStatus.PASSED if raw['exitcode'] == 0 else TestStatus.FAILED
   environment = TestEnvironment(raw['environment']['Python'], raw['environment']['Platform'])
+  errors: List[TestError] = []
   tests: List[TestCase] = []
 
   # Map the nodes to the line and function that they are defined in.
@@ -57,7 +58,10 @@ def load_report_file(report_file: str) -> TestRun:
   for node in raw['collectors']:
     if node['nodeid'] and node['result']:
       for result in node['result']:
-        testid_to_source[result['nodeid']] = (node['nodeid'], result['lineno'])
+        if result['type'] == 'Function':
+          testid_to_source[result['nodeid']] = (node['nodeid'], result['lineno'])
+    if node['outcome'] != 'passed':
+      errors.append(TestError(node['nodeid'], node['longrepr']))
 
   # Collect the test results.
   for test in raw['tests']:
@@ -86,7 +90,7 @@ def load_report_file(report_file: str) -> TestRun:
       stdout=stdout,
     ))
 
-  return TestRun(started_time, duration, status, environment, tests)
+  return TestRun(started_time, duration, status, environment, tests, errors)
 
 
 @datamodel
@@ -104,7 +108,7 @@ class PytestDriver(BaseTestDriver):
   # BaseTestDriver
 
   def test_package(self, package: 'PackageModel', runtime: Runtime, capture: bool) -> TestRun:
-    test_dir = os.path.join(package.source_directory, self.directory or '.')
+    test_dir = os.path.join(package.source_directory, self.directory) if self.directory else package.source_directory
     test_dir = os.path.join(package.get_directory(), test_dir)
     command = runtime.python + ['-m', 'pytest', test_dir]
     command += ['--json-report', '--json-report-file', self.report_file]
@@ -131,7 +135,7 @@ class PytestDriver(BaseTestDriver):
         status=TestStatus.ERROR,
         environment=runtime.get_environment(),
         tests=[],
-        error=output.decode(),
+        errors=[TestError(None, output.decode())],
       )
 
     return test_run
