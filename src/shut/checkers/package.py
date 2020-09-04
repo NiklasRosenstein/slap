@@ -103,6 +103,8 @@ class PackageChecker(Checker[PackageModel]):
     try:
       py_typed_file = os.path.join(metadata.package_directory, 'py.typed')
     except PackageError as exc:
+      yield CheckResult(CheckStatus.ERROR, str(exc))
+    except ValueError as exc:
       if package.typed:
         yield CheckResult(
           CheckStatus.WARNING,
