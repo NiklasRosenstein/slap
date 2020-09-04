@@ -29,7 +29,6 @@ def test_comparison():
   ]
 
   for a, b in pairs:
-    print('-'*60)
     assert Version(a) < Version(b)
     assert not (Version(b) < Version(a))
     assert Version(b) > Version(a)

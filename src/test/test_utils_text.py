@@ -1,7 +1,7 @@
 
 from pytest import raises
 
-from .text import substitute_ranges
+from shut.utils.text import substitute_ranges
 
 
 def test_substitute_ranges():
