@@ -32,6 +32,7 @@ from .abstract import AbstractProjectModel
 from .linter import LinterConfiguration
 from .publish import PublishConfiguration
 from .requirements import Requirement
+from .test import TestConfiguration
 from .version import Version
 
 
@@ -95,6 +96,7 @@ class PackageModel(AbstractProjectModel):
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
   publish: PublishConfiguration = field(default_factory=PublishConfiguration)
+  test: TestConfiguration = field(default_factory=TestConfiguration)
 
   def get_modulename(self) -> str:
     if self.modulename:
