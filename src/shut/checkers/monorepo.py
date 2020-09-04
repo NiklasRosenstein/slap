@@ -41,6 +41,7 @@ class MonorepoChecker(Checker[MonorepoModel]):
           CheckStatus.ERROR,
           f'package name is {package.name!r} but directory name is {dirname!r}',
           subject=package)
+    yield SkipCheck()
 
   @check('inconsistent-single-version')
   def _check_consistent_mono_version(self, project, monorepo):
