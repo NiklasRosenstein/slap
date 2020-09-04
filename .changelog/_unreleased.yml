@@ -10,3 +10,7 @@ changes:
   component: tests
   description: fix unit tests
   fixes: []
+- type: change
+  component: shore.checkers.package
+  description: '`package-author` check is now an error level check'
+  fixes: []

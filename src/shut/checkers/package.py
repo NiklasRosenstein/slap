@@ -67,7 +67,7 @@ class PackageChecker(Checker[PackageModel]):
   @check('package-author')
   def _check_consistent_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
     if not package.author:
-      yield CheckResult(CheckStatus.WARNING, 'missing')
+      yield CheckResult(CheckStatus.ERROR, 'missing')
     metadata = package.get_python_package_metadata()
     try:
       author = metadata.author
