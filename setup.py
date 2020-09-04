@@ -37,13 +37,13 @@ requirements = [
 
 setuptools.setup(
   name = 'shut',
-  version = '0.3.0',
+  version = '0.4.0',
   author = 'Niklas Rosenstein',
   author_email = 'rosensteinniklas@gmail.com',
   description = 'Automates the heavy lifting of release and distribution management for pure Python packages.',
   long_description = long_description,
   long_description_content_type = 'text/markdown',
-  url = 'https://git.niklasrosenstein.com/NiklasRosenstein/shore',
+  url = 'https://github.com/NiklasRosenstein/shut',
   license = 'MIT',
   packages = setuptools.find_packages('src', ['test', 'test.*', 'tests', 'tests.*', 'docs', 'docs.*']),
   package_dir = {'': 'src'},
@@ -55,16 +55,7 @@ setuptools.setup(
   data_files = [],
   entry_points = {
     'console_scripts': [
-      'shore = shore.__main__:_entry_point',
-      'shore-conda-forge = shore.tools.conda_forge:main',
       'shut = shut.commands:shut',
-    ],
-    'shore.core.plugins': [
-      'core = shore.plugins.core:CorePlugin',
-      'install-script = shore.plugins.install_script:InstallScriptRenderer',
-      'pypi = shore.plugins.pypi:PypiPublisher',
-      'requirements-file = shore.plugins.requirements_file:RequirementsFileRenderer',
-      'setuptools = shore.plugins.setuptools:SetuptoolsRenderer',
     ]
   },
   cmdclass = {},

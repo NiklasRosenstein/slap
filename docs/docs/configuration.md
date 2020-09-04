@@ -3,7 +3,7 @@
 ## Python Packages
 
 Python packages are configured with a `package.yml` file. Most of the information will be
-rendered into the `setup.py` file when running the `shore pkg update` command.
+rendered into the `setup.py` file when running the `shut pkg update` command.
 
 ```yaml
 name: my-package
