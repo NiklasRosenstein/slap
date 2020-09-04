@@ -42,3 +42,7 @@ changes:
   component: cli
   description: no longer set `PYTHONWARNINGS` environment variable
   fixes: []
+- type: change
+  component: shut.model.monorepo
+  description: add `Monorepo.get_inter_dependencies_for()` method
+  fixes: []
