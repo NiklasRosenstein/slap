@@ -60,7 +60,22 @@ def _get_file_in_directory(directory: str, prefix: str, preferred: List[str]) ->
 
 
 @datamodel
-class PackageData:
+class InstallConfiguration:
+  @datamodel
+  class InstallHooks:
+    before_install: List[str] = field(altname='before-install', default_factory=list)
+    after_install: List[str] = field(altname='after-install', default_factory=list)
+    before_develop: List[str] = field(altname='before-develop', default_factory=list)
+    after_develop: List[str] = field(altname='after-develop', default_factory=list)
+
+    def any(self):
+      return any((self.before_install, self.after_install, self.before_develop, self.after_develop))
+
+  hooks: InstallHooks = field(default_factory=InstallHooks)
+
+
+@datamodel
+class PackageModel(AbstractProjectModel):
   modulename: Optional[str] = None
   description: Optional[str] = None
   readme: Optional[str] = None
@@ -76,6 +91,10 @@ class PackageData:
   classifiers: List[str] = field(default_factory=list)
   keywords: List[str] = field(default_factory=list)
   # TODO: Data files
+
+  install: InstallConfiguration = field(default_factory=InstallConfiguration)
+  linter: LinterConfiguration = field(default_factory=LinterConfiguration)
+  publish: PublishConfiguration = field(default_factory=PublishConfiguration)
 
   def get_modulename(self) -> str:
     if self.modulename:
@@ -110,34 +129,6 @@ class PackageData:
     has_2 = re.search(r'\b2\b|\b2\.\b', str(python_requirement))
     has_3 = re.search(r'\b3\b|\b3\.\b', str(python_requirement))
     return bool(has_2 and has_3)
-
-
-@datamodel
-class InstallConfiguration:
-  @datamodel
-  class InstallHooks:
-    before_install: List[str] = field(altname='before-install', default_factory=list)
-    after_install: List[str] = field(altname='after-install', default_factory=list)
-    before_develop: List[str] = field(altname='before-develop', default_factory=list)
-    after_develop: List[str] = field(altname='after-develop', default_factory=list)
-
-    def any(self):
-      return any((self.before_install, self.after_install, self.before_develop, self.after_develop))
-
-  hooks: InstallHooks = field(default_factory=InstallHooks)
-
-
-@datamodel
-class PackageModel(PackageData, AbstractProjectModel):
-  install: InstallConfiguration = field(default_factory=InstallConfiguration)
-  linter: LinterConfiguration = field(default_factory=LinterConfiguration)
-  publish: PublishConfiguration = field(default_factory=PublishConfiguration)
-
-  @property
-  def data(self) -> 'PackageModel':
-    warnings.warn('Use of PackageModel.data is deprecated, use the object directly.',
-                  DeprecationWarning, stacklevel=2)
-    return self
 
   def get_python_package_metadata(self) -> 'PythonPackageMetadata':
     """
