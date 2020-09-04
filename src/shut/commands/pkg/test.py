@@ -47,12 +47,14 @@ def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> 
     except SystemExit as exc:
       if exc.code != 0:
         raise
-    test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
-    if test_reqs:
-      sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
   else:
     venv = None
     runtime = Runtime.current()
+
+  test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
+  if test_reqs:
+    sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
+
   try:
     return package.test_driver.test_package(package, runtime, capture)
   finally:
@@ -75,34 +77,49 @@ def print_test_run(test_run: TestRun) -> None:
   n_passed = sum(1 for t in test_run.tests if t.status == TestStatus.PASSED)
   status_line = (
     f'Ran {len(test_run.tests)} test(s) in {test_run.duration:.3f}s '
-    f'({n_passed} passed, {len(test_run.tests) - n_passed} failed).')
+    f'({n_passed} passed, {len(test_run.tests) - n_passed} failed, {len(test_run.errors)} error(s)).')
   print(status_line)
   print()
   for test in sorted_tests:
     color = 'green' if test.status == TestStatus.PASSED else 'red'
     print(f'  {colored(test.name, color, attrs=["bold"])} {test.status.name}')
-  print()
-
-  if n_passed == len(test_run.tests):
-    return
-
-  # Print error details.
-  print('Failed test details:')
-  print('====================')
-  for i, test in enumerate(filter(lambda t: t.status != TestStatus.PASSED, sorted_tests)):
-    if test.status == TestStatus.PASSED:
-      continue
+  if sorted_tests:
     print()
-    print(f'  {colored(test.name, "red", attrs=["bold"])} ({test.filename}:{test.lineno})')
-    print('  ' + '-' * (len(test.name) + len(test.filename) + len(str(test.lineno)) + 4))
-    print()
-    print(indent_text(test.crash.longrepr, 6))
-    if test.stdout:
-      print('\n  captured stdout:\n')
-      print(indent_text(test.stdout, 6))
-  print()
 
-  print(status_line)
+  if n_passed < len(test_run.tests):
+    # Print error details.
+    print('Failed test details:')
+    print('====================')
+    for i, test in enumerate(filter(lambda t: t.status != TestStatus.PASSED, sorted_tests)):
+      if test.status == TestStatus.PASSED:
+        continue
+      print()
+      line = f'  {colored(test.name, "red", attrs=["bold"])} ({test.filename}:{test.lineno})'
+      print(line)
+      print('  ' + '-' * (len(line) - 2))
+      print()
+      print(indent_text(test.crash.longrepr, 6))
+      if test.stdout:
+        print('\n  captured stdout:\n')
+        print(indent_text(test.stdout, 6))
+    print()
+
+  if test_run.errors:
+    header = f'Encountered {len(test_run.errors)} error(s)'
+    print(header)
+    print('=' * len(header))
+    for err in test_run.errors:
+      print()
+      if err.filename:
+        print(f'  {colored(err.filename, "red")}')
+        print('  ' + '-' * len(err.filename))
+        print()
+      else:
+        print('  ----')
+      print(indent_text(err.longrepr, 6))
+    print()
+
+  print(colored(status_line, 'grey'))
 
 
 @pkg.command()

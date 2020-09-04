@@ -24,10 +24,11 @@ import enum
 import datetime
 import json
 import os
+import shlex
 import shutil
 import subprocess as sp
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List, TYPE_CHECKING
 
 from shut.model.requirements import Requirement
@@ -88,13 +89,19 @@ class TestCase:
 
 
 @dataclass
+class TestError:
+  filename: Optional[str]
+  longrepr: str
+
+
+@dataclass
 class TestRun:
   started: datetime.datetime
   duration: float
   status: TestStatus
   environment: TestEnvironment
   tests: List[TestCase]
-  error: Optional[str] = None
+  errors: List[TestError] = field(default_factory=list)
 
 
 @dataclass
@@ -111,7 +118,8 @@ class Runtime:
 
   @classmethod
   def current(self) -> 'Runtime':
-    return Runtime([sys.executable])
+    python = shlex.split(os.getenv('PYTHON', 'python'))
+    return Runtime(python)
 
   def get_environment(self) -> TestEnvironment:
     env = getattr(self, '_environment', None)
