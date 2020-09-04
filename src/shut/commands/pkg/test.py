@@ -39,7 +39,7 @@ def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> 
   if isolate:
     print('Creating temporary virtual environment at .venv-test ...')
     venv = Virtualenv(os.path.join(package.get_directory(), '.venv-test'))
-    venv.create(Runtime.current())
+    venv.create(Runtime.from_env())
     runtime = venv.get_runtime()
     print(f'Installing package "{package.name}" and test requirements ...')
     try:
@@ -52,7 +52,7 @@ def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> 
         raise
   else:
     venv = None
-    runtime = Runtime.current()
+    runtime = Runtime.from_env()
 
   test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
   if test_reqs:

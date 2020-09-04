@@ -107,19 +107,21 @@ class TestRun:
 @dataclass
 class Runtime:
   python: List[str]
-  pip: List[str] = None
-  virtualenv: List[str] = None
-
-  def __post_init__(self):
-    if not self.pip:
-      self.pip = self.python + ['-m', 'pip']
-    if not self.virtualenv:
-      self.virtualenv = self.python + ['-m', 'venv']
+  pip: List[str]
+  virtualenv: List[str]
 
   @classmethod
-  def current(self) -> 'Runtime':
+  def from_env(self) -> 'Runtime':
     python = shlex.split(os.getenv('PYTHON', 'python'))
-    return Runtime(python)
+    pip = shlex.split(os.getenv('PIP')) if os.getenv('PIP') else python + ['-m', 'pip']
+    virtualenv = shlex.split(os.getenv('VIRTUALENV')) if os.getenv('VIRTUALENV') else python + ['-m', 'venv']
+    return Runtime(python, pip, virtualenv)
+
+  @classmethod
+  def from_python3(self, python: List[str]) -> 'Runtime':
+    pip = python + ['-m', 'pip']
+    virtualenv = python + ['-m', 'venv']
+    return Runtime(python, pip, virtualenv)
 
   def get_environment(self) -> TestEnvironment:
     env = getattr(self, '_environment', None)
@@ -156,7 +158,7 @@ class Virtualenv:
     return os.path.join(self.path, 'Scripts' if os.name == 'nt' else 'bin', name)
 
   def get_runtime(self) -> Runtime:
-    return Runtime([self.bin('python')])
+    return Runtime.from_python3([self.bin('python')])
 
 
 class BaseTestDriver(metaclass=abc.ABCMeta):
