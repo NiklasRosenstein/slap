@@ -26,11 +26,11 @@ import sys
 import click
 from termcolor import colored
 
+from shut.commands import shut
 from shut.model.package import PackageModel
 from shut.test import Runtime, TestRun, TestStatus, Virtualenv
 from shut.utils.text import indent_text
 from . import pkg, project
-from .install import install
 
 
 def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> TestRun:
@@ -43,8 +43,11 @@ def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> 
     runtime = venv.get_runtime()
     print(f'Installing package "{package.name}" and test requirements ...')
     try:
-      install(['--pip', venv.bin('pip'), '--extra', 'test', '-q'], standalone_mode=False, parent=click.get_current_context())
+      orig_cwd = os.getcwd()
+      os.chdir(package.get_directory())
+      shut(['pkg', 'install', '--pip', venv.bin('pip'), '--extra', 'test', '-q'], standalone_mode=False)
     except SystemExit as exc:
+      os.chdir(orig_cwd)
       if exc.code != 0:
         raise
   else:
