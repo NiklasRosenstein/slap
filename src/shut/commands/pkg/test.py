@@ -121,3 +121,4 @@ def test(isolate: bool, capture: bool) -> None:
   package = project.load_or_exit(expect=PackageModel)
   test_run = test_package(package, isolate, capture)
   print_test_run(test_run)
+  sys.exit(0 if test_run.status == TestStatus.PASSED else 1)
