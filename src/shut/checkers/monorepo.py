@@ -30,7 +30,7 @@ class MonorepoChecker(Checker[MonorepoModel]):
   @check('invalid-package')
   def _check_no_invalid_packages(self, project, monorepo):
     for package_name, exc_info in project.invalid_packages:
-      yield CheckResult(CheckStatus.ERROR, package_name)
+      yield CheckResult(CheckStatus.ERROR, f'{package_name}: {exc_info[1]}')
 
   @check('bad-package-directory')
   def _check_bad_package_directory(self, project, monorepo):

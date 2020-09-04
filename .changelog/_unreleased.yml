@@ -26,3 +26,7 @@ changes:
   description: '`shut pkg` and `shut mono` commands will now print failed checks to
     stderr before executing the requested subcommand.'
   fixes: []
+- type: improvement
+  component: shut.checkers.monorepo
+  description: include error message in `invalid-package` check result
+  fixes: []
