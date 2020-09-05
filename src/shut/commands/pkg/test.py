@@ -80,7 +80,8 @@ def print_test_run(test_run: TestRun) -> None:
   n_passed = sum(1 for t in test_run.tests if t.status == TestStatus.PASSED)
   status_line = (
     f'Ran {len(test_run.tests)} test(s) in {test_run.duration:.3f}s '
-    f'({n_passed} passed, {len(test_run.tests) - n_passed} failed, {len(test_run.errors)} error(s)).')
+    f'({n_passed} passed, {len(test_run.tests) - n_passed} failed, {len(test_run.errors)} '
+    f'error(s)). {test_run.status.name}')
   print(status_line)
   print()
   for test in sorted_tests:
