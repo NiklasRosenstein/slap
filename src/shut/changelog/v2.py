@@ -29,14 +29,25 @@ from databind.core import datamodel, field
 from . import _ChangelogBase, v1
 
 
+class BumpMode(enum.IntEnum):
+  patch = 0
+  minor = 1
+  major = 2
+
+
 class Type(enum.Enum):
-  fix = enum.auto()
-  improvement = enum.auto()
-  change = enum.auto()
-  refactor = enum.auto()
-  feature = enum.auto()
-  docs = enum.auto()
-  tests = enum.auto()
+  fix = ('fix', BumpMode.patch)
+  improvement = ('improvement', BumpMode.patch)
+  change = ('change', BumpMode.minor)
+  breaking_change = ('breaking_change', BumpMode.major)
+  refactor = ('refactor', BumpMode.patch)
+  feature = ('feature', BumpMode.minor)
+  docs = ('docs', BumpMode.patch)
+  tests = ('test', BumpMode.patch)
+
+  @property
+  def bump_mode(self) -> BumpMode:
+    return self.value[1]
 
 
 @datamodel

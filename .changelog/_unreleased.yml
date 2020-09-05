@@ -1,0 +1,11 @@
+release_date: null
+changes:
+- type: feature
+  component: shut.changelog
+  description: Add `breaking_change` Changelog type
+  fixes: []
+- type: feature
+  component: ci
+  description: '`shut ... bump` command without version argument or bump mode option
+    will determine the bump mode from the unreleased changelog'
+  fixes: []

@@ -33,7 +33,6 @@ entrypoints:
 
 __Todo__
 
-* [ ] Bump version based on changelog
 * [ ] Package data / data files
 * [ ] Conda recipe generator
 * [ ] Automatic check for license headers in files / automatically insert license headers
