@@ -60,6 +60,8 @@ def test(isolate: bool, capture: bool, only: str) -> None:
   else:
     packages = list(filter(lambda p: p.test_driver, project.packages))
 
+  packages = sorted(packages, key=lambda p: p.name)
+
   print(f'Going to test {len(packages)} package(s):')
   for package in packages:
     print(f'  {colored(package.name, "yellow")}')
@@ -68,6 +70,7 @@ def test(isolate: bool, capture: bool, only: str) -> None:
   exit_code = 0
   all_tests = []
   all_errors = []
+  package_statuses = []
   tstart = time.perf_counter()
 
   for i, package in enumerate(packages):
@@ -81,6 +84,7 @@ def test(isolate: bool, capture: bool, only: str) -> None:
     print_test_run(test_run)
     if test_run.status != TestStatus.PASSED:
       exit_code = 1
+    package_statuses.append((package, test_run.status))
 
   n_passed = sum(1 for t in all_tests if t.status == TestStatus.PASSED)
   duration = time.perf_counter() - tstart
@@ -88,8 +92,12 @@ def test(isolate: bool, capture: bool, only: str) -> None:
   print()
   print(colored('Monorepo summary:', attrs=['bold', 'underline']))
   print()
-  print(f'  Ran {len(all_tests)} test(s) in {duration:.3f}s ({n_passed} passed, '
+  print(f'Ran {len(all_tests)} test(s) in {duration:.3f}s ({n_passed} passed, '
         f'{len(all_tests) - n_passed} failed, {len(all_errors)} error(s)). '
         f'{"PASSED" if exit_code == 0 else "FAILED"}')
+  print()
+  for package, status in package_statuses:
+    color = 'green' if status == TestStatus.PASSED else 'red'
+    print(f'  {colored(package.name, color, attrs=["bold"])} {status.name}')
 
   sys.exit(exit_code)

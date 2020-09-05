@@ -4,3 +4,8 @@ changes:
   component: shut.test.pytest
   description: set altname for `PytestDriver.report_file` to `report-file`
   fixes: []
+- type: improvement
+  component: cli
+  description: '`shut mono test` now prints a summary of the status for every tested
+    package'
+  fixes: []
