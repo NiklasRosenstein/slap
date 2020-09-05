@@ -1,0 +1,6 @@
+release_date: null
+changes:
+- type: change
+  component: shut.test.pytest
+  description: set altname for `PytestDriver.report_file` to `report-file`
+  fixes: []

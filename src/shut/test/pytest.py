@@ -103,7 +103,7 @@ class PytestDriver(BaseTestDriver):
 
   directory: Optional[str] = None
   args: List[str] = field(default_factory=lambda: ['-vv'])
-  report_file: str = field(default='.pytest-report.json')
+  report_file: str = field(default='.pytest-report.json', altname='report-file')
 
   # BaseTestDriver
 
