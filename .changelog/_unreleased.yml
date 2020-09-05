@@ -4,3 +4,7 @@ changes:
   component: shut.test.pytest
   description: '`PytestDriver.args` option now defaults to `["-vv"]`'
   fixes: []
+- type: feature
+  component: cli
+  description: Add `shut mono test --only` option
+  fixes: []
