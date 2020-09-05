@@ -39,13 +39,26 @@ from . import mono, project
 @click.option('--capture/--no-capture', default=True,
   help='Capture the output of the underlying testing framework. If set to false, the output '
        'will be routed to stderr (default: true)')
-def test(isolate: bool, capture: bool) -> None:
+@click.option('--only', help='Comma-separated list of packages to test.')
+def test(isolate: bool, capture: bool, only: str) -> None:
   """
   Run unit tests for all packages in the mono repository.
   """
 
   monorepo = project.load_or_exit(expect=MonorepoModel)
-  packages = list(filter(lambda p: p.test_driver, project.packages))
+
+  if only:
+    packages = []
+    package_map = {p.name: p for p in project.packages}
+    for package_name in only.split(','):
+      if package_name not in package_map:
+        sys.exit(f'error: package "{package_name}" does not exist')
+      package = package_map[package_name]
+      if not package.test_driver:
+        sys.exit(f'error: package "{package_name}" has no test driver configured')
+      packages.append(package)
+  else:
+    packages = list(filter(lambda p: p.test_driver, project.packages))
 
   print(f'Going to test {len(packages)} package(s):')
   for package in packages:
