@@ -23,6 +23,7 @@ import abc
 import logging
 import os
 import sys
+from collections import Counter
 from typing import Iterable, Generic, Optional, T, Type
 
 import click
@@ -168,8 +169,18 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
   if len(provided_args) > 1:
     sys.exit('error: conflicting options: {}'.format(provided_args))
   elif not provided_args:
-    # TODO(NiklasRosenstein): Bump based on changelog
-    sys.exit('error: missing version argument or bump option')
+    print()
+    print('figuring bump mode from changelog')
+    changelog = ChangelogManager(data.obj.get_changelog_directory()).unreleased
+    if not changelog.exists() or not changelog.entries:
+      sys.exit(f'error: changelog "{changelog.filename}" does not exist')
+    counter = Counter(entry.type_.name for entry in changelog.entries)
+    bump_mode = max(entry.type_.bump_mode for entry in changelog.entries)
+    assert hasattr(args, bump_mode.name), bump_mode.name
+    setattr(args, bump_mode.name, True)
+    print('  {} → {}'.format(
+      ', '.join(f'{c} {colored(k, "cyan")}' for k, c in counter.items()),
+      colored(bump_mode.name, "blue", attrs=["bold"])))
 
   version_refs = list(get_version_refs(data.obj))
   if not version_refs:
