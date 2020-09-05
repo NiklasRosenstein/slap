@@ -89,6 +89,7 @@ def test(isolate: bool, capture: bool, only: str) -> None:
   print(colored('Monorepo summary:', attrs=['bold', 'underline']))
   print()
   print(f'  Ran {len(all_tests)} test(s) in {duration:.3f}s ({n_passed} passed, '
-        f'{len(all_tests) - n_passed} failed, {len(all_errors)} error(s)).')
+        f'{len(all_tests) - n_passed} failed, {len(all_errors)} error(s)). '
+        f'{"PASSED" if exit_code == 0 else "FAILED"}')
 
   sys.exit(exit_code)
