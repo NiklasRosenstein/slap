@@ -1,6 +1,6 @@
 
+import os
 from pytest import raises
-
 from shut.model.requirements import Requirement, VendoredRequirement, VersionSelector
 
 
@@ -37,3 +37,8 @@ def test_parse_vendored_requirememt():
     VendoredRequirement.parse('git+without_url')
   with raises(ValueError):
     VendoredRequirement.parse('hg+https://mercurial.org/a/b.hg')
+
+  assert VendoredRequirement(VendoredRequirement.Type.Path, 'vendored/liba').to_pip_args('root', True) == \
+    ['-e', os.path.normpath('root/vendored/liba')]
+  assert VendoredRequirement(VendoredRequirement.Type.Path, 'vendored/liba').to_pip_args('root', False) == \
+    [os.path.normpath('root/vendored/liba')]
