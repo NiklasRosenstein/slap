@@ -38,6 +38,10 @@ def test_parse_vendored_requirememt():
   with raises(ValueError):
     VendoredRequirement.parse('hg+https://mercurial.org/a/b.hg')
 
+  # TODO: This test might fail on Windows?
+  assert VendoredRequirement(VendoredRequirement.Type.Path, '/absolute/path').to_pip_args('root', False) == \
+    [os.path.normpath('/absolute/path')]
+
   assert VendoredRequirement(VendoredRequirement.Type.Path, 'vendored/liba').to_pip_args('root', True) == \
     ['-e', os.path.normpath('root/vendored/liba')]
   assert VendoredRequirement(VendoredRequirement.Type.Path, 'vendored/liba').to_pip_args('root', False) == \
