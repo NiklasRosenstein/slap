@@ -42,3 +42,7 @@ changes:
   component: shut.model.requirements
   description: '`Requirement` now supports package extras'
   fixes: []
+- type: feature
+  component: cli
+  description: Add `--verify` option to `shut pkg update`
+  fixes: []
