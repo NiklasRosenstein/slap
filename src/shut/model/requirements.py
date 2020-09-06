@@ -198,12 +198,27 @@ class VendoredRequirement(BaseRequirement):
   type: Type
   location: str
 
+  def __post_init__(self):
+    if self.type == self.Type.Path:
+      self.location = self._normpath(self.location)
+
   def __str__(self):
     if self.type == self.Type.Git:
       return 'git+' + self.location
     elif self.type == self.Type.Path:
-      return self.location
+      return self._normpath(self.location)
     assert False, self.type
+
+  @staticmethod
+  def _normpath(path: str) -> str:
+    """
+    Normalizes a path in the way that it should be represented in the serialized form of the
+    vendored requirement (as posix path).
+    """
+
+    if os.name == 'nt':
+      path = path.replace('\\', '/')
+    return './' + posixpath.normpath(path)
 
   @classmethod
   def parse(cls, requirement_string: str, fallback_to_path: bool = False) -> 'VendoredRequirement':
@@ -218,12 +233,8 @@ class VendoredRequirement(BaseRequirement):
     result = urlparse(requirement_string)
     if result.scheme:
       raise error
-    if not requirement_string.startswith('./'):
-      if not fallback_to_path:
-        raise error
-      if os.name == 'nt':
-        requirement_string = requirement_string.replace('\\', '/')
-      requirement_string = './' + posixpath.normpath(requirement_string)
+    if not requirement_string.startswith('./') and not fallback_to_path:
+      raise error
     return cls(cls.Type.Path, requirement_string)
 
   def to_setuptools(self) -> str:
@@ -231,9 +242,10 @@ class VendoredRequirement(BaseRequirement):
 
   def to_pip_args(self, root: str, develop: bool) -> List[str]:
     args = [self.location]
-    if self.type == self.Type.Path and develop:
-      args.insert(0, '-e')
-      args[1] = os.path.join(root, args[1])
+    if self.type == self.Type.Path:
+      args[0] = os.path.normpath(os.path.join(root, args[0]))
+      if develop:
+        args.insert(0, '-e')
     return args
 
   @classmethod
