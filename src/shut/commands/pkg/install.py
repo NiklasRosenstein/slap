@@ -29,7 +29,8 @@ import click
 from nr.stream import concat
 from termcolor import colored
 
-from shut.model import PackageModel
+from shut.model.package import PackageModel
+from shut.model.requirements import Requirement, RequirementsList, VendoredRequirement
 from . import pkg
 from .. import project
 
@@ -75,16 +76,17 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
 
   package = project.load_or_exit(expect=PackageModel)
   extras = set((extra or '').split(','))
-  reqs = []
+  reqs = RequirementsList()
 
   # Pip does not understand "test" as an extra and does not have an option to
   # install test requirements.
   if 'test' in extras:
     extras.discard('test')
     extra = ','.join(extras)
-    reqs += [Requirement(x.to_setuptools()) for x in package.test_requirements]
+    reqs += package.test_requirements
 
-  reqs.append(Requirement(package.get_directory(), develop, extra))
+  reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
+  reqs += package.requirements.vendored_reqs()
 
   if project.monorepo and inter_deps:
     # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate
@@ -100,7 +102,7 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
         reqs.insert(0, Requirement(dep.get_directory(), develop))
 
   pip_bin = shlex.split(os.getenv('PIP', pip or 'python -m pip'))
-  command = pip_bin + ['install'] + list(concat(r.to_args() for r in reqs))
+  command = pip_bin + ['install'] + reqs.to_pip_args(package.get_directory(), develop)
   if upgrade:
     command.append('--upgrade')
   if quiet:
