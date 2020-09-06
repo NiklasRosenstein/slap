@@ -50,3 +50,7 @@ changes:
   component: shut.checkers.package
   description: Add `up to date` check for packages
   fixes: []
+- type: feature
+  component: cli
+  description: '`shut pkg install` now supports installing vendored requirements'
+  fixes: []
