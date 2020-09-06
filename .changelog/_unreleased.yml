@@ -46,3 +46,7 @@ changes:
   component: cli
   description: Add `--verify` option to `shut pkg update`
   fixes: []
+- type: feature
+  component: shut.checkers.package
+  description: Add `up to date` check for packages
+  fixes: []

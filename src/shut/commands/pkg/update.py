@@ -38,7 +38,7 @@ def update_package(
   dry: bool = False,
   indent: int = 0,
   verify: bool = False,
-  verify_tag: Optional[str] = None
+  verify_tag: Optional[str] = None,
 ) -> VirtualFiles:
 
   result = 0
