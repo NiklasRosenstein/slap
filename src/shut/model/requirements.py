@@ -218,7 +218,9 @@ class VendoredRequirement(BaseRequirement):
 
     if os.name == 'nt':
       path = path.replace('\\', '/')
-    return './' + posixpath.normpath(path)
+    if not posixpath.isabs(path):
+      path = './' + posixpath.normpath(path)
+    return path
 
   @classmethod
   def parse(cls, requirement_string: str, fallback_to_path: bool = False) -> 'VendoredRequirement':
@@ -275,3 +277,11 @@ class RequirementsList(List[BaseRequirement]):
 
   def vendored_reqs(self) -> Iterable[VendoredRequirement]:
     return filter(lambda x: isinstance(x, VendoredRequirement), self)
+
+  def to_pip_args(self, root: str, develop: bool) -> List[str]:
+    result = []
+    for req in self.reqs():
+      result.append(req.to_setuptools())
+    for req in self.vendored_reqs():
+      result += req.to_pip_args(root, develop)
+    return result
