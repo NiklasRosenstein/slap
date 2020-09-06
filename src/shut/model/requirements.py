@@ -24,7 +24,7 @@ import enum
 import os
 import posixpath
 import re
-from typing import Iterable, List, Union
+from typing import Iterable, List, Optional, Union
 from urllib.parse import urlparse
 
 from databind.core import datamodel
@@ -132,15 +132,19 @@ class Requirement(BaseRequirement):
   A Requirement is simply combination of a package name and a version selector.
   """
 
-  INVALID_CHARACTERS = '/&:;\'"!{}[]()%'
+  INVALID_CHARACTERS = '/&:;\'"!{}()%'
 
   package: str
-  version: VersionSelector
+  version: VersionSelector = VersionSelector.ANY
+  extras: Optional[List[str]] = None
 
-  def __str__(self):
-    if self.version == VersionSelector.ANY:
-      return self.package
-    return '{} {}'.format(self.package, self.version)
+  def __str__(self, *, setuptools: bool = False):
+    result = self.package
+    if self.extras:
+      result += '[' + ','.join(sorted(self.extras)) + ']'
+    if self.version != VersionSelector.ANY:
+      result += ' ' + (str(self.version.to_setuptools()) if setuptools else str(self.version))
+    return result
 
   def __repr__(self):
     return repr(str(self))
@@ -150,16 +154,20 @@ class Requirement(BaseRequirement):
     error = ValueError('invalid requirement: {!r}'.format(requirement_string))
     if set(requirement_string) & set(cls.INVALID_CHARACTERS):
       raise error
-    match = re.match(r'^\s*([\w\d\-\._]+)(?:\s*(.+))?$', requirement_string)
+    match = re.match(r'''
+      ^\s*                # Allow leading whitespace
+      ([\w\d\-\._]+)      # Package name
+      (?:\[([^\]]+)\])?   # Package extras
+      (?:\s*([^\[\]]+))?  # Version selector (do not allow brackets to avoid matching empty extras)
+      $''', requirement_string, re.VERBOSE)
     if not match:
       raise error
-    package, version = match.groups()
-    return cls(package, VersionSelector(version or VersionSelector.ANY))
+    package, extras, version = match.groups()
+    return cls(package, VersionSelector(version or VersionSelector.ANY),
+      extras=sorted(map(str.strip, extras.split(','))) if extras else None)
 
   def to_setuptools(self) -> str:
-    if self.version == VersionSelector.ANY:
-      return self.package
-    return '{} {}'.format(self.package, self.version.to_setuptools())
+    return self.__str__(setuptools=True)
 
   @classmethod
   def databind_json_load(cls, value, context):
@@ -181,17 +189,21 @@ class VendoredRequirement(BaseRequirement):
   Pip understands as an installable source.
   """
 
-  INVALID_CHARACTERS = '*&^:;\'"!{}[]()%'
+  INVALID_CHARACTERS = '*&^;\'"!{}[]()%'
 
   class Type(enum.Enum):
     Git = enum.auto()
     Path = enum.auto()
 
   type: Type
-  value: str
+  location: str
 
   def __str__(self):
-    return self.value
+    if self.type == self.Type.Git:
+      return 'git+' + self.location
+    elif self.type == self.Type.Path:
+      return self.location
+    assert False, self.type
 
   @classmethod
   def parse(cls, requirement_string: str, fallback_to_path: bool = False) -> 'VendoredRequirement':
@@ -202,7 +214,7 @@ class VendoredRequirement(BaseRequirement):
       url = requirement_string[4:]
       if not urlparse(url).scheme:
         raise error
-      return cls(cls.Type.Git, requirement_string)
+      return cls(cls.Type.Git, url)
     result = urlparse(requirement_string)
     if result.scheme:
       raise error
@@ -218,7 +230,7 @@ class VendoredRequirement(BaseRequirement):
     raise RuntimeError('VendoredRequirement is not supported in setuptools')
 
   def to_pip_args(self, root: str, develop: bool) -> List[str]:
-    args = [self.value]
+    args = [self.location]
     if self.type == self.Type.Path and develop:
       args.insert(0, '-e')
       args[1] = os.path.join(root, args[1])
