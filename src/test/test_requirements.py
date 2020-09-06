@@ -42,3 +42,6 @@ def test_parse_vendored_requirememt():
     ['-e', os.path.normpath('root/vendored/liba')]
   assert VendoredRequirement(VendoredRequirement.Type.Path, 'vendored/liba').to_pip_args('root', False) == \
     [os.path.normpath('root/vendored/liba')]
+  # Ensure that to_pip_args() returns a Path that Pip must recognize as a path as well.
+  assert VendoredRequirement(VendoredRequirement.Type.Path, 'liba').to_pip_args('.', False) == \
+    [os.path.join('.', 'liba')]

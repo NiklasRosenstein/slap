@@ -244,6 +244,10 @@ class VendoredRequirement(BaseRequirement):
     args = [self.location]
     if self.type == self.Type.Path:
       args[0] = os.path.normpath(os.path.join(root, args[0]))
+      # We gotta make sure that Pip recognizes the argument as a path if there's no path
+      # separator in there.
+      if args[0].count(os.sep) == 0:
+        args[0] = os.path.join(os.curdir, args[0])
       if develop:
         args.insert(0, '-e')
     return args
