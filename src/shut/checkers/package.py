@@ -24,6 +24,7 @@ from typing import Iterable, Optional
 
 from shut.model import MonorepoModel, Project
 from shut.model.package import PackageError, PackageModel
+from shut.renderers import get_files
 from shut.utils.external.classifiers import get_classifiers
 from .core import CheckResult, CheckStatus, Checker, SkipCheck, check, register_checker
 
@@ -115,6 +116,19 @@ class PackageChecker(Checker[PackageModel]):
           CheckStatus.WARNING,
           'file "py.typed" exists but $.typed is not set')
     yield SkipCheck()
+
+  @check('up to date')
+  def _check_up_to_date(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+    """
+    Checks if the package is up to date.
+    """
+
+    files = get_files(package)
+    modified_files = files.get_modified_files(package.get_directory())
+    if modified_files:
+      yield CheckResult(
+        CheckStatus.ERROR,
+        f'managed files are not up to date ({",".join(modified_files)})')
 
 
 register_checker(PackageModel, PackageChecker)
