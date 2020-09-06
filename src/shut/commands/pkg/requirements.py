@@ -94,7 +94,7 @@ def add(packages, test, vendored_packages, develop):
 
   # Update any existing requirements.
   seen = set()
-  for req in target:
+  for req in target.reqs():
     matching_req = next((x for x in scoped_reqs if x.package == req.package), None)
     if matching_req:
       seen.add(req.package)

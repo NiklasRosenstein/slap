@@ -24,7 +24,7 @@ import enum
 import os
 import posixpath
 import re
-from typing import List, Union
+from typing import Iterable, List, Union
 from urllib.parse import urlparse
 
 from databind.core import datamodel
@@ -235,3 +235,15 @@ class VendoredRequirement(BaseRequirement):
 
   def databind_json_dump(self, context):
     return str(self)
+
+
+class RequirementsList(List[BaseRequirement]):
+  """
+  A list of requirements. Provides some convenience methods.
+  """
+
+  def reqs(self) -> Iterable[Requirement]:
+    return filter(lambda x: isinstance(x, Requirement), self)
+
+  def vendored_reqs(self) -> Iterable[VendoredRequirement]:
+    return filter(lambda x: isinstance(x, VendoredRequirement), self)
