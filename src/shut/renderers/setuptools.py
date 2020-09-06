@@ -31,7 +31,7 @@ from typing import Dict, Iterable, List, Optional, TextIO, Tuple
 import nr.fs
 
 from shut.model import PackageModel
-from shut.model.requirements import BaseRequirement, Requirement
+from shut.model.requirements import RequirementsList
 from shut.utils.io.virtual import VirtualFiles
 from .core import Renderer, register_renderer, VersionRef
 
@@ -297,14 +297,14 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     return '\n'.join(lines)
 
   @staticmethod
-  def _format_reqs(reqs: List[BaseRequirement], level: int = 0) -> List[str]:
+  def _format_reqs(reqs: RequirementsList, level: int = 0) -> List[str]:
     indent = '  ' * (level + 1)
-    reqs = [r for r in reqs if isinstance(r, Requirement) and r.package != 'python']
+    reqs = [r for r in reqs.reqs() if r.package != 'python']
     if not reqs:
       return '[]'
     return '[\n' + ''.join(indent + '{!r},\n'.format(x.to_setuptools()) for x in reqs if x.package != 'python') + ']'
 
-  def _render_requirements(self, fp: TextIO, target: str, requirements: List[BaseRequirement]):
+  def _render_requirements(self, fp: TextIO, target: str, requirements: RequirementsList):
     fp.write('{} = {}\n'.format(target, self._format_reqs(requirements)))
 
   def _get_readme_status(self, package: PackageModel) -> Optional[_ReadmeStatus]:

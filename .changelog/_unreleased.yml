@@ -34,3 +34,7 @@ changes:
   description: '`shut pkg requirements add` now supports adding vendored requirements
     using the `-v,--vendor` option'
   fixes: []
+- type: change
+  component: shut.model.package
+  description: Use new `RequirementsList` class instead of `List[BaseRequirement]`
+  fixes: []
