@@ -24,3 +24,8 @@ changes:
   description: '`Package.requirements` and related properties are now of type `BaseRequirement`,
     allowing the use of `VendoredRequirement`s'
   fixes: []
+- type: change
+  component: cli
+  description: '`shut pkg build` and `shut pkg publish` will now error if the package
+    uses vendored requirements'
+  fixes: []

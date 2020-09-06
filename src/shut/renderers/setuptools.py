@@ -409,6 +409,10 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       directory = package.get_python_package_metadata().package_directory
       files.add_static(os.path.join(directory, 'py.typed'), '')
 
+    if package.has_vendored_requirements():
+      logger.info('package "%s" has vendored requirements which will prevent it from '
+        'being published.', package.name)
+
   def get_version_refs(self, package: PackageModel) -> Iterable[VersionRef]:
     def _regex_refs(filename: Optional[str], regex: str) -> Iterable[VersionRef]:
       if filename and os.path.isfile(filename):

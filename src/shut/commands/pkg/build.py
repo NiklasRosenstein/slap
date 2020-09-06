@@ -64,6 +64,9 @@ def build(target, list_, build_dir, verbose):
   package = project.load_or_exit(expect=PackageModel)
   builders = list(get_builders(package))
 
+  if package.has_vendored_requirements():
+    sys.exit(f'error: package has vendored requirements and cannot be built')
+
   if list_:
     print()
     for scope, builders in groupby(builders, lambda b: b.id.scope):

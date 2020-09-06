@@ -55,6 +55,9 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
   package = project.load_or_exit(expect=PackageModel)
   publishers = list(get_publishers(package))
 
+  if package.has_vendored_requirements():
+    sys.exit(f'error: package has vendored requirements and cannot be published')
+
   if list_:
     for scope, publishers in groupby(publishers, lambda p: p.id.scope):
       print(f'{colored(scope, "green")}:')
