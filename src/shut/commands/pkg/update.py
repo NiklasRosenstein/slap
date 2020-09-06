@@ -37,6 +37,7 @@ def update_package(
   package: PackageModel,
   dry: bool = False,
   indent: int = 0,
+  verify: bool = False,
   verify_tag: Optional[str] = None
 ) -> VirtualFiles:
 
@@ -51,7 +52,7 @@ def update_package(
 
   files = get_files(package)
 
-  if verify_tag:
+  if verify:
     modified_files = files.get_modified_files(package.get_directory())
     if modified_files:
       print(f'{colored("error", "red")}: the following files would be modified with an update')
@@ -71,13 +72,14 @@ def update_package(
 
 @pkg.command()
 @click.option('--dry', is_flag=True)
-@click.option('--verify-tag', help='Verify the integrity of the managed files (asserting that '
-  'they would not change from running this command) and parse the version number from the '
-  'specified tag and assert that the version matches the version in the package.')
-def update(dry, verify_tag):
+@click.option('--verify', is_flag=True, help='Verify the integrity of the managed files '
+  '(asserting that they would not change from running this command).')
+@click.option('--verify-tag', help='Parse the version number from the specified tag and '
+  'assert that it matches the version in the package configuration. (implies --verify)')
+def update(dry, verify, verify_tag):
   """
   Update files auto-generated from the configuration file.
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  update_package(package, verify_tag=verify_tag)
+  update_package(package, verify=verify or bool(verify_tag), verify_tag=verify_tag)
