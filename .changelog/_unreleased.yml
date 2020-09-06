@@ -38,3 +38,7 @@ changes:
   component: shut.model.package
   description: Use new `RequirementsList` class instead of `List[BaseRequirement]`
   fixes: []
+- type: feature
+  component: shut.model.requirements
+  description: '`Requirement` now supports package extras'
+  fixes: []
