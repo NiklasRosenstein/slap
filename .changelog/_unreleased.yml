@@ -14,3 +14,8 @@ changes:
   description: '`dump()` method now uses `nr.fs.atomic_file` to ensure the original
     file contents are not modified if the dump operation fails'
   fixes: []
+- type: change
+  component: shore.model.requirements
+  description: Add `BaseRequirement` and `VendoredRequirement` classes, require databind.core
+    and databind.json ^0.4.0 for the `@datamodel(serialize_as)` feature
+  fixes: []
