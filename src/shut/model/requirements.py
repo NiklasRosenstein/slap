@@ -19,9 +19,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import abc
+import enum
+import os
+import posixpath
 import re
-from typing import Union
+from typing import List, Union
+from urllib.parse import urlparse
+
 from databind.core import datamodel
+
 from .version import bump_version, Version
 
 
@@ -106,11 +113,26 @@ class VersionSelector(object):
 VersionSelector.ANY = VersionSelector('*')
 
 
+@datamodel(serialize_as=lambda: Union[Requirement, VendoredRequirement])
+class BaseRequirement(metaclass=abc.ABCMeta):
+
+  @classmethod
+  @abc.abstractmethod
+  def databind_json_load(self, value, context):
+    pass
+
+  @abc.abstractmethod
+  def databind_json_dump(self, context):
+    pass
+
+
 @datamodel
-class Requirement:
+class Requirement(BaseRequirement):
   """
   A Requirement is simply combination of a package name and a version selector.
   """
+
+  INVALID_CHARACTERS = '/&:;\'"!{}[]()%'
 
   package: str
   version: VersionSelector
@@ -124,14 +146,17 @@ class Requirement:
     return repr(str(self))
 
   @classmethod
-  def parse(cls, requirement_string):
+  def parse(cls, requirement_string: str) -> 'Requirement':
+    error = ValueError('invalid requirement: {!r}'.format(requirement_string))
+    if set(requirement_string) & set(cls.INVALID_CHARACTERS):
+      raise error
     match = re.match(r'^\s*([\w\d\-\._]+)(?:\s*(.+))?$', requirement_string)
     if not match:
-      raise ValueError('invalid requirement: {!r}'.format(requirement_string))
+      raise error
     package, version = match.groups()
     return cls(package, VersionSelector(version or VersionSelector.ANY))
 
-  def to_setuptools(self):  # type: () -> str
+  def to_setuptools(self) -> str:
     if self.version == VersionSelector.ANY:
       return self.package
     return '{} {}'.format(self.package, self.version.to_setuptools())
@@ -139,8 +164,74 @@ class Requirement:
   @classmethod
   def databind_json_load(cls, value, context):
     if isinstance(value, str):
-      return Requirement.parse(value)
+      try:
+        return Requirement.parse(value)
+      except ValueError as exc:
+        raise context.type_error(str(exc))
     return NotImplemented
+
+  def databind_json_dump(self, context):
+    return str(self)
+
+
+@datamodel
+class VendoredRequirement(BaseRequirement):
+  """
+  A vendored requirement is either a relative path or a string prefixed with `git+` that
+  Pip understands as an installable source.
+  """
+
+  INVALID_CHARACTERS = '*&^:;\'"!{}[]()%'
+
+  class Type(enum.Enum):
+    Git = enum.auto()
+    Path = enum.auto()
+
+  type: Type
+  value: str
+
+  def __str__(self):
+    return self.value
+
+  @classmethod
+  def parse(cls, requirement_string: str, fallback_to_path: bool = False) -> 'VendoredRequirement':
+    error = ValueError(f'invalid vendored requirement: {requirement_string!r}')
+    if set(requirement_string) & set(cls.INVALID_CHARACTERS):
+      raise error
+    if requirement_string.startswith('git+'):
+      url = requirement_string[4:]
+      if not urlparse(url).scheme:
+        raise error
+      return cls(cls.Type.Git, requirement_string)
+    result = urlparse(requirement_string)
+    if result.scheme:
+      raise error
+    if not requirement_string.startswith('./'):
+      if not fallback_to_path:
+        raise error
+      if os.name == 'nt':
+        requirement_string = requirement_string.replace('\\', '/')
+      requirement_string = './' + posixpath.normpath(requirement_string)
+    return cls(cls.Type.Path, requirement_string)
+
+  def to_setuptools(self) -> str:
+    raise RuntimeError('VendoredRequirement is not supported in setuptools')
+
+  def to_pip_args(self, root: str, develop: bool) -> List[str]:
+    args = [self.value]
+    if self.type == self.Type.Path and develop:
+      args.insert(0, '-e')
+      args[1] = os.path.join(root, args[1])
+    return args
+
+  @classmethod
+  def databind_json_load(cls, value, context):
+    if isinstance(value, str):
+      try:
+        return VendoredRequirement.parse(value)
+      except ValueError as exc:
+        raise context.type_error(str(exc))
+    raise context.type_error()
 
   def databind_json_dump(self, context):
     return str(self)

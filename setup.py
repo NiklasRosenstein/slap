@@ -17,8 +17,8 @@ else:
 
 requirements = [
   'beautifulsoup4 >=4.8.1,<5.0.0',
-  'databind.core >=0.3.0,<1.0.0',
-  'databind.json >=0.3.0,<1.0.0',
+  'databind.core >=0.4.0,<1.0.0',
+  'databind.json >=0.4.0,<1.0.0',
   'click >=7.0.0,<8.0.0',
   'jinja2 >=2.11.1,<3.0.0',
   'networkx >=2.4.0,<3.0.0',
