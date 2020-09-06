@@ -23,10 +23,11 @@ import os
 import sys
 from typing import Any, Dict, List, TextIO, Tuple, Type, TypeVar, Union
 
+import nr.fs
+import yaml
 from databind.core import ConversionError, datamodel, field, Registry
 from databind.json import from_json, to_json, registry as json_registry
 from nr.stream import Stream
-import yaml
 
 registry = Registry(json_registry)
 registry.set_option(datamodel, 'skip_defaults', True)
@@ -161,7 +162,7 @@ class Project:
 
 def dump(obj: Any, file_: Union[str, TextIO]) -> None:
   if isinstance(file_, str):
-    with open(file_, 'w') as fp:
+    with nr.fs.atomic_file(file_, 'w') as fp:
       dump(obj, fp)
   else:
     data = to_json(obj, registry=registry)

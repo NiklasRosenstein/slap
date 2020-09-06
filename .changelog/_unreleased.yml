@@ -9,3 +9,8 @@ changes:
   description: '`shut ... bump` command without version argument or bump mode option
     will determine the bump mode from the unreleased changelog'
   fixes: []
+- type: improvement
+  component: shore.model
+  description: '`dump()` method now uses `nr.fs.atomic_file` to ensure the original
+    file contents are not modified if the dump operation fails'
+  fixes: []
