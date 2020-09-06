@@ -20,17 +20,22 @@
 # IN THE SOFTWARE.
 
 import os
+import logging
 import shlex
 import subprocess
 import sys
 from typing import Dict, List
 
 import click
+from nr.stream import concat
+from termcolor import colored
 
 from shut.commands import project
 from shut.model import dump, PackageModel
-from shut.model.requirements import Requirement, VersionSelector
+from shut.model.requirements import Requirement, VersionSelector, VendoredRequirement
 from . import pkg
+
+logger = logging.getLogger(__name__)
 
 
 @pkg.group()
@@ -42,8 +47,15 @@ def requirements():
 
 @requirements.command(no_args_is_help=True)
 @click.argument('packages', nargs=-1)
-@click.option('--test', is_flag=True)
-def add(packages, test):
+@click.option('-v', '--vendor', 'vendored_packages', multiple=True,
+  help='Specify a vendored installation source. This can point to a subdirectory of your project '
+  'or a Git repository URL in a format that Pip understands (i.e. starting with git+). This is '
+  'useful if a dependency is not available on any package index but only exists in a Git '
+  'repository (in which case it can be tracked as a submodule and added with this option).')
+@click.option('--test', is_flag=True, help='Add the requirement for testing.')
+@click.option('--develop/--no-develop', default=True, help='Specifies whether vendored packages '
+  'referencing a local directory should be installed in develop mode or not (default: true)')
+def add(packages, test, vendored_packages, develop):
   """
   Install packages and save them to the package requirements.
 
@@ -52,12 +64,24 @@ def add(packages, test):
   """
 
   package = project.load_or_exit(expect=PackageModel)
+  if not packages and not vendored_packages:
+    sys.exit('error: no packages specified')
 
   reqs = [Requirement.parse(x) for x in packages]
+  vendored_reqs = [VendoredRequirement.parse(x, fallback_to_path=True) for x in vendored_packages]
+  target = package.test_requirements if test else package.requirements
 
+  # Ensure that the same vendored requirement doesn't already exist.
+  duplicate = next((x for x in vendored_reqs if x in target), None)
+  if duplicate:
+    logger.warning(f'vendored package {colored("%s", "cyan")} already exists', duplicate)
+
+  # Install the requirements with Pip.
   python = shlex.split(os.getenv('PYTHON', 'python'))
   pip = python + ['-m', 'pip']
-  res = subprocess.call(pip + ['install'] + [r.to_setuptools() for r in reqs])
+  command = pip + ['install'] + [r.to_setuptools() for r in reqs]
+  command += concat(x.to_pip_args(package.get_directory(), develop) for x in vendored_reqs)
+  res = subprocess.call(command)
   if res != 0:
     sys.exit('error: pip install failed')
 
@@ -67,8 +91,6 @@ def add(packages, test):
   if unscoped_packages:
     package_versions = get_pip_versions(pip, unscoped_packages)
     scoped_reqs += [Requirement.parse(f'{k} ^{v}') for k, v in package_versions.items()]
-
-  target = package.test_requirements if test else package.requirements
 
   # Update any existing requirements.
   seen = set()
@@ -80,6 +102,7 @@ def add(packages, test):
 
   # Append the remaining reqs.
   target += [r for r in scoped_reqs if r.package not in seen]
+  target += [r for r in vendored_reqs if r not in target]
 
   dump(package, package.filename)
 

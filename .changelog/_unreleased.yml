@@ -5,7 +5,7 @@ changes:
   description: Add `breaking_change` Changelog type
   fixes: []
 - type: feature
-  component: ci
+  component: cli
   description: '`shut ... bump` command without version argument or bump mode option
     will determine the bump mode from the unreleased changelog'
   fixes: []
@@ -28,4 +28,9 @@ changes:
   component: cli
   description: '`shut pkg build` and `shut pkg publish` will now error if the package
     uses vendored requirements'
+  fixes: []
+- type: feature
+  component: cli
+  description: '`shut pkg requirements add` now supports adding vendored requirements
+    using the `-v,--vendor` option'
   fixes: []
