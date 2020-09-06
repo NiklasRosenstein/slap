@@ -233,9 +233,18 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
   if args.tag:
     print()
     git = Git()
-    if any(f.mode == 'A' for f in git.porcelain()):
+    files = list(git.porcelain())
+
+    # We require that no files are currently staged.
+    if any(f.mode == 'A' for f in files):
       logger.error('cannot tag with non-empty staging area')
       exit(1)
+
+    # TODO: If this step errors (e.g. for example because the unreleased changelog file
+    #   was not yet tracked by Git, making Git complain that it doesn't know about the
+    #   file and it doesn't exits anymore when we add it down below), it's a bit painful
+    #   to recover from it because it's a manual process of reverting the version number
+    #   bumps.
 
     tag_name = data.obj.get_tag(new_version)
     print(f'tagging {tag_name}')
