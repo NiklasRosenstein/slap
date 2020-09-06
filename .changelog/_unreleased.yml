@@ -19,3 +19,8 @@ changes:
   description: Add `BaseRequirement` and `VendoredRequirement` classes, require databind.core
     and databind.json ^0.4.0 for the `@datamodel(serialize_as)` feature
   fixes: []
+- type: feature
+  component: shut.model.package
+  description: '`Package.requirements` and related properties are now of type `BaseRequirement`,
+    allowing the use of `VendoredRequirement`s'
+  fixes: []

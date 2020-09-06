@@ -26,12 +26,13 @@ import warnings
 from typing import Dict, List, Optional
 
 from databind.core import datamodel, field
+from nr.stream import chain, concat
 
 from shut.utils.ast import load_module_members
 from .abstract import AbstractProjectModel
 from .linter import LinterConfiguration
 from .publish import PublishConfiguration
-from .requirements import Requirement
+from .requirements import BaseRequirement, Requirement, VendoredRequirement
 from .test import TestDriver
 from .version import Version
 
@@ -83,9 +84,9 @@ class PackageModel(AbstractProjectModel):
   wheel: Optional[bool] = True
   universal: Optional[bool] = None
   typed: Optional[bool] = False
-  requirements: List[Requirement] = field(default_factory=list)
-  test_requirements: List[Requirement] = field(altname='test-requirements', default_factory=list)
-  extra_requirements: Dict[str, List[Requirement]] = field(altname='extra-requirements', default_factory=dict)
+  requirements: List[BaseRequirement] = field(default_factory=list)
+  test_requirements: List[BaseRequirement] = field(altname='test-requirements', default_factory=list)
+  extra_requirements: Dict[str, List[BaseRequirement]] = field(altname='extra-requirements', default_factory=dict)
   source_directory: str = field(altname='source-directory', default='src')
   exclude: List[str] = field(default_factory=lambda: ['test', 'tests', 'docs'])
   entrypoints: Dict[str, List[str]] = field(default_factory=dict)
@@ -110,7 +111,15 @@ class PackageModel(AbstractProjectModel):
     return self.name.replace('-', '_')
 
   def get_python_requirement(self) -> Optional[Requirement]:
-    return next(filter(lambda x: x.package == 'python', self.requirements), None)
+    return next(filter(lambda x: isinstance(x, Requirement) and x.package == 'python', self.requirements), None)
+
+  def has_vendored_requirements(self) -> bool:
+    """
+    Returns #True if the package has any vendored requirements.
+    """
+
+    return any(isinstance(r, VendoredRequirement) for r in
+      chain(self.requirements, self.test_requirements, concat(self.extra_requirements.values())))
 
   def is_universal(self) -> bool:
     """
