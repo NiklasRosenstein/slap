@@ -54,3 +54,7 @@ changes:
   component: cli
   description: '`shut pkg install` now supports installing vendored requirements'
   fixes: []
+- type: fix
+  component: shut.renderers.setuptools
+  description: Fix error when package author was not set
+  fixes: []
