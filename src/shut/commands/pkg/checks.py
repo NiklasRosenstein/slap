@@ -41,10 +41,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_package_checks(package: PackageModel) -> List[Check]:
-  checks = list(get_checks(package.project, package))
+  checks = list(get_checks(package))
   if package.project.monorepo:
     # Inherit mono-repo checks if the check targets the package specifically.
-    for check in get_checks(package.project, package.project.monorepo):
+    for check in get_checks(package.project.monorepo):
       if check.result.subject == package:
         checks.append(check)
   return sorted(checks, key=lambda c: c.name)

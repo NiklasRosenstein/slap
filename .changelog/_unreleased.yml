@@ -58,3 +58,7 @@ changes:
   component: shut.renderers.setuptools
   description: Fix error when package author was not set
   fixes: []
+- type: change
+  component: shut.checkers
+  description: Change Checkers interface (remove `project` argument)
+  fixes: []

@@ -19,17 +19,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from .core import CheckResult, CheckStatus, Checker, SkipCheck, check, register_checker
-from shut.model import AbstractProjectModel, Project
 from typing import Iterable, Optional, Union
+
+from shut.model import AbstractProjectModel, Project
+from .base import CheckResult, CheckStatus, Checker, SkipCheck, check, register_checker
 
 
 class GenericChecker(Checker):
 
   @check('unknown-config-options')
-  def _check_unknown_keys(
-    self,
-    project: 'Project',
+  def _check_unknown_keys(self,
     obj: Union['MonorepoModel', 'PackageModel'],
   ) -> Iterable[CheckResult]:
     if obj.unknown_keys:
@@ -38,4 +37,3 @@ class GenericChecker(Checker):
 
 
 register_checker(AbstractProjectModel, GenericChecker)
-
