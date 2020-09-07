@@ -25,10 +25,12 @@ import sys
 from typing import Iterable
 
 import click
+from termcolor import colored
 
 from shut.commands.commons.bump import make_bump_command, VersionBumpData, VersionRef
 from shut.model import PackageModel, Project
 from shut.model.version import get_commit_distance_version, parse_version, Version
+from shut.renderers import get_files
 from . import pkg
 from .checks import check_package
 from .update import update_package
@@ -39,15 +41,26 @@ logger = logging.getLogger(__name__)
 class PackageBumpData(VersionBumpData[PackageModel]):
 
   def loaded(self) -> None:
-    project = self.project
-    if project.monorepo and project.monorepo.release.single_version:
+    error_s = colored('error', 'red', attrs=['bold', 'underline'])
+
+    # Cannot bump a package if the managed files are out-dated.
+    files = get_files(self.obj)
+    if files.get_modified_files(self.obj.get_directory()):
+      command = colored("shut pkg update", "green", attrs=["bold", "underline"])
+      print(f'{error_s}: cannot bump package version while some managed files '
+            f'are outdated. run  {command} to fix.', file=sys.stderr)
+      sys.exit(1)
+
+    # Cannot bump a package that is part of a mono repository and that mono
+    # repository has $.release.single-version enabled.
+    if self.project.monorepo and self.project.monorepo.release.single_version:
       if self.args.force:
         logger.warning(
           'forcing version bump on individual package version that is usually managed '
           'by the monorepo.')
         return
-      print('error: cannot bump package version managed by monorepo.', file=sys.stderr)
-      exit(1)
+      print(f'{error_s}: cannot bump package tied to a monorepo single-version.', file=sys.stderr)
+      sys.exit(1)
 
   def update(self, new_version: Version) -> Iterable[str]:
     self.obj.version = new_version
