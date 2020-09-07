@@ -24,7 +24,7 @@ The `shut.checkers` package implements all the sanity checks that are run over a
 package definition to prevent common pitfalls and errors.
 """
 
-from . import core, generic, monorepo, package
-from .core import *
+from . import base, generic, monorepo, package
+from .base import *
 
-__all__ = core.__all__
+__all__ = base.__all__

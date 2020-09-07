@@ -22,19 +22,19 @@
 from pathlib import Path
 
 from shut.model import MonorepoModel
-from .core import Check, CheckStatus, CheckResult, Checker, SkipCheck, check, register_checker
+from .base import Check, CheckStatus, CheckResult, Checker, SkipCheck, check, register_checker
 
 
 class MonorepoChecker(Checker[MonorepoModel]):
 
   @check('invalid-package')
-  def _check_no_invalid_packages(self, project, monorepo):
-    for package_name, exc_info in project.invalid_packages:
+  def _check_no_invalid_packages(self, monorepo):
+    for package_name, exc_info in monorepo.project.invalid_packages:
       yield CheckResult(CheckStatus.ERROR, f'{package_name}: {exc_info[1]}')
 
   @check('bad-package-directory')
-  def _check_bad_package_directory(self, project, monorepo):
-    for package in project.packages:
+  def _check_bad_package_directory(self, monorepo):
+    for package in monorepo.project.packages:
       dirname = Path(package.filename).parent.name
       if dirname != package.name:
         yield CheckResult(
@@ -44,9 +44,9 @@ class MonorepoChecker(Checker[MonorepoModel]):
     yield SkipCheck()
 
   @check('inconsistent-single-version')
-  def _check_consistent_mono_version(self, project, monorepo):
-    if monorepo.release.single_version and project.packages:
-      for package in project.packages:
+  def _check_consistent_mono_version(self, monorepo):
+    if monorepo.release.single_version and monorepo.project.packages:
+      for package in monorepo.project.packages:
         if package.version is not None and package.version != monorepo.version:
           yield CheckResult(CheckStatus.ERROR, f'{package.name} v{package.version}, expected v{monorepo.version}')
     yield SkipCheck()

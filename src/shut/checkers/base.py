@@ -27,7 +27,7 @@ from typing import Callable, Iterable, Generic, NamedTuple, Optional, Type, Type
 import enum
 import types
 
-from shut.model import AbstractProjectModel, Project
+from shut.model import AbstractProjectModel
 from shut.utils.type_registry import TypeRegistry
 
 __all__ = [
@@ -85,7 +85,7 @@ def check(name: str) -> Callable[[Callable], Callable]:
 
 class Checker(Generic[T]):
 
-  def get_checks(self, project: Project, subject: T) -> Iterable[Check]:
+  def get_checks(self, subject: T) -> Iterable[Check]:
     """
     Yield #Check objects for the *subject*. By default, all methods decorated with
     #check() are called.
@@ -98,7 +98,7 @@ class Checker(Generic[T]):
         check_value = value.__func__
       if isinstance(check_value, types.FunctionType) and hasattr(check_value, '__check_name__'):
         index = None
-        for index, result in enumerate(value(project, subject)):
+        for index, result in enumerate(value(subject)):
           if not isinstance(result, SkipCheck):
             yield Check(value.__check_name__, result)
         if index is None:
@@ -116,10 +116,10 @@ def register_checker(t: Type[T], checker: Type[Checker[T]]) -> None:
   registry.put(t, checker)
 
 
-def get_checks(project: Project, obj: T) -> Iterable[Check]:
+def get_checks(obj: T) -> Iterable[Check]:
   """
   Returns all checks from the checkers registered for the type of *obj*.
   """
 
   for checker in registry.for_type(type(obj)):
-    yield from checker().get_checks(project, obj)
+    yield from checker().get_checks(obj)

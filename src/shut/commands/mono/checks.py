@@ -47,7 +47,7 @@ def check_monorepo(
   use_stderr: bool = False,
 ) -> int:
   start_time = time.perf_counter()
-  checks = sorted(get_checks(project, monorepo), key=lambda c: c.name)
+  checks = sorted(get_checks(monorepo), key=lambda c: c.name)
   seconds = time.perf_counter() - start_time
   print_checks_all(monorepo.name, checks, seconds,
     skip_positive_checks=skip_positive_checks, print_stats=print_stats,

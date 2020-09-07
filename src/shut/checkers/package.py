@@ -26,25 +26,25 @@ from shut.model import MonorepoModel, Project
 from shut.model.package import PackageError, PackageModel
 from shut.renderers import get_files
 from shut.utils.external.classifiers import get_classifiers
-from .core import CheckResult, CheckStatus, Checker, SkipCheck, check, register_checker
+from .base import CheckResult, CheckStatus, Checker, SkipCheck, check, register_checker
 
 
 class PackageChecker(Checker[PackageModel]):
 
   @check('readme')
-  def _check_readme(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_readme(self, package: PackageModel) -> Iterable[CheckResult]:
     if not package.get_readme_file():
       yield CheckResult(CheckStatus.WARNING, 'No README file found.')
 
   @check('license')
-  def _check_license(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_license(self, package: PackageModel) -> Iterable[CheckResult]:
     if not package.license:
       yield CheckResult(CheckStatus.WARNING, 'not specified')
 
     elif package.license and not package.get_license_file():
       yield CheckResult(CheckStatus.WARNING, 'No LICENSE file found.')
 
-    monorepo = project.monorepo
+    monorepo = package.project.monorepo
     if package.license and monorepo and monorepo.license \
         and monorepo.license != package.license:
       yield CheckResult(CheckStatus.ERROR,
@@ -52,7 +52,7 @@ class PackageChecker(Checker[PackageModel]):
           .format(package.license, monorepo.license))
 
   @check('classifiers')
-  def _check_classifiers(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_classifiers(self, package: PackageModel) -> Iterable[CheckResult]:
     classifiers = get_classifiers()
     unknown_classifiers = [x for x in package.classifiers if x not in classifiers]
     if unknown_classifiers:
@@ -61,12 +61,12 @@ class PackageChecker(Checker[PackageModel]):
         'Unknown classifiers: ' + ', '.join(unknown_classifiers))
 
   @check('package-url')
-  def _check_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_author(self, package: PackageModel) -> Iterable[CheckResult]:
     if not package.url:
       yield CheckResult(CheckStatus.WARNING, 'missing')
 
   @check('package-author')
-  def _check_consistent_author(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_consistent_author(self, package: PackageModel) -> Iterable[CheckResult]:
     if not package.author:
       yield CheckResult(CheckStatus.ERROR, 'missing')
     metadata = package.get_python_package_metadata()
@@ -82,7 +82,7 @@ class PackageChecker(Checker[PackageModel]):
           str(package.author), metadata.filename, author))
 
   @check('package-version')
-  def _check_consistent_version(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_consistent_version(self, package: PackageModel) -> Iterable[CheckResult]:
     metadata = package.get_python_package_metadata()
     try:
       version = metadata.version
@@ -99,7 +99,7 @@ class PackageChecker(Checker[PackageModel]):
           os.path.relpath(metadata.filename)))
 
   @check('typed')
-  def _check_typed(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_typed(self, package: PackageModel) -> Iterable[CheckResult]:
     metadata = package.get_python_package_metadata()
     try:
       py_typed_file = os.path.join(metadata.package_directory, 'py.typed')
@@ -118,7 +118,7 @@ class PackageChecker(Checker[PackageModel]):
     yield SkipCheck()
 
   @check('up to date')
-  def _check_up_to_date(self, project: Project, package: PackageModel) -> Iterable[CheckResult]:
+  def _check_up_to_date(self, package: PackageModel) -> Iterable[CheckResult]:
     """
     Checks if the package is up to date.
     """
