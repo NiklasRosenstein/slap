@@ -62,3 +62,12 @@ changes:
   component: shut.checkers
   description: Change Checkers interface (remove `project` argument)
   fixes: []
+- type: feature
+  component: cli
+  description: '`shut pkg bump` now prevents bumping if managed files are outdated'
+  fixes: []
+- type: fix
+  component: cli
+  description: '`shut pkg bump` now prevents bumping if package version is managed
+    by a monorepo single-version (as was previously already expected to happen)'
+  fixes: []

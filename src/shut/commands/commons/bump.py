@@ -68,7 +68,8 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
     self.project = project
     self.obj = obj
 
-  def post_init(self) -> None:
+  @abc.abstractmethod
+  def loaded(self) -> None:
     pass
 
   @abc.abstractmethod
@@ -154,6 +155,7 @@ def make_bump_command(
   def bump(**kwargs):
     args = Args(**kwargs)
     data = data_class(args, project, project.load_or_exit(expect=model_type))
+    data.loaded()
     do_bump(args, data)
 
   return bump
