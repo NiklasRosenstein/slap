@@ -29,6 +29,7 @@ from .version import Version
 from .requirements import VersionSelector
 from .release import MonorepoReleaseConfiguration
 from .package import PackageModel
+from .publish import PublishConfiguration
 
 
 @datamodel
@@ -73,6 +74,7 @@ class MonorepoModel(AbstractProjectModel):
 
   # AbstractProjectModel Overrides
 
+  publish: PublishConfiguration = field(default_factory=PublishConfiguration)
   release: MonorepoReleaseConfiguration = field(default_factory=MonorepoReleaseConfiguration)
 
   def get_name(self) -> str:

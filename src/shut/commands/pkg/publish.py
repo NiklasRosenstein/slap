@@ -37,40 +37,26 @@ from .build import run_builds
 from .. import project
 
 
-@pkg.command()
-@click.argument('target', type=lambda s: TargetId.parse(s, True), required=False)
-@click.option('-t', '--test', is_flag=True, help='publish to the test repository instead')
-@click.option('-l', '--list', 'list_', is_flag=True, help='list available publishers')
-@click.option('-v', '--verbose', is_flag=True, help='show more output')
-@click.option('-b', '--build-dir', default='build', help='build output directory')
-@click.option('--skip-build', is_flag=True, help='do not build artifacts that are to be published')
-def publish(target, test, list_, verbose, build_dir, skip_build):
-  """
-  Publish the package to PyPI or another target.
-  """
+class PublishError(Exception):
+  pass
 
-  if list_ and target:
-    sys.exit('error: conflicting options')
 
-  package = project.load_or_exit(expect=PackageModel)
-  publishers = list(get_publishers(package))
+def publish_package(
+  package: PackageModel,
+  target: TargetId,
+  build_dir: str,
+  skip_build: bool,
+  test: bool,
+  verbose: bool,
+) -> None:
 
   if package.has_vendored_requirements():
-    sys.exit(f'error: package has vendored requirements and cannot be published')
+    raise PublishError('package has vendored requirements and cannot be published')
 
-  if list_:
-    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
-      print(f'{colored(scope, "green")}:')
-      for publisher in publishers:
-        print(f'  {publisher.id.name} – {publisher.get_description()}')
-    return
-
-  if not target:
-    sys.exit('error: no target specified')
-
+  publishers = list(get_publishers(package))
   publishers = [p for p in publishers if target.match(p.id)]
   if not publishers:
-    sys.exit(f'error: no target matches "{target}"')
+    raise PublishError(f'no target matches "{target}"')
 
   # Prepare the builds that need to be built for the publishers.
   all_builders = list(get_builders(package))
@@ -80,8 +66,8 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
     for target_id in publisher.get_build_dependencies():
       matched_builders = [b for b in all_builders if target_id.match(b.id)]
       if not matched_builders:
-        sys.exit(f'error: publisher "{publisher.id}" depends on build target "{target_id}" '
-                  'which could not be resolved.')
+        raise PublishError(f'publisher "{publisher.id}" depends on build target "{target_id}" '
+                           f'which could not be resolved.')
       builders.extend(b for b in matched_builders if b not in builders)
     builders_for_publisher[publisher.id] = builders
 
@@ -93,7 +79,7 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
       builders = builders_for_publisher[publisher.id]
       success = run_builds([b for b in builders if b not in built], build_dir, verbose)
       if not success:
-        sys.exit(1)
+        raise PublishError('build step failed')
 
   # Execute the publishers.
   for publisher in publishers:
@@ -110,4 +96,51 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
     print()
     success = publisher.publish(files, test, verbose)
     if not success:
-      sys.exit(1)
+      raise PublishError('publish step failed')
+
+
+@pkg.command()
+@click.argument('target', type=lambda s: TargetId.parse(s, True), required=False)
+@click.option('-t', '--test', is_flag=True, help='publish to the test repository instead')
+@click.option('-l', '--list', 'list_', is_flag=True, help='list available publishers')
+@click.option('-v', '--verbose', is_flag=True, help='show more output')
+@click.option('-b', '--build-dir', default='build', help='build output directory')
+@click.option('--skip-build', is_flag=True, help='do not build artifacts that are to be published')
+def publish(target, test, list_, verbose, build_dir, skip_build):
+  """
+  Publish the package to PyPI or another target.
+  """
+
+  if list_ and target:
+    sys.exit('error: conflicting options')
+
+  package = project.load_or_exit(expect=PackageModel)
+
+  if list_:
+    publishers = list(get_publishers(package))
+    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
+      print(f'{colored(scope, "green")}:')
+      for publisher in publishers:
+        print(f'  {publisher.id.name} – {publisher.get_description()}')
+    return
+
+  if not target:
+    sys.exit('error: no target specified')
+
+  if package.has_vendored_requirements():
+    sys.exit(f'error: package has vendored requirements and cannot be published')
+
+  if list_:
+    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
+      print(f'{colored(scope, "green")}:')
+      for publisher in publishers:
+        print(f'  {publisher.id.name} – {publisher.get_description()}')
+    return
+
+  if not target:
+    sys.exit('error: no target specified')
+
+  try:
+    publish_package(package, target, build_dir, skip_build, test, verbose)
+  except PublishError as exc:
+    sys.exit(f'error: {exc}')

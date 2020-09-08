@@ -81,3 +81,7 @@ changes:
   description: remove `bad-package-directory` check again, having a package name differ
     from the directory name is a valid use case
   fixes: []
+- type: feature
+  component: cli
+  description: Add `shut mono publish` command which delegates to `shut pkg publish`.
+  fixes: []

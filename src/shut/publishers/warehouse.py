@@ -128,12 +128,13 @@ class WarehouseProvider(PublisherProvider[PackageModel]):
   # PublisherProvider Overrides
 
   def get_publishers(self, package: PackageModel) -> Iterable[Publisher]:
-    if package.publish.pypi.enabled:
+    publish = package.get_publish_config()
+    if publish.pypi.enabled:
       yield WarehousePublisher.from_pypi_credentials(
         TargetId('warehouse', 'pypi'),
-        package.publish.pypi.credentials)
+        publish.pypi.credentials)
 
-    for name, config in package.publish.warehouses.items():
+    for name, config in publish.warehouses.items():
       display_name = name
       if config.repository_url:
         display_name = urlparse(config.repository_url).netloc
