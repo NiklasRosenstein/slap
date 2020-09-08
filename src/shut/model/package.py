@@ -187,6 +187,11 @@ class PackageModel(AbstractProjectModel):
     directory = self.get_python_package_metadata().package_directory
     return os.path.join(directory, 'py.typed')
 
+  def get_publish_config(self) -> PublishConfiguration:
+    if self.project and self.project.monorepo and self.project.monorepo.publish:
+      return self.project.monorepo.publish
+    return self.publish
+
   # AbstractProjectModel
 
   def get_name(self) -> str:
