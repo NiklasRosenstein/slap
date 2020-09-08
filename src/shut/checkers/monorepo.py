@@ -32,17 +32,6 @@ class MonorepoChecker(Checker[MonorepoModel]):
     for package_name, exc_info in monorepo.project.invalid_packages:
       yield CheckResult(CheckStatus.ERROR, f'{package_name}: {exc_info[1]}')
 
-  @check('bad-package-directory')
-  def _check_bad_package_directory(self, monorepo):
-    for package in monorepo.project.packages:
-      dirname = Path(package.filename).parent.name
-      if dirname != package.name:
-        yield CheckResult(
-          CheckStatus.ERROR,
-          f'package name is {package.name!r} but directory name is {dirname!r}',
-          subject=package)
-    yield SkipCheck()
-
   @check('inconsistent-single-version')
   def _check_consistent_mono_version(self, monorepo):
     if monorepo.release.single_version and monorepo.project.packages:

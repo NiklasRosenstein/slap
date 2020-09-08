@@ -76,3 +76,8 @@ changes:
   description: '`shut mono bump` now includes the packages in the mono repo if `$.release.single-version`
     is enabled'
   fixes: []
+- type: change
+  component: shut.checkers.monorepo
+  description: remove `bad-package-directory` check again, having a package name differ
+    from the directory name is a valid use case
+  fixes: []
