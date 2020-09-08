@@ -27,10 +27,30 @@ from termcolor import colored
 
 from shut.commands import project
 from shut.commands.commons.new import write_files
-from shut.model import PackageModel
+from shut.model import AbstractProjectModel
+from shut.model.package import PackageModel
 from shut.renderers import get_files
 from shut.utils.io.virtual import VirtualFiles
 from . import pkg
+
+
+def verify_tag(obj: AbstractProjectModel, tag: str = None) -> bool:
+  assert obj.version is not None
+  expected_tag = obj.get_tag(obj.version)
+  if expected_tag != tag:
+    print(f'{colored("error", "red")}: tag "{tag}" does not match expected tag "{expected_tag}"')
+    return False
+  return True
+
+
+def verify_integrity(obj: AbstractProjectModel, files: VirtualFiles) -> bool:
+  modified_files = files.get_modified_files(obj.get_directory())
+  if modified_files:
+    print(f'{colored("error", "red")}: the following files would be modified with an update')
+    for filename in modified_files:
+      print(f'  {filename}')
+    return False
+  return True
 
 
 def update_package(
@@ -38,35 +58,20 @@ def update_package(
   dry: bool = False,
   indent: int = 0,
   verify: bool = False,
-  verify_tag: Optional[str] = None,
+  tag: Optional[str] = None,
 ) -> VirtualFiles:
 
   result = 0
-
-  if verify_tag:
-    assert package.version is not None
-    expected_tag = package.get_tag(package.version)
-    if expected_tag != verify_tag:
-      print(f'{colored("error", "red")}: tag "{verify_tag}" does not match expected tag "{expected_tag}"')
-      result = 1
-
+  if tag and not verify_tag(package, tag):
+    result = 1
   files = get_files(package)
-
-  if verify:
-    modified_files = files.get_modified_files(package.get_directory())
-    if modified_files:
-      print(f'{colored("error", "red")}: the following files would be modified with an update')
-      for filename in modified_files:
-        print(f'  {filename}')
-      result = 1
-
+  if verify and not verify_integrity(package, files):
+    result = 1
   if result != 0:
     sys.exit(result)
 
-  if verify_tag:
-    return files
-
-  write_files(files, package.get_directory(), force=True, dry=dry, indent=indent)
+  if not verify:
+    write_files(files, package.get_directory(), force=True, dry=dry, indent=indent)
   return files
 
 
@@ -82,4 +87,4 @@ def update(dry, verify, verify_tag):
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  update_package(package, verify=verify or bool(verify_tag), verify_tag=verify_tag)
+  update_package(package, verify=verify or bool(verify_tag), tag=verify_tag)

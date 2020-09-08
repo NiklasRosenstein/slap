@@ -22,7 +22,7 @@
 import contextlib
 import io
 import os
-from typing import Any, Callable, ContextManager, IO, Iterable, Set, Union
+from typing import Any, Callable, ContextManager, IO, Iterable, Optional, Set, Union
 
 
 class VirtualFiles:
@@ -34,6 +34,13 @@ class VirtualFiles:
 
   def __init__(self):
     self._files = []
+
+  def update(self, other: 'VirtualFiles', prefix: Optional[str] = None) -> None:
+    for item in other._files:
+      item = dict(item)
+      if prefix:
+        item['filename'] = os.path.join(prefix, item['filename'])
+      self._files.append(item)
 
   def add_static(self, filename: str, content: Union[str, bytes]) -> None:
     def _write(fp):

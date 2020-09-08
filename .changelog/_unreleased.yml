@@ -1,0 +1,11 @@
+release_date: null
+changes:
+- type: change
+  component: cli
+  description: Removed `-a,--all` flag from `shut mono update`, the command now always
+    behaves like that flag is set
+  fixes: []
+- type: feature
+  component: cli
+  description: Add `shut mono update` flags `--verify` and `--verify-tag`
+  fixes: []

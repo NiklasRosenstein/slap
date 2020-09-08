@@ -35,26 +35,6 @@ from . import pkg
 from .. import project
 
 
-class Requirement:
-
-  def __init__(self, name: str, develop: bool = False, extras: str = None) -> None:
-    self.name = name
-    self.develop = develop
-    self.extras = extras
-
-  def __str__(self):
-    return ' '.join(self.to_args())
-
-  def __repr__(self):
-    return 'Requirement({})'.format(str(self))
-
-  def to_args(self) -> List[str]:
-    args = [self.name + ('[{}]'.format(self.extras) if self.extras else '')]
-    if self.develop:
-      args.insert(0, '-e')
-    return args
-
-
 @pkg.command()
 @click.option('--develop/--no-develop', default=True,
   help='Install in develop mode (default: true)')
@@ -99,7 +79,7 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
               '{} does not match the present version {}'
               .format(dep.name, ref.version_selector, dep.version), file=sys.stderr)
       else:
-        reqs.insert(0, Requirement(dep.get_directory(), develop))
+        reqs.insert(0, VendoredRequirement(VendoredRequirement.Type.Path, dep.get_directory()))
 
   pip_bin = shlex.split(os.getenv('PIP', pip or 'python -m pip'))
   command = pip_bin + ['install'] + reqs.to_pip_args(package.get_directory(), develop)
