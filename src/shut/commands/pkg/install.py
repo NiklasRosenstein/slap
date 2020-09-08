@@ -23,7 +23,7 @@ import os
 import shlex
 import subprocess as sp
 import sys
-from typing import List
+from typing import List, Optional, Set, Tuple
 
 import click
 from nr.stream import concat
@@ -33,6 +33,60 @@ from shut.model.package import PackageModel
 from shut.model.requirements import Requirement, RequirementsList, VendoredRequirement
 from . import pkg
 from .. import project
+
+
+def collect_installable_requirements(package: bool, inter_deps: bool, extra: Set[str]) -> RequirementsList:
+  reqs = RequirementsList()
+
+  # Pip does not understand "test" as an extra and does not have an option to
+  # install test requirements.
+  if 'test' in extra:
+    reqs += package.test_requirements
+
+  reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
+  reqs += package.requirements.vendored_reqs()
+
+  if project.monorepo and inter_deps:
+    # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate
+    #   between normal, test and extra requirements.
+    project_packages = {p.name: p for p in project.packages}
+    for ref in project.monorepo.get_inter_dependencies_for(package):
+      dep = project_packages[ref.package_name]
+      if not ref.version_selector.matches(dep.version):
+        print('note: skipping inter-dependency on package "{}" because the version selector '
+              '{} does not match the present version {}'
+              .format(dep.name, ref.version_selector, dep.version), file=sys.stderr)
+      else:
+        reqs.insert(0, VendoredRequirement(VendoredRequirement.Type.Path, dep.get_directory()))
+
+  return reqs
+
+
+def run_install(
+  pip: Optional[str],
+  reqs: List[Tuple[str, RequirementsList]],
+  develop: bool,
+  extra: Set[str],
+  upgrade: bool,
+  quiet: bool,
+  dry: bool,
+  pip_args: Optional[str],
+) -> None:
+
+  pip_bin = shlex.split(os.getenv('PIP', pip or 'python -m pip'))
+  command = pip_bin + ['install']
+  for directory, req in reqs:
+    command += req.to_pip_args(directory, develop)
+  if upgrade:
+    command.append('--upgrade')
+  if quiet:
+    command.append('--quiet')
+  command += shlex.split(pip_args) if pip_args else []
+
+  if dry:
+    print(' '.join(map(shlex.quote, command)))
+  else:
+    sys.exit(sp.call(command))
 
 
 @pkg.command()
@@ -55,41 +109,6 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  extras = set((extra or '').split(','))
-  reqs = RequirementsList()
-
-  # Pip does not understand "test" as an extra and does not have an option to
-  # install test requirements.
-  if 'test' in extras:
-    extras.discard('test')
-    extra = ','.join(extras)
-    reqs += package.test_requirements
-
-  reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
-  reqs += package.requirements.vendored_reqs()
-
-  if project.monorepo and inter_deps:
-    # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate
-    #   between normal, test and extra requirements.
-    project_packages = {p.name: p for p in project.packages}
-    for ref in project.monorepo.get_inter_dependencies_for(package):
-      dep = project_packages[ref.package_name]
-      if not ref.version_selector.matches(dep.version):
-        print('note: skipping inter-dependency on package "{}" because the version selector '
-              '{} does not match the present version {}'
-              .format(dep.name, ref.version_selector, dep.version), file=sys.stderr)
-      else:
-        reqs.insert(0, VendoredRequirement(VendoredRequirement.Type.Path, dep.get_directory()))
-
-  pip_bin = shlex.split(os.getenv('PIP', pip or 'python -m pip'))
-  command = pip_bin + ['install'] + reqs.to_pip_args(package.get_directory(), develop)
-  if upgrade:
-    command.append('--upgrade')
-  if quiet:
-    command.append('--quiet')
-  command += shlex.split(pip_args) if pip_args else []
-
-  if dry:
-    print(' '.join(map(shlex.quote, command)))
-  else:
-    sys.exit(sp.call(command))
+  extra = set((extra or '').split(','))
+  reqs = collect_installable_requirements(package, inter_deps, extra)
+  run_install(pip, [(package.get_directory(), reqs)], develop, extra,upgrade, quiet, dry, pip_args)
