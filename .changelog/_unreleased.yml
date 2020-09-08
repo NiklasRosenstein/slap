@@ -85,3 +85,9 @@ changes:
   component: cli
   description: Add `shut mono publish` command which delegates to `shut pkg publish`.
   fixes: []
+- type: change
+  component: shut.publishers.warehouse
+  description: The `WarehouseProvider` now uses the new `PackageModel.get_publish_conf()`
+    instead of `PackageModel.publish` directly, allowing packages to inherit the publish
+    configuration of the mono repository
+  fixes: []
