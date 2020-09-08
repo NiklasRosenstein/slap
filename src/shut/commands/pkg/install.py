@@ -35,12 +35,16 @@ from . import pkg
 from .. import project
 
 
-def collect_installable_requirements(package: bool, inter_deps: bool, extra: Set[str]) -> RequirementsList:
+def collect_requirements(
+  package: bool,
+  inter_deps: bool,
+  extra: Optional[Set[str]],
+) -> RequirementsList:
   reqs = RequirementsList()
 
   # Pip does not understand "test" as an extra and does not have an option to
   # install test requirements.
-  if 'test' in extra:
+  if extra and 'test' in extra:
     reqs += package.test_requirements
 
   reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
@@ -66,7 +70,6 @@ def run_install(
   pip: Optional[str],
   reqs: List[Tuple[str, RequirementsList]],
   develop: bool,
-  extra: Set[str],
   upgrade: bool,
   quiet: bool,
   dry: bool,
@@ -89,12 +92,18 @@ def run_install(
     sys.exit(sp.call(command))
 
 
+def split_extras(extras: str) -> Set[str]:
+  result = set(map(str.strip, extras.split(',')))
+  result.discard('')
+  return result
+
+
 @pkg.command()
 @click.option('--develop/--no-develop', default=True,
   help='Install in develop mode (default: true)')
 @click.option('--inter-deps/--no-inter-deps', default=True,
   help='Install package inter dependencies from inside the same monorepo (default: true)')
-@click.option('--extra', help='Specify one or more extras to install.')
+@click.option('--extra', type=split_extras, help='Specify one or more extras to install.')
 @click.option('-U', '--upgrade', is_flag=True, help='Upgrade all packages (forwarded to pip install).')
 @click.option('-q', '--quiet', is_flag=True, help='Quiet install')
 @click.option('--pip', help='Override the command to run Pip. Defaults to "python -m pip" or the PIP variable.')
@@ -110,5 +119,5 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
 
   package = project.load_or_exit(expect=PackageModel)
   extra = set((extra or '').split(','))
-  reqs = collect_installable_requirements(package, inter_deps, extra)
-  run_install(pip, [(package.get_directory(), reqs)], develop, extra,upgrade, quiet, dry, pip_args)
+  reqs = collect_requirements(package, inter_deps, extra)
+  run_install(pip, [(package.get_directory(), reqs)], develop, upgrade, quiet, dry, pip_args)

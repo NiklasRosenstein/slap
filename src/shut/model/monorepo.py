@@ -22,6 +22,7 @@
 import re
 from typing import Iterable, Optional
 
+import networkx as nx
 from databind.core import datamodel, field
 
 from .abstract import AbstractProjectModel
@@ -71,6 +72,20 @@ class MonorepoModel(AbstractProjectModel):
         if version_selector:
           version_selector = VersionSelector(version_selector)
         yield InterdependencyRef(package.filename, package_name, version_selector, match.start(2), match.end(2))
+
+  def get_inter_dependencies_graph(self) -> nx.DiGraph:
+    """
+    Create a directed graph from the inter dependencies of packages in the mono repo.
+    """
+
+    graph = nx.DiGraph()
+    for package in self.project.packages:
+      graph.add_node(package.name)
+    for package in self.project.packages:
+      for ref in self.get_inter_dependencies_for(package):
+        graph.add_edge(ref.package_name, package.name)
+
+    return graph
 
   # AbstractProjectModel Overrides
 
