@@ -1,0 +1,11 @@
+release_date: null
+changes:
+- type: feature
+  component: shore.models.monorepo
+  description: Add `Monorepo.get_inter_dependencies_graph()`
+  fixes: []
+- type: fix
+  component: cli
+  description: '`shut mono install` now uses topological order to retrieve package
+    requirements'
+  fixes: []
