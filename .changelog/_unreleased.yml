@@ -9,3 +9,7 @@ changes:
   component: cli
   description: Add `shut mono update` flags `--verify` and `--verify-tag`
   fixes: []
+- type: fix
+  component: shut.renderers.setuptools
+  description: Fix rendering of `extras_require`
+  fixes: []
