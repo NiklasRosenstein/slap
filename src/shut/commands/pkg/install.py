@@ -118,6 +118,5 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  extra = set((extra or '').split(','))
   reqs = collect_requirements(package, inter_deps, extra)
   run_install(pip, [(package.get_directory(), reqs)], develop, upgrade, quiet, dry, pip_args)
