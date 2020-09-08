@@ -71,3 +71,8 @@ changes:
   description: '`shut pkg bump` now prevents bumping if package version is managed
     by a monorepo single-version (as was previously already expected to happen)'
   fixes: []
+- type: improvement
+  component: cli
+  description: '`shut mono bump` now includes the packages in the mono repo if `$.release.single-version`
+    is enabled'
+  fixes: []
