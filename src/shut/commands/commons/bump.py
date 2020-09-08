@@ -34,6 +34,7 @@ from nr.utils.git import Git
 from termcolor import colored
 
 from shut.changelog.manager import ChangelogManager
+from shut.changelog.v3 import Changelog
 from shut.commands import project
 from shut.model import AbstractProjectModel, Project
 from shut.model.version import bump_version, parse_version, Version
@@ -76,13 +77,16 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
   def get_snapshot_version(self) -> Version:
     pass
 
+  def get_version_refs(self) -> Iterable[VersionRef]:
+    yield from get_version_refs(self.obj)
+
   def bump_to_version(self, target_version: Version) -> Iterable[str]:
     """
     Called to bump to the specified *target_version*. The default implementation uses the
     version refs provided by #get_version_refs() to bump.
     """
 
-    version_refs = list(get_version_refs(self.obj))
+    version_refs = list(self.get_version_refs())
 
     print()
     print(f'bumping {len(version_refs)} version reference(s)')
@@ -110,17 +114,19 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
     changed_files = set(x.filename for x in version_refs)
 
     # Release the staged changelog.
-    manager = ChangelogManager(self.obj.get_changelog_directory())
-    if manager.unreleased.exists():
-      changed_files.add(manager.unreleased.filename)
-      if self.args.dry:
-        changelog = manager.version(target_version)
-      else:
-        changelog = manager.release(target_version)
-      changed_files.add(changelog.filename)
+    managers = list(self.get_changelog_managers())
+    managers = [m for m in managers if m.unreleased.exists()]
+    if managers:
       print()
-      print('release staged changelog')
-      print(f'  {colored(os.path.relpath(manager.unreleased.filename), "cyan")} → {os.path.relpath(changelog.filename)}')
+      print('release staged changelog' + ('s' if len(managers) > 1 else ''))
+      for manager in managers:
+        changed_files.add(manager.unreleased.filename)
+        if self.args.dry:
+          changelog = manager.version(target_version)
+        else:
+          changelog = manager.release(target_version)
+        changed_files.add(changelog.filename)
+        print(f'  {colored(os.path.relpath(manager.unreleased.filename), "cyan")} → {os.path.relpath(changelog.filename)}')
 
     return changed_files
 
@@ -130,6 +136,9 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
     Run the "update" function for the current monorepo or package. A list of the modified files
     must be returned.
     """
+
+  def get_changelog_managers(self) -> Iterable[ChangelogManager]:
+    yield ChangelogManager(self.obj.get_changelog_directory())
 
 
 def make_bump_command(
@@ -173,11 +182,14 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
   elif not provided_args:
     print()
     print('figuring bump mode from changelog')
-    changelog = ChangelogManager(data.obj.get_changelog_directory()).unreleased
-    if not changelog.exists() or not changelog.entries:
-      sys.exit(f'error: changelog "{changelog.filename}" does not exist')
-    counter = Counter(entry.type_.name for entry in changelog.entries)
-    bump_mode = max(entry.type_.bump_mode for entry in changelog.entries)
+    entries = []
+    for manager in data.get_changelog_managers():
+      if manager.unreleased.exists():
+        entries += manager.unreleased.entries
+    if not entries:
+      sys.exit('error: no changelog entries found')
+    counter = Counter(entry.type_.name for entry in entries)
+    bump_mode = max(entry.type_.bump_mode for entry in entries)
     assert hasattr(args, bump_mode.name), bump_mode.name
     setattr(args, bump_mode.name, True)
     print('  {} → {}'.format(

@@ -29,7 +29,9 @@ import nr.fs
 from nr.stream import Stream
 from termcolor import colored
 
+from shut.changelog.manager import ChangelogManager
 from shut.commands.commons.bump import make_bump_command, VersionBumpData, VersionRef
+from shut.commands.pkg.bump import PackageBumpData
 from shut.model import MonorepoModel, Project
 from shut.model.version import get_commit_distance_version, parse_version, Version
 from shut.utils.text import substitute_ranges
@@ -46,6 +48,12 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
     self.obj.version = new_version
     vfiles = update_monorepo(self.obj, dry=self.args.dry, indent=1)
     return vfiles.abspaths(self.obj.get_directory())
+
+  def get_version_refs(self) -> Iterable[VersionRef]:
+    yield from super().get_version_refs()
+    if self.obj.release.single_version:
+      for package in self.project.packages:
+        yield from PackageBumpData(self.args, self.project, package).get_version_refs()
 
   def bump_to_version(self, target_version: Version) -> Iterable[str]:
     changed_files = list(super().bump_to_version(target_version))
@@ -89,6 +97,12 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
       self.obj.directory,
       self.obj.version,
       self.obj.get_tag(self.obj.version)) or self.obj.version
+
+  def get_changelog_managers(self) -> Iterable[ChangelogManager]:
+    yield from super().get_changelog_managers()
+    if self.obj.release.single_version:
+      for package in self.project.packages:
+        yield from PackageBumpData(self.args, self.project, package).get_changelog_managers()
 
 
 mono.command()(make_bump_command(MonorepoBumpdata, MonorepoModel))
