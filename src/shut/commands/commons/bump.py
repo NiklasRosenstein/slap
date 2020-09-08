@@ -69,7 +69,6 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
     self.project = project
     self.obj = obj
 
-  @abc.abstractmethod
   def loaded(self) -> None:
     pass
 
