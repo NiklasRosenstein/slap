@@ -41,6 +41,7 @@ def mono(ctx, run_checks):
 
 from . import bump
 from . import checks
+from . import install
 from . import new
 from . import publish
 from . import status

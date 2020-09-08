@@ -13,3 +13,7 @@ changes:
   component: shut.renderers.setuptools
   description: Fix rendering of `extras_require`
   fixes: []
+- type: feature
+  component: cli
+  description: Add `shut mono install` command
+  fixes: []
