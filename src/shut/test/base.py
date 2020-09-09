@@ -52,6 +52,7 @@ __all__ = [
 class TestStatus(enum.Enum):
   PASSED = enum.auto()  #: The test passed.
   FAILED = enum.auto()  #: The test failed.
+  SKIPPED = enum.auto()  #: The test was skipped.
   ERROR = enum.auto()  #: An error occurred when running the test.
 
 

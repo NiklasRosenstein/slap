@@ -66,7 +66,7 @@ def load_report_file(report_file: str) -> TestRun:
   # Collect the test results.
   for test in raw['tests']:
     failed_stage = next((test[k] for k in ('setup', 'call', 'teardown')
-      if test[k]['outcome'] == 'failed'), None)
+      if k in test and test[k]['outcome'] == 'failed'), None)
     if failed_stage:
       crash = TestCrashReport(
         filename=failed_stage['crash']['path'],
@@ -79,13 +79,13 @@ def load_report_file(report_file: str) -> TestRun:
     else:
       crash = None
       stdout = None
-    status = {'passed': TestStatus.PASSED, 'failed': TestStatus.FAILED}[test['outcome']]
+    test_status = {'passed': TestStatus.PASSED, 'failed': TestStatus.FAILED, 'skipped': TestStatus.SKIPPED}[test['outcome']]
     tests.append(TestCase(
       name=test['nodeid'],
-      duration=test['setup']['duration'] + test['call']['duration'] + test['teardown']['duration'],
+      duration=sum(test[k]['duration'] for k in ('setup', 'call', 'teardown') if k in test),
       filename=testid_to_source[test['nodeid']][0],
       lineno=testid_to_source[test['nodeid']][1],
-      status=status,
+      status=test_status,
       crash=crash,
       stdout=stdout,
     ))
