@@ -33,13 +33,21 @@ from shut.utils.text import indent_text
 from . import pkg, project
 
 
-def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> TestRun:
+def test_package(
+  package: PackageModel,
+  isolate: bool,
+  keep_test_env: bool = False,
+  capture: bool = True,
+) -> TestRun:
   if not package.test_driver:
     raise RuntimeError('package has no test driver configured')
   if isolate:
-    print('Creating temporary virtual environment at .venv-test ...')
     venv = Virtualenv(os.path.join(package.get_directory(), '.venv-test'))
-    venv.create(Runtime.from_env())
+    if venv.exists():
+      print('Re-using existing virtual environment at .venv-test ...')
+    else:
+      print('Creating temporary virtual environment at .venv-test ...')
+      venv.create(Runtime.from_env())
     runtime = venv.get_runtime()
     print(f'Installing package "{package.name}" and test requirements ...')
     try:
@@ -61,7 +69,7 @@ def test_package(package: PackageModel, isolate: bool, capture: bool = True) -> 
   try:
     return package.test_driver.test_package(package, runtime, capture)
   finally:
-    if venv:
+    if venv and not keep_test_env:
       venv.rm()
 
 
@@ -78,14 +86,15 @@ def print_test_run(test_run: TestRun) -> None:
 
   # Print a summary.
   n_passed = sum(1 for t in test_run.tests if t.status == TestStatus.PASSED)
+  n_skipped = sum(1 for t in test_run.tests if t.status == TestStatus.SKIPPED)
   status_line = (
     f'Ran {len(test_run.tests)} test(s) in {test_run.duration:.3f}s '
-    f'({n_passed} passed, {len(test_run.tests) - n_passed} failed, {len(test_run.errors)} '
-    f'error(s)). {test_run.status.name}')
+    f'({n_passed} passed, {n_skipped} skipped, {len(test_run.tests) - n_passed - n_skipped} failed, '
+    f'{len(test_run.errors)} error(s)). {test_run.status.name}')
   print(status_line)
   print()
   for test in sorted_tests:
-    color = 'green' if test.status == TestStatus.PASSED else 'red'
+    color = {TestStatus.PASSED: 'green', TestStatus.SKIPPED: 'yellow', TestStatus.FAILED: 'red'}[test.status]
     print(f'  {colored(test.name, color, attrs=["bold"])} {test.status.name}')
   if sorted_tests:
     print()
@@ -94,9 +103,8 @@ def print_test_run(test_run: TestRun) -> None:
     # Print error details.
     print('Failed test details:')
     print('====================')
-    for i, test in enumerate(filter(lambda t: t.status != TestStatus.PASSED, sorted_tests)):
-      if test.status == TestStatus.PASSED:
-        continue
+    not_passed_not_skipped = lambda t: t.status not in (TestStatus.PASSED, TestStatus.SKIPPED)
+    for i, test in enumerate(filter(not_passed_not_skipped, sorted_tests)):
       print()
       line = f'  {colored(test.name, "red", attrs=["bold"])} ({test.filename}:{test.lineno})'
       print(line)
@@ -131,15 +139,17 @@ def print_test_run(test_run: TestRun) -> None:
   help='Isolate all test runs in virtual environments. This greatly increases the duration '
        'for tests to run as the environment needs to be created and packages installed first, '
        'but it ensures that the unit tests work for a vanilla installation (default: false)')
+@click.option('--keep-test-env', is_flag=True,
+  help='Do not delete the virtual environment created when testing with --isolate.')
 @click.option('--capture/--no-capture', default=True,
   help='Capture the output of the underlying testing framework. If set to false, the output '
        'will be routed to stderr (default: true)')
-def test(isolate: bool, capture: bool) -> None:
+def test(isolate: bool, keep_test_env: bool, capture: bool) -> None:
   """
   Run the package's unit tests.
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  test_run = test_package(package, isolate, capture)
+  test_run = test_package(package, isolate, keep_test_env, capture)
   print_test_run(test_run)
   sys.exit(0 if test_run.status == TestStatus.PASSED else 1)

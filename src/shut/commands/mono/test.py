@@ -36,11 +36,13 @@ from . import mono, project
   help='Isolate all test runs in virtual environments. This greatly increases the duration '
        'for tests to run as the environment needs to be created and packages installed first, '
        'but it ensures that the unit tests work for a vanilla installation (default: false)')
+@click.option('--keep-test-env', is_flag=True,
+  help='Do not delete the virtual environment created when testing with --isolate.')
 @click.option('--capture/--no-capture', default=True,
   help='Capture the output of the underlying testing framework. If set to false, the output '
        'will be routed to stderr (default: true)')
 @click.option('--only', help='Comma-separated list of packages to test.')
-def test(isolate: bool, capture: bool, only: str) -> None:
+def test(isolate: bool, keep_test_env: bool, capture: bool, only: str) -> None:
   """
   Run unit tests for all packages in the mono repository.
   """
@@ -78,7 +80,7 @@ def test(isolate: bool, capture: bool, only: str) -> None:
       print()
     print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
     print()
-    test_run = test_package(package, isolate, capture)
+    test_run = test_package(package, isolate, keep_test_env, capture)
     all_tests += test_run.tests
     all_errors += test_run.errors
     print_test_run(test_run)
@@ -87,17 +89,18 @@ def test(isolate: bool, capture: bool, only: str) -> None:
     package_statuses.append((package, test_run.status))
 
   n_passed = sum(1 for t in all_tests if t.status == TestStatus.PASSED)
+  n_skipped = sum(1 for t in all_tests if t.status == TestStatus.SKIPPED)
   duration = time.perf_counter() - tstart
 
   print()
   print(colored('Monorepo summary:', attrs=['bold', 'underline']))
   print()
   print(f'Ran {len(all_tests)} test(s) in {duration:.3f}s ({n_passed} passed, '
-        f'{len(all_tests) - n_passed} failed, {len(all_errors)} error(s)). '
+        f'{n_skipped} skipped, {len(all_tests) - n_passed} failed, {len(all_errors)} error(s)). '
         f'{"PASSED" if exit_code == 0 else "FAILED"}')
   print()
   for package, status in package_statuses:
-    color = 'green' if status == TestStatus.PASSED else 'red'
+    color = {TestStatus.PASSED: 'green', TestStatus.SKIPPED: 'yellow', TestStatus.FAILED: 'red', TestStatus.ERROR: 'red'}[status]
     print(f'  {colored(package.name, color, attrs=["bold"])} {status.name}')
 
   sys.exit(exit_code)

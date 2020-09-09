@@ -1,0 +1,18 @@
+release_date: null
+changes:
+- type: feature
+  component: cli
+  description: Add `shut ... test --keep-test-env` option
+  fixes: []
+- type: feature
+  component: shut.test.base
+  description: Add `TestStatus.SKIPPED` enumeration value
+  fixes: []
+- type: fix
+  component: shut.test.pytest
+  description: Support skipped tests instead of failing ungracefully
+  fixes: []
+- type: feature
+  component: cli
+  description: Support skipped tests `shut ... test` output
+  fixes: []
