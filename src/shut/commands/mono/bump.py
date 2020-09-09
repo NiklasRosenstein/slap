@@ -94,7 +94,7 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
 
   def get_snapshot_version(self) -> Version:
     return get_commit_distance_version(
-      self.obj.directory,
+      self.obj.get_directory(),
       self.obj.version,
       self.obj.get_tag(self.obj.version)) or self.obj.version
 
