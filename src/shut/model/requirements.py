@@ -242,7 +242,7 @@ class VendoredRequirement(BaseRequirement):
   def to_setuptools(self) -> str:
     raise RuntimeError('VendoredRequirement is not supported in setuptools')
 
-  def to_pip_args(self, root: str, develop: bool) -> List[str]:
+  def get_pip_args(self, root: str, develop: bool) -> List[str]:
     args = [self.location]
     if self.type == self.Type.Path:
       args[0] = os.path.normpath(os.path.join(root, args[0]))
@@ -278,10 +278,10 @@ class RequirementsList(List[BaseRequirement]):
   def vendored_reqs(self) -> Iterable[VendoredRequirement]:
     return filter(lambda x: isinstance(x, VendoredRequirement), self)
 
-  def to_pip_args(self, root: str, develop: bool) -> List[str]:
+  def get_pip_args(self, root: str, develop: bool) -> List[str]:
     result = []
     for req in self.reqs():
       result.append(req.to_setuptools())
     for req in self.vendored_reqs():
-      result += req.to_pip_args(root, develop)
+      result += req.get_pip_args(root, develop)
     return result

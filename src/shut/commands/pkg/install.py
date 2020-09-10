@@ -35,11 +35,12 @@ from . import pkg
 from .. import project
 
 
-def collect_requirements(
+def collect_requirement_args(
   package: bool,
+  develop: bool,
   inter_deps: bool,
   extra: Optional[Set[str]],
-) -> RequirementsList:
+) -> List[str]:
   reqs = RequirementsList()
 
   # Pip does not understand "test" as an extra and does not have an option to
@@ -63,28 +64,24 @@ def collect_requirements(
       else:
         reqs.insert(0, VendoredRequirement(VendoredRequirement.Type.Path, dep.get_directory()))
 
-  return reqs
+  return reqs.get_pip_args(package.get_directory(), develop)
 
 
 def run_install(
   pip: Optional[str],
-  reqs: List[Tuple[str, RequirementsList]],
+  args: List[str],
   develop: bool,
   upgrade: bool,
   quiet: bool,
   dry: bool,
-  pip_args: Optional[str],
 ) -> None:
 
   pip_bin = shlex.split(os.getenv('PIP', pip or 'python -m pip'))
-  command = pip_bin + ['install']
-  for directory, req in reqs:
-    command += req.to_pip_args(directory, develop)
+  command = pip_bin + ['install'] + args
   if upgrade:
     command.append('--upgrade')
   if quiet:
     command.append('--quiet')
-  command += shlex.split(pip_args) if pip_args else []
 
   if dry:
     print(' '.join(map(shlex.quote, command)))
@@ -109,7 +106,8 @@ def split_extras(extras: str) -> Set[str]:
 @click.option('--pip', help='Override the command to run Pip. Defaults to "python -m pip" or the PIP variable.')
 @click.option('--pip-args', help='Additional arguments to pass to Pip.')
 @click.option('--dry', is_flag=True, help='Print the Pip command to stdout instead of running it.')
-def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
+@click.option('--pipx', is_flag=True, help='Install using Pipx.')
+def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry, pipx):
   """
   Install the package using `python -m pip`. If the package is part of a mono repository,
   inter-dependencies will be installed from the mono repsitory rather than from PyPI.
@@ -117,6 +115,15 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry):
   The command used to invoke Pip can be overwritten using the `PIP` environment variable.
   """
 
+  if not pip and pipx:
+    pip = 'pipx'
+
   package = project.load_or_exit(expect=PackageModel)
-  reqs = collect_requirements(package, inter_deps, extra)
-  run_install(pip, [(package.get_directory(), reqs)], develop, upgrade, quiet, dry, pip_args)
+  args = collect_requirement_args(package, develop, inter_deps, extra)
+  if pipx:
+    args += ['--pip-args', ' '.join(map(shlex.quote, package.install.get_pip_args()))]
+  else:
+    args += package.install.get_pip_args()
+  if pip_args:
+    args += shlex.split(pip_args)
+  run_install(pip, args, develop, upgrade, quiet, dry)
