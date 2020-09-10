@@ -80,7 +80,7 @@ def add(packages, test, vendored_packages, develop):
   python = shlex.split(os.getenv('PYTHON', 'python'))
   pip = python + ['-m', 'pip']
   command = pip + ['install'] + [r.to_setuptools() for r in reqs]
-  command += concat(x.to_pip_args(package.get_directory(), develop) for x in vendored_reqs)
+  command += concat(x.get_pip_args(package.get_directory(), develop) for x in vendored_reqs)
   res = subprocess.call(command)
   if res != 0:
     sys.exit('error: pip install failed')

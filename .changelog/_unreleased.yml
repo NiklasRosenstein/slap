@@ -6,3 +6,13 @@ changes:
     if packages have inter dependencies
   fixes:
   - '#7'
+- type: feature
+  component: shut.model.package
+  description: Add `$.install.index-url` and `$.install.extra-index-urls`
+    fields
+  fixes: []
+- type: feature
+  component: cli
+  description: '`shut pkg install` now supports `$.install.index-url` and `$.install.extra-index-urls`,
+    added a `--pipx` option'
+  fixes: []

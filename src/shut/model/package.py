@@ -75,6 +75,21 @@ class InstallConfiguration:
 
   hooks: InstallHooks = field(default_factory=InstallHooks)
 
+  #: A value for the `--index-url` option to pass to Pip when using `shut pkg install`.
+  index_url: Optional[str] = field(altname='index-url', default=None)
+
+  #: A list of URLs to pass to Pip via the `--extra-index-url` option when using
+  #: `shut pkg install`.
+  extra_index_urls: List[str] = field(altname='extra-index-urls', default_factory=list)
+
+  def get_pip_args(self) -> List[str]:
+    result = []
+    if self.index_url:
+      result += ['--index-url', self.index_url]
+    for url in self.extra_index_urls:
+      result += ['--extra-index-url', url]
+    return result
+
 
 @datamodel
 class PackageModel(AbstractProjectModel):
