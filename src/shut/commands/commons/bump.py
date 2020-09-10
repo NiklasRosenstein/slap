@@ -39,6 +39,7 @@ from shut.commands import project
 from shut.model import AbstractProjectModel, Project
 from shut.model.version import bump_version, parse_version, Version
 from shut.renderers import get_version_refs, VersionRef
+from shut.utils.io.virtual import VirtualFiles
 from shut.utils.text import substitute_ranges
 
 logger = logging.getLogger(__name__)
@@ -130,7 +131,7 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
     return changed_files
 
   @abc.abstractmethod
-  def update(self, new_version: Version) -> Iterable[str]:
+  def update(self, new_version: Version) -> VirtualFiles:
     """
     Run the "update" function for the current monorepo or package. A list of the modified files
     must be returned.
@@ -241,7 +242,7 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
   if not args.skip_update:
     print()
     print('updating files')
-    changed_files += data.update(new_version)
+    changed_files += data.update(new_version).abspaths('.')
 
   if args.tag:
     print()

@@ -1,0 +1,8 @@
+release_date: null
+changes:
+- type: fix
+  component: cli
+  description: Fix `shut mono bump` not updating requirements in package `setup.py`
+    if packages have inter dependencies
+  fixes:
+  - '#7'

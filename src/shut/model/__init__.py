@@ -109,6 +109,21 @@ class Project:
 
     return self.subject
 
+  def reload(self) -> None:
+    """
+    Reloads the monorepo and packages.
+    """
+
+    if self.monorepo:
+      self._reload(self.monorepo)
+
+    for package in self.packages:
+      self._reload(package)
+
+  def _reload(self, obj: 'AbstractProjectModel') -> None:
+    result = self._load_object(obj.filename, type(obj), force=True)
+    vars(obj).update(vars(result))
+
   def load_or_exit(self, *args, **kwargs):
     try:
       return self.load(*args, **kwargs)
@@ -120,9 +135,9 @@ class Project:
       else:
         raise
 
-  def _load_object(self, filename: str, type_: Type[T]) -> T:
+  def _load_object(self, filename: str, type_: Type[T], force: bool = False) -> T:
     filename = os.path.normpath(os.path.abspath(filename))
-    if filename in self._cache:
+    if not force and filename in self._cache:
       obj = self._cache[filename]
       assert isinstance(obj, type_), 'type mismatch: have {} but expected {}'.format(
         type(obj).__name__, type_.__name__)
