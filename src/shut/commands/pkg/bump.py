@@ -31,6 +31,7 @@ from shut.commands.commons.bump import make_bump_command, VersionBumpData, Versi
 from shut.model import PackageModel, Project
 from shut.model.version import get_commit_distance_version, parse_version, Version
 from shut.renderers import get_files
+from shut.utils.io.virtual import VirtualFiles
 from . import pkg
 from .checks import check_package
 from .update import update_package
@@ -62,10 +63,10 @@ class PackageBumpData(VersionBumpData[PackageModel]):
       print(f'{error_s}: cannot bump package tied to a monorepo single-version.', file=sys.stderr)
       sys.exit(1)
 
-  def update(self, new_version: Version) -> Iterable[str]:
+  def update(self, new_version: Version) -> VirtualFiles:
     self.obj.version = new_version
     vfiles = update_package(self.obj, dry=self.args.dry, indent=1)
-    return vfiles.abspaths(self.obj.get_directory())
+    return vfiles
 
   def get_snapshot_version(self) -> Version:
     project = self.project

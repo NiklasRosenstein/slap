@@ -34,6 +34,7 @@ from shut.commands.commons.bump import make_bump_command, VersionBumpData, Versi
 from shut.commands.pkg.bump import PackageBumpData
 from shut.model import MonorepoModel, Project
 from shut.model.version import get_commit_distance_version, parse_version, Version
+from shut.utils.io.virtual import VirtualFiles
 from shut.utils.text import substitute_ranges
 from . import mono
 from .checks import check_monorepo
@@ -44,10 +45,20 @@ logger = logging.getLogger(__name__)
 
 class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
 
-  def update(self, new_version: Version) -> None:
-    self.obj.version = new_version
+  def update(self, new_version: Version) -> VirtualFiles:
+    # We have to re-load the monorepo and package definitions from the files since
+    # they have been updated by #bump_to_version(). This is a workaround to updating
+    # the version selectors of inter-dependencies in memory.
+    self.project.reload()
+
     vfiles = update_monorepo(self.obj, dry=self.args.dry, indent=1)
-    return vfiles.abspaths(self.obj.get_directory())
+    if self.obj.release.single_version:
+      for package in self.project.packages:
+        vfiles.update(
+          PackageBumpData(self.args, self.project, package).update(new_version),
+          os.path.relpath(package.get_directory(), self.obj.get_directory()))
+
+    return vfiles
 
   def get_version_refs(self) -> Iterable[VersionRef]:
     yield from super().get_version_refs()
