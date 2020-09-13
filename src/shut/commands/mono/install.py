@@ -17,7 +17,7 @@ from . import mono, project
 @click.option('--pip', help='Override the command to run Pip. Defaults to "python -m pip" or the PIP variable.')
 @click.option('--pip-args', help='Additional arguments to pass to Pip.')
 @click.option('--dry', is_flag=True, help='Print the Pip command to stdout instead of running it.')
-def install(develop, extra, upgrade, quiet, pip, dry):
+def install(develop, extra, upgrade, quiet, pip, pip_args, dry):
   """
   Install all packages in the monorepo using`python -m pip`.
 
