@@ -117,6 +117,17 @@ class PackageChecker(Checker[PackageModel]):
           'file "py.typed" exists but $.typed is not set')
     yield SkipCheck()
 
+  @check('namespace files')
+  def _check_naemspace_files(self, package: PackageModel) -> Iterable[CheckResult]:
+    namespaces = package.get_modulename().split('.')[:-1]
+    namespaces = [os.sep.join(namespaces[:i+1]) for i in range(len(namespaces))]
+
+    for namespace in namespaces:
+      namespace_file = os.path.join(package.get_directory(), package.source_directory, namespace, '__init__.py')
+      if not os.path.exists(namespace_file):
+        yield CheckResult(CheckStatus.WARNING,
+          f'namespace file "{namespace + os.sep}__init__.py" does not exist')
+
   @check('up to date')
   def _check_up_to_date(self, package: PackageModel) -> Iterable[CheckResult]:
     """
