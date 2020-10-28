@@ -162,6 +162,10 @@ def make_bump_command(
     'the same or a lower version). the flag will also result in force adding a Git tag and force '
     'pushing to the remote repository if the respective options as set (--tag and --push).')
   def bump(**kwargs):
+    """
+    Bump the version number to prepare a new release.
+    """
+
     args = Args(**kwargs)
     data = data_class(args, project, project.load_or_exit(expect=model_type))
     data.loaded()
