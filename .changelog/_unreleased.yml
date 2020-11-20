@@ -19,3 +19,8 @@ changes:
   component: checks
   description: Add check for namespace files
   fixes: []
+- type: fix
+  component: general
+  description: fix order of dependencies in the same mono repository when using `shut
+    pkg install`
+  fixes: []

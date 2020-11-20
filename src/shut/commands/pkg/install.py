@@ -55,6 +55,7 @@ def collect_requirement_args(
     # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate
     #   between normal, test and extra requirements.
     project_packages = {p.name: p for p in project.packages}
+    insert_index = 0
     for ref in project.monorepo.get_inter_dependencies_for(package):
       dep = project_packages[ref.package_name]
       if not ref.version_selector.matches(dep.version):
@@ -62,7 +63,8 @@ def collect_requirement_args(
               '{} does not match the present version {}'
               .format(dep.name, ref.version_selector, dep.version), file=sys.stderr)
       else:
-        reqs.insert(0, VendoredRequirement(VendoredRequirement.Type.Path, dep.get_directory()))
+        reqs.insert(insert_index, VendoredRequirement(VendoredRequirement.Type.Path, dep.get_directory()))
+        insert_index += 1
 
   return reqs.get_pip_args(package.get_directory(), develop)
 
