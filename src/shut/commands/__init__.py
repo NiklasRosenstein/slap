@@ -33,8 +33,8 @@ import os
 import warnings
 import sys
 
-context = proxy(lambda: click.get_current_context().obj)
-project = proxy(lambda: click.get_current_context().obj['project'])
+context: click.Context = proxy(lambda: click.get_current_context().obj)
+project: Project = proxy(lambda: click.get_current_context().obj['project'])
 
 
 @click.group()

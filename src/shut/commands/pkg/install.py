@@ -23,7 +23,7 @@ import os
 import shlex
 import subprocess as sp
 import sys
-from typing import List, Optional, Set, Tuple
+from typing import cast, List, Optional, Set, Tuple
 
 import click
 from nr.stream import concat
@@ -118,7 +118,7 @@ def install(develop, inter_deps, extra, upgrade, quiet, pip, pip_args, dry, pipx
   if not pip and pipx:
     pip = 'pipx'
 
-  package = project.load_or_exit(expect=PackageModel)
+  package = cast(PackageModel, project.load_or_exit(expect=PackageModel))
   args = collect_requirement_args(package, develop, inter_deps, extra)
   if pipx:
     args += ['--pip-args', ' '.join(map(shlex.quote, package.install.get_pip_args()))]
