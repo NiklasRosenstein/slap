@@ -21,7 +21,7 @@
 
 import os
 import sys
-from typing import Any, Dict, List, TextIO, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Optional, TextIO, Tuple, Type, TypeVar, Union
 
 import nr.fs
 import yaml
@@ -74,7 +74,7 @@ class Project:
   def load(
     self,
     directory: str = '.',
-    expect: Type['AbstractProjectModel'] = None,
+    expect: Optional[Type['AbstractProjectModel']] = None,
   ) -> 'AbstractProjectModel':
     """
     Loads all project information from *directory*. This searches in all parent directories
