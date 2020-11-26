@@ -24,7 +24,7 @@ This package implements rendering the files that can be produced from a monorepo
 and package definition.
 """
 
-from . import core, generic, setuptools
+from . import core, generic, license, setuptools
 from .core import *
 
 __all__ = core.__all__
