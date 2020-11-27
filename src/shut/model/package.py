@@ -30,6 +30,7 @@ from nr.stream import chain, concat
 
 from shut.utils.ast import load_module_members
 from shut.utils.fs import get_file_in_directory
+from .author import Author
 from .abstract import AbstractProjectModel
 from .linter import LinterConfiguration
 from .publish import PublishConfiguration
@@ -185,13 +186,31 @@ class PackageModel(AbstractProjectModel):
       return self.project.monorepo.license
     return None
 
+  def get_author(self) -> Optional[Author]:
+    if self.author:
+      return self.author
+    if self.project.monorepo:
+      return self.project.monorepo.author
+    return None
+
+  def get_url(self) -> Optional[str]:
+    if self.url:
+      return self.url
+    if self.project.monorepo:
+      return self.project.monorepo.url
+    return None
+
   # AbstractProjectModel
 
   def get_name(self) -> str:
     return self.name
 
   def get_version(self) -> Optional[Version]:
-    return self.version
+    if self.version:
+      return self.version
+    if self.project.monorepo and self.project.monorepo.release.single_version:
+      return self.project.monorepo.get_version()
+    return None
 
   def get_tag(self, version: Version) -> str:
     tag_format = self.release.tag_format

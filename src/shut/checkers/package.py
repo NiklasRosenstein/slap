@@ -67,7 +67,7 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('package-author')
   def _check_consistent_author(self, package: PackageModel) -> Iterable[CheckResult]:
-    if not package.author:
+    if not package.get_author():
       yield CheckResult(CheckStatus.ERROR, 'missing')
     metadata = package.get_python_package_metadata()
     try:
@@ -75,11 +75,11 @@ class PackageChecker(Checker[PackageModel]):
     except PackageError as exc:
       yield CheckResult(CheckStatus.ERROR, str(exc))
       return
-    if package.author and author != str(package.author):
+    if package.get_author() and author != str(package.get_author()):
       yield CheckResult(
         CheckStatus.ERROR,
         'Inconsistent package author (package.yaml: {!r} != {}: {!r})'.format(
-          str(package.author), metadata.filename, author))
+          str(package.get_author()), metadata.filename, author))
 
   @check('package-version')
   def _check_consistent_version(self, package: PackageModel) -> Iterable[CheckResult]:
