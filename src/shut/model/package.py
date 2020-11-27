@@ -29,6 +29,7 @@ from databind.core import datamodel, field
 from nr.stream import chain, concat
 
 from shut.utils.ast import load_module_members
+from shut.utils.fs import get_file_in_directory
 from .abstract import AbstractProjectModel
 from .linter import LinterConfiguration
 from .publish import PublishConfiguration
@@ -39,26 +40,6 @@ from .version import Version
 
 class PackageError(Exception):
   pass
-
-
-def _get_file_in_directory(directory: str, prefix: str, preferred: List[str]) -> Optional[str]:
-  """
-  Returns a file in *directory* that is either in the *preferred* list or starts with
-  specified *prefix*.
-  """
-
-  choices = []
-  for name in sorted(os.listdir(directory)):
-    if name in preferred:
-      break
-    if name.startswith(prefix):
-      choices.append(name)
-  else:
-    if choices:
-      return choices[0]
-    return None
-
-  return os.path.join(directory, name)
 
 
 @datamodel
@@ -180,20 +161,10 @@ class PackageModel(AbstractProjectModel):
     if self.readme:
       return os.path.abspath(os.path.join(directory, self.readme))
 
-    return _get_file_in_directory(
+    return get_file_in_directory(
       directory=directory,
       prefix='README.',
       preferred=['README.md', 'README.rst', 'README.txt', 'README'])
-
-  def get_license_file(self) -> Optional[str]:
-    """
-    Returns the absolute path to the LICENSE file for this package.
-    """
-
-    return _get_file_in_directory(
-      directory=os.path.dirname(self.filename),
-      prefix='LICENSE.',
-      preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'])
 
   def get_py_typed_file(self) -> Optional[str]:
     if not self.typed:
@@ -206,6 +177,13 @@ class PackageModel(AbstractProjectModel):
     if self.project and self.project.monorepo and self.project.monorepo.publish:
       return self.project.monorepo.publish
     return self.publish
+
+  def get_license(self) -> Optional[str]:
+    if self.license:
+      return self.license
+    if self.project.monorepo:
+      return self.project.monorepo.license
+    return None
 
   # AbstractProjectModel
 
@@ -220,6 +198,15 @@ class PackageModel(AbstractProjectModel):
     if self.project and self.project.monorepo and '{name}' not in tag_format:
       tag_format = '{name}@' + tag_format
     return tag_format.format(name=self.name, version=version)
+
+  def get_license_file(self, inherit: bool = False) -> Optional[str]:
+    if inherit and self.project.monorepo and (not self.license or
+        self.license == self.project.monorepo.license):
+      filename = os.path.join(self.project.monorepo.get_directory(), self.project.monorepo.get_license_file())
+      if filename:
+        return filename
+
+    return super().get_license_file(False)
 
 
 class PythonPackageMetadata:

@@ -30,6 +30,7 @@ from .author import Author
 from .changelog import ChangelogConfiguration
 from .release import ReleaseConfiguration
 from .version import Version
+from shut.utils.fs import get_file_in_directory
 
 
 @datamodel
@@ -66,6 +67,16 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
   def get_changelog_directory(self) -> str:
     assert self.filename
     return os.path.join(os.path.dirname(self.filename), self.changelog.directory)
+
+  def get_license_file(self, inherit: bool = False) -> Optional[str]:
+    """
+    Returns the absolute path to the LICENSE file for this package.
+    """
+
+    return get_file_in_directory(
+      directory=os.path.dirname(self.filename),
+      prefix='LICENSE.',
+      preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'])
 
 
 from . import Project
