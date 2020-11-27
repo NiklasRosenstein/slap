@@ -15,3 +15,8 @@ changes:
   description: '`shut {mono,pkg} update` commands now produce a LICENSE.txt file if
     a license template exists for the specified license (currently only `MIT`)'
   fixes: []
+- type: feature
+  component: general
+  description: packages now inherit the monorepo `author` and `url`, and `version`
+    if `release.single_version == True`
+  fixes: []
