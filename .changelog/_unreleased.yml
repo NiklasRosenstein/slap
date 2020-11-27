@@ -20,3 +20,11 @@ changes:
   description: packages now inherit the monorepo `author` and `url`, and `version`
     if `release.single_version == True`
   fixes: []
+- type: feature
+  component: general
+  description: add "shut pkg format" command
+  fixes: []
+- type: feature
+  component: general
+  description: package `author` and `url` are now inherited from the monorepo
+  fixes: []

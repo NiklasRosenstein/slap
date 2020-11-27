@@ -79,7 +79,7 @@ class LicenseRenderer(Renderer[AbstractProjectModel]):
     files.add_static(
       license_file,
       get_license_template(model.license)
-        .format(year=datetime.datetime.utcnow().year, author=model.author.name),
+        .format(year=datetime.datetime.utcnow().year, author=model.get_author().name),
     )
 
 

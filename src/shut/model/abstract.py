@@ -64,6 +64,9 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
     assert self.filename
     return os.path.dirname(self.filename)
 
+  def get_author(self) -> Optional[Author]:
+    return self.author
+
   def get_changelog_directory(self) -> str:
     assert self.filename
     return os.path.join(os.path.dirname(self.filename), self.changelog.directory)

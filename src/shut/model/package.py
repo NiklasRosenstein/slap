@@ -221,9 +221,9 @@ class PackageModel(AbstractProjectModel):
   def get_license_file(self, inherit: bool = False) -> Optional[str]:
     if inherit and self.project.monorepo and (not self.license or
         self.license == self.project.monorepo.license):
-      filename = os.path.join(self.project.monorepo.get_directory(), self.project.monorepo.get_license_file())
+      filename = self.project.monorepo.get_license_file()
       if filename:
-        return filename
+        return os.path.join(self.project.monorepo.get_directory(), filename)
 
     return super().get_license_file(False)
 
