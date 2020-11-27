@@ -1,0 +1,7 @@
+release_date: null
+changes:
+- type: fix
+  component: general
+  description: add `PackageModel.license_file` and fix license rendering into MANIFEST.in
+    and setup.py
+  fixes: []

@@ -219,12 +219,11 @@ class PackageModel(AbstractProjectModel):
     return tag_format.format(name=self.name, version=version)
 
   def get_license_file(self, inherit: bool = False) -> Optional[str]:
-    if inherit and self.project.monorepo and (not self.license or
-        self.license == self.project.monorepo.license):
+    if not self.license_file and inherit and self.project.monorepo and \
+        (not self.license or self.license == self.project.monorepo.license):
       filename = self.project.monorepo.get_license_file()
       if filename:
         return os.path.join(self.project.monorepo.get_directory(), filename)
-
     return super().get_license_file(False)
 
 

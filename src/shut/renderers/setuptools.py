@@ -163,7 +163,8 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       '''))
       cmdclass['develop'] = 'develop_command'
 
-    if package.get_license_file(True) and not package.get_license_file(False):
+    license_file = os.path.normpath(package.get_license_file(True))
+    if license_file and license_file.startswith(os.pardir + os.sep):
       # We need to copy the license from the monorepo.
       self._render_temp_file_copy_function(fp)
       license_src = os.path.relpath(package.get_license_file(True), package.get_directory())
@@ -407,22 +408,24 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     files = [
       package.filename,
       package.get_py_typed_file(),
+      package.get_license_file(True),
     ]
 
     readme = self._get_readme_status(package)
     if readme:
-      files.append(os.path.join(package.get_directory(), readme.runtime_path))
-
-    license_file = package.get_license_file(True)
-    if license_file:
-      files.append(os.path.join(package.get_directory(), os.path.basename(license_file)))
-    elif package.get_license_file():
-      files.append(os.path.join(package.get_directory(), package.get_license_file()))
+      files.append(readme.path)
 
     manifest = [
-      os.path.relpath(f, package.get_directory())
+      os.path.relpath(os.path.abspath(f), package.get_directory())
       for f in files
       if f
+    ]
+
+    # Paths outside of the package directory are copied into the package directory
+    # on setup.py.
+    manifest = [
+      os.path.basename(f) if f.startswith(os.pardir + os.sep) else f
+      for f in manifest
     ]
 
     markers = (self._BEGIN_SECTION, self._END_SECTION)
