@@ -1,0 +1,7 @@
+release_date: null
+changes:
+- type: fix
+  component: general
+  description: referencing a LICENSE or README outside the package directory now does
+    not fail on install if the source file does not exist, but it will print a warning
+  fixes: []
