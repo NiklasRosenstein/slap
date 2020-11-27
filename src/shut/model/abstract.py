@@ -45,6 +45,7 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
   version: Optional[Version] = None
   author: Optional[Author] = None
   license: Optional[str] = None
+  license_file: Optional[str] = None
   url: Optional[str] = None
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
   release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
@@ -75,6 +76,9 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
     """
     Returns the absolute path to the LICENSE file for this package.
     """
+
+    if self.license_file:
+      return self.license_file
 
     return get_file_in_directory(
       directory=os.path.dirname(self.filename),
