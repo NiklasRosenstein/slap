@@ -19,34 +19,21 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import datetime
+import os
+
 import click
 
-from shut.commands import shut, commons, project
-from shut.model import Project, PackageModel
+from shut.model import dump
+from shut.model.package import PackageModel
+from . import pkg, project
 
 
-@shut.group()
-@click.option('--checks/--no-checks', 'run_checks', default=True,
-  help='Run checks before executing the subcommand (default: true)')
-@click.pass_context
-def pkg(ctx, run_checks):
+@pkg.command()
+def format():
   """
-  Manage the Python package in the current directory.
+  Format the package manifest.
   """
 
-  if run_checks and ctx.invoked_subcommand not in ('new', 'checks'):
-    package = project.load(expect=PackageModel)
-    checks.check_package(package, skip_positive_checks=True, print_stats=False, use_stderr=True)
-
-
-from . import build
-from . import bump
-from . import checks
-from . import format
-from . import install
-from . import new
-from . import publish
-from . import requirements
-from . import status
-from . import test
-from . import update
+  package = project.load(expect=PackageModel)
+  dump(package, package.filename)

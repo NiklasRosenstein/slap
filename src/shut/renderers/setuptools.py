@@ -416,8 +416,8 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     license_file = package.get_license_file(True)
     if license_file:
       files.append(os.path.join(package.get_directory(), os.path.basename(license_file)))
-    else:
-      files.append(os.path.join(package.get_directory(), package.get_license_file(False)))
+    elif package.get_license_file():
+      files.append(os.path.join(package.get_directory(), package.get_license_file()))
 
     manifest = [
       os.path.relpath(f, package.get_directory())

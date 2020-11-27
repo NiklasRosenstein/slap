@@ -38,11 +38,11 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('license')
   def _check_license(self, package: PackageModel) -> Iterable[CheckResult]:
-    if not package.license:
-      yield CheckResult(CheckStatus.WARNING, 'not specified')
-
-    elif package.license and not package.get_license_file(True):
-      yield CheckResult(CheckStatus.WARNING, 'No LICENSE file found.')
+    if not package.get_license_file(True):
+      if not package.license:
+        yield CheckResult(CheckStatus.WARNING, 'not specified')
+      else:
+        yield CheckResult(CheckStatus.WARNING, 'No LICENSE file')
 
     monorepo = package.project.monorepo
     if package.license and monorepo and monorepo.license \
@@ -62,8 +62,10 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('package-url')
   def _check_author(self, package: PackageModel) -> Iterable[CheckResult]:
-    if not package.url:
+    if not package.get_url():
       yield CheckResult(CheckStatus.WARNING, 'missing')
+    else:
+      print(package.get_url())
 
   @check('package-author')
   def _check_consistent_author(self, package: PackageModel) -> Iterable[CheckResult]:
