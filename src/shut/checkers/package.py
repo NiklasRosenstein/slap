@@ -41,7 +41,7 @@ class PackageChecker(Checker[PackageModel]):
     if not package.license:
       yield CheckResult(CheckStatus.WARNING, 'not specified')
 
-    elif package.license and not package.get_license_file():
+    elif package.license and not package.get_license_file(True):
       yield CheckResult(CheckStatus.WARNING, 'No LICENSE file found.')
 
     monorepo = package.project.monorepo

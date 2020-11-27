@@ -163,6 +163,13 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       '''))
       cmdclass['develop'] = 'develop_command'
 
+    if package.get_license_file(True) and not package.get_license_file(False):
+      # We need to copy the license from the monorepo.
+      self._render_temp_file_copy_function(fp)
+      license_src = os.path.relpath(package.get_license_file(True), package.get_directory())
+      license_dst = os.path.basename(license_src)
+      fp.write('\n_tempcopy({!r}, {!r})\n'.format(license_src, license_dst))
+
     readme_file, long_description_expr = self._render_readme_code(fp, package)
 
     # Write the install requirements.
@@ -245,7 +252,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       author_name=package.author.name if package.author else None,
       author_email=package.author.email if package.author else None,
       url=package.url,
-      license=package.license,
+      license=package.get_license(),
       description=package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
       long_description_expr=long_description_expr,
       long_description_content_type=_get_readme_content_type(readme_file) if readme_file else None,
@@ -331,6 +338,29 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     return _ReadmeStatus(readme, readme_relative_path, not is_inside)
 
+  def _render_temp_file_copy_function(self, fp: TextIO) -> None:
+    """
+    Renders a Python function called `_tempcopy()` into *fp*. The function can be used to
+    temporarily copy a file for the runtime of the setup file. If the destination file
+    already exists, nothing will be done.
+    """
+
+    if hasattr(fp, '_SetuptoolsRenderer_tempcopy_rendered'):
+      return
+    fp._SetuptoolsRenderer_tempcopy_rendered = True
+
+    # TODO(NiklasRosenstein): make sure this gets rendered into the file only once.
+
+    fp.write('\n')
+    fp.write(textwrap.dedent('''
+      def _tempcopy(src, dst):
+        import atexit, shutil
+        if not os.path.isfile(dst):
+          shutil.copyfile(src, dst)
+          atexit.register(lambda: os.remove(dst))
+    ''').lstrip())
+    fp.write('\n')
+
   def _render_readme_code(self, fp: TextIO, package: PackageModel) -> Tuple[Optional[str], Optional[str]]:
     """
     Renders code for the setup.py file, creating a `long_description` variable. If
@@ -353,12 +383,8 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     if readme.outside:
       # Copy the relative README file if it exists.
-      fp.write(textwrap.dedent('''
-        source_readme_file = {!r}
-        if not os.path.isfile(readme_file) and os.path.isfile(source_readme_file):
-          import shutil; shutil.copyfile(source_readme_file, readme_file)
-          import atexit; atexit.register(lambda: os.remove(readme_file))
-      ''').format(readme.path).lstrip())
+      self._render_temp_file_copy_function(fp)
+      fp.write('_tempcopy({!r}, readme_file)\n'.format(readme.path))
 
     # Read the contents of the file into the "long_description" variable.
     fp.write(textwrap.dedent('''
@@ -380,13 +406,18 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     files = [
       package.filename,
-      package.get_license_file(),
       package.get_py_typed_file(),
     ]
 
     readme = self._get_readme_status(package)
     if readme:
       files.append(os.path.join(package.get_directory(), readme.runtime_path))
+
+    license_file = package.get_license_file(True)
+    if license_file:
+      files.append(os.path.join(package.get_directory(), os.path.basename(license_file)))
+    else:
+      files.append(os.path.join(package.get_directory(), package.get_license_file(False)))
 
     manifest = [
       os.path.relpath(f, package.get_directory())
