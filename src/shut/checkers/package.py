@@ -64,8 +64,6 @@ class PackageChecker(Checker[PackageModel]):
   def _check_author(self, package: PackageModel) -> Iterable[CheckResult]:
     if not package.get_url():
       yield CheckResult(CheckStatus.WARNING, 'missing')
-    else:
-      print(package.get_url())
 
   @check('package-author')
   def _check_consistent_author(self, package: PackageModel) -> Iterable[CheckResult]:
