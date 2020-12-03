@@ -24,13 +24,14 @@ import contextlib
 import json
 import logging
 import os
+import posixpath
 import re
 import textwrap
 from typing import Dict, Iterable, List, Optional, TextIO, Tuple
 
 import nr.fs
 
-from shut.model import PackageModel
+from shut.model.package import PackageModel, Include, Exclude
 from shut.model.requirements import RequirementsList
 from shut.utils.io.virtual import VirtualFiles
 from .core import Renderer, register_renderer, VersionRef
@@ -431,10 +432,24 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       for f in manifest
     ]
 
+    manifest = ['include ' + s for s in manifest]
+    metadata = package.get_python_package_metadata()
+    for entry in package.package_data:
+      if isinstance(entry, Include):
+        verb = 'include'
+        path = entry.include
+      elif isinstance(entry, Exclude):
+        verb = 'exclude'
+        path = entry.exclude
+      else:
+        raise RuntimeError(f'unexpected package_data entry: {entry!r}')
+      path = posixpath.join(package.source_directory, package.get_modulename().replace('.', '/'), path)
+      manifest.append(f'{verb} {path}')
+
     markers = (self._BEGIN_SECTION, self._END_SECTION)
     with _rewrite_section(fp, current.read() if current else '', *markers):
       for entry in manifest:
-        fp.write('include {}\n'.format(entry))
+        fp.write(entry + '\n')
 
   # Renderer[PackageModel] Overrides
 

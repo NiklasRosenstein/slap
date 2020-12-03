@@ -31,5 +31,7 @@ test-requirements:
 entrypoints:
   console_scripts:
   - shut = shut.commands:shut
+package-data:
+  - include: data/license_templates/*.txt
 test-driver:
   type: pytest

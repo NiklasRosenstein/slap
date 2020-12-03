@@ -23,7 +23,7 @@ import ast
 import os
 import re
 import warnings
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from databind.core import datamodel, field
 from nr.stream import chain, concat
@@ -74,6 +74,16 @@ class InstallConfiguration:
 
 
 @datamodel
+class Include:
+  include: str
+
+
+@datamodel
+class Exclude:
+  exclude: str
+
+
+@datamodel
 class PackageModel(AbstractProjectModel):
   modulename: Optional[str] = None
   description: Optional[str] = None
@@ -89,7 +99,7 @@ class PackageModel(AbstractProjectModel):
   entrypoints: Dict[str, List[str]] = field(default_factory=dict)
   classifiers: List[str] = field(default_factory=list)
   keywords: List[str] = field(default_factory=list)
-  # TODO: Data files
+  package_data: List[Union[Include, Exclude]] = field(altname='package-data', default_factory=list)
 
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)

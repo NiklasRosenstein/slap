@@ -29,13 +29,9 @@ requirements:
 entrypoints:
   console_scripts:
   - mycli = my_module.__main__:mycli
+package-data:
+  - include: data/*.txt
 ```
-
-__Todo__
-
-* [ ] Package data / data files
-* [ ] Conda recipe generator
-* [ ] Automatic check for license headers in files / automatically insert license headers
 
 ---
 
