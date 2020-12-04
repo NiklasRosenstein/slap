@@ -164,7 +164,8 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       '''))
       cmdclass['develop'] = 'develop_command'
 
-    license_file = os.path.normpath(package.get_license_file(True))
+    license_file = package.get_license_file(True)
+    license_file = os.path.normpath(license_file) if license_file else None
     if license_file and license_file.startswith(os.pardir + os.sep):
       # We need to copy the license from the monorepo.
       self._render_temp_file_copy_function(fp)
