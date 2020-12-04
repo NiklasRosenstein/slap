@@ -1,0 +1,7 @@
+release_date: null
+changes:
+- type: fix
+  component: general
+  description: fix error in `setuptools` renderer if no license is configured in the
+    package
+  fixes: []
