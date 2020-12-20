@@ -1,0 +1,7 @@
+release_date: '2020-12-19'
+changes:
+- type: fix
+  component: general
+  description: fix license_file relative path generation in setuptools renderer, now
+    correctly inherits the license file from the monorepo
+  fixes: []
