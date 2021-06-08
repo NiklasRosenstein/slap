@@ -1,0 +1,10 @@
+release_date: null
+changes:
+- type: change
+  component: general
+  description: allow running Shut via `python -m shut`
+  fixes: []
+- type: fix
+  component: general
+  description: fix call to `run_install()` in `shut mono install`
+  fixes: []
