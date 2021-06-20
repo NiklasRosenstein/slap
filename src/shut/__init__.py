@@ -20,4 +20,4 @@
 # IN THE SOFTWARE.
 
 __author__ = 'Niklas Rosenstein <rosensteinniklas@gmail.com>'
-__version__ = '0.13.1'
+__version__ = '0.13.2'
