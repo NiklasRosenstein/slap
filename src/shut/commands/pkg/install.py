@@ -52,6 +52,7 @@ def collect_requirement_args(
   reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
   reqs += package.requirements.vendored_reqs()
   if develop:
+    reqs += package.test_requirements
     reqs += package.dev_requirements
 
   if project.monorepo and inter_deps:

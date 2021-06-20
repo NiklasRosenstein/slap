@@ -1,0 +1,6 @@
+release_date: null
+changes:
+- type: fix
+  component: general
+  description: also install `PackageModel.test_requirements` on `shut pkg install`
+  fixes: []
