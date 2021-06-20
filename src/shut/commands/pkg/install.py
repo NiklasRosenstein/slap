@@ -37,7 +37,7 @@ from .. import project
 
 
 def collect_requirement_args(
-  package: bool,
+  package: PackageModel,
   develop: bool,
   inter_deps: bool,
   extra: Optional[Set[str]],
@@ -51,6 +51,8 @@ def collect_requirement_args(
 
   reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
   reqs += package.requirements.vendored_reqs()
+  if develop:
+    reqs += package.dev_requirements
 
   if project.monorepo and inter_deps:
     # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate
@@ -110,7 +112,7 @@ def split_extras(extras: str) -> Set[str]:
 
 @pkg.command()
 @click.option('--develop/--no-develop', default=True,
-  help='Install in develop mode (default: true)')
+  help='Install in develop mode (default: true). If enabled, it will also install dev-requirements.')
 @click.option('--inter-deps/--no-inter-deps', default=True,
   help='Install package inter dependencies from inside the same monorepo (default: true)')
 @click.option('--extra', type=split_extras, help='Specify one or more extras to install.')

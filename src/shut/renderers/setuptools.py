@@ -46,10 +46,6 @@ GENERATED_FILE_REMARK = '''
 _ReadmeStatus = collections.namedtuple('ReadmeStatus', 'path,runtime_path,outside')
 
 
-def _normpath(x):
-  return os.path.normpath(x).replace(os.sep, '/')
-
-
 def _get_readme_content_type(filename: str) -> str:
   return {
     'md': 'text/markdown',
@@ -453,11 +449,20 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       for entry in manifest:
         fp.write(entry + '\n')
 
+  def _render_requirements_txt(self, fp: TextIO, package: PackageModel) -> None:
+    for url in package.install.extra_index_urls:
+      fp.write('--extra-index-url %s\n' % url)
+    for req in package.requirements:
+      fp.write(str(req) + '\n')
+
   # Renderer[PackageModel] Overrides
 
   def get_files(self, files: VirtualFiles, package: PackageModel) -> None:
     files.add_dynamic('setup.py', self._render_setup, package)
     files.add_dynamic('MANIFEST.in', self._render_manifest_in, package, inplace=True)
+
+    if package.render_requirements_txt:
+      files.add_dynamic('requirements.txt', self._render_requirements_txt, package)
 
     if package.typed:
       directory = package.get_python_package_metadata().package_directory

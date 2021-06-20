@@ -125,6 +125,10 @@ class BaseRequirement(metaclass=abc.ABCMeta):
   def databind_json_dump(self, context):
     pass
 
+  @abc.abstractmethod
+  def to_setuptools(self) -> str:
+    pass
+
 
 @datamodel
 class Requirement(BaseRequirement):

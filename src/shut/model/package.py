@@ -93,6 +93,8 @@ class PackageModel(AbstractProjectModel):
   requirements: RequirementsList = field(default_factory=RequirementsList)
   test_requirements: RequirementsList = field(altname='test-requirements', default_factory=RequirementsList)
   extra_requirements: Dict[str, RequirementsList] = field(altname='extra-requirements', default_factory=dict)
+  dev_requirements: RequirementsList = field(altname='dev-requirements', default_factory=RequirementsList)
+  render_requirements_txt: bool = field(altname='render-requirements-txt', default=False)
   source_directory: str = field(altname='source-directory', default='src')
   exclude: List[str] = field(default_factory=lambda: ['test', 'tests', 'docs'])
   entrypoints: Dict[str, List[str]] = field(default_factory=dict)

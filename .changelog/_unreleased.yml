@@ -1,0 +1,7 @@
+release_date: null
+changes:
+- type: feature
+  component: general
+  description: add `PackageModel.dev_requirements` which will be installed with `shut
+    pkg install`
+  fixes: []
