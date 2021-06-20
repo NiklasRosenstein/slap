@@ -5,3 +5,8 @@ changes:
   description: add `PackageModel.dev_requirements` which will be installed with `shut
     pkg install`
   fixes: []
+- type: feature
+  component: general
+  description: add `PackageModel.render_requirements_txt` which will be rendered with
+    `shut pkg update`
+  fixes: []
