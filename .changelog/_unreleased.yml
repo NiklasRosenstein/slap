@@ -1,0 +1,7 @@
+release_date: null
+changes:
+- type: feature
+  component: general
+  description: add `--dev/--no-dev` and `--test/--no-test` options to `shut mono install`
+    and `shut pkg install`
+  fixes: []

@@ -48,12 +48,11 @@ def collect_requirement_args(
   # install test requirements.
   if extra and 'test' in extra:
     reqs += package.test_requirements
+  if extra and 'dev' in extra:
+    reqs += package.dev_requirements
 
   reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
   reqs += package.requirements.vendored_reqs()
-  if develop:
-    reqs += package.test_requirements
-    reqs += package.dev_requirements
 
   if project.monorepo and inter_deps:
     # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate
@@ -114,6 +113,8 @@ def split_extras(extras: str) -> Set[str]:
 @pkg.command()
 @click.option('--develop/--no-develop', default=True,
   help='Install in develop mode (default: true). If enabled, it will also install dev-requirements.')
+@click.option('--dev/--no-dev', default=None, help='Install dev requirements (default: as per --develop/--no-develop)')
+@click.option('--test/--no-test', default=None, help='Install test requirements (default: as per --develop/--no-develop)')
 @click.option('--inter-deps/--no-inter-deps', default=True,
   help='Install package inter dependencies from inside the same monorepo (default: true)')
 @click.option('--extra', type=split_extras, help='Specify one or more extras to install.')
@@ -124,13 +125,19 @@ def split_extras(extras: str) -> Set[str]:
 @click.option('--pip-args', help='Additional arguments to pass to Pip.')
 @click.option('--dry', is_flag=True, help='Print the Pip command to stdout instead of running it.')
 @click.option('--pipx', is_flag=True, help='Install using Pipx.')
-def install(develop, inter_deps, extra, upgrade, quiet, verbose, pip, pip_args, dry, pipx):
+def install(develop, dev, test, inter_deps, extra, upgrade, quiet, verbose, pip, pip_args, dry, pipx):
   """
   Install the package using `python -m pip`. If the package is part of a mono repository,
   inter-dependencies will be installed from the mono repsitory rather than from PyPI.
 
   The command used to invoke Pip can be overwritten using the `PIP` environment variable.
   """
+
+  if extra is None: extra = []
+  if dev is None: dev = develop
+  if test is None: test = develop
+  if dev: extra += ['dev']
+  if test: extra += ['test']
 
   if not pip and pipx:
     pip = 'pipx'
