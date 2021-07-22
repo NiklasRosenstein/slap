@@ -133,11 +133,11 @@ def install(develop, dev, test, inter_deps, extra, upgrade, quiet, verbose, pip,
   The command used to invoke Pip can be overwritten using the `PIP` environment variable.
   """
 
-  if extra is None: extra = []
+  if extra is None: extra = set()
   if dev is None: dev = develop
   if test is None: test = develop
-  if dev: extra += ['dev']
-  if test: extra += ['test']
+  if dev: extra.add('dev')
+  if test: extra.add('test')
 
   if not pip and pipx:
     pip = 'pipx'

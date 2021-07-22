@@ -28,11 +28,11 @@ def install(develop, dev, test, extra, upgrade, quiet, pip, pip_args, dry):
   graph = monorepo.get_inter_dependencies_graph()
   package_map = {p.name: p for p in project.packages}
 
-  if extra is None: extra = []
+  if extra is None: extra = set()
   if dev is None: dev = develop
   if test is None: test = develop
-  if dev: extra += ['dev']
-  if test: extra += ['test']
+  if dev: extra.add('dev')
+  if test: extra.add('test')
 
   args = []
   for package_name in nx.algorithms.dag.topological_sort(graph):
