@@ -117,10 +117,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     # Write hook overrides.
     cmdclass = {}
     if install.hooks.any():
-      fp.write('\ninstall_hooks = [\n')
-      for hook in package.install_hooks:
-        fp.write('  ' + json.dumps(hook.normalize().to_json(), sort_keys=True) + ',\n')
-      fp.write(']\n')
+      fp.write('\ninstall_hooks = {}\n'.format(json.dumps(install.hooks.as_payload(), indent=2)))
       fp.write(textwrap.dedent('''
         def _run_hooks(event):
           import subprocess, shlex, os
@@ -130,33 +127,31 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
               if line.startswith('#'):
                 return shlex.split(line[1:].strip())
               return []
-          for hook in install_hooks:
-            if not hook['event'] or hook['event'] == event:
-              command = hook['command']
-              if command[0].endswith('.py') or 'python' in _shebang(command[0]):
-                command.insert(0, sys.executable)
-              env = os.environ.copy()
-              env['SHUT_INSTALL_HOOK_EVENT'] = event
-              res = subprocess.call(command, env=env)
-              if res != 0:
-                raise RuntimeError('command {!r} returned exit code {}'.format(command, res))
+          for command in install_hooks[event]:
+            if command[0].endswith('.py') or 'python' in _shebang(command[0]):
+              command.insert(0, sys.executable)
+            env = os.environ.copy()
+            env['SHUT_INSTALL_HOOK_EVENT'] = event
+            res = subprocess.call(command, env=env)
+            if res != 0:
+              raise RuntimeError('command {!r} returned exit code {}'.format(command, res))
       '''))
     if install.hooks.after_install or install.hooks.before_install:
       fp.write(textwrap.dedent('''
         class install_command(_install_command):
           def run(self):
-            _run_hooks('install')
+            _run_hooks('before-install')
             super(install_command, self).run()
-            _run_hooks('post-install')
+            _run_hooks('after-install')
       '''))
       cmdclass['install'] = 'install_command'
     if install.hooks.before_develop or install.hooks.after_develop:
       fp.write(textwrap.dedent('''
         class develop_command(_develop_command):
           def run(self):
-            _run_hooks('develop')
+            _run_hooks('before-develop')
             super(develop_command, self).run()
-            _run_hooks('post-develop')
+            _run_hooks('after-develop')
       '''))
       cmdclass['develop'] = 'develop_command'
 
@@ -431,7 +426,6 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     ]
 
     manifest = ['include ' + s for s in manifest]
-    metadata = package.get_python_package_metadata()
     for entry in package.package_data:
       if isinstance(entry, Include):
         verb = 'include'

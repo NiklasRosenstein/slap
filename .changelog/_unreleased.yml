@@ -1,0 +1,6 @@
+release_date: null
+changes:
+- type: change
+  component: general
+  description: update how install hooks are rendered into `setup.py`
+  fixes: []

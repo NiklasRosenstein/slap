@@ -22,6 +22,7 @@
 import ast
 import os
 import re
+import shlex
 from typing import Dict, List, Optional, Union
 
 from databind.core import datamodel, field
@@ -53,6 +54,16 @@ class InstallConfiguration:
 
     def any(self):
       return any((self.before_install, self.after_install, self.before_develop, self.after_develop))
+
+    def as_payload(self) -> Dict[str, List[str]]:
+      def _splitall(x):
+        return list(map(shlex.split, x))
+      return {
+        'before-install': _splitall(self.before_install),
+        'after-install': _splitall(self.after_install),
+        'before-develop': _splitall(self.before_develop),
+        'after-develop': _splitall(self.after_develop),
+      }
 
   hooks: InstallHooks = field(default_factory=InstallHooks)
 
