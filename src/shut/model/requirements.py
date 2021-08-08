@@ -222,7 +222,7 @@ class VendoredRequirement(BaseRequirement):
 
     if os.name == 'nt':
       path = path.replace('\\', '/')
-    if not posixpath.isabs(path):
+    if not os.path.isabs(path):
       path = './' + posixpath.normpath(path)
     return path
 

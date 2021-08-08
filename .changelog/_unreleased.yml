@@ -1,0 +1,8 @@
+release_date: null
+changes:
+- type: fix
+  component: general
+  description: fix `VendoredRequirement._normpath()` which corrupted absolute paths
+    on Windows (e.g. `C:/path/to` would be converted to `./C:\path\to` when it should
+    just be `C:\path\to`). This caused `shut pkg install` on Windows to fail.
+  fixes: []
