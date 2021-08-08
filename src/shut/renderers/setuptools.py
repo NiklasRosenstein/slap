@@ -413,13 +413,13 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       files.append(readme.path)
 
     manifest = [
-      os.path.relpath(os.path.abspath(f), package.get_directory())
+      os.path.relpath(os.path.abspath(f), package.get_directory()).replace('\\', '/')
       for f in files
       if f
     ]
 
-    # Paths outside of the package directory are copied into the package directory
-    # on setup.py.
+    # NOTE (NiklasRosenstein): Paths outside of the package directory are copied into the package
+    # directory on setup.py. That is why we can reference them relative to the MANIFEST.in file.
     manifest = [
       os.path.basename(f) if f.startswith(os.pardir + os.sep) else f
       for f in manifest

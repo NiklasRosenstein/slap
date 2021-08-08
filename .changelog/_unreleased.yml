@@ -18,3 +18,7 @@ changes:
     Shut from source
   fixes:
   - '#17'
+- type: fix
+  component: general
+  description: '`py.typed` file is rendered into `MANIFEST.in` with backslashes'
+  fixes: []
