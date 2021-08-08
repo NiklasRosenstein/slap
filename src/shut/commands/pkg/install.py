@@ -21,6 +21,7 @@
 
 import os
 import shlex
+import shutil
 import subprocess as sp
 import sys
 import typing as t
@@ -34,6 +35,10 @@ from shut.model.monorepo import InterdependencyRef
 from shut.model.requirements import RequirementsList, VendoredRequirement
 from . import pkg
 from .. import project
+
+
+def _join_command(cmd: t.List[str]) -> str:
+  return ' '.join(map(shlex.quote, cmd))
 
 
 def collect_requirement_args(
@@ -91,7 +96,15 @@ def run_install(
   dry: bool,
 ) -> None:
 
-  pip_bin = shlex.split(os.getenv('PIP', pip or 'python -m pip'))
+  if pip is None:
+    # NOTE (NiklasRosenstein): If we use just "python -m pip", for some reason on Windows, Pip
+    #   will kick off the build/install step with the system-wide Python installation even when
+    #   we're in a venv. Using the full path to the current python installation works as expected
+    #   though...
+    python = shutil.which('python')
+    pip = os.getenv('PIP', _join_command([python, '-m', 'pip']))
+
+  pip_bin = shlex.split(pip)
   command = pip_bin + ['install'] + args
   if upgrade:
     command.append('--upgrade')

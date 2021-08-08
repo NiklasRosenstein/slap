@@ -6,3 +6,9 @@ changes:
     on Windows (e.g. `C:/path/to` would be converted to `./C:\path\to` when it should
     just be `C:\path\to`). This caused `shut pkg install` on Windows to fail.
   fixes: []
+- type: fix
+  component: general
+  description: '`No module named setuptools` error when using `shut pkg install` in
+    venv on Windows'
+  fixes:
+  - '#16'
