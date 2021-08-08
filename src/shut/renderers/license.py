@@ -30,7 +30,9 @@ from shut.utils.io.virtual import VirtualFiles
 
 
 def get_license_template(license_name: str) -> str:
-  return resource_string('shut', f'data/license_templates/{license_name}.txt').decode('utf-8')
+  # NOTE (NiklasRosenstein): See https://github.com/NiklasRosenstein/shut/issues/17
+  return resource_string('shut', f'data/license_templates/{license_name}.txt').decode('utf-8').replace('\r\n', '\n')
+
 
 
 def has_license_template(license_name: str) -> bool:
@@ -75,11 +77,8 @@ class LicenseRenderer(Renderer[AbstractProjectModel]):
 
     license_file = model.get_license_file()
     license_file = license_file or os.path.join(model.get_directory(), 'LICENSE.txt')
-    files.add_static(
-      license_file,
-      get_license_template(model.license)
-        .format(year=datetime.datetime.utcnow().year, author=model.get_author().name),
-    )
-
+    license_text = get_license_template(model.license)\
+        .format(year=datetime.datetime.utcnow().year, author=model.get_author().name)
+    files.add_static(license_file, license_text)
 
 register_renderer(AbstractProjectModel, LicenseRenderer)

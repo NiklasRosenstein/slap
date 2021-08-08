@@ -12,3 +12,9 @@ changes:
     venv on Windows'
   fixes:
   - '#16'
+- type: fix
+  component: general
+  description: fix additional CR in generated `LICENSE.txt` on Windows when installing
+    Shut from source
+  fixes:
+  - '#17'
