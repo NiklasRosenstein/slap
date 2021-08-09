@@ -19,16 +19,30 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import json as _json
+import typing as t
+import click
+
+from shut.model import serialize
 from . import mono
 from .. import project
-from ..commons.status import print_status
+from ..commons.status import get_status, print_status, jsonify_status
 from shut.model.monorepo import MonorepoModel
 
 
 @mono.command(help="""
   Show which packages have been modified since their last release.
   """ + print_status.__doc__)
-def status():
+@click.option('--json', is_flag=True, help='Output as JSON.')
+@click.option('--include-config', is_flag=True, help='Include the package config in the JSON output.')
+def status(json: bool, include_config: bool) -> None:
 
   project.load_or_exit(expect=MonorepoModel)
-  print_status(project)
+
+  status = get_status(project)
+  if json:
+    result = jsonify_status(project, status, include_config)
+    result.sort(key=lambda x: x['name'])
+    print(_json.dumps(result, indent=2))
+  else:
+    print_status(status)

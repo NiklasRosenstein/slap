@@ -21,11 +21,12 @@
 
 import os
 import sys
+import typing as t
 
 from nr.utils.git import Git  # type: ignore
 from termcolor import colored
 
-from shut.model import AbstractProjectModel, MonorepoModel, Project
+from shut.model import AbstractProjectModel, MonorepoModel, Project, serialize
 
 
 def get_commits_since_last_tag(subject: AbstractProjectModel):
@@ -37,13 +38,17 @@ def get_commits_since_last_tag(subject: AbstractProjectModel):
     return tag, len(Git().rev_list(tag + '..HEAD', subject.get_directory()))
 
 
-def print_status(project: Project) -> None:
-  """
-  The latest version is taken from the current version number in the package
-  configuration file. Git is then queried for the tag and the commit distance
-  to the current revision.
-  """
+class PackageStatus(t.NamedTuple):
+  #: The tag for the package.
+  tag: str
 
+  #: The number of commits that the #tag is behind the current package state. This is `0` if the
+  #: tag is up to date with the latest commit on the package, and `None` if the #tag does not
+  #: exist.
+  behind: t.Optional[int]
+
+
+def get_status(project: Project) -> t.Dict[str, PackageStatus]:
   assert project.subject, "No subject"
 
   if isinstance(project.subject, MonorepoModel):
@@ -56,10 +61,26 @@ def print_status(project: Project) -> None:
     items = [project.subject]
     names = [project.subject.get_name()]
 
-  width = max(map(len, names)) if names else 0
-
+  result = {}
   for item, name in zip(items, names):
     tag, num_commits = get_commits_since_last_tag(item)
+    result[name] = PackageStatus(tag, num_commits)
+
+  return result
+
+
+def print_status(status: t.Dict[str, PackageStatus]) -> None:
+  """
+  The latest version is taken from the current version number in the package
+  configuration file. Git is then queried for the tag and the commit distance
+  to the current revision.
+  """
+
+
+  width = max(map(len, status)) if status else 0
+
+  for name, info in status.items():
+    tag, num_commits = info
     if num_commits is None:
       item_info = colored('tag "{}" not found'.format(tag), 'red')
     elif num_commits == 0:
@@ -67,3 +88,12 @@ def print_status(project: Project) -> None:
     else:
       item_info = colored('{} commit(s)'.format(num_commits), 'yellow') + ' since "{}"'.format(tag)
     print('{}: {}'.format(name.rjust(width), item_info))
+
+
+def jsonify_status(project: Project, status: t.Dict[str, t.Any], include_config: bool) -> t.List[t.Dict[str, t.Any]]:
+  result = []
+  for package_name, status_info in status.items():
+    result.append({'name': package_name, 'tag': status_info.tag, 'behind': status_info.behind})
+    if include_config:
+      result[-1]['package'] = serialize(project[package_name])
+  return result

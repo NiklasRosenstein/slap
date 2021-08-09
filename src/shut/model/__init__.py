@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import io
 import os
 import sys
 from typing import Any, Dict, List, Optional, TextIO, Tuple, Type, TypeVar, Union
@@ -69,6 +70,12 @@ class Project:
     self.monorepo: MonorepoModel = None
     self.packages: List[PackageModel] = []
     self.invalid_packages: List[Tuple[str, ExcInfo]] = []
+
+  def __getitem__(self, package_name: str) -> 'PackageModel':
+    for package in self.packages:
+      if package.name == package_name:
+        return package
+    raise KeyError(package_name)
 
   def load(
     self,
@@ -179,8 +186,11 @@ def dump(obj: Any, file_: Union[str, TextIO]) -> None:
     with nr.fs.atomic_file(file_, 'w') as fp:
       dump(obj, fp)
   else:
-    data = to_json(obj, registry=registry)
-    yaml.safe_dump(data, file_, sort_keys=False)
+    yaml.safe_dump(serialize(obj), file_, sort_keys=False)
+
+
+def serialize(obj: Any) -> Dict[str, Any]:
+  return to_json(obj, registry=registry)
 
 
 from .abstract import AbstractProjectModel

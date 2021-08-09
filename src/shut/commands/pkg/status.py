@@ -19,15 +19,24 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import json as _json
+import click
 from shut.commands import project
-from shut.commands.commons.status import print_status
+from shut.commands.commons.status import get_status, jsonify_status, print_status
 from shut.commands.pkg import pkg
 from shut.model import PackageModel
 
 
 @pkg.command(help="""
-  Shows whether the package was modified since the last release.
+Shows whether the package was modified since the last release.
   """ + print_status.__doc__)
-def status():
+@click.option('--json', is_flag=True, help='Output as JSON.')
+@click.option('--include-config', is_flag=True, help='Include the package config in the JSON output.')
+def status(json: bool, include_config: bool) -> None:
   project.load_or_exit(expect=PackageModel)
-  print_status(project)
+  status = get_status(project)
+  if json:
+    result = jsonify_status(project, status, include_config)
+    print(_json.dumps(result, indent=2))
+  else:
+    print_status(status)
