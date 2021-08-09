@@ -46,6 +46,8 @@ test_requirements = [
   'types-PyYAML',
   'types-termcolor',
 ]
+extras_require = {}
+extras_require['test'] = test_requirements
 
 setuptools.setup(
   name = 'shut',
@@ -61,9 +63,9 @@ setuptools.setup(
   package_dir = {'': 'src'},
   include_package_data = True,
   install_requires = requirements,
-  extras_require = {},
+  extras_require = extras_require,
   tests_require = test_requirements,
-  python_requires = '>=3.6.0,<4.0.0',
+  python_requires = '>=3.7.0,<4.0.0',
   data_files = [],
   entry_points = {
     'console_scripts': [
