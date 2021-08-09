@@ -24,7 +24,7 @@ import json
 import os
 import subprocess as sp
 import sys
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 from databind.core import datamodel, field
 from nr.parsing.date import timezone  # type: ignore
@@ -78,7 +78,7 @@ def load_report_file(report_file: str) -> TestRun:
     else:
       crash = None
       stdout = None
-    test_status = {'passed': TestStatus.PASSED, 'failed': TestStatus.FAILED, 'skipped': TestStatus.SKIPPED}[test['outcome']]
+    test_status = {'passed': TestStatus.PASSED, 'failed': TestStatus.FAILED, 'skipped': TestStatus.SKIPPED}[test['outcome'].lstrip('x')]
     tests.append(TestCase(
       name=test['nodeid'],
       duration=sum(test[k]['duration'] for k in ('setup', 'call', 'teardown') if k in test),
