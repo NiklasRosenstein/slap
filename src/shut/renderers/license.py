@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 import datetime
+import logging
 import os
 
 from pkg_resources import resource_string
@@ -28,17 +29,35 @@ from .core import Renderer, register_renderer
 from shut.model import AbstractProjectModel, PackageModel
 from shut.utils.io.virtual import VirtualFiles
 
+log = logging.getLogger(__name__)
+
+# https://spdx.org/licenses/
+LICENSE_TEMPLATE_MAP = {
+  'MIT.txt': ['MIT'],
+  'BSD2.txt': ['BSD-2-Clause', 'BSD-Simplified', 'BSD-2', 'BSD2'],
+  'BSD3.txt': ['BSD-3-Clause', 'BSD-new', 'BSD-3', 'BSD3'],
+  'BSD4.txt': ['BSD-4-Clause', 'BSD-old', 'BSD-Original'],
+  'Apache2.txt': ['Apache-2.0', 'Apache-2', 'Apache2']
+}
+
+
+class LicenseTemplateDoesNotExist(Exception):
+  pass
+
 
 def get_license_template(license_name: str) -> str:
-  # NOTE (NiklasRosenstein): See https://github.com/NiklasRosenstein/shut/issues/17
-  return resource_string('shut', f'data/license_templates/{license_name}.txt').decode('utf-8').replace('\r\n', '\n')
-
+  for license_filename, license_identifiers in LICENSE_TEMPLATE_MAP.items():
+    for license_identifier in license_identifiers:
+      if license_name.lower() == license_identifier.lower():
+        # NOTE (NiklasRosenstein): See https://github.com/NiklasRosenstein/shut/issues/17
+        return resource_string('shut', f'data/license_templates/{license_filename}').decode('utf-8').replace('\r\n', '\n')
+  raise LicenseTemplateDoesNotExist('License template not available for supplied license name', license_name)
 
 
 def has_license_template(license_name: str) -> bool:
   try:
     return get_license_template(license_name)
-  except FileNotFoundError:
+  except LicenseTemplateDoesNotExist:
     pass
 
 
@@ -75,10 +94,15 @@ class LicenseRenderer(Renderer[AbstractProjectModel]):
         and self.inherits_monorepo_license(model)):
       return
 
+    if not has_license_template(model.license):
+      log.warning('Don\'t have a license tempalte for "%s", make sure to keep the license up to date manually.', model.license)
+      return
+
     license_file = model.get_license_file()
     license_file = license_file or os.path.join(model.get_directory(), 'LICENSE.txt')
     license_text = get_license_template(model.license)\
         .format(year=datetime.datetime.utcnow().year, author=model.get_author().name)
     files.add_static(license_file, license_text)
+
 
 register_renderer(AbstractProjectModel, LicenseRenderer)
