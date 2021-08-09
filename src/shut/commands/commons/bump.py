@@ -90,7 +90,7 @@ class VersionBumpData(Generic[T_AbstractProjectModel], metaclass=abc.ABCMeta):
 
     print()
     print(f'bumping {len(version_refs)} version reference(s)')
-    for filename, refs in Stream(version_refs).groupby(lambda r: r.filename, collect=lambda r: list(r)):  # type: ignore
+    for filename, refs in Stream(version_refs).groupby(lambda r: r.filename, lambda r: list(r)):  # type: ignore
       with open(filename) as fp:
         content = fp.read()
 

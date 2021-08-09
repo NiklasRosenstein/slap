@@ -15,11 +15,11 @@ requirements:
 - jinja2 ^2.11.1
 - networkx ^2.4
 - nr.fs ^1.5.0
-- nr.parsing.date ^1.0.1
+- nr.parsing.date ^1.0.3
 - nr.proxy ^1.0.0
 - nr.pylang.utils ^0.0.1
 - nr.utils.git ~0.1.3
-- nr.stream ^0.1.0
+- nr.stream ^0.2.1
 - requests ^2.22.0
 - packaging ^20.1
 - PyYAML ^5.1.0
@@ -30,7 +30,7 @@ requirements:
 test-requirements:
 - pytest
 - mypy
-- types-beautifoulsoup4
+- types-beautifulsoup4
 - types-click
 - types-requests
 - types-jinja2

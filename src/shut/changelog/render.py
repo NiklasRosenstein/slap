@@ -34,8 +34,7 @@ import textwrap
 
 
 def _group_entries_by_component(entries):
-  key = lambda x: x.component
-  return list(Stream.sortby(entries, key).groupby(key, collect=list))
+  return list(Stream(entries).sortby(lambda x: x.component).groupby(lambda x: x.component, list))
 
 
 def _terminal(fp: TextIO, changelogs: List[Changelog]) -> None:
