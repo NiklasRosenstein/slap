@@ -4,6 +4,10 @@ Shut is an opinionated tool that allows you to configure everything around the P
 packaging and release process from a single source of truth. It is intended to simplify
 the process of publishing Python packages and prevent common pitfalls.
 
+__Requirements__
+
+* Python 3.7+
+
 ## At a glance
 
 * Bootstrap Python packages: `shut pkg new --name my-package`

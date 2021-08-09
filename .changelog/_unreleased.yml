@@ -1,7 +1,8 @@
 changes:
 - type: change
   component: general
-  description: upgrade to `databind.core ^1.1.2` and `nr.stream ^0.1.0`
+  description: 'upgrade to `databind.core ^1.1.2` and `nr.stream ^0.1.0`. This requires us to drop Python 3.6
+    compatibility, thus Python 3.7 is the new minimum required version for Shut'
   fixes: []
 - type: fix
   component: general
