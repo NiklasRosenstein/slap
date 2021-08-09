@@ -24,6 +24,7 @@ import enum
 import os
 import posixpath
 import re
+import typing as t
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Union, TypeVar, Type
 from urllib.parse import urlparse
@@ -43,10 +44,10 @@ class VersionSelector(object):
 
   ANY: 'VersionSelector'
 
-  def __init__(self, selector):
+  def __init__(self, selector: t.Union[str, 'VersionSelector']):
     if isinstance(selector, VersionSelector):
       selector = selector._string
-    self._string = selector.strip()
+    self._string: str = selector.strip()
 
   def __str__(self):
     return str(self._string)
@@ -95,7 +96,7 @@ class VersionSelector(object):
     return re.sub(regex, sub, s)
 
   def is_semver_selector(self) -> bool:
-    return self._string and self._string[0] in '^~' and ',' not in self._string
+    return bool(self._string and self._string[0] in '^~' and ',' not in self._string)
 
   def matches(self, version: Union[Version, str]) -> bool:
     if not self.is_semver_selector():

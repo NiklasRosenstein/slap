@@ -34,7 +34,7 @@ import os
 import warnings
 import sys
 
-context = cast(click.Context, proxy(lambda: click.get_current_context().obj))
+context = cast(dict, proxy(lambda: click.get_current_context().obj))
 project = cast(Project, proxy(lambda: click.get_current_context().obj['project']))
 
 

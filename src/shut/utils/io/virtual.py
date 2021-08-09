@@ -123,7 +123,7 @@ class VirtualFiles:
 
     @contextlib.contextmanager
     def opener(filename, mode):
-      fp = io.BytesIO() if 'b' in mode else io.StringIO()
+      fp: Union[io.BytesIO, io.StringIO] = io.BytesIO() if 'b' in mode else io.StringIO()
       yield fp
       if not os.path.isfile(filename):
         modified_files.add(filename)

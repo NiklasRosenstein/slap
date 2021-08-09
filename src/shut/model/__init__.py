@@ -71,7 +71,7 @@ class Project:
 
   def __init__(self):
     self._cache: Dict[str, 'AbstractProjectModel'] = {}
-    self.subject: 'AbstractProjectModel' = None
+    self.subject: Optional['AbstractProjectModel'] = None
     self.monorepo: MonorepoModel = None
     self.packages: List[PackageModel] = []
     self.invalid_packages: List[Tuple[str, ExcInfo]] = []
@@ -118,6 +118,7 @@ class Project:
     if expect and not isinstance(self.subject, expect):
       raise Unexpected(expect, type(self.subject))
 
+    assert self.subject
     return self.subject
 
   def reload(self) -> None:
