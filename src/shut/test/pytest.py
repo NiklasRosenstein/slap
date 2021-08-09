@@ -24,7 +24,7 @@ import json
 import os
 import subprocess as sp
 import sys
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 from databind.core import datamodel, field
 from nr.parsing.date import timezone  # type: ignore
