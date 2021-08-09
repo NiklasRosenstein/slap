@@ -44,6 +44,7 @@ test_requirements = [
   'types-requests',
   'types-jinja2',
   'types-PyYAML',
+  'types-setuptools',
   'types-termcolor',
 ]
 extras_require = {}
