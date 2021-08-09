@@ -77,7 +77,7 @@ def collect_requirement_args(
     for dep_name in nx.algorithms.topological_sort(graph):
       dep = project_packages[dep_name]
       ref = direct_inter_dependencies[dep_name]
-      if not ref.version_selector.matches(dep.version):
+      if ref.version_selector and dep.version and not ref.version_selector.matches(dep.version):
         print('note: skipping inter-dependency on package "{}" because the version selector '
               '{} does not match the present version {}'
               .format(dep.name, ref.version_selector, dep.version), file=sys.stderr)
@@ -102,8 +102,10 @@ def run_install(
     #   we're in a venv. Using the full path to the current python installation works as expected
     #   though...
     python = shutil.which('python')
+    assert python
     pip = os.getenv('PIP', _join_command([python, '-m', 'pip']))
 
+  assert pip
   pip_bin = shlex.split(pip)
   command = pip_bin + ['install'] + args
   if upgrade:

@@ -28,8 +28,8 @@ from shut.model import PackageModel
 
 
 @pkg.command(help="""
-Shows whether the package was modified since the last release.
-  """ + print_status.__doc__)
+  Shows whether the package was modified since the last release.
+  """ + (print_status.__doc__ or ''))
 @click.option('--json', is_flag=True, help='Output as JSON.')
 @click.option('--include-config', is_flag=True, help='Include the package config in the JSON output.')
 def status(json: bool, include_config: bool) -> None:

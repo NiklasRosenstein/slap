@@ -132,7 +132,7 @@ class PackageModel(AbstractProjectModel):
     return self.name.replace('-', '_')
 
   def get_python_requirement(self) -> Optional[Requirement]:
-    return next(filter(lambda x: isinstance(x, Requirement) and x.package == 'python', self.requirements), None)
+    return next(filter(lambda x: isinstance(x, Requirement) and x.package == 'python', self.requirements), None)  # type: ignore
 
   def has_vendored_requirements(self) -> bool:
     """
@@ -172,6 +172,7 @@ class PackageModel(AbstractProjectModel):
     source code.
     """
 
+    assert self.filename
     return PythonPackageMetadata(
       os.path.join(os.path.dirname(self.filename), self.source_directory),
       self.get_modulename())
@@ -181,6 +182,7 @@ class PackageModel(AbstractProjectModel):
     Returns the absolute path to the README for this package.
     """
 
+    assert self.filename
     directory = os.path.dirname(self.filename)
 
     if self.readme:
@@ -199,11 +201,13 @@ class PackageModel(AbstractProjectModel):
     return os.path.join(directory, 'py.typed')
 
   def get_publish_config(self) -> PublishConfiguration:
+    assert self.project
     if self.project and self.project.monorepo and self.project.monorepo.publish:
       return self.project.monorepo.publish
     return self.publish
 
   def get_license(self) -> Optional[str]:
+    assert self.project
     if self.license:
       return self.license
     if self.project.monorepo:
@@ -211,6 +215,7 @@ class PackageModel(AbstractProjectModel):
     return None
 
   def get_author(self) -> Optional[Author]:
+    assert self.project
     if self.author:
       return self.author
     if self.project.monorepo:
@@ -218,6 +223,7 @@ class PackageModel(AbstractProjectModel):
     return None
 
   def get_url(self) -> Optional[str]:
+    assert self.project
     if self.url:
       return self.url
     if self.project.monorepo:
@@ -230,6 +236,7 @@ class PackageModel(AbstractProjectModel):
     return self.name
 
   def get_version(self) -> Optional[Version]:
+    assert self.project
     if self.version:
       return self.version
     if self.project.monorepo and self.project.monorepo.release.single_version:
@@ -237,12 +244,14 @@ class PackageModel(AbstractProjectModel):
     return None
 
   def get_tag(self, version: Version) -> str:
+    assert self.project
     tag_format = self.release.tag_format
     if self.project and self.project.monorepo and '{name}' not in tag_format:
       tag_format = '{name}@' + tag_format
     return tag_format.format(name=self.name, version=version)
 
   def get_license_file(self, inherit: bool = False) -> Optional[str]:
+    assert self.project
     if not self.license_file and inherit and self.project.monorepo and \
         (not self.license or self.license == self.project.monorepo.license):
       filename = self.project.monorepo.get_license_file()
@@ -259,9 +268,9 @@ class PythonPackageMetadata:
   def __init__(self, source_directory: str, modulename: str) -> None:
     self.source_directory = source_directory
     self.modulename = modulename
-    self._filename = None
-    self._author = None
-    self._version = None
+    self._filename: Optional[str] = None
+    self._author: Optional[str] = None
+    self._version: Optional[str] = None
 
   @property
   def filename(self) -> str:
@@ -310,12 +319,14 @@ class PythonPackageMetadata:
   def author(self) -> str:
     if not self._author:
       self._load_metadata()
+    assert self._author
     return self._author
 
   @property
   def version(self) -> str:
     if not self._version:
       self._load_metadata()
+    assert self._version
     return self._version
 
   def _load_metadata(self) -> None:

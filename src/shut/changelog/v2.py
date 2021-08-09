@@ -79,5 +79,6 @@ class Changelog(_ChangelogBase[v1.Changelog], List[Entry]):
   Supersedes = v1.Changelog  # _ChangelogBase
 
   @classmethod
-  def adapt(cls, v1_changelog: v1.Changelog) -> 'Changelog':
+  def adapt(cls, v1_changelog: _ChangelogBase) -> 'Changelog':
+    assert isinstance(v1_changelog, v1.Changelog)
     return cls(map(Entry.from_v1, v1_changelog))

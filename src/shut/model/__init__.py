@@ -21,7 +21,7 @@
 
 import os
 import sys
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, TextIO, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, TextIO, Tuple, Type, TypeVar, Union, cast
 
 import databind.core
 import databind.json
@@ -40,7 +40,7 @@ mapper = databind.json.mapper()
 #registry.set_option(D.dataclass, 'skip_defaults', True)
 
 
-def get_existing_file(directory: str, choices: List[str]) -> bool:
+def get_existing_file(directory: str, choices: List[str]) -> Optional[str]:
   for fn in choices:
     path = os.path.join(directory, fn)
     if os.path.isfile(path):
@@ -132,7 +132,8 @@ class Project:
       self._reload(package)
 
   def _reload(self, obj: 'AbstractProjectModel') -> None:
-    result = self._load_object(obj.filename, type(obj), force=True)
+    assert obj.filename
+    result: AbstractProjectModel = self._load_object(obj.filename, type(obj), force=True)
     vars(obj).update(vars(result))
 
   def load_or_exit(self, *args, **kwargs):
@@ -146,21 +147,22 @@ class Project:
       else:
         raise
 
-  def _load_object(self, filename: str, type_: Type[T_AbstractProjectModel], force: bool = False) -> T:
+  def _load_object(self, filename: str, type_: Type[T_AbstractProjectModel], force: bool = False) -> T_AbstractProjectModel:
     filename = os.path.normpath(os.path.abspath(filename))
     if not force and filename in self._cache:
-      obj = self._cache[filename]
-      assert isinstance(obj, type_), 'type mismatch: have {} but expected {}'.format(
-        type(obj).__name__, type_.__name__)
-      return obj
+      obj_in_cache = self._cache[filename]
+      assert isinstance(obj_in_cache, type_), 'type mismatch: have {} but expected {}'.format(
+        type(obj_in_cache).__name__, type_.__name__)
+      return obj_in_cache
     with open(filename) as fp:
       data = yaml.safe_load(fp)
     collect_unknowns = databind.core.annotations.collect_unknowns()
-    obj = self._cache[filename] = databind.json.load(data, type_, mapper=mapper, options=[collect_unknowns])
+    obj = cast('T_AbstractProjectModel', databind.json.load(data, type_, mapper=mapper, options=[collect_unknowns]))
+    self._cache[filename] = obj
     obj.filename = filename
     obj.project = self
     obj.unknown_keys = list(Stream(collect_unknowns.entries)
-        .flatmap(lambda e: (e.location.push(k).format(e.location.Format.PLAIN) for k in e.keys)))
+        .flatmap(lambda e: (e.location.push_unknown(k).format(e.location.Format.PLAIN) for k in e.keys)))
     return obj
 
   def _load_monorepo(self, filename: str) -> 'MonorepoModel':
@@ -194,7 +196,7 @@ def dump(obj: Any, file_: Union[str, TextIO]) -> None:
 
 
 def serialize(obj: Any) -> Dict[str, Any]:
-  return databind.json.dump(obj, mapper=mapper)
+  return cast(Dict[str, Any], databind.json.dump(obj, mapper=mapper))
 
 
 from .abstract import AbstractProjectModel

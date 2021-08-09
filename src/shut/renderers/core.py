@@ -46,7 +46,7 @@ class VersionRef:
   value: str
 
 
-class Renderer(Generic[T_co], metaclass=abc.ABCMeta):
+class Renderer(Generic[T], metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def get_files(self, files: VirtualFiles, obj: T) -> None:
@@ -56,10 +56,10 @@ class Renderer(Generic[T_co], metaclass=abc.ABCMeta):
     return; yield
 
 
-registry = TypeRegistry[Renderer[T_co]]()
+registry = TypeRegistry[Renderer[T]]()
 
 
-def register_renderer(t: Type[T_co], renderer: Type[Renderer[T_co]]) -> None:
+def register_renderer(t: Type[T], renderer: Type[Renderer[T]]) -> None:
   """
   Register the *renderer* implementation to run when creating files for *t*.
   """

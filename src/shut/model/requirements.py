@@ -28,7 +28,6 @@ from dataclasses import dataclass
 from typing import Iterable, List, Optional, Union, TypeVar, Type
 from urllib.parse import urlparse
 
-from databind.core import Context, Converter, Direction, ConcreteType
 from .version import bump_version, Version
 
 T = TypeVar('T')
@@ -118,7 +117,7 @@ VersionSelector.ANY = VersionSelector('*')
 class BaseRequirement(abc.ABC):
 
   @abc.abstractclassmethod
-  def from_string(cls: Type[T], value: str) -> T: ...
+  def from_string(cls, value: str) -> 'BaseRequirement': ...
 
   @abc.abstractmethod
   def __str__(self) -> str: ...
@@ -168,7 +167,7 @@ class Requirement(BaseRequirement):
       extras=sorted(map(str.strip, extras.split(','))) if extras else None)
 
   def to_setuptools(self) -> str:
-    return self.__str__(setuptools=True)
+    return self.__str__(setuptools=True)  # type: ignore
 
   @classmethod
   def from_string(cls, value: str) -> 'Requirement':
@@ -258,21 +257,21 @@ class RequirementsList(List[Union[Requirement, VendoredRequirement]]):
   """
 
   def reqs(self) -> Iterable[Requirement]:
-    return filter(lambda x: isinstance(x, Requirement), self)
+    return filter(lambda x: isinstance(x, Requirement), self)  # type: ignore
 
   def vendored_reqs(self) -> Iterable[VendoredRequirement]:
-    return filter(lambda x: isinstance(x, VendoredRequirement), self)
+    return filter(lambda x: isinstance(x, VendoredRequirement), self)  # type: ignore
 
   def get_pip_args(self, root: str, develop: bool) -> List[str]:
     result = []
     for req in self.reqs():
       result.append(req.to_setuptools())
-    for req in self.vendored_reqs():
-      result += req.get_pip_args(root, develop)
+    for vreq in self.vendored_reqs():
+      result += vreq.get_pip_args(root, develop)
     return result
 
 
 from .utils import StringConverter
 from . import mapper
-mapper.add_converter_for_type(Requirement, StringConverter())
-mapper.add_converter_for_type(VendoredRequirement, StringConverter())
+mapper.add_converter_for_type(Requirement, StringConverter())  # type: ignore
+mapper.add_converter_for_type(VendoredRequirement, StringConverter())  # type: ignore

@@ -47,6 +47,7 @@ def update_monorepo(
   if tag and not verify_tag(monorepo, tag):
     result = 1
 
+  assert monorepo.project
   files = get_files(monorepo)
   if all_:
     for package in monorepo.project.packages:

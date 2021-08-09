@@ -76,6 +76,7 @@ class AbstractProjectModel(abc.ABC):
     Returns the absolute path to the LICENSE file for this package.
     """
 
+    assert self.filename
     if self.license_file:
       return self.license_file
 

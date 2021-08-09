@@ -103,6 +103,7 @@ class TestRun:
   environment: TestEnvironment
   tests: List[TestCase]
   errors: List[TestError] = field(default_factory=list)
+  error: Optional[str] = None
 
 
 @dataclass
@@ -114,8 +115,10 @@ class Runtime:
   @classmethod
   def from_env(self) -> 'Runtime':
     python = shlex.split(os.getenv('PYTHON', 'python'))
-    pip = shlex.split(os.getenv('PIP')) if os.getenv('PIP') else python + ['-m', 'pip']
-    virtualenv = shlex.split(os.getenv('VIRTUALENV')) if os.getenv('VIRTUALENV') else python + ['-m', 'venv']
+    pip_var = os.getenv('PIP')
+    pip = shlex.split(pip_var) if pip_var else python + ['-m', 'pip']
+    venv_var = os.getenv('VIRTUALENV')
+    virtualenv = shlex.split(venv_var) if venv_var else python + ['-m', 'venv']
     return Runtime(python, pip, virtualenv)
 
   @classmethod
@@ -169,7 +172,7 @@ class BaseTestDriver(abc.ABC):
   """
 
   @abc.abstractmethod
-  def test_package(self, package: 'PackageModel', runtime: Runtime) -> TestRun:
+  def test_package(self, package: 'PackageModel', runtime: Runtime, capture: bool) -> TestRun:
     pass
 
   @abc.abstractmethod

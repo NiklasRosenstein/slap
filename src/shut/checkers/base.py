@@ -45,6 +45,7 @@ class CheckStatus(enum.IntEnum):
   PASSED = enum.auto()  #: The check has passed.
   WARNING = enum.auto()  #: The check is merely giving a warning.
   ERROR = enum.auto()  #: The check has an error, something is in a bad or invalid state.
+  SKIP = enum.auto()
 
 
 class CheckResult(NamedTuple):
@@ -58,12 +59,15 @@ class CheckResult(NamedTuple):
   subject: Optional[AbstractProjectModel] = None
 
 
-class SkipCheck(NamedTuple):
+class SkipCheck(CheckResult):
   """
   Yield this from a #@check() decorated method on a #Checker subclass to indicate that the
   check should be skipped. This is different from not yielding anything as the check will be
   considered successful in that case.
   """
+
+  def __init__(self):
+    super().__init__(CheckStatus.SKIP, '', None)
 
 
 class Check(NamedTuple):

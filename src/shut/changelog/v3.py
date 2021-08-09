@@ -38,8 +38,6 @@ class Changelog(_ChangelogBase[v2.Changelog]):
   release_date: Optional[datetime.date] = None
 
   @classmethod
-  def adapt(cls, v2_changelog: v2.Changelog) -> 'Changelog':
-    return cls(
-      release_date=None,
-      changes=list(v2_changelog),
-    )
+  def adapt(cls, v2_changelog: _ChangelogBase) -> 'Changelog':
+    assert isinstance(v2_changelog, v2.Changelog)
+    return cls(release_date=None, changes=list(v2_changelog))

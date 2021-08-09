@@ -72,7 +72,7 @@ def _terminal(fp: TextIO, changelogs: List[Changelog]) -> None:
 
   # Explode entries by component.
   for changelog in changelogs:
-    fp.write(colored(changelog.version or 'Unreleased', 'blue', attrs=['bold', 'underline']))
+    fp.write(colored(str(changelog.version or 'Unreleased'), 'blue', attrs=['bold', 'underline']))
     fp.write(' ({})\n'.format(changelog.data.release_date or 'no release date'))
     for component, entries in _group_entries_by_component(changelog.entries):
       maxw = max(map(lambda x: len(x.type_.name), entries))
@@ -127,7 +127,7 @@ def render(fp: TextIO, format: str, changelogs: List[Changelog]) -> None:
   unreleased = next((x for x in changelogs if not x.version), None)
   if unreleased:
     changelogs.remove(unreleased)
-  changelogs.sort(key=lambda x: x.version, reverse=True)
+  changelogs.sort(key=lambda x: x.version, reverse=True)  # type: ignore
   if unreleased:
     changelogs.insert(0, unreleased)
 

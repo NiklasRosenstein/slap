@@ -19,7 +19,6 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import collections
 import contextlib
 import json
 import logging
@@ -27,12 +26,13 @@ import os
 import posixpath
 import re
 import textwrap
-from typing import Dict, Iterable, List, Optional, TextIO, Tuple
+from typing import Dict, Iterable, List, NamedTuple, Optional, TextIO, Tuple
 
 import nr.fs  # type: ignore
+from nr.optional import Optional as _Opt
 
 from shut.model.package import PackageModel, Include, Exclude
-from shut.model.requirements import RequirementsList
+from shut.model.requirements import Requirement, RequirementsList
 from shut.utils.io.virtual import VirtualFiles
 from .core import Renderer, register_renderer, VersionRef
 
@@ -43,7 +43,10 @@ GENERATED_FILE_REMARK = '''
 # For more information about Shut, check out https://pypi.org/project/shut/
 '''.strip() + '\n'
 
-_ReadmeStatus = collections.namedtuple('ReadmeStatus', 'path,runtime_path,outside')
+class _ReadmeStatus(NamedTuple):
+  path: str
+  runtime_path: str
+  outside: bool
 
 
 def _get_readme_content_type(filename: str) -> str:
@@ -161,7 +164,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     if license_file and license_file.startswith(os.pardir + os.sep):
       # We need to copy the license from the monorepo.
       self._render_temp_file_copy_function(fp)
-      license_src = os.path.relpath(package.get_license_file(True), package.get_directory())
+      license_src = os.path.relpath(license_file, package.get_directory())
       license_dst = os.path.basename(license_src)
       fp.write('\n_tempcopy({!r}, {!r})\n'.format(license_src, license_dst))
 
@@ -244,11 +247,11 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       name=package.name,
       version=str(package.get_version()),
       packages_args=packages_args,
-      author_name=package.get_author().name if package.get_author() else None,
-      author_email=package.get_author().email if package.get_author() else None,
+      author_name=_Opt(package.get_author()).map(lambda a: a.name),
+      author_email=_Opt(package.get_author()).map(lambda a: a.email),
       url=package.get_url(),
       license=package.get_license(),
-      description=package.description.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip(),
+      description=_Opt(package.description).map(lambda d: d.replace('\n\n', '%%%%').replace('\n', ' ').replace('%%%%', '\n').strip()),
       long_description_expr=long_description_expr,
       long_description_content_type=_get_readme_content_type(readme_file) if readme_file else None,
       extras_require=extras_require,
@@ -276,7 +279,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     else:
       fp.write('\n)\n')
 
-  def _render_entrypoints(self, entrypoints: Dict[str, List[str]]) -> None:
+  def _render_entrypoints(self, entrypoints: Dict[str, List[str]]) -> str:
     if not entrypoints:
       return '{}'
     lines = ['{']
@@ -284,7 +287,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       lines.append('    {!r}: ['.format(key))
       for item in value:
         item = repr(item)
-        args = []
+        args: List[str] = []
         for varname, expr in self._ENTRTYPOINT_VARS.items():
           varname = '{{' + varname + '}}'
           if varname in item:
@@ -299,12 +302,12 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     return '\n'.join(lines)
 
   @staticmethod
-  def _format_reqs(reqs: RequirementsList, level: int = 0) -> List[str]:
+  def _format_reqs(reqs: RequirementsList, level: int = 0) -> str:
     indent = '  ' * (level + 1)
-    reqs = [r for r in reqs.reqs() if r.package != 'python']
-    if not reqs:
+    filtered_reqs = [r for r in reqs.reqs() if r.package != 'python']
+    if not filtered_reqs:
       return '[]'
-    return '[\n' + ''.join(indent + '{!r},\n'.format(x.to_setuptools()) for x in reqs if x.package != 'python') + ']'
+    return '[\n' + ''.join(indent + '{!r},\n'.format(x.to_setuptools()) for x in filtered_reqs if x.package != 'python') + ']'
 
   def _render_requirements(self, fp: TextIO, target: str, requirements: RequirementsList):
     fp.write('{} = {}\n'.format(target, self._format_reqs(requirements)))
@@ -340,11 +343,12 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     already exists, nothing will be done.
     """
 
+    # TODO (NiklasRosenstein): Dirty haxx
     if hasattr(fp, '_SetuptoolsRenderer_tempcopy_rendered'):
       return
-    fp._SetuptoolsRenderer_tempcopy_rendered = True
+    fp._SetuptoolsRenderer_tempcopy_rendered = True  # type: ignore
 
-    # TODO(NiklasRosenstein): make sure this gets rendered into the file only once.
+    # TODO (NiklasRosenstein): make sure this gets rendered into the file only once.
 
     fp.write('\n')
     fp.write(textwrap.dedent('''
@@ -440,14 +444,14 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     markers = (self._BEGIN_SECTION, self._END_SECTION)
     with _rewrite_section(fp, current.read() if current else '', *markers):
-      for entry in manifest:
-        fp.write(entry + '\n')
+      for entry_str in manifest:
+        fp.write(entry_str + '\n')
 
   def _render_requirements_txt(self, fp: TextIO, package: PackageModel) -> None:
     for url in package.install.extra_index_urls:
       fp.write('--extra-index-url %s\n' % url)
     for req in package.requirements:
-      if req.package != 'python':
+      if not (isinstance(req, Requirement) and req.package != 'python'):
         fp.write(req.to_setuptools() + '\n')
 
   # Renderer[PackageModel] Overrides

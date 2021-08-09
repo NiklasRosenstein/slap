@@ -54,7 +54,7 @@ def print_checks(
   if colors:
     colored = termcolor.colored
   else:
-    def colored(s, *a, **kw):
+    def colored(s, *a, **kw):  # type: ignore
       return str(s)
 
   out = sys.stderr if use_stderr else sys.stdout

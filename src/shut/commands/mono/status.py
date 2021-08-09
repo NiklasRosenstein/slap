@@ -32,7 +32,7 @@ from shut.model.monorepo import MonorepoModel
 
 @mono.command(help="""
   Show which packages have been modified since their last release.
-  """ + print_status.__doc__)
+  """ + (print_status.__doc__ or ''))
 @click.option('--json', is_flag=True, help='Output as JSON.')
 @click.option('--include-config', is_flag=True, help='Include the package config in the JSON output.')
 def status(json: bool, include_config: bool) -> None:

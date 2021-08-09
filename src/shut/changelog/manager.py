@@ -23,7 +23,7 @@
 import datetime
 import os
 from dataclasses import dataclass, field
-from typing import Iterable, Optional, Union
+from typing import Dict, Iterable, Optional, Tuple, Union
 
 import databind.json
 import yaml
@@ -54,15 +54,17 @@ class Changelog:
   def exists(self) -> bool:
     " Returns #True if the changelog file exists. "
 
+    assert self.filename
     return os.path.isfile(self.filename)
 
   def load(self) -> None:
     " Loads the data from the file of this changelog. "
 
+    assert self.filename
     with open(self.filename) as fp:
       raw_data = yaml.safe_load(fp)
 
-    data = databind.json.load(raw_data, AllChangelogTypes, mapper=mapper)
+    data: AllChangelogTypes = databind.json.load(raw_data, AllChangelogTypes, mapper=mapper)  # type: ignore
     if not isinstance(data, v3.Changelog):
       data = v3.Changelog.migrate(data)
 
@@ -71,6 +73,7 @@ class Changelog:
   def save(self, create_directory: bool = False) -> None:
     " Saves the changelog. It will always save the changelog in the newest supported format. "
 
+    assert self.filename
     if create_directory:
       os.makedirs(os.path.dirname(self.filename), exist_ok=True)
     data = databind.json.dump(self.data, v3.Changelog, mapper=mapper)
@@ -89,9 +92,9 @@ class ChangelogManager:
 
   def __init__(self, directory: str) -> None:
     self.directory = directory
-    self._cache = {}
+    self._cache: Dict[Tuple[str, str], Changelog] = {}
 
-  def _get(self, name: str, version: Optional[str]) -> Changelog:
+  def _get(self, name: str, version: Optional[Version]) -> Changelog:
     key = (name, str(version))
     if key in self._cache:
       return self._cache[key]
@@ -117,8 +120,11 @@ class ChangelogManager:
     unreleased = self.unreleased
     unreleased.data.release_date = datetime.date.today()
     unreleased.save()
+    new_version = self.version(version)
 
-    os.rename(unreleased.filename, self.version(version).filename)
+    assert unreleased.filename
+    assert new_version.filename
+    os.rename(unreleased.filename, new_version.filename)
     self._cache.clear()
 
     return self.version(version)

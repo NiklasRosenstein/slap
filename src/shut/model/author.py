@@ -49,4 +49,4 @@ class Author:
 
 from .utils import StringConverter
 from . import mapper
-mapper.add_converter_for_type(Author, StringConverter(Author.parse))
+mapper.add_converter_for_type(Author, StringConverter(Author.parse))  # type: ignore

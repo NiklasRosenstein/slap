@@ -30,6 +30,7 @@ from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 from typing_extensions import Annotated
 
 from databind.core import annotations as A
+from nr.parsing.date import tzlocal
 
 from shut.model.requirements import Requirement
 from .base import (BaseTestDriver, Runtime, StackTrace, TestCase, TestCrashReport,
@@ -47,7 +48,7 @@ def load_report_file(report_file: str) -> TestRun:
   with open(report_file) as fp:
     raw = json.load(fp)
 
-  started_time = datetime.datetime.fromtimestamp(raw['created']).replace(tzinfo=timezone.local).astimezone(timezone.utc)
+  started_time = datetime.datetime.fromtimestamp(raw['created']).replace(tzinfo=tzlocal()).astimezone(timezone.utc)
   duration = raw['duration']
   status = TestStatus.PASSED if raw['exitcode'] == 0 else TestStatus.FAILED
   environment = TestEnvironment(raw['environment']['Python'], raw['environment']['Platform'])
@@ -68,6 +69,8 @@ def load_report_file(report_file: str) -> TestRun:
   for test in raw['tests']:
     failed_stage = next((test[k] for k in ('setup', 'call', 'teardown')
       if k in test and test[k]['outcome'] == 'failed'), None)
+    crash: Optional[TestCrashReport] = None
+    stdout: str = ''
     if failed_stage:
       crash = TestCrashReport(
         filename=failed_stage['crash']['path'],
@@ -77,9 +80,6 @@ def load_report_file(report_file: str) -> TestRun:
         longrepr=failed_stage['longrepr'],
       )
       stdout = failed_stage.get('stdout')
-    else:
-      crash = None
-      stdout = None
     test_status = {'passed': TestStatus.PASSED, 'failed': TestStatus.FAILED, 'skipped': TestStatus.SKIPPED}[test['outcome']]
     tests.append(TestCase(
       name=test['nodeid'],

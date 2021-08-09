@@ -3,3 +3,8 @@ changes:
   component: general
   description: upgrade to `databind.core ^1.1.2` and `nr.stream ^0.1.0`
   fixes: []
+- type: fix
+  component: general
+  description: 'make changes to satisfy MyPy for the most part, and add `# type: ignore`
+    or `cast()` for some special cases that we can deal with later'
+  fixes: []
