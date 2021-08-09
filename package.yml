@@ -19,7 +19,7 @@ requirements:
 - nr.proxy ^1.0.0
 - nr.pylang.utils ^0.0.1
 - nr.utils.git ~0.1.3
-- nr.stream ^0.2.1
+- nr.stream ^0.2.2
 - requests ^2.22.0
 - packaging ^20.1
 - PyYAML ^5.1.0

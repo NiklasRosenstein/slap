@@ -66,7 +66,7 @@ class SkipCheck(CheckResult):
   considered successful in that case.
   """
 
-  def __new__(cls) -> None:
+  def __new__(cls) -> 'SkipCheck':
     return super().__new__(cls, CheckStatus.SKIP, '', None)
 
 

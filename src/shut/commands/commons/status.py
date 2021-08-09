@@ -23,7 +23,7 @@ import os
 import sys
 import typing as t
 
-from nr.utils.git import Git  # type: ignore
+from nr.utils.git import Git
 from termcolor import colored
 
 from shut.model import AbstractProjectModel, MonorepoModel, Project, serialize

@@ -24,7 +24,7 @@ import logging
 from typing import Iterable
 
 import nr.fs  # type: ignore
-from nr.stream import Stream  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.changelog.manager import ChangelogManager
@@ -75,7 +75,8 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
 
     print()
     print(f'bumping {len(inter_deps)} mono repository inter-dependency(-ies)')
-    for filename, refs in Stream.groupby(inter_deps, lambda d: d.filename, list):  # type: ignore
+
+    for filename, refs in Stream(inter_deps).groupby(lambda d: d.filename, lambda it: list(it)):
       print(f'  {colored(nr.fs.rel(filename), "cyan")}:')
 
       with open(filename) as fp:

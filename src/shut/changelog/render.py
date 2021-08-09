@@ -24,17 +24,18 @@ Provides functions to render a list of changelogs. Always only supports the newe
 changelog version.
 """
 
+from shut.changelog.v2 import Entry
 from .manager import Changelog
-from nr.stream import Stream  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
-from typing import List, TextIO
+from typing import List, TextIO, Tuple
 import re
 import shutil
 import textwrap
 
 
-def _group_entries_by_component(entries):
-  return list(Stream(entries).sortby(lambda x: x.component).groupby(lambda x: x.component, list))
+def _group_entries_by_component(entries: List[Entry]) -> List[Tuple[str, List[Entry]]]:
+  return Stream(entries).sortby(lambda x: x.component).groupby(lambda x: x.component, lambda it: list(it)).collect()
 
 
 def _terminal(fp: TextIO, changelogs: List[Changelog]) -> None:

@@ -25,7 +25,7 @@ import os
 import sys
 from collections import Counter
 from dataclasses import dataclass
-from typing import Iterable, Generic, Optional, Type, TypeVar
+from typing import Iterable, Generic, List, Optional, Type, TypeVar
 
 import click
 import nr.fs  # type: ignore
@@ -90,7 +90,8 @@ class VersionBumpData(Generic[T_AbstractProjectModel], metaclass=abc.ABCMeta):
 
     print()
     print(f'bumping {len(version_refs)} version reference(s)')
-    for filename, refs in Stream(version_refs).groupby(lambda r: r.filename, lambda r: list(r)):  # type: ignore
+
+    for filename, refs in Stream(version_refs).groupby(lambda r: r.filename, lambda it: list(it)):
       with open(filename) as fp:
         content = fp.read()
 

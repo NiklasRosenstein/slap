@@ -27,7 +27,7 @@ import sys
 import click
 import nr.fs  # type: ignore
 import requests
-from nr.utils.git import Git  # type: ignore
+from nr.utils.git import Git
 from termcolor import colored
 
 from shut.model import PackageModel
