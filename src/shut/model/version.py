@@ -23,8 +23,8 @@ import logging
 import re
 from typing import Optional, Union
 
-from databind.core import Converter
-from nr.utils.git import Git  # type: ignore
+from databind.core import Converter, Context, Direction
+from nr.utils.git import Git
 from packaging.version import Version as _Version
 
 logger = logging.getLogger(__name__)
@@ -160,16 +160,14 @@ def get_commit_distance_version(repo_dir: str, version: Version, latest_tag: str
   return parse_version(str(version) + local)
 
 
-from . import registry
-
-
 class VersionConverter(Converter):
 
-  def from_python(self, value, context):
-    return str(value)
+  def convert(self, ctx: Context) -> object:
+    if ctx.direction == Direction.serialize:
+      return str(ctx.value)
+    else:
+      return parse_version(ctx.value)
 
-  def to_python(self, value, context):
-    return parse_version(value)
 
-
-registry.register_converter(Version, VersionConverter())
+from . import mapper
+mapper.add_converter_for_type(Version, VersionConverter())

@@ -24,12 +24,14 @@ import enum
 import os
 import posixpath
 import re
-from typing import Iterable, List, Optional, Union
+from dataclasses import dataclass
+from typing import Iterable, List, Optional, Union, TypeVar, Type
 from urllib.parse import urlparse
 
-from databind.core import datamodel
-
+from databind.core import Context, Converter, Direction, ConcreteType
 from .version import bump_version, Version
+
+T = TypeVar('T')
 
 
 class VersionSelector(object):
@@ -113,24 +115,19 @@ class VersionSelector(object):
 VersionSelector.ANY = VersionSelector('*')
 
 
-@datamodel(serialize_as=lambda: Union[Requirement, VendoredRequirement])
-class BaseRequirement(metaclass=abc.ABCMeta):
+class BaseRequirement(abc.ABC):
 
-  @classmethod
-  @abc.abstractmethod
-  def databind_json_load(self, value, context):
-    pass
+  @abc.abstractclassmethod
+  def from_string(cls: Type[T], value: str) -> T: ...
 
   @abc.abstractmethod
-  def databind_json_dump(self, context):
-    pass
+  def __str__(self) -> str: ...
 
   @abc.abstractmethod
-  def to_setuptools(self) -> str:
-    pass
+  def to_setuptools(self) -> str: ...
 
 
-@datamodel
+@dataclass
 class Requirement(BaseRequirement):
   """
   A Requirement is simply combination of a package name and a version selector.
@@ -174,19 +171,11 @@ class Requirement(BaseRequirement):
     return self.__str__(setuptools=True)
 
   @classmethod
-  def databind_json_load(cls, value, context):
-    if isinstance(value, str):
-      try:
-        return Requirement.parse(value)
-      except ValueError as exc:
-        raise context.type_error(str(exc))
-    return NotImplemented
-
-  def databind_json_dump(self, context):
-    return str(self)
+  def from_string(cls, value: str) -> 'Requirement':
+    return Requirement.parse(value)
 
 
-@datamodel
+@dataclass
 class VendoredRequirement(BaseRequirement):
   """
   A vendored requirement is either a relative path or a string prefixed with `git+` that
@@ -259,19 +248,11 @@ class VendoredRequirement(BaseRequirement):
     return args
 
   @classmethod
-  def databind_json_load(cls, value, context):
-    if isinstance(value, str):
-      try:
-        return VendoredRequirement.parse(value)
-      except ValueError as exc:
-        raise context.type_error(str(exc))
-    raise context.type_error()
-
-  def databind_json_dump(self, context):
-    return str(self)
+  def from_string(cls, value: str) -> 'VendoredRequirement':
+    return VendoredRequirement.parse(value)
 
 
-class RequirementsList(List[BaseRequirement]):
+class RequirementsList(List[Union[Requirement, VendoredRequirement]]):
   """
   A list of requirements. Provides some convenience methods.
   """
@@ -289,3 +270,21 @@ class RequirementsList(List[BaseRequirement]):
     for req in self.vendored_reqs():
       result += req.get_pip_args(root, develop)
     return result
+
+
+class BaseRequirementConverter(Converter):
+
+  def convert(self, ctx: Context) -> object:
+    assert isinstance(ctx.type, ConcreteType)
+    if ctx.direction == Direction.serialize:
+      assert isinstance(ctx.value, ctx.type.type)
+      return str(ctx.value)
+    else:
+      if not isinstance(ctx.value, str):
+        raise ctx.type_error(expected=str)
+      return ctx.type.type.from_string(ctx.value)
+
+
+from . import mapper
+mapper.add_converter_for_type(Requirement, BaseRequirementConverter())
+mapper.add_converter_for_type(VendoredRequirement, BaseRequirementConverter())

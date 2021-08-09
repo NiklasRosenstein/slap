@@ -24,11 +24,11 @@ import logging
 import os
 import sys
 from collections import Counter
+from dataclasses import dataclass
 from typing import Iterable, Generic, Optional, T, Type
 
 import click
 import nr.fs  # type: ignore
-from databind.core import datamodel
 from nr.stream import Stream  # type: ignore
 from nr.utils.git import Git  # type: ignore
 from termcolor import colored
@@ -44,7 +44,7 @@ from shut.utils.text import substitute_ranges
 logger = logging.getLogger(__name__)
 
 
-@datamodel
+@dataclass
 class Args:
   version: Optional[Version]
   major: bool

@@ -19,10 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from databind.core import datamodel
+from dataclasses import dataclass
 
 
-@datamodel
+@dataclass
 class LinterConfiguration:
   # TODO
   pass

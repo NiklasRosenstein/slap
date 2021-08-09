@@ -19,11 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from databind.core import datamodel
+from dataclasses import dataclass
 import re
 
 
-@datamodel
+@dataclass
 class Author:
   """
   Represents information about an author. Can be deserialized from a string of the form

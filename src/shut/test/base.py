@@ -30,6 +30,7 @@ import subprocess as sp
 from dataclasses import dataclass, field
 from typing import Optional, List, TYPE_CHECKING
 
+from databind.core import annotations as A
 from shut.model.requirements import Requirement
 
 if TYPE_CHECKING:
@@ -161,7 +162,8 @@ class Virtualenv:
     return Runtime.from_python3([self.bin('python')])
 
 
-class BaseTestDriver(metaclass=abc.ABCMeta):
+@A.union(style=A.union.Style.flat)
+class BaseTestDriver(abc.ABC):
   """
   Base class for drivers that can run unit tests for a package.
   """

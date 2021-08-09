@@ -24,8 +24,10 @@ The V3 of changelogs.
 """
 
 import enum
+from dataclasses import dataclass
 from typing import List
-from databind.core import datamodel, field
+from typing_extensions import Annotated
+from databind.core import annotations as A
 from . import _ChangelogBase, v1
 
 
@@ -50,9 +52,9 @@ class Type(enum.Enum):
     return self.value[1]
 
 
-@datamodel
+@dataclass
 class Entry:
-  type_: Type = field(altname='type')
+  type_: Annotated[Type, A.alias('type')]
   component: str
   description: str
   fixes: List[str]

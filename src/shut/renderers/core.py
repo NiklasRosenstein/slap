@@ -20,9 +20,8 @@
 # IN THE SOFTWARE.
 
 import abc
+from dataclasses import dataclass
 from typing import Iterable, Generic, Type, TypeVar
-
-from databind.core import datamodel
 
 from shut.utils.io.virtual import VirtualFiles
 from shut.utils.type_registry import TypeRegistry
@@ -39,7 +38,7 @@ __all__ = [
 ]
 
 
-@datamodel
+@dataclass
 class VersionRef:
   filename: str
   start: int

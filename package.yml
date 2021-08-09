@@ -1,6 +1,8 @@
 name: shut
 version: 0.15.1
-author: Niklas Rosenstein <rosensteinniklas@gmail.com>
+author:
+  name: Niklas Rosenstein
+  email: rosensteinniklas@gmail.com
 license: MIT
 url: https://github.com/NiklasRosenstein/shut
 description: Automates the heavy lifting of release and distribution management for
@@ -9,21 +11,22 @@ typed: true
 requirements:
 - python ^3.6
 - beautifulsoup4 ^4.8.1
-- databind.core ^0.4.0
-- databind.json ^0.4.0
+- databind.core ^1.1.2
+- databind.json ^1.1.2
 - click ^7.0
 - jinja2 ^2.11.1
 - networkx ^2.4
 - nr.fs ^1.5.0
-- nr.parsing.date ^0.4.0
+- nr.parsing.date ^1.0.1
 - nr.proxy ^1.0.0
 - nr.pylang.utils ^0.0.1
 - nr.utils.git ~0.1.3
-- nr.stream ~0.0.4
+- nr.stream ^0.1.0
 - requests ^2.22.0
 - packaging ^20.1
 - PyYAML ^5.1.0
 - termcolor ^1.1.0
+- typing-extensions ^3.10.0.0
 - twine
 - wheel
 test-requirements:
@@ -32,6 +35,6 @@ entrypoints:
   console_scripts:
   - shut = shut.commands:shut
 package-data:
-  - include: data/license_templates/*.txt
+- include: data/license_templates/*.txt
 test-driver:
   type: pytest

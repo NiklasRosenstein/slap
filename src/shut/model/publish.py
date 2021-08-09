@@ -19,12 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from dataclasses import dataclass, field
 from typing import Dict, Optional
 
-from databind.core import datamodel, field
 
-
-@datamodel
+@dataclass
 class WarehouseCredentials:
   username: Optional[str] = None
   password: Optional[str] = None
@@ -32,7 +31,7 @@ class WarehouseCredentials:
   test_password: Optional[str] = None
 
 
-@datamodel
+@dataclass
 class WarehouseConfiguration(WarehouseCredentials):
   repository: Optional[str] = None
   repository_url: Optional[str] = None
@@ -44,7 +43,7 @@ class WarehouseConfiguration(WarehouseCredentials):
     return self
 
 
-@datamodel
+@dataclass
 class PypiConfiguration:
   #: Whether publishing to PyPI is enabled.
   enabled: bool = True
@@ -54,7 +53,7 @@ class PypiConfiguration:
   credentials: WarehouseCredentials = field(default_factory=WarehouseCredentials)
 
 
-@datamodel
+@dataclass
 class PublishConfiguration:
   # Configuration for PyPI.
   pypi: PypiConfiguration = field(default_factory=PypiConfiguration)

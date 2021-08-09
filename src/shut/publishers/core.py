@@ -22,7 +22,7 @@
 import abc
 from typing import Generic, Iterable, List, T, Type
 
-from nr.stream import concat  # type: ignore
+from nr.stream import Stream
 
 from shut.model import AbstractProjectModel
 from shut.model.target import Target, TargetId
@@ -73,4 +73,4 @@ def register_publisher_provider(type_: Type[T], provider_class: Type[PublisherPr
 
 
 def get_publishers(obj: T) -> Iterable[Publisher]:
-  return concat(provider().get_publishers(obj) for provider in registry.for_type(type(obj)))
+  return Stream(provider().get_publishers(obj) for provider in registry.for_type(type(obj))).concat()

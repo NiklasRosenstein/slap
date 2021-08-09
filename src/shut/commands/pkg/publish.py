@@ -23,7 +23,7 @@ import os
 import sys
 
 import click
-from nr.stream import groupby, Stream  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.builders import get_builders
@@ -116,7 +116,7 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
 
   if list_:
     publishers = list(get_publishers(package))
-    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
+    for scope, publishers in Stream(publishers).groupby(lambda p: p.id.scope):
       print(f'{colored(scope, "green")}:')
       for publisher in publishers:
         print(f'  {publisher.id.name} – {publisher.get_description()}')
@@ -129,7 +129,7 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
     sys.exit(f'error: package has vendored requirements and cannot be published')
 
   if list_:
-    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
+    for scope, publishers in Stream(publishers).groupby(lambda p: p.id.scope):
       print(f'{colored(scope, "green")}:')
       for publisher in publishers:
         print(f'  {publisher.id.name} – {publisher.get_description()}')

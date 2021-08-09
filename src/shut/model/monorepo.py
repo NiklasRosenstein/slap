@@ -19,11 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from dataclasses import dataclass, field
 import re
 from typing import Iterable, Optional
 
 import networkx as nx
-from databind.core import datamodel, field
 
 from .abstract import AbstractProjectModel
 from .version import Version
@@ -33,7 +33,7 @@ from .package import PackageModel
 from .publish import PublishConfiguration
 
 
-@datamodel
+@dataclass
 class InterdependencyRef:
   filename: str
   package_name: str
@@ -42,7 +42,7 @@ class InterdependencyRef:
   version_end: int
 
 
-@datamodel
+@dataclass
 class MonorepoModel(AbstractProjectModel):
 
   def get_inter_dependencies(self) -> Iterable[InterdependencyRef]:

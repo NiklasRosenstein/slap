@@ -1,0 +1,5 @@
+changes:
+- type: change
+  component: general
+  description: upgrade to `databind.core ^1.1.2` and `nr.stream ^0.1.0`
+  fixes: []

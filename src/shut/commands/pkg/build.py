@@ -24,7 +24,7 @@ import sys
 from typing import List
 
 import click
-from nr.stream import groupby  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.builders import Builder, get_builders
@@ -69,7 +69,7 @@ def build(target, list_, build_dir, verbose):
 
   if list_:
     print()
-    for scope, builders in groupby(builders, lambda b: b.id.scope):
+    for scope, builders in Stream(builders).groupby(lambda b: b.id.scope):
       print(f'{colored(scope, "green")}:')
       for builder in builders:
         print(f'  {builder.id.name} – {builder.get_description()}')

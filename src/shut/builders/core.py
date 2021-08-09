@@ -22,7 +22,7 @@
 import abc
 from typing import Generic, Iterable, List, Type, TypeVar
 
-from nr.stream import concat  # type: ignore
+from nr.stream import Stream
 
 from shut.model import AbstractProjectModel
 from shut.model.target import Target
@@ -68,4 +68,4 @@ def register_builder_provider(type_: Type[T], provider_class: Type[BuilderProvid
 
 
 def get_builders(obj: T) -> Iterable[Builder]:
-  return concat(provider().get_builders(obj) for provider in registry.for_type(type(obj)))
+  return Stream(provider().get_builders(obj) for provider in registry.for_type(type(obj))).concat()

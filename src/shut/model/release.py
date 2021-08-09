@@ -19,14 +19,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-from databind.core import datamodel, field
+from dataclasses import dataclass, field
+from typing_extensions import Annotated
+from databind.core import annotations as A
 
 
-@datamodel
+@dataclass
 class ReleaseConfiguration:
-  tag_format: str = field(altname='tag-format', default='{version}')
+  tag_format: Annotated[str, A.alias('tag-format')] = '{version}'
 
 
-@datamodel
+@dataclass
 class MonorepoReleaseConfiguration(ReleaseConfiguration):
-  single_version: bool  = field(altname='single-version', default=False)
+  single_version: Annotated[bool, A.alias('single-version')] = False

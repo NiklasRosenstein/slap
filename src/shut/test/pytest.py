@@ -24,10 +24,12 @@ import json
 import os
 import subprocess as sp
 import sys
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from dataclasses import dataclass, field
+from datetime import timezone
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing_extensions import Annotated
 
-from databind.core import datamodel, field
-from nr.parsing.date import timezone  # type: ignore
+from databind.core import annotations as A
 
 from shut.model.requirements import Requirement
 from .base import (BaseTestDriver, Runtime, StackTrace, TestCase, TestCrashReport,
@@ -92,7 +94,8 @@ def load_report_file(report_file: str) -> TestRun:
   return TestRun(started_time, duration, status, environment, tests, errors)
 
 
-@datamodel
+@A.union.subtype(BaseTestDriver, 'pytest')
+@dataclass
 class PytestDriver(BaseTestDriver):
   """
   A driver for running unit tests using [Pytest][1].
@@ -102,7 +105,7 @@ class PytestDriver(BaseTestDriver):
 
   directory: Optional[str] = None
   args: List[str] = field(default_factory=lambda: ['-vv'])
-  report_file: str = field(default='.pytest-report.json', altname='report-file')
+  report_file: Annotated[str, A.alias('report-file')] = '.pytest-report.json'
 
   # BaseTestDriver
 

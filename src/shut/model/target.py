@@ -20,12 +20,11 @@
 # IN THE SOFTWARE.
 
 import abc
+from dataclasses import dataclass
 from fnmatch import fnmatch
 
-from databind.core import datamodel
 
-
-@datamodel(frozen=True)
+@dataclass(frozen=True)
 class TargetId:
   """
   Represents the ID of a target that can be selected on the command line. We use the
@@ -54,7 +53,7 @@ class TargetId:
     return False
 
 
-class Target(metaclass=abc.ABCMeta):
+class Target(abc.ABC):
 
   @abc.abstractproperty
   def id(self) -> TargetId:
