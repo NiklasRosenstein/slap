@@ -69,9 +69,9 @@ def build(target, list_, build_dir, verbose):
 
   if list_:
     print()
-    for scope, builders in Stream(builders).groupby(lambda b: b.id.scope):
+    for scope, scoped_builders in Stream(builders).groupby(lambda b: b.id.scope):
       print(f'{colored(scope, "green")}:')
-      for builder in builders:
+      for builder in scoped_builders:
         print(f'  {builder.id.name} – {builder.get_description()}')
     print()
     return

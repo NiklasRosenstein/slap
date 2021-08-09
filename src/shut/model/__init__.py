@@ -21,7 +21,7 @@
 
 import os
 import sys
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, TextIO, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, TextIO, Tuple, Type, TypeVar, Union, cast, overload
 
 import databind.core
 import databind.json
@@ -72,7 +72,7 @@ class Project:
   def __init__(self):
     self._cache: Dict[str, 'AbstractProjectModel'] = {}
     self.subject: Optional['AbstractProjectModel'] = None
-    self.monorepo: MonorepoModel = None
+    self.monorepo: Optional[MonorepoModel] = None
     self.packages: List[PackageModel] = []
     self.invalid_packages: List[Tuple[str, ExcInfo]] = []
 
@@ -82,11 +82,13 @@ class Project:
         return package
     raise KeyError(package_name)
 
-  def load(
-    self,
-    directory: str = '.',
-    expect: Optional[Type['AbstractProjectModel']] = None,
-  ) -> 'AbstractProjectModel':
+  @overload
+  def load(self, directory: str = '.') -> 'AbstractProjectModel': ...
+
+  @overload
+  def load(self, directory: str = '.', *, expect: Type[T_AbstractProjectModel]) -> T_AbstractProjectModel: ...
+
+  def load(self, directory='.', expect=None):
     """
     Loads all project information from *directory*. This searches in all parent directories
     for a package or monorepo configuration, then loads all resources that belong to the

@@ -26,6 +26,7 @@ from typing import List, Optional
 import click
 import yaml
 import databind.json
+from nr.preconditions import check_not_none
 from nr.utils.git import Git
 from termcolor import colored
 
@@ -96,7 +97,7 @@ def changelog(**args):
     # Allow the user to edit the entry if no description is provided or the
     # -e,--edit option was set.
     if not entry.description or args['edit']:
-      serialized = yaml.safe_dump(databind.jsonto_json(entry, v3.Changelog.Entry, mapper=mapper), sort_keys=False)
+      serialized = yaml.safe_dump(databind.json.dump(entry, v3.Changelog.Entry, mapper=mapper), sort_keys=False)
       entry = databind.json.load(yaml.safe_load(edit_text(serialized)), v3.Changelog.Entry, mapper=mapper)
 
     # Validate the entry contents (need a description and at least one type and component).
@@ -111,7 +112,7 @@ def changelog(**args):
     print(colored(message, 'cyan'))
 
     if args['stage'] or args['commit']:
-      _git.add([manager.unreleased.filename])
+      _git.add([check_not_none(manager.unreleased.filename)])
     if args['commit']:
       commit_message = entry.description
       if package and monorepo:
@@ -128,7 +129,7 @@ def changelog(**args):
     if not manager.unreleased.exists():
       logger.error('no staged changelog')
       sys.exit(1)
-    sys.exit(editor_open(manager.unreleased.filename))
+    sys.exit(editor_open(check_not_none(manager.unreleased.filename)))
 
   changelogs = []
   if args['version'] or not args['all']:

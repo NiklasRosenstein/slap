@@ -86,8 +86,8 @@ def publish_package(
     print()
     print(f'publishing {colored(str(publisher.id), "cyan")}')
     builders = builders_for_publisher[publisher.id]
-    files = (Stream
-      .concat(b.get_outputs() for b in builders)
+    files = (Stream(b.get_outputs() for b in builders)
+      .concat()
       .map(lambda x: os.path.join(build_dir, x))
       .collect()
     )
@@ -118,9 +118,9 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
 
   if list_:
     publishers = list(get_publishers(package))
-    for scope, publishers in Stream(publishers).groupby(lambda p: p.id.scope):
+    for scope, scoped_publishers in Stream(publishers).groupby(lambda p: p.id.scope):
       print(f'{colored(scope, "green")}:')
-      for publisher in publishers:
+      for publisher in scoped_publishers:
         print(f'  {publisher.id.name} – {publisher.get_description()}')
     return
 
@@ -131,9 +131,9 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
     sys.exit(f'error: package has vendored requirements and cannot be published')
 
   if list_:
-    for scope, publishers in Stream(publishers).groupby(lambda p: p.id.scope):
+    for scope, scoped_publishers in Stream(publishers).groupby(lambda p: p.id.scope):
       print(f'{colored(scope, "green")}:')
-      for publisher in publishers:
+      for publisher in scoped_publishers:
         print(f'  {publisher.id.name} – {publisher.get_description()}')
     return
 

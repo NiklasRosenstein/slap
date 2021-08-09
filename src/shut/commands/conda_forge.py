@@ -37,14 +37,6 @@ from . import project, shut
 logger = logging.getLogger(__name__)
 
 
-def _call(*args, **kwargs):
-  proc = subprocess.Popen(*args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs)
-  stdout, _ = proc.communicate()
-  if proc.returncode != 0:
-    print(colored(stdout.decode(), 'red'))
-    sys.exit(proc.returncode)
-
-
 @shut.group()
 def conda_forge():
   """
@@ -61,8 +53,8 @@ def update_feedstock(package_name, version, force):
   Update a conda-forge feedstock from a PyPI release. You can explicitly specify a *package_name*
   and *version*, or rely on the metadata from the package configuration file in your cwd.
 
-  This command will clone the feedstack from the conda-forge organization on GitHub, then
-  update thr version and sha256 reference and push a new branch to the repository.
+  This command will clone the feedstock from the conda-forge organization on GitHub, then
+  update the version and sha256 reference and push a new branch to the repository.
   """
 
   if package_name or version:

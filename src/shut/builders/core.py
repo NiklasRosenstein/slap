@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 import abc
-from typing import Generic, Iterable, List, Type, TypeVar
+from typing import Generic, Iterable, Optional, Type, TypeVar
 
 from nr.stream import Stream
 
@@ -39,6 +39,9 @@ __all__ = [
 
 
 class Builder(Target, metaclass=abc.ABCMeta):
+
+  @abc.abstractmethod
+  def get_description(self) -> Optional[str]: ...
 
   @abc.abstractmethod
   def get_outputs(self) -> Iterable[str]:

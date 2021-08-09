@@ -45,9 +45,29 @@ class AbstractProjectModel(abc.ABC):
 
   def __post_init__(self) -> None:
     # May be filled during the deserialization process to track additional metadata.
-    self.project: Optional['Project'] = None
-    self.filename: Optional[str] = None
+    self._project: Optional['Project'] = None
+    self._filename: Optional[str] = None
     self.unknown_keys: List[str] = []
+
+  @property
+  def project(self) -> 'Project':
+    if self._project is None:
+      raise RuntimeError(f'{type(self).__name__}.project is not set')
+    return self._project
+
+  @project.setter
+  def project(self, project: 'Project') -> None:
+    self._project = project
+
+  @property
+  def filename(self) -> str:
+    if self._filename is None:
+      raise RuntimeError(f'{type(self).__name__}.filename is not set')
+    return self._filename
+
+  @filename.setter
+  def filename(self, filename: str) -> None:
+    self._filename = filename
 
   def get_name(self) -> str:
     warnings.warn(f'{type(self).__name__}.get_name() is deprecated, use .name instead', DeprecationWarning)
