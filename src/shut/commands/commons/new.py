@@ -49,7 +49,7 @@ README_TEMPLATE = '''
 '''.lstrip()
 
 
-def load_author_from_git() -> Optional[str]:
+def load_author_from_git() -> Optional[Author]:
   """
   Returns a string formatted as "name <mail>" from the Git `user.name` and `user.email`
   configuration values. Returns `None` if Git is not configured.

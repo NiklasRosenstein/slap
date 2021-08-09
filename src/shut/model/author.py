@@ -46,11 +46,7 @@ class Author:
   def __str__(self):
     return '{} <{}>'.format(self.name, self.email)
 
-  @classmethod
-  def databind_json_load(cls, value, context):
-    if isinstance(value, str):
-      return cls.parse(value)
-    return NotImplemented
 
-  def databind_json_dump(self, context):
-    return str(self)
+from .utils import StringConverter
+from . import mapper
+mapper.add_converter_for_type(Author, StringConverter(Author.parse))

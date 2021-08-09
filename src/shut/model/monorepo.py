@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 import re
 from typing import Iterable, Optional
 
-import networkx as nx
+import networkx as nx  # type: ignore
 
 from .abstract import AbstractProjectModel
 from .version import Version

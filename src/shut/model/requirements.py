@@ -272,19 +272,7 @@ class RequirementsList(List[Union[Requirement, VendoredRequirement]]):
     return result
 
 
-class BaseRequirementConverter(Converter):
-
-  def convert(self, ctx: Context) -> object:
-    assert isinstance(ctx.type, ConcreteType)
-    if ctx.direction == Direction.serialize:
-      assert isinstance(ctx.value, ctx.type.type)
-      return str(ctx.value)
-    else:
-      if not isinstance(ctx.value, str):
-        raise ctx.type_error(expected=str)
-      return ctx.type.type.from_string(ctx.value)
-
-
+from .utils import StringConverter
 from . import mapper
-mapper.add_converter_for_type(Requirement, BaseRequirementConverter())
-mapper.add_converter_for_type(VendoredRequirement, BaseRequirementConverter())
+mapper.add_converter_for_type(Requirement, StringConverter())
+mapper.add_converter_for_type(VendoredRequirement, StringConverter())

@@ -1,8 +1,6 @@
 name: shut
 version: 0.15.1
-author:
-  name: Niklas Rosenstein
-  email: rosensteinniklas@gmail.com
+author: Niklas Rosenstein <rosensteinniklas@gmail.com>
 license: MIT
 url: https://github.com/NiklasRosenstein/shut
 description: Automates the heavy lifting of release and distribution management for
@@ -31,6 +29,13 @@ requirements:
 - wheel
 test-requirements:
 - pytest
+- mypy
+- types-beautifoulsoup4
+- types-click
+- types-requests
+- types-jinja2
+- types-PyYAML
+- types-termcolor
 entrypoints:
   console_scripts:
   - shut = shut.commands:shut

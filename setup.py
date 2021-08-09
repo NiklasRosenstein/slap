@@ -38,6 +38,13 @@ requirements = [
 ]
 test_requirements = [
   'pytest',
+  'mypy',
+  'types-beautifoulsoup4',
+  'types-click',
+  'types-requests',
+  'types-jinja2',
+  'types-PyYAML',
+  'types-termcolor',
 ]
 
 setuptools.setup(

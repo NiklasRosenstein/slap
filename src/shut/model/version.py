@@ -169,5 +169,6 @@ class VersionConverter(Converter):
       return parse_version(ctx.value)
 
 
+from .utils import StringConverter
 from . import mapper
-mapper.add_converter_for_type(Version, VersionConverter())
+mapper.add_converter_for_type(Version, StringConverter(parse_version))

@@ -28,7 +28,7 @@ import typing as t
 from typing import cast, List, Optional, Set
 
 import click
-import networkx as nx
+import networkx as nx  # type: ignore
 
 from shut.model.package import PackageModel
 from shut.model.monorepo import InterdependencyRef
