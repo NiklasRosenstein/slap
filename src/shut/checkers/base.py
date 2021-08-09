@@ -66,8 +66,8 @@ class SkipCheck(CheckResult):
   considered successful in that case.
   """
 
-  def __init__(self):
-    super().__init__(CheckStatus.SKIP, '', None)
+  def __new__(cls) -> None:
+    return super().__new__(cls, CheckStatus.SKIP, '', None)
 
 
 class Check(NamedTuple):
