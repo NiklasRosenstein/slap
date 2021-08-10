@@ -19,11 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from dataclasses import dataclass, field
 import re
 from typing import Iterable, Optional
 
-import networkx as nx
-from databind.core import datamodel, field
+import networkx as nx  # type: ignore
 
 from .abstract import AbstractProjectModel
 from .version import Version
@@ -33,16 +33,16 @@ from .package import PackageModel
 from .publish import PublishConfiguration
 
 
-@datamodel
+@dataclass
 class InterdependencyRef:
   filename: str
   package_name: str
-  version_selector: VersionSelector
+  version_selector: Optional[VersionSelector]
   version_start: int
   version_end: int
 
 
-@datamodel
+@dataclass
 class MonorepoModel(AbstractProjectModel):
 
   def get_inter_dependencies(self) -> Iterable[InterdependencyRef]:
@@ -53,6 +53,7 @@ class MonorepoModel(AbstractProjectModel):
     package data in order to return start and end index data.
     """
 
+    assert self.project
     for package in self.project.packages:
       yield from self.get_inter_dependencies_for(package)
 
@@ -61,16 +62,17 @@ class MonorepoModel(AbstractProjectModel):
     Like #get_inter_dependencies() but for a single package.
     """
 
+    assert self.project
+    assert package.filename
     regex = re.compile(r'^\s*- +([A-z0-9\.\-_]+) *([^\n:]+)?$', re.M)
     package_names = set(p.name for p in self.project.packages)
     with open(package.filename) as fp:
       content = fp.read()
       for match in regex.finditer(content):
-        package_name, version_selector = match.groups()
+        package_name, version_selector_str = match.groups()
         if package_name not in package_names:
           continue
-        if version_selector:
-          version_selector = VersionSelector(version_selector)
+        version_selector = VersionSelector(version_selector_str) if version_selector_str else None
         yield InterdependencyRef(package.filename, package_name, version_selector, match.start(2), match.end(2))
 
   def get_inter_dependencies_graph(self) -> nx.DiGraph:
@@ -78,6 +80,7 @@ class MonorepoModel(AbstractProjectModel):
     Create a directed graph from the inter dependencies of packages in the mono repo.
     """
 
+    assert self.project
     graph = nx.DiGraph()
     for package in self.project.packages:
       graph.add_node(package.name)

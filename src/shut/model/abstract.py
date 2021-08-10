@@ -19,12 +19,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from dataclasses import dataclass, field
 import abc
 import os
 import warnings
 from typing import List, Optional
-
-from databind.core import datamodel, field
 
 from .author import Author
 from .changelog import ChangelogConfiguration
@@ -33,14 +32,8 @@ from .version import Version
 from shut.utils.fs import get_file_in_directory
 
 
-@datamodel
-class AbstractProjectModel(metaclass=abc.ABCMeta):
-  # Derived fields that are not de-serialized per-se, but may be filled during the
-  # deserialization process to track additional metadata.
-  project: Optional['Project'] = field(derived=True, default=None)
-  filename: Optional[str] = field(derived=True, default=None)
-  unknown_keys: List[str] = field(derived=True, default_factory=list)
-
+@dataclass
+class AbstractProjectModel(abc.ABC):
   name: str
   version: Optional[Version] = None
   author: Optional[Author] = None
@@ -49,6 +42,32 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
   url: Optional[str] = None
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
   release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
+
+  def __post_init__(self) -> None:
+    # May be filled during the deserialization process to track additional metadata.
+    self._project: Optional['Project'] = None
+    self._filename: Optional[str] = None
+    self.unknown_keys: List[str] = []
+
+  @property
+  def project(self) -> 'Project':
+    if self._project is None:
+      raise RuntimeError(f'{type(self).__name__}.project is not set')
+    return self._project
+
+  @project.setter
+  def project(self, project: 'Project') -> None:
+    self._project = project
+
+  @property
+  def filename(self) -> str:
+    if self._filename is None:
+      raise RuntimeError(f'{type(self).__name__}.filename is not set')
+    return self._filename
+
+  @filename.setter
+  def filename(self, filename: str) -> None:
+    self._filename = filename
 
   def get_name(self) -> str:
     warnings.warn(f'{type(self).__name__}.get_name() is deprecated, use .name instead', DeprecationWarning)
@@ -77,6 +96,7 @@ class AbstractProjectModel(metaclass=abc.ABCMeta):
     Returns the absolute path to the LICENSE file for this package.
     """
 
+    assert self.filename
     if self.license_file:
       return self.license_file
 

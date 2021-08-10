@@ -22,28 +22,30 @@
 
 import datetime
 import os
-from typing import Iterable, Optional, Union
+from dataclasses import dataclass, field
+from typing import Dict, Iterable, Optional, Tuple, Union
 
-from databind.core import datamodel, field
-from databind.json import from_json, to_json
+import databind.json
 import yaml
 
-from shut.model import registry
+from shut.model import mapper
 from shut.model.version import Version
 from . import v1, v2, v3
 
 AllChangelogTypes = Union[v3.Changelog, v2.Changelog, v1.Changelog]
 
 
-@datamodel
+@dataclass
 class Changelog:
   """
   Represents a changelog on disk.
   """
 
-  filename: Optional[str] = field(derived=True, default=None)
   version: Optional[Version]
   data: v3.Changelog = field(default_factory=lambda: v3.Changelog(changes=[]))
+
+  def __post_init__(self) -> None:
+    self.filename: Optional[str] = None
 
   @property
   def entries(self):
@@ -52,15 +54,17 @@ class Changelog:
   def exists(self) -> bool:
     " Returns #True if the changelog file exists. "
 
+    assert self.filename
     return os.path.isfile(self.filename)
 
   def load(self) -> None:
     " Loads the data from the file of this changelog. "
 
+    assert self.filename
     with open(self.filename) as fp:
       raw_data = yaml.safe_load(fp)
 
-    data = from_json(AllChangelogTypes, raw_data, registry=registry)
+    data: AllChangelogTypes = databind.json.load(raw_data, AllChangelogTypes, filename=self.filename, mapper=mapper)  # type: ignore
     if not isinstance(data, v3.Changelog):
       data = v3.Changelog.migrate(data)
 
@@ -69,9 +73,10 @@ class Changelog:
   def save(self, create_directory: bool = False) -> None:
     " Saves the changelog. It will always save the changelog in the newest supported format. "
 
+    assert self.filename
     if create_directory:
       os.makedirs(os.path.dirname(self.filename), exist_ok=True)
-    data = to_json(self.data, v3.Changelog)
+    data = databind.json.dump(self.data, v3.Changelog, mapper=mapper)
     with open(self.filename, 'w') as fp:
       yaml.safe_dump(data, fp, sort_keys=False)
 
@@ -87,13 +92,14 @@ class ChangelogManager:
 
   def __init__(self, directory: str) -> None:
     self.directory = directory
-    self._cache = {}
+    self._cache: Dict[Tuple[str, str], Changelog] = {}
 
-  def _get(self, name: str, version: Optional[str]) -> Changelog:
+  def _get(self, name: str, version: Optional[Version]) -> Changelog:
     key = (name, str(version))
     if key in self._cache:
       return self._cache[key]
-    changelog = Changelog(os.path.join(self.directory, name), version)
+    changelog = Changelog(version)
+    changelog.filename = os.path.join(self.directory, name)
     if os.path.isfile(changelog.filename):
       changelog.load()
     self._cache[key] = changelog
@@ -114,8 +120,11 @@ class ChangelogManager:
     unreleased = self.unreleased
     unreleased.data.release_date = datetime.date.today()
     unreleased.save()
+    new_version = self.version(version)
 
-    os.rename(unreleased.filename, self.version(version).filename)
+    assert unreleased.filename
+    assert new_version.filename
+    os.rename(unreleased.filename, new_version.filename)
     self._cache.clear()
 
     return self.version(version)

@@ -25,7 +25,7 @@ import sys
 from termcolor import colored
 
 from shut.commands.commons.bump import make_bump_command, VersionBumpData
-from shut.model import PackageModel
+from shut.model import AbstractProjectModel, PackageModel
 from shut.model.version import get_commit_distance_version, Version
 from shut.renderers import get_files
 from shut.utils.io.virtual import VirtualFiles
@@ -66,14 +66,19 @@ class PackageBumpData(VersionBumpData[PackageModel]):
 
   def get_snapshot_version(self) -> Version:
     project = self.project
+    subject: AbstractProjectModel
     if project.monorepo and project.monorepo.release.single_version:
       subject = project.monorepo
     else:
       subject = self.obj
-    return get_commit_distance_version(
-      subject.directory,
-      subject.version,
-      subject.get_tag(subject.get_version())) or subject.get_version()
+    version = subject.get_version()
+    assert version, subject
+    version = get_commit_distance_version(
+      subject.get_directory(),
+      version,
+      subject.get_tag(version)) or subject.get_version()
+    assert version, "could not get snapshot version"
+    return version
 
 
-pkg.command()(make_bump_command(PackageBumpData, PackageModel))
+pkg.command()(make_bump_command(PackageBumpData, PackageModel))  # type: ignore

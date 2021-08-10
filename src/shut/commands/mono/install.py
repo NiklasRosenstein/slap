@@ -1,6 +1,7 @@
 
 import click
-import networkx as nx
+import networkx as nx  # type: ignore
+import shlex
 
 from shut.commands.pkg.install import collect_requirement_args, run_install, split_extras
 from shut.model.monorepo import MonorepoModel

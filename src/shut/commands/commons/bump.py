@@ -24,13 +24,13 @@ import logging
 import os
 import sys
 from collections import Counter
-from typing import Iterable, Generic, Optional, T, Type
+from dataclasses import dataclass
+from typing import Iterable, Generic, List, Optional, Type, TypeVar
 
 import click
 import nr.fs  # type: ignore
-from databind.core import datamodel
-from nr.stream import Stream  # type: ignore
-from nr.utils.git import Git  # type: ignore
+from nr.stream import Stream
+from nr.utils.git import Git
 from termcolor import colored
 
 from shut.changelog.manager import ChangelogManager
@@ -42,9 +42,10 @@ from shut.utils.io.virtual import VirtualFiles
 from shut.utils.text import substitute_ranges
 
 logger = logging.getLogger(__name__)
+T_AbstractProjectModel = TypeVar('T_AbstractProjectModel', bound=AbstractProjectModel)
 
 
-@datamodel
+@dataclass
 class Args:
   version: Optional[Version]
   major: bool
@@ -62,9 +63,9 @@ class Args:
   allow_lower: bool = False
 
 
-class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
+class VersionBumpData(Generic[T_AbstractProjectModel], metaclass=abc.ABCMeta):
 
-  def __init__(self, args: Args, project: Project, obj: T) -> None:
+  def __init__(self, args: Args, project: Project, obj: T_AbstractProjectModel) -> None:
     self.args = args
     self.project = project
     self.obj = obj
@@ -89,7 +90,8 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
 
     print()
     print(f'bumping {len(version_refs)} version reference(s)')
-    for filename, refs in Stream.groupby(version_refs, lambda r: r.filename, collect=list):
+
+    for filename, refs in Stream(version_refs).groupby(lambda r: r.filename, lambda it: list(it)):
       with open(filename) as fp:
         content = fp.read()
 
@@ -103,7 +105,7 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
 
       content = substitute_ranges(
         content,
-        ((ref.start, ref.end, target_version) for ref in refs),
+        ((ref.start, ref.end, str(target_version)) for ref in refs),
       )
 
       if not self.args.dry:
@@ -119,11 +121,13 @@ class VersionBumpData(Generic[T], metaclass=abc.ABCMeta):
       print()
       print('release staged changelog' + ('s' if len(managers) > 1 else ''))
       for manager in managers:
+        assert manager.unreleased.filename
         changed_files.add(manager.unreleased.filename)
         if self.args.dry:
           changelog = manager.version(target_version)
         else:
           changelog = manager.release(target_version)
+        assert changelog.filename
         changed_files.add(changelog.filename)
         print(f'  {colored(os.path.relpath(manager.unreleased.filename), "cyan")} → {os.path.relpath(changelog.filename)}')
 
@@ -213,12 +217,16 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
 
   # Bump the current version number.
   if args.post:
+    assert current_version
     new_version = bump_version(current_version, 'post')
   elif args.patch:
+    assert current_version
     new_version = bump_version(current_version, 'patch')
   elif args.minor:
+    assert current_version
     new_version = bump_version(current_version, 'minor')
   elif args.major:
+    assert current_version
     new_version = bump_version(current_version, 'major')
   elif args.snapshot:
     new_version = data.get_snapshot_version()
@@ -226,7 +234,8 @@ def do_bump(args: Args, data: VersionBumpData[AbstractProjectModel]) -> None:
       # The snapshot version number can be considered lower, so we'll allow it.
       args.allow_lower = True
   else:
-    new_version = parse_version(args.version)
+    assert args.version, "no new version specified"
+    new_version = args.version
 
   if not new_version.pep440_compliant:
     logger.warning(f'version "{new_version}" is not PEP440 compliant.')

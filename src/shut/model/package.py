@@ -23,10 +23,12 @@ import ast
 import os
 import re
 import shlex
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
+from typing_extensions import Annotated
 
-from databind.core import datamodel, field
-from nr.stream import chain, concat  # type: ignore
+from databind.core import annotations as A
+from nr.stream import Stream
 
 from shut.utils.ast import load_module_members
 from shut.utils.fs import get_file_in_directory
@@ -35,7 +37,7 @@ from .abstract import AbstractProjectModel
 from .linter import LinterConfiguration
 from .publish import PublishConfiguration
 from .requirements import Requirement, RequirementsList
-from .test import TestDriver
+from ..test import BaseTestDriver
 from .version import Version
 
 
@@ -43,14 +45,14 @@ class PackageError(Exception):
   pass
 
 
-@datamodel
+@dataclass
 class InstallConfiguration:
-  @datamodel
+  @dataclass
   class InstallHooks:
-    before_install: List[str] = field(altname='before-install', default_factory=list)
-    after_install: List[str] = field(altname='after-install', default_factory=list)
-    before_develop: List[str] = field(altname='before-develop', default_factory=list)
-    after_develop: List[str] = field(altname='after-develop', default_factory=list)
+    before_install: Annotated[List[str], A.alias('before-install')] = field(default_factory=list)
+    after_install: Annotated[List[str], A.alias('after-install')] = field(default_factory=list)
+    before_develop: Annotated[List[str], A.alias('before-develop')] = field(default_factory=list)
+    after_develop: Annotated[List[str], A.alias('after-develop')] = field(default_factory=list)
 
     def any(self):
       return any((self.before_install, self.after_install, self.before_develop, self.after_develop))
@@ -68,11 +70,11 @@ class InstallConfiguration:
   hooks: InstallHooks = field(default_factory=InstallHooks)
 
   #: A value for the `--index-url` option to pass to Pip when using `shut pkg install`.
-  index_url: Optional[str] = field(altname='index-url', default=None)
+  index_url: Annotated[Optional[str], A.alias('index-url')] = field(default=None)
 
   #: A list of URLs to pass to Pip via the `--extra-index-url` option when using
   #: `shut pkg install`.
-  extra_index_urls: List[str] = field(altname='extra-index-urls', default_factory=list)
+  extra_index_urls: Annotated[List[str], A.alias('extra-index-urls')] = field(default_factory=list)
 
   def get_pip_args(self) -> List[str]:
     result = []
@@ -83,17 +85,17 @@ class InstallConfiguration:
     return result
 
 
-@datamodel
+@dataclass
 class Include:
   include: str
 
 
-@datamodel
+@dataclass
 class Exclude:
   exclude: str
 
 
-@datamodel
+@dataclass
 class PackageModel(AbstractProjectModel):
   modulename: Optional[str] = None
   description: Optional[str] = None
@@ -102,21 +104,21 @@ class PackageModel(AbstractProjectModel):
   universal: Optional[bool] = None
   typed: Optional[bool] = False
   requirements: RequirementsList = field(default_factory=RequirementsList)
-  test_requirements: RequirementsList = field(altname='test-requirements', default_factory=RequirementsList)
-  extra_requirements: Dict[str, RequirementsList] = field(altname='extra-requirements', default_factory=dict)
-  dev_requirements: RequirementsList = field(altname='dev-requirements', default_factory=RequirementsList)
-  render_requirements_txt: bool = field(altname='render-requirements-txt', default=False)
-  source_directory: str = field(altname='source-directory', default='src')
+  test_requirements: Annotated[RequirementsList, A.alias('test-requirements')] = field(default_factory=RequirementsList)
+  extra_requirements: Annotated[Dict[str, RequirementsList], A.alias('extra-requirements')] = field(default_factory=dict)
+  dev_requirements: Annotated[RequirementsList, A.alias('dev-requirements')] = field(default_factory=RequirementsList)
+  render_requirements_txt: Annotated[bool, A.alias('render-requirements-txt')] = False
+  source_directory: Annotated[str, A.alias('source-directory')] = 'src'
   exclude: List[str] = field(default_factory=lambda: ['test', 'tests', 'docs'])
   entrypoints: Dict[str, List[str]] = field(default_factory=dict)
   classifiers: List[str] = field(default_factory=list)
   keywords: List[str] = field(default_factory=list)
-  package_data: List[Union[Include, Exclude]] = field(altname='package-data', default_factory=list)
+  package_data: Annotated[List[Union[Include, Exclude]], A.alias('package-data')] = field(default_factory=list)
 
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
   publish: PublishConfiguration = field(default_factory=PublishConfiguration)
-  test_driver: TestDriver = field(altname='test-driver', default=None)
+  test_driver: Annotated[Optional[BaseTestDriver], A.alias('test-driver')] = None
 
   def get_modulename(self) -> str:
     if self.modulename:
@@ -130,18 +132,18 @@ class PackageModel(AbstractProjectModel):
     return self.name.replace('-', '_')
 
   def get_python_requirement(self) -> Optional[Requirement]:
-    return next(filter(lambda x: isinstance(x, Requirement) and x.package == 'python', self.requirements), None)
+    return next(filter(lambda x: isinstance(x, Requirement) and x.package == 'python', self.requirements), None)  # type: ignore
 
   def has_vendored_requirements(self) -> bool:
     """
     Returns #True if the package has any vendored requirements.
     """
 
-    return any(chain(
+    return any(Stream([
       self.requirements.vendored_reqs(),
       self.test_requirements.vendored_reqs(),
-      concat(l.vendored_reqs() for l in self.extra_requirements.values())
-    ))
+      *(l.vendored_reqs() for l in self.extra_requirements.values())
+    ]).concat())
 
   def is_universal(self) -> bool:
     """
@@ -170,6 +172,7 @@ class PackageModel(AbstractProjectModel):
     source code.
     """
 
+    assert self.filename
     return PythonPackageMetadata(
       os.path.join(os.path.dirname(self.filename), self.source_directory),
       self.get_modulename())
@@ -179,6 +182,7 @@ class PackageModel(AbstractProjectModel):
     Returns the absolute path to the README for this package.
     """
 
+    assert self.filename
     directory = os.path.dirname(self.filename)
 
     if self.readme:
@@ -197,11 +201,13 @@ class PackageModel(AbstractProjectModel):
     return os.path.join(directory, 'py.typed')
 
   def get_publish_config(self) -> PublishConfiguration:
+    assert self.project
     if self.project and self.project.monorepo and self.project.monorepo.publish:
       return self.project.monorepo.publish
     return self.publish
 
   def get_license(self) -> Optional[str]:
+    assert self.project
     if self.license:
       return self.license
     if self.project.monorepo:
@@ -209,6 +215,7 @@ class PackageModel(AbstractProjectModel):
     return None
 
   def get_author(self) -> Optional[Author]:
+    assert self.project
     if self.author:
       return self.author
     if self.project.monorepo:
@@ -216,6 +223,7 @@ class PackageModel(AbstractProjectModel):
     return None
 
   def get_url(self) -> Optional[str]:
+    assert self.project
     if self.url:
       return self.url
     if self.project.monorepo:
@@ -228,6 +236,7 @@ class PackageModel(AbstractProjectModel):
     return self.name
 
   def get_version(self) -> Optional[Version]:
+    assert self.project
     if self.version:
       return self.version
     if self.project.monorepo and self.project.monorepo.release.single_version:
@@ -235,12 +244,14 @@ class PackageModel(AbstractProjectModel):
     return None
 
   def get_tag(self, version: Version) -> str:
+    assert self.project
     tag_format = self.release.tag_format
     if self.project and self.project.monorepo and '{name}' not in tag_format:
       tag_format = '{name}@' + tag_format
     return tag_format.format(name=self.name, version=version)
 
   def get_license_file(self, inherit: bool = False) -> Optional[str]:
+    assert self.project
     if not self.license_file and inherit and self.project.monorepo and \
         (not self.license or self.license == self.project.monorepo.license):
       filename = self.project.monorepo.get_license_file()
@@ -257,9 +268,9 @@ class PythonPackageMetadata:
   def __init__(self, source_directory: str, modulename: str) -> None:
     self.source_directory = source_directory
     self.modulename = modulename
-    self._filename = None
-    self._author = None
-    self._version = None
+    self._filename: Optional[str] = None
+    self._author: Optional[str] = None
+    self._version: Optional[str] = None
 
   @property
   def filename(self) -> str:
@@ -308,12 +319,14 @@ class PythonPackageMetadata:
   def author(self) -> str:
     if not self._author:
       self._load_metadata()
+    assert self._author
     return self._author
 
   @property
   def version(self) -> str:
     if not self._version:
       self._load_metadata()
+    assert self._version
     return self._version
 
   def _load_metadata(self) -> None:

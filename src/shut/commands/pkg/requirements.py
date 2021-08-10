@@ -27,7 +27,7 @@ import sys
 from typing import Dict, List
 
 import click
-from nr.stream import concat  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.commands import project
@@ -80,7 +80,7 @@ def add(packages, test, vendored_packages, develop):
   python = shlex.split(os.getenv('PYTHON', 'python'))
   pip = python + ['-m', 'pip']
   command = pip + ['install'] + [r.to_setuptools() for r in reqs]
-  command += concat(x.get_pip_args(package.get_directory(), develop) for x in vendored_reqs)
+  command += Stream(x.get_pip_args(package.get_directory(), develop) for x in vendored_reqs).concat()
   command += package.install.get_pip_args()
   res = subprocess.call(command)
   if res != 0:

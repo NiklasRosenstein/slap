@@ -23,20 +23,20 @@ import logging
 import sys
 from typing import List, Optional
 
-from databind.json import from_json, to_json
-from nr.utils.git import Git  # type: ignore
-from termcolor import colored
 import click
 import yaml
+import databind.json
+from nr.utils.git import Git
+from termcolor import colored
 
 from .. import shut, commons, project
 from shut.changelog import v3
 from shut.changelog.manager import ChangelogManager
 from shut.changelog.render import render as render_changelogs
-from shut.model import registry
+from shut.model import mapper
 from shut.model.version import parse_version
-from shut.model.package import PackageModel
 from shut.utils.cli import editor_open, edit_text
+from shut.utils.functional import expect
 
 
 _git = Git()
@@ -97,8 +97,8 @@ def changelog(**args):
     # Allow the user to edit the entry if no description is provided or the
     # -e,--edit option was set.
     if not entry.description or args['edit']:
-      serialized = yaml.safe_dump(to_json(entry, v3.Changelog.Entry, registry=registry), sort_keys=False)
-      entry = from_json(v3.Changelog.Entry, yaml.safe_load(edit_text(serialized)), registry=registry)
+      serialized = yaml.safe_dump(databind.json.dump(entry, v3.Changelog.Entry, mapper=mapper), sort_keys=False)
+      entry = databind.json.load(yaml.safe_load(edit_text(serialized)), v3.Changelog.Entry, mapper=mapper)
 
     # Validate the entry contents (need a description and at least one type and component).
     if not entry.description or not entry.component:
@@ -112,7 +112,7 @@ def changelog(**args):
     print(colored(message, 'cyan'))
 
     if args['stage'] or args['commit']:
-      _git.add([manager.unreleased.filename])
+      _git.add([expect(manager.unreleased.filename)])
     if args['commit']:
       commit_message = entry.description
       if package and monorepo:
@@ -129,7 +129,7 @@ def changelog(**args):
     if not manager.unreleased.exists():
       logger.error('no staged changelog')
       sys.exit(1)
-    sys.exit(editor_open(manager.unreleased.filename))
+    sys.exit(editor_open(expect(manager.unreleased.filename)))
 
   changelogs = []
   if args['version'] or not args['all']:

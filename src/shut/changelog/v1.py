@@ -23,21 +23,21 @@
 The V1 of changelogs.
 """
 
+from dataclasses import dataclass, field
 from typing import List, Union
-from databind.core import datamodel, field
 from . import _ChangelogBase
 
 
-@datamodel
+@dataclass
 class Entry:
   """
   Represents a changelog entry in the V1 changelog format.
   """
 
   types: List[str]
-  issues: List[Union[str, int]] = field(default_factory=list)
   components: List[str]
   description: str
+  issues: List[Union[str, int]] = field(default_factory=list)
 
 
 class Changelog(_ChangelogBase[None], List[Entry]):

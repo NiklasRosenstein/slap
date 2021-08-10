@@ -22,6 +22,7 @@
 import os
 import subprocess as sp
 import sys
+from typing import Optional
 
 import click
 from termcolor import colored
@@ -41,6 +42,8 @@ def test_package(
 ) -> TestRun:
   if not package.test_driver:
     raise RuntimeError('package has no test driver configured')
+
+  venv: Optional[Virtualenv] = None
   if isolate:
     venv = Virtualenv(os.path.join(package.get_directory(), '.venv-test'))
     if venv.exists():
@@ -59,7 +62,6 @@ def test_package(
       if exc.code != 0:
         raise
   else:
-    venv = None
     runtime = Runtime.from_env()
 
   test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
@@ -110,7 +112,8 @@ def print_test_run(test_run: TestRun) -> None:
       print(line)
       print('  ' + '-' * (len(line) - 2))
       print()
-      print(indent_text(test.crash.longrepr, 6))
+      if test.crash:
+        print(indent_text(test.crash.longrepr, 6))
       if test.stdout:
         print('\n  captured stdout:\n')
         print(indent_text(test.stdout, 6))

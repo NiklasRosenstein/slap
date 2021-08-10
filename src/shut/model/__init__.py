@@ -19,23 +19,28 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import io
 import os
 import sys
-from typing import Any, Dict, List, Optional, TextIO, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, TextIO, Tuple, Type, TypeVar, Union, cast, overload
 
+import databind.core
+import databind.json
 import nr.fs  # type: ignore
 import yaml
-from databind.core import ConversionError, datamodel, field, Registry
-from databind.json import from_json, to_json, registry as json_registry
+from nr.stream import Stream
 
-registry = Registry(json_registry)
-registry.set_option(datamodel, 'skip_defaults', True)
+if TYPE_CHECKING:
+  from .abstract import AbstractProjectModel
+
 T = TypeVar('T')
+T_AbstractProjectModel = TypeVar('T_AbstractProjectModel', bound='AbstractProjectModel')
 ExcInfo = Tuple
 
+mapper = databind.json.mapper()
+#registry.set_option(D.dataclass, 'skip_defaults', True)
 
-def get_existing_file(directory: str, choices: List[str]) -> bool:
+
+def get_existing_file(directory: str, choices: List[str]) -> Optional[str]:
   for fn in choices:
     path = os.path.join(directory, fn)
     if os.path.isfile(path):
@@ -66,8 +71,8 @@ class Project:
 
   def __init__(self):
     self._cache: Dict[str, 'AbstractProjectModel'] = {}
-    self.subject: 'AbstractProjectModel' = None
-    self.monorepo: MonorepoModel = None
+    self.subject: Optional['AbstractProjectModel'] = None
+    self.monorepo: Optional[MonorepoModel] = None
     self.packages: List[PackageModel] = []
     self.invalid_packages: List[Tuple[str, ExcInfo]] = []
 
@@ -77,11 +82,13 @@ class Project:
         return package
     raise KeyError(package_name)
 
-  def load(
-    self,
-    directory: str = '.',
-    expect: Optional[Type['AbstractProjectModel']] = None,
-  ) -> 'AbstractProjectModel':
+  @overload
+  def load(self, directory: str = '.') -> Optional['AbstractProjectModel']: ...
+
+  @overload
+  def load(self, directory: str = '.', *, expect: Type[T_AbstractProjectModel]) -> T_AbstractProjectModel: ...
+
+  def load(self, directory='.', expect=None):
     """
     Loads all project information from *directory*. This searches in all parent directories
     for a package or monorepo configuration, then loads all resources that belong to the
@@ -127,7 +134,8 @@ class Project:
       self._reload(package)
 
   def _reload(self, obj: 'AbstractProjectModel') -> None:
-    result = self._load_object(obj.filename, type(obj), force=True)
+    assert obj.filename
+    result: AbstractProjectModel = self._load_object(obj.filename, type(obj), force=True)
     vars(obj).update(vars(result))
 
   def load_or_exit(self, *args, **kwargs):
@@ -141,22 +149,22 @@ class Project:
       else:
         raise
 
-  def _load_object(self, filename: str, type_: Type[T], force: bool = False) -> T:
+  def _load_object(self, filename: str, type_: Type[T_AbstractProjectModel], force: bool = False) -> T_AbstractProjectModel:
     filename = os.path.normpath(os.path.abspath(filename))
     if not force and filename in self._cache:
-      obj = self._cache[filename]
-      assert isinstance(obj, type_), 'type mismatch: have {} but expected {}'.format(
-        type(obj).__name__, type_.__name__)
-      return obj
+      obj_in_cache = self._cache[filename]
+      assert isinstance(obj_in_cache, type_), 'type mismatch: have {} but expected {}'.format(
+        type(obj_in_cache).__name__, type_.__name__)
+      return obj_in_cache
     with open(filename) as fp:
       data = yaml.safe_load(fp)
-    #node_collector = NodeCollector()
-    obj = self._cache[filename] = from_json(type_, data, registry=registry)
+    collect_unknowns = databind.core.annotations.collect_unknowns()
+    obj = cast('T_AbstractProjectModel', databind.json.load(data, type_, mapper=mapper, options=[collect_unknowns]))
+    self._cache[filename] = obj
     obj.filename = filename
     obj.project = self
-    #obj.unknown_keys = list(Stream.concat(
-    #    (x.locator.append(k) for k in x.unknowns)
-    #    for x in node_collector.nodes))
+    obj.unknown_keys = list(Stream(collect_unknowns.entries)
+        .flatmap(lambda e: (e.location.push_unknown(k).format(e.location.Format.PLAIN) for k in e.keys)))
     return obj
 
   def _load_monorepo(self, filename: str) -> 'MonorepoModel':
@@ -169,7 +177,7 @@ class Project:
       if package_fn:
         try:
           self._load_package(package_fn)
-        except ConversionError as exc:
+        except databind.core.ConversionError:
           self.invalid_packages.append((item_name, sys.exc_info()))
 
     return self.monorepo
@@ -190,7 +198,7 @@ def dump(obj: Any, file_: Union[str, TextIO]) -> None:
 
 
 def serialize(obj: Any) -> Dict[str, Any]:
-  return to_json(obj, registry=registry)
+  return cast(Dict[str, Any], databind.json.dump(obj, mapper=mapper))
 
 
 from .abstract import AbstractProjectModel

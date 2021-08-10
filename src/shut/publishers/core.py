@@ -20,13 +20,16 @@
 # IN THE SOFTWARE.
 
 import abc
-from typing import Generic, Iterable, List, T, Type
+from typing import cast, Generic, Iterable, List, Type, TypeVar
 
-from nr.stream import concat  # type: ignore
+from nr.stream import Stream
 
 from shut.model import AbstractProjectModel
 from shut.model.target import Target, TargetId
 from shut.utils.type_registry import TypeRegistry
+
+T = TypeVar('T')
+T_AbstractProjectModel = TypeVar('T_AbstractProjectModel', bound='AbstractProjectModel')
 
 __all__ = [
   'Publisher',
@@ -68,9 +71,12 @@ class PublisherProvider(Generic[T], metaclass=abc.ABCMeta):
 registry = TypeRegistry[PublisherProvider[AbstractProjectModel]]()
 
 
-def register_publisher_provider(type_: Type[T], provider_class: Type[PublisherProvider[T]]) -> None:
-  registry.put(type_, provider_class)
+def register_publisher_provider(
+  type_: Type[T_AbstractProjectModel],
+  provider_class: Type[PublisherProvider[T_AbstractProjectModel]]
+) -> None:
+  registry.put(type_, provider_class)  # type: ignore
 
 
 def get_publishers(obj: T) -> Iterable[Publisher]:
-  return concat(provider().get_publishers(obj) for provider in registry.for_type(type(obj)))
+  return Stream(provider().get_publishers(obj) for provider in registry.for_type(type(obj))).concat()  # type: ignore

@@ -23,8 +23,9 @@ import logging
 import re
 from typing import Optional, Union
 
-from databind.core import Converter
-from nr.utils.git import Git  # type: ignore
+from databind.core import Converter, Context, Direction
+from databind.core.mapper.objectmapper import ObjectMapper
+from nr.utils.git import Git
 from packaging.version import Version as _Version
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,8 @@ class Version(_Version):
       s = str(s)
     elif not isinstance(s, str):
       raise TypeError('expected Version or str, got {}'.format(type(s).__name__))
+    commit_distance: Optional[int]
+    sha: Optional[str]
     match = re.match(r'(.*)-(\d+)-g([0-9a-f]{7})', s)
     if match:
       s = match.group(1)
@@ -91,9 +94,9 @@ def bump_version(version: Version, kind: str) -> Version:
   major, minor, patch, post = version.major, version.minor, version.micro, version.post
   if kind == 'post':
     if post is None:
-      post = 1
+      post = ('post', 1)
     else:
-      post += 1
+      post = (post[0], post[1] + 1)
   elif kind == 'patch':
     post = None
     patch += 1
@@ -156,20 +159,20 @@ def get_commit_distance_version(repo_dir: str, version: Version, latest_tag: str
     return None
 
   rev = git.rev_parse('HEAD')
+  assert rev, git
   local = '+{}.g{}{}'.format(distance, rev[:7], '.dirty' if dirty else '')
   return parse_version(str(version) + local)
 
 
-from . import registry
-
-
 class VersionConverter(Converter):
 
-  def from_python(self, value, context):
-    return str(value)
+  def convert(self, ctx: Context) -> object:
+    if ctx.direction == Direction.serialize:
+      return str(ctx.value)
+    else:
+      return parse_version(ctx.value)
 
-  def to_python(self, value, context):
-    return parse_version(value)
 
-
-registry.register_converter(Version, VersionConverter())
+from .utils import StringConverter
+from . import mapper
+mapper.add_converter_for_type(Version, StringConverter(parse_version))  # type: ignore

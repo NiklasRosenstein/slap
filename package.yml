@@ -7,31 +7,40 @@ description: Automates the heavy lifting of release and distribution management 
   pure Python packages.
 typed: true
 requirements:
-- python ^3.6
+- python ^3.7
 - beautifulsoup4 ^4.8.1
-- databind.core ^0.4.0
-- databind.json ^0.4.0
+- databind.core ^1.1.2
+- databind.json ^1.1.2
 - click ^7.0
 - jinja2 ^2.11.1
 - networkx ^2.4
 - nr.fs ^1.5.0
-- nr.parsing.date ^0.4.0
+- nr.parsing.date ^1.0.3
 - nr.proxy ^1.0.0
 - nr.pylang.utils ^0.0.1
 - nr.utils.git ~0.1.3
-- nr.stream ~0.0.4
+- nr.stream ^0.2.2
 - requests ^2.22.0
 - packaging ^20.1
 - PyYAML ^5.1.0
 - termcolor ^1.1.0
+- typing-extensions ^3.10.0.0
 - twine
 - wheel
 test-requirements:
 - pytest
+- mypy
+- types-beautifulsoup4
+- types-click
+- types-requests
+- types-jinja2
+- types-PyYAML
+- types-setuptools
+- types-termcolor
 entrypoints:
   console_scripts:
   - shut = shut.commands:shut
 package-data:
-  - include: data/license_templates/*.txt
+- include: data/license_templates/*.txt
 test-driver:
   type: pytest

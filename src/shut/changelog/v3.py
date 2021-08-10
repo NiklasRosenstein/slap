@@ -24,22 +24,20 @@ The V2 of changelogs.
 """
 
 import datetime
+from dataclasses import dataclass
 from typing import List, Optional
-from databind.core import datamodel, field
 from . import _ChangelogBase, v2
 
 
-@datamodel
+@dataclass
 class Changelog(_ChangelogBase[v2.Changelog]):
   Supersedes = v2.Changelog  # _ChangelogBase
   Entry = v2.Entry
 
-  release_date: Optional[datetime.date] = field(default=None)
   changes: List[v2.Entry]
+  release_date: Optional[datetime.date] = None
 
   @classmethod
-  def adapt(cls, v2_changelog: v2.Changelog) -> 'Changelog':
-    return cls(
-      release_date=None,
-      changes=list(v2_changelog),
-    )
+  def adapt(cls, v2_changelog: _ChangelogBase) -> 'Changelog':
+    assert isinstance(v2_changelog, v2.Changelog)
+    return cls(release_date=None, changes=list(v2_changelog))

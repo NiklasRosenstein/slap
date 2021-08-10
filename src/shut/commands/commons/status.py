@@ -23,14 +23,16 @@ import os
 import sys
 import typing as t
 
-from nr.utils.git import Git  # type: ignore
+from nr.utils.git import Git
 from termcolor import colored
 
 from shut.model import AbstractProjectModel, MonorepoModel, Project, serialize
 
 
-def get_commits_since_last_tag(subject: AbstractProjectModel):
-  tag = subject.get_tag(subject.get_version())
+def get_commits_since_last_tag(subject: AbstractProjectModel) -> t.Tuple[str, t.Optional[int]]:
+  version = subject.get_version()
+  assert version, 'require version to get commits since last tag'
+  tag = subject.get_tag(version)
   ref = Git().rev_parse(tag)
   if not ref:
     return tag, None
@@ -51,6 +53,8 @@ class PackageStatus(t.NamedTuple):
 def get_status(project: Project) -> t.Dict[str, PackageStatus]:
   assert project.subject, "No subject"
 
+  items: t.List[AbstractProjectModel]
+  names: t.List[str]
   if isinstance(project.subject, MonorepoModel):
     monorepo_dir = project.subject.get_directory()
     if not project.packages:

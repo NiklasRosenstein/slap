@@ -56,9 +56,10 @@ def get_license_template(license_name: str) -> str:
 
 def has_license_template(license_name: str) -> bool:
   try:
-    return get_license_template(license_name)
+    get_license_template(license_name)
+    return True
   except LicenseTemplateDoesNotExist:
-    pass
+    return False
 
 
 class LicenseRenderer(Renderer[AbstractProjectModel]):
@@ -70,6 +71,7 @@ class LicenseRenderer(Renderer[AbstractProjectModel]):
     and the license is one for which we deliver a template for.
     """
 
+    assert package.project
     if not package.license:
       if package.project.monorepo and package.project.monorepo.license:
         return True
@@ -98,10 +100,13 @@ class LicenseRenderer(Renderer[AbstractProjectModel]):
       log.warning('Don\'t have a license tempalte for "%s", make sure to keep the license up to date manually.', model.license)
       return
 
+    author = model.get_author()
+    assert author, "need author to render license"
+
     license_file = model.get_license_file()
     license_file = license_file or os.path.join(model.get_directory(), 'LICENSE.txt')
     license_text = get_license_template(model.license)\
-        .format(year=datetime.datetime.utcnow().year, author=model.get_author().name)
+        .format(year=datetime.datetime.utcnow().year, author=author.name)
     files.add_static(license_file, license_text)
 
 

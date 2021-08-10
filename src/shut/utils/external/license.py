@@ -29,6 +29,7 @@ import bs4
 import re
 import requests
 import textwrap
+import typing as t
 
 BASE_URL = 'https://enterprise.dejacode.com/licenses/public/{}/'
 
@@ -80,13 +81,13 @@ def get_license_metadata(license_name):
   return data
 
 
-def wrap_license_text(license_text, width=79):
+def wrap_license_text(license_text: str, width: int = 79) -> str:
   lines = []
-  for line in license_text.split('\n'):
-    line = line.split(' ')
+  for raw_line in license_text.split('\n'):
+    line = raw_line.split(' ')
     length = sum(map(len, line)) + len(line) - 1
     if length > width:
-      words = []
+      words: t.List[str] = []
       length = -1
       for word in line:
         if length + 1 + len(word) >= width:

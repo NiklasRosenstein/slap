@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_package_checks(package: PackageModel) -> List[Check]:
+  assert package.project
   checks = list(get_checks(package))
   if package.project.monorepo:
     # Inherit mono-repo checks if the check targets the package specifically.

@@ -26,6 +26,7 @@ This package implements the Shut CLI.
 from shut import __version__
 from shut.model import Project
 from nr.proxy import proxy
+from typing import cast
 
 import click
 import logging
@@ -33,8 +34,8 @@ import os
 import warnings
 import sys
 
-context: click.Context = proxy(lambda: click.get_current_context().obj)
-project: Project = proxy(lambda: click.get_current_context().obj['project'])
+context = cast(dict, proxy(lambda: click.get_current_context().obj))
+project = cast(Project, proxy(lambda: click.get_current_context().obj['project']))
 
 
 @click.group()

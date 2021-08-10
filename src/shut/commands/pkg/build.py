@@ -24,7 +24,7 @@ import sys
 from typing import List
 
 import click
-from nr.stream import groupby  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.builders import Builder, get_builders
@@ -37,7 +37,7 @@ from .. import project
 def run_builds(builders: List[Builder], build_dir: str, verbose: bool) -> bool:
   os.makedirs(build_dir, exist_ok=True)
   for builder in builders:
-    print(colored(f'building {colored(builder.id, "green")}'))
+    print(f'building {colored(str(builder.id), "green")}')
     for filename in builder.get_outputs():
       print(f'  :: {os.path.join(build_dir, filename)}')
     print()
@@ -69,9 +69,9 @@ def build(target, list_, build_dir, verbose):
 
   if list_:
     print()
-    for scope, builders in groupby(builders, lambda b: b.id.scope):
+    for scope, scoped_builders in Stream(builders).groupby(lambda b: b.id.scope):
       print(f'{colored(scope, "green")}:')
-      for builder in builders:
+      for builder in scoped_builders:
         print(f'  {builder.id.name} – {builder.get_description()}')
     print()
     return

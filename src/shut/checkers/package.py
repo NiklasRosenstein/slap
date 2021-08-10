@@ -37,6 +37,7 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('license')
   def _check_license(self, package: PackageModel) -> Iterable[CheckResult]:
+    assert package.project
     if not package.get_license_file(True):
       if not package.license:
         yield CheckResult(CheckStatus.WARNING, 'not specified')
@@ -82,6 +83,7 @@ class PackageChecker(Checker[PackageModel]):
 
   @check('package-version')
   def _check_consistent_version(self, package: PackageModel) -> Iterable[CheckResult]:
+    assert package.filename
     metadata = package.get_python_package_metadata()
     try:
       version = metadata.version

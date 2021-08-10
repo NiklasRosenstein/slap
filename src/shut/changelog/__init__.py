@@ -34,9 +34,11 @@ the type of change and whether it is breaking an API.
 """
 
 import abc
-from typing import Any, Generic, Optional, Type, TypeVar
+from typing import ClassVar, Generic, Optional, Type, TypeVar
 
 T = TypeVar('T')
+T_ChangelogBase = TypeVar('T_ChangelogBase', bound='_ChangelogBase')
+U = TypeVar('U')
 
 
 class _ChangelogBase(Generic[T], metaclass=abc.ABCMeta):
@@ -47,10 +49,10 @@ class _ChangelogBase(Generic[T], metaclass=abc.ABCMeta):
   migrating to the next version.
   """
 
-  Supersedes: Optional[Type[T]] = None
+  Supersedes: ClassVar[Optional[Type[T]]] = None
 
   @classmethod
-  def migrate(cls, older_changelog: Any) -> '_ChangelogBase':
+  def migrate(cls: Type[T_ChangelogBase], older_changelog: '_ChangelogBase') -> 'T_ChangelogBase':
     if not cls.Supersedes:
       raise TypeError('reached {}, unsure how to migrate from {!r}'.format(
         cls.__module__, type(older_changelog).__name__))
@@ -59,5 +61,5 @@ class _ChangelogBase(Generic[T], metaclass=abc.ABCMeta):
     return cls.adapt(older_changelog)
 
   @classmethod
-  def adapt(cls, older_changelog: T) -> '_ChangelogBase':
+  def adapt(cls: Type[T_ChangelogBase], older_changelog: '_ChangelogBase') -> 'T_ChangelogBase':
     raise NotImplementedError

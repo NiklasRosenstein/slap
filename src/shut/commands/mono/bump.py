@@ -24,7 +24,7 @@ import logging
 from typing import Iterable
 
 import nr.fs  # type: ignore
-from nr.stream import Stream  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.changelog.manager import ChangelogManager
@@ -75,7 +75,8 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
 
     print()
     print(f'bumping {len(inter_deps)} mono repository inter-dependency(-ies)')
-    for filename, refs in Stream.groupby(inter_deps, lambda d: d.filename, collect=list):
+
+    for filename, refs in Stream(inter_deps).groupby(lambda d: d.filename, lambda it: list(it)):
       print(f'  {colored(nr.fs.rel(filename), "cyan")}:')
 
       with open(filename) as fp:
@@ -101,10 +102,13 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
     return changed_files
 
   def get_snapshot_version(self) -> Version:
-    return get_commit_distance_version(
+    assert self.obj.version
+    version = get_commit_distance_version(
       self.obj.get_directory(),
       self.obj.version,
       self.obj.get_tag(self.obj.version)) or self.obj.version
+    assert version
+    return version
 
   def get_changelog_managers(self) -> Iterable[ChangelogManager]:
     yield from super().get_changelog_managers()
@@ -113,4 +117,4 @@ class MonorepoBumpdata(VersionBumpData[MonorepoModel]):
         yield from PackageBumpData(self.args, self.project, package).get_changelog_managers()
 
 
-mono.command()(make_bump_command(MonorepoBumpdata, MonorepoModel))
+mono.command()(make_bump_command(MonorepoBumpdata, MonorepoModel))  # type: ignore

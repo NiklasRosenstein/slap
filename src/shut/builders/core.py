@@ -20,9 +20,9 @@
 # IN THE SOFTWARE.
 
 import abc
-from typing import Generic, Iterable, List, Type, TypeVar
+from typing import Generic, Iterable, Optional, Type, TypeVar
 
-from nr.stream import concat  # type: ignore
+from nr.stream import Stream
 
 from shut.model import AbstractProjectModel
 from shut.model.target import Target
@@ -41,6 +41,9 @@ __all__ = [
 class Builder(Target, metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
+  def get_description(self) -> Optional[str]: ...
+
+  @abc.abstractmethod
   def get_outputs(self) -> Iterable[str]:
     """
     Returns a list of the output files produced by this builder.
@@ -56,7 +59,7 @@ class Builder(Target, metaclass=abc.ABCMeta):
 class BuilderProvider(Generic[T], metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
-  def get_builders(self, obj: T) -> List[Builder]:
+  def get_builders(self, obj: T) -> Iterable[Builder]:
     pass
 
 
@@ -64,8 +67,8 @@ registry = TypeRegistry[AbstractProjectModel]()
 
 
 def register_builder_provider(type_: Type[T], provider_class: Type[BuilderProvider[T]]) -> None:
-  registry.put(type_, provider_class)
+  registry.put(type_, provider_class)  # type: ignore
 
 
 def get_builders(obj: T) -> Iterable[Builder]:
-  return concat(provider().get_builders(obj) for provider in registry.for_type(type(obj)))
+  return Stream(provider().get_builders(obj) for provider in registry.for_type(type(obj))).concat()  # type: ignore

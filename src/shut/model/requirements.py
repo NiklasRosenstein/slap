@@ -24,12 +24,14 @@ import enum
 import os
 import posixpath
 import re
-from typing import Iterable, List, Optional, Union
+import typing as t
+from dataclasses import dataclass
+from typing import Iterable, List, Optional, Union, TypeVar, Type
 from urllib.parse import urlparse
 
-from databind.core import datamodel
-
 from .version import bump_version, Version
+
+T = TypeVar('T')
 
 
 class VersionSelector(object):
@@ -42,10 +44,10 @@ class VersionSelector(object):
 
   ANY: 'VersionSelector'
 
-  def __init__(self, selector):
+  def __init__(self, selector: t.Union[str, 'VersionSelector']):
     if isinstance(selector, VersionSelector):
       selector = selector._string
-    self._string = selector.strip()
+    self._string: str = selector.strip()
 
   def __str__(self):
     return str(self._string)
@@ -94,7 +96,7 @@ class VersionSelector(object):
     return re.sub(regex, sub, s)
 
   def is_semver_selector(self) -> bool:
-    return self._string and self._string[0] in '^~' and ',' not in self._string
+    return bool(self._string and self._string[0] in '^~' and ',' not in self._string)
 
   def matches(self, version: Union[Version, str]) -> bool:
     if not self.is_semver_selector():
@@ -113,24 +115,19 @@ class VersionSelector(object):
 VersionSelector.ANY = VersionSelector('*')
 
 
-@datamodel(serialize_as=lambda: Union[Requirement, VendoredRequirement])
-class BaseRequirement(metaclass=abc.ABCMeta):
+class BaseRequirement(abc.ABC):
 
-  @classmethod
-  @abc.abstractmethod
-  def databind_json_load(self, value, context):
-    pass
+  @abc.abstractclassmethod
+  def from_string(cls, value: str) -> 'BaseRequirement': ...
 
   @abc.abstractmethod
-  def databind_json_dump(self, context):
-    pass
+  def __str__(self) -> str: ...
 
   @abc.abstractmethod
-  def to_setuptools(self) -> str:
-    pass
+  def to_setuptools(self) -> str: ...
 
 
-@datamodel
+@dataclass
 class Requirement(BaseRequirement):
   """
   A Requirement is simply combination of a package name and a version selector.
@@ -171,22 +168,14 @@ class Requirement(BaseRequirement):
       extras=sorted(map(str.strip, extras.split(','))) if extras else None)
 
   def to_setuptools(self) -> str:
-    return self.__str__(setuptools=True)
+    return self.__str__(setuptools=True)  # type: ignore
 
   @classmethod
-  def databind_json_load(cls, value, context):
-    if isinstance(value, str):
-      try:
-        return Requirement.parse(value)
-      except ValueError as exc:
-        raise context.type_error(str(exc))
-    return NotImplemented
-
-  def databind_json_dump(self, context):
-    return str(self)
+  def from_string(cls, value: str) -> 'Requirement':
+    return Requirement.parse(value)
 
 
-@datamodel
+@dataclass
 class VendoredRequirement(BaseRequirement):
   """
   A vendored requirement is either a relative path or a string prefixed with `git+` that
@@ -259,33 +248,31 @@ class VendoredRequirement(BaseRequirement):
     return args
 
   @classmethod
-  def databind_json_load(cls, value, context):
-    if isinstance(value, str):
-      try:
-        return VendoredRequirement.parse(value)
-      except ValueError as exc:
-        raise context.type_error(str(exc))
-    raise context.type_error()
-
-  def databind_json_dump(self, context):
-    return str(self)
+  def from_string(cls, value: str) -> 'VendoredRequirement':
+    return VendoredRequirement.parse(value)
 
 
-class RequirementsList(List[BaseRequirement]):
+class RequirementsList(List[Union[Requirement, VendoredRequirement]]):
   """
   A list of requirements. Provides some convenience methods.
   """
 
   def reqs(self) -> Iterable[Requirement]:
-    return filter(lambda x: isinstance(x, Requirement), self)
+    return filter(lambda x: isinstance(x, Requirement), self)  # type: ignore
 
   def vendored_reqs(self) -> Iterable[VendoredRequirement]:
-    return filter(lambda x: isinstance(x, VendoredRequirement), self)
+    return filter(lambda x: isinstance(x, VendoredRequirement), self)  # type: ignore
 
   def get_pip_args(self, root: str, develop: bool) -> List[str]:
     result = []
     for req in self.reqs():
       result.append(req.to_setuptools())
-    for req in self.vendored_reqs():
-      result += req.get_pip_args(root, develop)
+    for vreq in self.vendored_reqs():
+      result += vreq.get_pip_args(root, develop)
     return result
+
+
+from .utils import StringConverter
+from . import mapper
+mapper.add_converter_for_type(Requirement, StringConverter())  # type: ignore
+mapper.add_converter_for_type(VendoredRequirement, StringConverter())  # type: ignore

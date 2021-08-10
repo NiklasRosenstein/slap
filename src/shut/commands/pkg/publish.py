@@ -21,12 +21,14 @@
 
 import os
 import sys
+from typing import List, Set
 
 import click
-from nr.stream import groupby, Stream  # type: ignore
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.builders import get_builders
+from shut.builders.core import Builder
 from shut.model import PackageModel
 from shut.model.target import TargetId
 from shut.publishers import get_publishers
@@ -60,7 +62,7 @@ def publish_package(
   all_builders = list(get_builders(package))
   builders_for_publisher = {}
   for publisher in publishers:
-    builders = []
+    builders: List[Builder] = []
     for target_id in publisher.get_build_dependencies():
       matched_builders = [b for b in all_builders if target_id.match(b.id)]
       if not matched_builders:
@@ -71,7 +73,7 @@ def publish_package(
 
   # Build all builders that are needed.
   if not skip_build:
-    built = set()
+    built: Set[str] = set()
     for publisher in publishers:
       print()
       builders = builders_for_publisher[publisher.id]
@@ -82,10 +84,10 @@ def publish_package(
   # Execute the publishers.
   for publisher in publishers:
     print()
-    print(f'publishing {colored(publisher.id, "cyan")}')
+    print(f'publishing {colored(str(publisher.id), "cyan")}')
     builders = builders_for_publisher[publisher.id]
-    files = (Stream
-      .concat(b.get_outputs() for b in builders)
+    files = (Stream(b.get_outputs() for b in builders)
+      .concat()
       .map(lambda x: os.path.join(build_dir, x))
       .collect()
     )
@@ -116,9 +118,9 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
 
   if list_:
     publishers = list(get_publishers(package))
-    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
+    for scope, scoped_publishers in Stream(publishers).groupby(lambda p: p.id.scope):
       print(f'{colored(scope, "green")}:')
-      for publisher in publishers:
+      for publisher in scoped_publishers:
         print(f'  {publisher.id.name} – {publisher.get_description()}')
     return
 
@@ -129,9 +131,9 @@ def publish(target, test, list_, verbose, build_dir, skip_build):
     sys.exit(f'error: package has vendored requirements and cannot be published')
 
   if list_:
-    for scope, publishers in groupby(publishers, lambda p: p.id.scope):
+    for scope, scoped_publishers in Stream(publishers).groupby(lambda p: p.id.scope):
       print(f'{colored(scope, "green")}:')
-      for publisher in publishers:
+      for publisher in scoped_publishers:
         print(f'  {publisher.id.name} – {publisher.get_description()}')
     return
 
