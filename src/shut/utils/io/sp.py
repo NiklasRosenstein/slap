@@ -20,11 +20,12 @@
 # IN THE SOFTWARE.
 
 import subprocess
+import typing as t
 
 from termcolor import colored
 
 
-def subprocess_trimmed_call(*args, verbose: bool = False, **kwargs) -> int:
+def subprocess_trimmed_call(command: t.List[str], verbose: bool = False, **kwargs: t.Any) -> int:
   """
   Executes a subprocess and only shows stderr in red and indented by 2 spaces if there
   was any error output. Returns the status code.
@@ -33,7 +34,7 @@ def subprocess_trimmed_call(*args, verbose: bool = False, **kwargs) -> int:
   """
 
   proc = subprocess.Popen(
-    *args,
+    command,
     stdout=None if verbose else subprocess.PIPE,
     stderr=None if verbose else subprocess.PIPE,
     **kwargs)  # type: ignore

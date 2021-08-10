@@ -36,6 +36,7 @@ from shut.changelog.render import render as render_changelogs
 from shut.model import mapper
 from shut.model.version import parse_version
 from shut.utils.cli import editor_open, edit_text
+from shut.utils.functional import expect
 
 
 _git = Git()
@@ -111,7 +112,7 @@ def changelog(**args):
     print(colored(message, 'cyan'))
 
     if args['stage'] or args['commit']:
-      _git.add([check_not_none(manager.unreleased.filename)])
+      _git.add([expect(manager.unreleased.filename)])
     if args['commit']:
       commit_message = entry.description
       if package and monorepo:
@@ -128,7 +129,7 @@ def changelog(**args):
     if not manager.unreleased.exists():
       logger.error('no staged changelog')
       sys.exit(1)
-    sys.exit(editor_open(check_not_none(manager.unreleased.filename)))
+    sys.exit(editor_open(expect(manager.unreleased.filename)))
 
   changelogs = []
   if args['version'] or not args['all']:
