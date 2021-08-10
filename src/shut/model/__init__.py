@@ -83,10 +83,10 @@ class Project:
     raise KeyError(package_name)
 
   @overload
-  def load(self, directory: str = '.') -> 'AbstractProjectModel': ...
+  def load(self, directory: str = '.') -> Optional['AbstractProjectModel']: ...
 
   @overload
-  def load(self, directory: str = '.', *, expect: Type[T_AbstractProjectModel]) -> T_AbstractProjectModel: ...
+  def load(self, directory: str = '.', *, expect: Type[T_AbstractProjectModel]) -> Optional[T_AbstractProjectModel]: ...
 
   def load(self, directory='.', expect=None):
     """
@@ -120,7 +120,6 @@ class Project:
     if expect and not isinstance(self.subject, expect):
       raise Unexpected(expect, type(self.subject))
 
-    assert self.subject
     return self.subject
 
   def reload(self) -> None:
