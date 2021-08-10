@@ -11,4 +11,10 @@ changes:
 - type: fix
   component: general
   description: fix `setup.py` rendering for inherit license files
-  fixes: ['21']
+  fixes:
+  - '21'
+- type: change
+  component: general
+  description: '`_tempcopy()` function in `setup.py` now fails if the file cannot
+    be copied from the source file'
+  fixes: []

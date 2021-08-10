@@ -356,8 +356,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
         import atexit, shutil
         if not os.path.isfile(dst):
           if not os.path.isfile(src):
-            print('warning: source file "{}" for destination "{}" does not exist'.format(src, dst))
-            return
+            raise RuntimeError('error: "{}" does not exist, and cannot copy it from "{}" either'.format(dst, src))
           shutil.copyfile(src, dst)
           atexit.register(lambda: os.remove(dst))
     ''').lstrip())
