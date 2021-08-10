@@ -16,7 +16,6 @@ requirements:
 - networkx ^2.4
 - nr.fs ^1.5.0
 - nr.parsing.date ^1.0.3
-- nr.preconditions ^0.0.4
 - nr.proxy ^1.0.0
 - nr.pylang.utils ^0.0.1
 - nr.utils.git ~0.1.3
