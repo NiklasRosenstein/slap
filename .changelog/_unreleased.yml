@@ -8,3 +8,7 @@ changes:
   component: general
   description: add `extra_requires[test]` in generated `setup.py`
   fixes: []
+- type: fix
+  component: general
+  description: fix `setup.py` rendering for inherit license files
+  fixes: ['21']
