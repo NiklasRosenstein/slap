@@ -37,7 +37,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics || true
     - name: Static type checks with Mypy
       run: |
-        mypy src  # --check-untyped-defs
+        mypy src --check-untyped-defs
     - name: Test with pytest
       run: |
         pytest
