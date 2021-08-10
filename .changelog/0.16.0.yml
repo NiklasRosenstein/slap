@@ -18,3 +18,4 @@ changes:
   description: '`_tempcopy()` function in `setup.py` now fails if the file cannot
     be copied from the source file'
   fixes: []
+release_date: '2021-08-10'
