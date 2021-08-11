@@ -159,7 +159,7 @@ class Project:
     with open(filename) as fp:
       data = yaml.safe_load(fp)
     collect_unknowns = databind.core.annotations.collect_unknowns()
-    obj = cast('T_AbstractProjectModel', databind.json.load(data, type_, mapper=mapper, options=[collect_unknowns]))
+    obj = cast('T_AbstractProjectModel', databind.json.load(data, type_, mapper=mapper, filename=filename, options=[collect_unknowns]))
     self._cache[filename] = obj
     obj.filename = filename
     obj.project = self

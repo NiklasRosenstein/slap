@@ -1,0 +1,6 @@
+changes:
+- type: fix
+  component: general
+  description: pass `filename` to databind deserializer when loading monorepo/package
+    configuration files
+  fixes: []
