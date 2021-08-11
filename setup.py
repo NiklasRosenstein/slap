@@ -7,6 +7,8 @@ import os
 import setuptools
 import sys
 
+command = sys.argv[1] if len(sys.argv) >= 2 else None
+
 readme_file = 'README.md'
 if os.path.isfile(readme_file):
   with io.open(readme_file, encoding='utf8') as fp:
@@ -52,7 +54,7 @@ extras_require['test'] = test_requirements
 
 setuptools.setup(
   name = 'shut',
-  version = '0.16.0',
+  version = '0.16.1',
   author = 'Niklas Rosenstein',
   author_email = 'rosensteinniklas@gmail.com',
   description = 'Automates the heavy lifting of release and distribution management for pure Python packages.',
