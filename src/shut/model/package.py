@@ -230,6 +230,9 @@ class PackageModel(AbstractProjectModel):
       return self.project.monorepo.url
     return None
 
+  def get_source_directory(self) -> str:
+    return os.path.join(self.get_directory(), self.source_directory)
+
   # AbstractProjectModel
 
   def get_name(self) -> str:

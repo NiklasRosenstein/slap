@@ -5,3 +5,11 @@ changes:
     if the current Python installation (determined by the `PYTHON` variable or falling
     back to just the `python` command) is a virtual env
   fixes: []
+- type: feature
+  component: general
+  description: add support for a `mypy` test driver
+  fixes: []
+- type: feature
+  component: api
+  description: add `Package.get_source_directory()`
+  fixes: []

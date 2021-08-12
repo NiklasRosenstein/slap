@@ -27,8 +27,12 @@ import os
 import shlex
 import shutil
 import subprocess as sp
+import sys
+import textwrap
+import traceback
 from dataclasses import dataclass, field
-from typing import Optional, List, TYPE_CHECKING
+import types
+from typing import Dict, Optional, List, TYPE_CHECKING
 
 from databind.core import annotations as A
 from shut.model.requirements import Requirement
@@ -68,6 +72,14 @@ class StackTrace:
   lineno: int
   message: str
 
+  @classmethod
+  def from_traceback(cls, tb: Optional[types.TracebackType]) -> List['StackTrace']:
+    result = []
+    while tb:
+      result.append(cls(filename=tb.tb_frame.f_code.co_filename, lineno=tb.tb_frame.f_lineno, message=''))
+      tb = tb.tb_next
+    return result
+
 
 @dataclass
 class TestCrashReport:
@@ -76,6 +88,20 @@ class TestCrashReport:
   message: str
   traceback: List[StackTrace]
   longrepr: str
+
+  @classmethod
+  def current_exception(cls) -> 'TestCrashReport':
+    exc = sys.exc_info()
+    if exc is None:
+      raise RuntimeError('no current exception')
+    tb = exc[2]
+    assert tb
+    return cls(
+      filename=tb.tb_frame.f_code.co_filename,
+      lineno=tb.tb_frame.f_lineno,
+      message=str(exc[1]),
+      traceback=StackTrace.from_traceback(tb),
+      longrepr='\n'.join(traceback.format_exception(*exc)))
 
 
 @dataclass
