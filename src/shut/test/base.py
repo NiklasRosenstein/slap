@@ -112,6 +112,9 @@ class Runtime:
   pip: List[str]
   virtualenv: List[str]
 
+  def __post_init__(self) -> None:
+    self._env_info: Optional[Dict[str, Optional[str]]] = None
+
   @classmethod
   def from_env(self) -> 'Runtime':
     python = shlex.split(os.getenv('PYTHON', 'python'))
@@ -127,15 +130,37 @@ class Runtime:
     virtualenv = python + ['-m', 'venv']
     return Runtime(python, pip, virtualenv)
 
+  def is_venv(self) -> bool:
+    """
+    Returns #True if the #Runtime refers to a local environment (e.g. Virtualenv).
+
+    Todo: Detect Conda environments as local environments?
+    """
+
+    # See https://stackoverflow.com/a/42580137/791713
+    info = self._get_environment_info()
+    return bool(info['real_prefix'] or (info['base_prefix'] and info['prefix'] != info['base_prefix']))
+
+  def _get_environment_info(self) -> Dict[str, Optional[str]]:
+    if self._env_info is None:
+      code = textwrap.dedent('''
+        import sys, platform, json
+        print(json.dumps({
+          "version": sys.version,
+          "platform": platform.platform(),
+          "prefix": sys.prefix,
+          "base_prefix": getattr(sys, 'base_prefix', None),
+          "real_prefix": getattr(sys, 'real_prefix', None),
+        }))
+      ''')
+      self._env_info = json.loads(sp.check_output(self.python + ['-c', code]).decode())
+    return self._env_info
+
   def get_environment(self) -> TestEnvironment:
-    env = getattr(self, '_environment', None)
-    if env is None:
-      code = 'import sys, platform, json\n'\
-            'print(json.dumps({"version": sys.version, "platform": platform.platform()}))'
-      raw = json.loads(sp.check_output(self.python + ['-c', code]).decode())
-      env =TestEnvironment(raw['version'], raw['platform'])
-      self._environment = env
-    return env
+    raw = self._get_environment_info()
+    version, platform = raw['version'], raw['platform']
+    assert version and platform
+    return TestEnvironment(version, platform)
 
 
 @dataclass

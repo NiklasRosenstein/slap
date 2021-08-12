@@ -1,0 +1,7 @@
+changes:
+- type: feature
+  component: general
+  description: add `shut pkg test --install/--no-install` which will default to `--install`
+    if the current Python installation (determined by the `PYTHON` variable or falling
+    back to just the `python` command) is a virtual env
+  fixes: []

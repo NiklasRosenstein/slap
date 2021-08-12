@@ -19,12 +19,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import logging
 import os
 import subprocess as sp
 import sys
 from typing import Optional
 
 import click
+import typing as t
 from termcolor import colored
 
 from shut.commands import shut
@@ -33,12 +35,15 @@ from shut.test import Runtime, TestRun, TestStatus, Virtualenv
 from shut.utils.text import indent_text
 from . import pkg, project
 
+log = logging.getLogger(__name__)
+
 
 def test_package(
   package: PackageModel,
   isolate: bool,
   keep_test_env: bool = False,
   capture: bool = True,
+  install_test_reqs: t.Optional[bool] = None,
 ) -> TestRun:
   if not package.test_driver:
     raise RuntimeError('package has no test driver configured')
@@ -64,10 +69,17 @@ def test_package(
   else:
     runtime = Runtime.from_env()
 
-  test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
-  if test_reqs:
-    sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
+  if install_test_reqs is None:
+    install_test_reqs = runtime.is_venv()
+    if not install_test_reqs:
+      log.warning('Not installing test driver requirements because it doesn\'t look like you are in a local '
+        'Python environment (environment: %s)', runtime.get_environment())
 
+  if install_test_reqs:
+    test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
+    if test_reqs:
+      log.info('Installing test requirements %s...', test_reqs)
+      sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
   try:
     return package.test_driver.test_package(package, runtime, capture)
   finally:
@@ -82,7 +94,6 @@ def print_test_run(test_run: TestRun) -> None:
       print()
       print(colored(indent_text(test_run.error.strip(), 4), 'red'))
       print()
-    return
 
   sorted_tests = sorted(test_run.tests, key=lambda t: t.name)
 
@@ -96,7 +107,12 @@ def print_test_run(test_run: TestRun) -> None:
   print(status_line)
   print()
   for test in sorted_tests:
-    color = {TestStatus.PASSED: 'green', TestStatus.SKIPPED: 'yellow', TestStatus.FAILED: 'red'}[test.status]
+    color = {
+      TestStatus.PASSED: 'green',
+      TestStatus.SKIPPED: 'yellow',
+      TestStatus.FAILED: 'red',
+      TestStatus.ERROR: 'magenta'
+    }[test.status]
     print(f'  {colored(test.name, color, attrs=["bold"])} {test.status.name}')
   if sorted_tests:
     print()
@@ -134,7 +150,7 @@ def print_test_run(test_run: TestRun) -> None:
       print(indent_text(err.longrepr, 6))
     print()
 
-  print(colored(status_line, 'grey'))
+  print(colored(status_line))
 
 
 @pkg.command()
@@ -147,12 +163,15 @@ def print_test_run(test_run: TestRun) -> None:
 @click.option('--capture/--no-capture', default=True,
   help='Capture the output of the underlying testing framework. If set to false, the output '
        'will be routed to stderr (default: true)')
-def test(isolate: bool, keep_test_env: bool, capture: bool) -> None:
+@click.option('--install/--no-install', default=None,
+  help='Install test requirements required by the driver. This is enabled by default unless this '
+       'command is run not from a virtual environment.')
+def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[bool]) -> None:
   """
   Run the package's unit tests.
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  test_run = test_package(package, isolate, keep_test_env, capture)
+  test_run = test_package(package, isolate, keep_test_env, capture, install)
   print_test_run(test_run)
   sys.exit(0 if test_run.status == TestStatus.PASSED else 1)
