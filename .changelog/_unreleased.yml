@@ -36,3 +36,8 @@ changes:
   description: lines in `MANIFEST.in` outside the shut-specific block are not kept
     on `shut pkg update` (fixed in `VirtualFiles.write_all()`)
   fixes: []
+- type: fix
+  component: general
+  description: package `$.author` data can now be de-serialized from a mapping again
+    (as used to be possible before migrating to `databind.core^1.x`
+  fixes: []
