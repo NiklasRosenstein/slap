@@ -27,7 +27,7 @@ import click
 
 from shut.commands import project
 from shut.commands.commons.new import write_files
-from shut.commands.pkg.update import verify_integrity, verify_tag
+from shut.commands.pkg.update import verify_integrity, verify_tag, _VERIFY_TAG_HELP
 from shut.model import MonorepoModel
 from shut.renderers import get_files
 from shut.utils.io.virtual import VirtualFiles
@@ -44,7 +44,7 @@ def update_monorepo(
 ) -> VirtualFiles:
 
   result = 0
-  if tag and not verify_tag(monorepo, tag):
+  if tag is not None and not verify_tag(monorepo, tag):
     result = 1
 
   assert monorepo.project
@@ -66,12 +66,14 @@ def update_monorepo(
 @click.option('--dry', is_flag=True)
 @click.option('--verify', is_flag=True, help='Verify the integrity of the managed files '
   '(asserting that they would not change from running this command).')
-@click.option('--verify-tag', help='Parse the version number from the specified tag and '
-  'assert that it matches the version in the package configuration. (implies --verify)')
-def update(dry, verify, verify_tag):
+@click.option('--verify-tag', help=_VERIFY_TAG_HELP)
+def update(dry: bool, verify: bool, verify_tag: Optional[str]) -> None:
   """
   Update files auto-generated from the configuration file.
   """
 
+  if verify_tag is not None and verify_tag.startswith('refs/tags/'):
+    verify_tag = verify_tag[10:]
+
   monorepo = project.load_or_exit(expect=MonorepoModel)
-  update_monorepo(monorepo, dry, verify=verify or bool(verify_tag), tag=verify_tag, all_=True)
+  update_monorepo(monorepo, dry, verify=verify or verify_tag is not None, tag=verify_tag, all_=True)

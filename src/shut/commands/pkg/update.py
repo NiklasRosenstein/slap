@@ -33,6 +33,12 @@ from shut.renderers import get_files
 from shut.utils.io.virtual import VirtualFiles
 from . import pkg
 
+_VERIFY_TAG_HELP = ('Parse the version number from the specified tag and '
+  'assert that it matches the version in the package configuration. (implies --verify). A '
+  'leading `refs/tags/` on the passed value is ignored to make integration with GitHub actions '
+  'and potentially other CI systems easier (GitHub actions provides a $GITHUB_REF variable while '
+  'other CI systems like CircleCI provide a $CIRCLE_TAG variable which only contains the tag name).')
+
 
 def verify_tag(obj: AbstractProjectModel, tag: str = None) -> bool:
   assert obj.version is not None
@@ -79,12 +85,8 @@ def update_package(
 @click.option('--dry', is_flag=True)
 @click.option('--verify', is_flag=True, help='Verify the integrity of the managed files '
   '(asserting that they would not change from running this command).')
-@click.option('--verify-tag', help='Parse the version number from the specified tag and '
-  'assert that it matches the version in the package configuration. (implies --verify). A '
-  'leading `refs/tags/` on the passed value is ignored to make integration with GitHub actions '
-  'and potentially other CI systems easier (GitHub actions provides a $GITHUB_REF variable while '
-  'other CI systems like CircleCI provide a $CIRCLE_TAG variable which only contains the tag name).')
-def update(dry, verify, verify_tag):
+@click.option('--verify-tag', help=_VERIFY_TAG_HELP)
+def update(dry: bool, verify: bool, verify_tag: Optional[str]) -> None:
   """
   Update files auto-generated from the configuration file.
   """
