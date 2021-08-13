@@ -1,0 +1,2 @@
+steps:
+- shut changelog -a --markdown > docs/docs/changelog.md
