@@ -25,3 +25,9 @@ changes:
     installed if Shut did not install the same requirements into the same environment
     before
   fixes: []
+- type: feature
+  component: general
+  description: make sure `$.test-requirements` are installed when running `shut mono|pkg
+    test` in addition to the test-driver requirements. Update some output formatting
+    of `shut mono|pkg test`
+  fixes: []

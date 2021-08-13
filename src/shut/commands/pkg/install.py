@@ -46,6 +46,7 @@ def collect_requirement_args(
   develop: bool,
   inter_deps: bool,
   extra: Optional[Set[str]],
+  skip_main_requirements: bool = False,
 ) -> List[str]:
   reqs = RequirementsList()
 
@@ -56,8 +57,9 @@ def collect_requirement_args(
   if extra and 'dev' in extra:
     reqs += package.dev_requirements
 
-  reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
-  reqs += package.requirements.vendored_reqs()
+  if skip_main_requirements:
+    reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
+    reqs += package.requirements.vendored_reqs()
 
   if project.monorepo and inter_deps:
     # TODO(NiklasRosenstein): get_inter_dependencies_for() does not currently differentiate

@@ -35,6 +35,7 @@ from nr.stream import Stream
 from termcolor import colored
 
 from shut.commands import shut
+from shut.commands.pkg.install import collect_requirement_args
 from shut.model.package import PackageModel
 from shut.test import Runtime, TestRun, TestStatus, Virtualenv
 from shut.utils.text import indent_text
@@ -45,7 +46,7 @@ log = logging.getLogger(__name__)
 
 class _TestReqsInstalledTracker:
   """
-  Internal. Helper class to track if we installed test requirements into an environment before.
+  Internal. Helper class to track if we installed test driver requirements into an environment before.
   We use this as a performance optimization to avoid kicking off `pip install` if we don't need to.
   """
 
@@ -103,6 +104,9 @@ def test_package(
 
   venv: Optional[Virtualenv] = None
   if isolate:
+    if install_test_reqs is not None and not install_test_reqs:
+      log.warning('--no-install is not compatible with --isolate, this will most likely result in an error '
+        'when invoking the test drivers.')
     venv = Virtualenv(os.path.join(package.get_directory(), '.venv-test'))
     if venv.exists():
       print('Re-using existing virtual environment at .venv-test ...')
@@ -110,11 +114,11 @@ def test_package(
       print('Creating temporary virtual environment at .venv-test ...')
       venv.create(Runtime.from_env())
     runtime = venv.get_runtime()
-    print(f'Installing package "{package.name}" and test requirements ...')
+    print(f'Installing package "{package.name}"...')
     try:
       orig_cwd = os.getcwd()
       os.chdir(package.get_directory())
-      shut(['pkg', '--no-checks', 'install', '--pip', venv.bin('pip'), '--extra', 'test', '-q'], standalone_mode=False)
+      shut(['pkg', '--no-checks', 'install', '--pip', venv.bin('pip'), '-q'], standalone_mode=False)
     except SystemExit as exc:
       os.chdir(orig_cwd)
       if exc.code != 0:
@@ -125,26 +129,30 @@ def test_package(
   test_reqs = Stream(
     [req.to_setuptools() for req in driver.get_test_requirements()]
     for driver in drivers).concat().collect()
+  test_reqs += collect_requirement_args(package, develop=False, inter_deps=False, extra={'test'},
+    skip_main_requirements=True)
   helper = _TestReqsInstalledTracker(package, runtime)
   reqs_hash = helper.get_requirements_hash(test_reqs)
 
   if install_test_reqs is None and test_reqs:
     if helper.get_stored_hash() == reqs_hash:
-      log.info('Skipping installation of test requirements because it appears we installed them before. This is '
+      log.debug('Skipping installation of test driver requirements because it appears we installed them before. This is '
         'a performance optimization that can be skipped using the --install option explicitly.')
     elif not runtime.is_venv():
-      log.warning('Skipping installation of test requirements because it doesn\'t look like you are in a local '
+      log.warning('Skipping installation of test driver requirements because it doesn\'t look like you are in a local '
         'Python environment (environment: %s)', runtime.get_environment())
     else:
       install_test_reqs = True
 
   if install_test_reqs and test_reqs:
-      log.info('Installing test requirements %s...', test_reqs)
-      sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
-      helper.store_hash(reqs_hash)
+    log.info('Installing test driver requirements %s...', test_reqs)
+    sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
+    helper.store_hash(reqs_hash)
 
   try:
     for driver in drivers:
+      log.info('Running test driver %s for package %s', colored(typeinfo.get_name(type(driver)), 'yellow'),
+        colored(package.name, 'green'))
       yield driver.test_package(package, runtime, capture)
   finally:
     if venv and not keep_test_env:
@@ -168,7 +176,6 @@ def print_test_run(test_run: TestRun) -> None:
     f'Ran {len(test_run.tests)} test(s) in {test_run.duration:.3f}s '
     f'({n_passed} passed, {n_skipped} skipped, {len(test_run.tests) - n_passed - n_skipped} failed, '
     f'{len(test_run.errors)} error(s)). {test_run.status.name}')
-  print(status_line)
   print()
   for test in sorted_tests:
     color = {
@@ -228,10 +235,10 @@ def print_test_run(test_run: TestRun) -> None:
   help='Capture the output of the underlying testing framework. If set to false, the output '
        'will be routed to stderr (default: true)')
 @click.option('--install/--no-install', default=None,
-  help='Install test requirements required by the driver. This is enabled by default unless this '
+  help='Install test driver requirements required by the driver. This is enabled by default unless this '
        'command is run not from a virtual environment. Shut performs a minor optimization in that '
        'it skips the installation if it appears to have installed the dependencies before (you can '
-       'pass --install explicitly to ensure that the test requirements are installed before invoking '
+       'pass --install explicitly to ensure that the test driver requirements are installed before invoking '
        'the test drivers).')
 def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[bool]) -> None:
   """

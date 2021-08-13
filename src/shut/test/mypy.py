@@ -28,7 +28,7 @@ class MypyTestDriver(BaseTestDriver):
   def test_package(self, package: 'PackageModel', runtime: Runtime, capture: bool) -> TestRun:
     command = runtime.python + ['-m', 'mypy']
     command += [package.get_source_directory()] + self.args
-    log.info('Running command %s', command)
+    log.debug('Running command %s', command)
 
     env = os.environ.copy()
     env.update(self.env)
