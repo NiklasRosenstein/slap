@@ -2,3 +2,5 @@ docs_dir: src
 site_name: Shut
 theme:
   name: readthedocs
+markdown_extensions:
+- fenced_code
