@@ -19,10 +19,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import hashlib
 import logging
+import json
 import os
 import subprocess as sp
 import sys
+from pathlib import Path
 from typing import List, Optional
 
 import click
@@ -38,6 +41,45 @@ from shut.utils.text import indent_text
 from . import pkg, project
 
 log = logging.getLogger(__name__)
+
+
+class _TestReqsInstalledTracker:
+  """
+  Internal. Helper class to track if we installed test requirements into an environment before.
+  We use this as a performance optimization to avoid kicking off `pip install` if we don't need to.
+  """
+
+  def __init__(self, package: PackageModel, runtime: Runtime) -> None:
+    self.package = package
+    self.runtime = runtime
+
+  def get_cache_filename(self) -> Path:
+    if self.package.project.monorepo:
+      directory = self.package.project.monorepo.get_directory()
+    else:
+      directory = self.package.get_directory()
+    return Path(directory) / 'build' / '.shut' / 'test-reqs-installed-status.json'
+
+  def get_requirements_hash(self, reqs: t.List[str]) -> str:
+    reqs_str = ','.join(sorted(reqs)).lower()
+    return hashlib.md5(f'{reqs_str}-{self.runtime.get_hash_code()}'.encode()).hexdigest()
+
+  def get_stored_hash(self) -> Optional[str]:
+    " Retrieves the currently stored hash. "
+
+    filename = self.get_cache_filename()
+    if not filename.exists():
+      return None
+    return json.loads(filename.read_text()).get(self.runtime.get_executable_path())
+
+  def store_hash(self, hash: str) -> None:
+    " Stores a new hash in the cache. "
+
+    filename = self.get_cache_filename()
+    data = json.loads(filename.read_text()) if filename.exists() else {}
+    data[self.runtime.get_executable_path()] = hash
+    filename.parent.mkdir(parents=True, exist_ok=True)
+    filename.write_text(json.dumps(data))
 
 
 def test_package(
@@ -80,19 +122,26 @@ def test_package(
   else:
     runtime = Runtime.from_env()
 
-  if install_test_reqs is None:
-    install_test_reqs = runtime.is_venv()
-    if not install_test_reqs:
-      log.warning('Not installing test driver requirements because it doesn\'t look like you are in a local '
-        'Python environment (environment: %s)', runtime.get_environment())
+  test_reqs = Stream(
+    [req.to_setuptools() for req in driver.get_test_requirements()]
+    for driver in drivers).concat().collect()
+  helper = _TestReqsInstalledTracker(package, runtime)
+  reqs_hash = helper.get_requirements_hash(test_reqs)
 
-  if install_test_reqs:
-    test_reqs = Stream(
-      [req.to_setuptools() for req in driver.get_test_requirements()]
-      for driver in drivers).concat().collect()
-    if test_reqs:
+  if install_test_reqs is None and test_reqs:
+    if helper.get_stored_hash() == reqs_hash:
+      log.info('Skipping installation of test requirements because it appears we installed them before. This is '
+        'a performance optimization that can be skipped using the --install option explicitly.')
+    elif not runtime.is_venv():
+      log.warning('Skipping installation of test requirements because it doesn\'t look like you are in a local '
+        'Python environment (environment: %s)', runtime.get_environment())
+    else:
+      install_test_reqs = True
+
+  if install_test_reqs and test_reqs:
       log.info('Installing test requirements %s...', test_reqs)
       sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
+      helper.store_hash(reqs_hash)
 
   try:
     for driver in drivers:
@@ -180,7 +229,10 @@ def print_test_run(test_run: TestRun) -> None:
        'will be routed to stderr (default: true)')
 @click.option('--install/--no-install', default=None,
   help='Install test requirements required by the driver. This is enabled by default unless this '
-       'command is run not from a virtual environment.')
+       'command is run not from a virtual environment. Shut performs a minor optimization in that '
+       'it skips the installation if it appears to have installed the dependencies before (you can '
+       'pass --install explicitly to ensure that the test requirements are installed before invoking '
+       'the test drivers).')
 def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[bool]) -> None:
   """
   Run the package's unit tests.

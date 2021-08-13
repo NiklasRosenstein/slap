@@ -18,3 +18,10 @@ changes:
   description: add `$.test-drivers` field in package model and deprecate `$.test-driver`
     for it.
   fixes: []
+- type: feature
+  component: general
+  description: add `shut mono test --install/--no-install` option (parallel to the
+    existing option for `shut pkg test`), without the flag test requirements are only
+    installed if Shut did not install the same requirements into the same environment
+    before
+  fixes: []

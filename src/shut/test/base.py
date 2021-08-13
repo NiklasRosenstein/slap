@@ -22,18 +22,21 @@
 import abc
 import enum
 import datetime
+import hashlib
 import json
 import os
 import shlex
 import shutil
+import socket
 import subprocess as sp
 import sys
 import textwrap
 import traceback
-from dataclasses import dataclass, field
 import types
+from dataclasses import dataclass, field
 from typing import Dict, Optional, List, TYPE_CHECKING
 
+from nr.preconditions import check_not_none
 from databind.core import annotations as A
 from shut.model.requirements import Requirement
 
@@ -167,11 +170,26 @@ class Runtime:
     info = self._get_environment_info()
     return bool(info['real_prefix'] or (info['base_prefix'] and info['prefix'] != info['base_prefix']))
 
+  def get_executable_path(self) -> str:
+    return check_not_none(self._get_environment_info()['executable'])
+
+  def get_hash_code(self) -> str:
+    """
+    Returns a has that identifies the runtime. This is a combination of the environment info
+    and the creation timestamp of the Python executable (which we expect to only be changed if
+    a virtualenv is re-created).
+    """
+
+    path = self.get_executable_path()
+    ctime = os.path.getctime(path)
+    return hashlib.md5(f'{socket.gethostname()}-{path}-{ctime}'.encode()).hexdigest()
+
   def _get_environment_info(self) -> Dict[str, Optional[str]]:
     if self._env_info is None:
       code = textwrap.dedent('''
         import sys, platform, json
         print(json.dumps({
+          "executable": sys.executable,
           "version": sys.version,
           "platform": platform.platform(),
           "prefix": sys.prefix,

@@ -21,6 +21,7 @@
 
 import sys
 import time
+from typing import Optional
 
 import click
 from termcolor import colored
@@ -42,7 +43,13 @@ from . import mono, project
   help='Capture the output of the underlying testing framework. If set to false, the output '
        'will be routed to stderr (default: true)')
 @click.option('--only', help='Comma-separated list of packages to test.')
-def test(isolate: bool, keep_test_env: bool, capture: bool, only: str) -> None:
+@click.option('--install/--no-install', default=None,
+  help='Install test requirements required by the driver. This is enabled by default unless this '
+       'command is run not from a virtual environment. Shut performs a minor optimization in that '
+       'it skips the installation if it appears to have installed the dependencies before (you can '
+       'pass --install explicitly to ensure that the test requirements are installed before invoking '
+       'the test drivers).')
+def test(isolate: bool, keep_test_env: bool, capture: bool, only: str, install: Optional[bool]) -> None:
   """
   Run unit tests for all packages in the mono repository.
   """
@@ -80,7 +87,7 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, only: str) -> None:
       print()
     print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
     print()
-    for test_run in test_package(package, isolate, keep_test_env, capture):
+    for test_run in test_package(package, isolate, keep_test_env, capture, install):
       all_tests += test_run.tests
       all_errors += test_run.errors
       print_test_run(test_run)
