@@ -1,5 +1,4 @@
 steps:
 - shut changelog -a --markdown > docs/docs/changelog.md
 - echo "============="
-- echo mkdocs build --clean --site-dir _build/html --config-file mkdocs.yml
-- mkdocs build --clean --site-dir _build/html --config-file mkdocs.yml
+- python -m mkdocs build --clean --site-dir _build/html --config-file mkdocs.yml
