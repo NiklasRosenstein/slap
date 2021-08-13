@@ -1,0 +1,4 @@
+steps:
+- shut changelog -a --markdown >docs/changelog.md
+- cp README.md docs/index.md
+- python -m "$@"
