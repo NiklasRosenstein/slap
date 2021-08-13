@@ -1,3 +1,4 @@
-site_name: Shut
-theme: readthedocs
 docs_dir: src
+site_name: Shut
+theme:
+  name: readthedocs
