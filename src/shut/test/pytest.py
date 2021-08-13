@@ -106,6 +106,7 @@ class PytestDriver(BaseTestDriver):
   directory: Optional[str] = None
   args: List[str] = field(default_factory=lambda: ['-vv'])
   report_file: Annotated[str, A.alias('report-file')] = '.pytest-report.json'
+  parallelism: int = 1
 
   # BaseTestDriver
 
@@ -114,6 +115,8 @@ class PytestDriver(BaseTestDriver):
     test_dir = os.path.join(package.get_directory(), test_dir)
     command = runtime.python + ['-m', 'pytest', test_dir]
     command += ['--json-report', '--json-report-file', self.report_file]
+    if self.parallelism != 1:
+      command += ['-n', str(self.parallelism)]
     command += self.args
 
     if os.path.isfile(self.report_file):
@@ -143,7 +146,10 @@ class PytestDriver(BaseTestDriver):
     return test_run
 
   def get_test_requirements(self) -> List[Requirement]:
-    return [
+    reqs = [
       Requirement.parse('pytest'),
       Requirement.parse('pytest-json-report ^1.2.1'),
     ]
+    if self.parallelism > 1:
+      reqs += [Requirement.parse('pytest-xdist')]
+    return reqs

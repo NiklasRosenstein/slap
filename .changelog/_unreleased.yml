@@ -46,3 +46,8 @@ changes:
   description: fix printing of `Failed test details:` when there were no failures
     but at least one skipped test case
   fixes: []
+- type: feature
+  component: general
+  description: '`pytest` driver now supports a `$.parallelism` option which automatically
+    pulls in `pytest-xdist` as a test requirement'
+  fixes: []
