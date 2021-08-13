@@ -51,3 +51,8 @@ changes:
   description: '`pytest` driver now supports a `$.parallelism` option which automatically
     pulls in `pytest-xdist` as a test requirement'
   fixes: []
+- type: feature
+  component: general
+  description: '`shut mono|pkg bump --tag|--push|--dry` options now have short versions
+    `-t|-p|-d` respectively'
+  fixes: []
