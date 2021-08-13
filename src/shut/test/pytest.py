@@ -56,8 +56,10 @@ def load_report_file(report_file: str) -> TestRun:
   tests: List[TestCase] = []
 
   # Map the nodes to the line and function that they are defined in.
+  # NOTE (NiklasRosenstein): This key is not present when there are no test cases or
+  #   when parallelizing tests with pytest-xdist.
   testid_to_source: Dict[str, Tuple[str, int]] = {}
-  for node in raw['collectors']:
+  for node in raw.get('collectors', []):
     if node['nodeid'] and node['result']:
       for result in node['result']:
         if 'lineno' in result:
@@ -81,11 +83,16 @@ def load_report_file(report_file: str) -> TestRun:
       )
       stdout = failed_stage.get('stdout')
     test_status = {'passed': TestStatus.PASSED, 'failed': TestStatus.FAILED, 'skipped': TestStatus.SKIPPED}[test['outcome'].lstrip('x')]
+    if test['nodeid'] in testid_to_source:
+      filename, lineno = testid_to_source[test['nodeid']]
+    else:
+      filename = test['nodeid'].partition('::')[0]
+      lineno = test['lineno']
     tests.append(TestCase(
       name=test['nodeid'],
       duration=sum(test[k]['duration'] for k in ('setup', 'call', 'teardown') if k in test),
-      filename=testid_to_source[test['nodeid']][0],
-      lineno=testid_to_source[test['nodeid']][1],
+      filename=filename,
+      lineno=lineno,
       status=test_status,
       crash=crash,
       stdout=stdout,
