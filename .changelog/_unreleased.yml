@@ -31,3 +31,8 @@ changes:
     test` in addition to the test-driver requirements. Update some output formatting
     of `shut mono|pkg test`
   fixes: []
+- type: fix
+  component: general
+  description: lines in `MANIFEST.in` outside the shut-specific block are not kept
+    on `shut pkg update` (fixed in `VirtualFiles.write_all()`)
+  fixes: []
