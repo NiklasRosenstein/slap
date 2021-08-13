@@ -47,6 +47,5 @@ jobs:
         TESTPYPI_TOKEN: ${{ secrets.TESTPYPI_TOKEN }}
       run: |
         shut pkg update --verify-tag "$CIRCLE_TAG"
-        rm foobar-does-not-exist
         shut pkg publish warehouse:pypi --test
         #shut pkg publish warehouse:pypi
