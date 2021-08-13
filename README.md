@@ -43,10 +43,10 @@ Sanity-check the package configuration:
 shut pkg checks
 
   ✔️   classifiers
-  ⚠️   license (warning): not specified
+  ⚠️   license: not specified
   ✔️   namespace files
   ✔️   package-author
-  ⚠️   package-url (warning): missing
+  ⚠️   package-url: missing
   ✔️   package-version
   ✔️   readme
   ✔️   up to date
@@ -90,7 +90,7 @@ Delta compression using up to 8 threads
 Compressing objects: 100% (17/17), done.
 Writing objects: 100% (24/24), 3.87 KiB | 566.00 KiB/s, done.
 Total 24 (delta 4), reused 0 (delta 0)
-To ../tmp2
+To https://github.com/me/my-package
  * [new branch]      master -> master
  * [new tag]         0.1.0 -> 0.1.0
 ```
