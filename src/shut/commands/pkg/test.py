@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import datetime
 import hashlib
 import logging
 import json
@@ -151,9 +152,15 @@ def test_package(
 
   try:
     for driver in drivers:
-      log.info('Running test driver %s for package %s', colored(typeinfo.get_name(type(driver)), 'yellow'),
-        colored(package.name, 'green'))
-      yield driver.test_package(package, runtime, capture)
+      driver_name = typeinfo.get_name(type(driver))
+      try:
+        print('[{time}] Running test driver {driver} for package {pkg}'.format(
+          driver=colored(driver_name, 'cyan'),
+          pkg=colored(package.name, 'cyan', attrs=['bold']),
+          time=datetime.datetime.now()))
+        yield driver.test_package(package, runtime, capture)
+      except Exception:
+        log.exception('Unhandled exception in driver "%s" for package "%s"', driver_name, package.name)
   finally:
     if venv and not keep_test_env:
       venv.rm()
@@ -251,6 +258,7 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[
   for test_run in test_package(package, isolate, keep_test_env, capture, install):
     num_tests += 1
     print_test_run(test_run)
+    print()
     if test_run.status in (TestStatus.PASSED, TestStatus.SKIPPED):
       num_passed += 1
 
