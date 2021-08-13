@@ -80,11 +80,17 @@ def update_package(
 @click.option('--verify', is_flag=True, help='Verify the integrity of the managed files '
   '(asserting that they would not change from running this command).')
 @click.option('--verify-tag', help='Parse the version number from the specified tag and '
-  'assert that it matches the version in the package configuration. (implies --verify)')
+  'assert that it matches the version in the package configuration. (implies --verify). A '
+  'leading `refs/tags/` on the passed value is ignored to make integration with GitHub actions '
+  'and potentially other CI systems easier (GitHub actions provides a $GITHUB_REF variable while '
+  'other CI systems like CircleCI provide a $CIRCLE_TAG variable which only contains the tag name).')
 def update(dry, verify, verify_tag):
   """
   Update files auto-generated from the configuration file.
   """
+
+  if verify_tag is not None and verify_tag.startswith('refs/tags/'):
+    verify_tag = verify_tag[10:]
 
   package = project.load_or_exit(expect=PackageModel)
   update_package(package, verify=verify or verify_tag is not None, tag=verify_tag)
