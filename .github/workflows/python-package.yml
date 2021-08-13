@@ -43,4 +43,4 @@ jobs:
         pytest
     - name: Test with shut itself
       run:
-        shut pkg test
+        shut pkg test --install
