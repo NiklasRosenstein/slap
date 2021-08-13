@@ -46,6 +46,7 @@ jobs:
         PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         TESTPYPI_TOKEN: ${{ secrets.TESTPYPI_TOKEN }}
       run: |
+        git fetch --tags
         shut pkg update --verify-tag "$CIRCLE_TAG"
         shut pkg bump --snapshot
         shut pkg publish warehouse:pypi --test
