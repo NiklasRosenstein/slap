@@ -1,0 +1,6 @@
+changes:
+- type: change
+  component: general
+  description: dd `shut mono|pkg test -q,--quiet` option to quietly install test requirements
+    with Pip, changed default to not do silent installs
+  fixes: []

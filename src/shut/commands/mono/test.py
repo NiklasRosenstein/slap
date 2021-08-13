@@ -50,7 +50,8 @@ from . import mono, project
        'it skips the installation if it appears to have installed the dependencies before (you can '
        'pass --install explicitly to ensure that the test requirements are installed before invoking '
        'the test drivers).')
-def test(isolate: bool, keep_test_env: bool, capture: bool, only: str, install: Optional[bool]) -> None:
+@click.option('-q', '--quiet', is_flag=True, help='Quiet Pip install of test requirements.')
+def test(isolate: bool, keep_test_env: bool, capture: bool, only: str, install: Optional[bool], quiet: bool) -> None:
   """
   Run unit tests for all packages in the mono repository.
   """
@@ -88,7 +89,7 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, only: str, install: 
       print()
     print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
     print()
-    for driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install):
+    for driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install, None, quiet):
       all_tests += test_run.tests
       all_errors += test_run.errors
       print_test_run(test_run)
