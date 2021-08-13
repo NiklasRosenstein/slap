@@ -33,27 +33,27 @@ __Fields__
   in the generated `setup.py` file.
 * `version` &ndash; The version of the package. This field may be unset if the package is part of a single-version
   monorepository. A semantic version should be used here (e.g. `0.0.1`, `1.4.2.post1` or `52.0.1.rc4`).
-  
-  __Checks__
+    
+    __Checks__
 
-  * Shut checks if the version given here matches the `__version__` in your package's main source file (e.g. either the `__init__.py`
-    of your package or your module file in case of a single-module package).
+    * Shut checks if the version given here matches the `__version__` in your package's main source file (e.g. either the `__init__.py`
+      of your package or your module file in case of a single-module package).
 
 * `author` &ndash; The author of the package, either as a string in the form `First Last <mail@email.org>` or in the
   form of a mapping as in `{name: "First Last", email: "mail@email.org"}`.
 
-  __Checks__
+    __Checks__
 
-  * Similar to the check for `version`, Shut will check that the author given here matches the `__author__` given in
-    your package's main source file.
+    * Similar to the check for `version`, Shut will check that the author given here matches the `__author__` given in
+      your package's main source file.
 
 * `license` &ndash; An [SPDX Open Source license identifier][spdx] for the license of the package.
 
-  __Checks__
-  
-  * Shut delivers license templates for some known license identifiers (e.g. `MIT`, `BSD2`, `BSD3`, `Apache2`) and will
-    use it to generate a `LICENSE.txt` file for you. If the content of the current `LICENSE.txt` file does not match
-    with the template or if the file does not exist, a check will indicate this.
+    __Checks__
+    
+    * Shut delivers license templates for some known license identifiers (e.g. `MIT`, `BSD2`, `BSD3`, `Apache2`) and will
+      use it to generate a `LICENSE.txt` file for you. If the content of the current `LICENSE.txt` file does not match
+      with the template or if the file does not exist, a check will indicate this.
 
 * `description` &ndash; A short description for the package which is included in the package metadata when publishing.
 
@@ -63,9 +63,9 @@ __Fields__
   list that exists in the same directory: `README.md`, `README.rst`, `README.txt`,` README`. (See
   `PackageModel.get_readme_file()`)
 
-  __Checks__
+    __Checks__
 
-  * A check will trigger if the readme file does not exist.
+    * A check will trigger if the readme file does not exist.
 
 * `license_file` &ndash; The path to the license file relative to the `package.yml` configuration file. Similar to
   the `readme` option, if the `license_file` points to a file not in the same project directory, Shut will generate
@@ -74,16 +74,16 @@ __Fields__
   If the package is part of a monorepository and the monorepository has a license file, it will default to that license
   file instead. (See `PackageModel.get_license_file()`)
 
-  __Checks__
+    __Checks__
 
-  * A check will trigger if the license file does not exist.
+    * A check will trigger if the license file does not exist.
 
 * `classifiers` &ndash; A list of classifiers for the package. Defaults to an empty list.
 
-  __Checks__
+    __Checks__
 
-  * A check will trigger if any of the listed classifiers are not known as per the the PyPI
-    classifiers [reference][classifiers].
+    * A check will trigger if any of the listed classifiers are not known as per the the PyPI
+      classifiers [reference][classifiers].
 
 * `keywords` &ndash; A list of keywords for the package. Defaults to an empty list.
 
