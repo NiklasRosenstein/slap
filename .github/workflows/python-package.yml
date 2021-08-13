@@ -47,7 +47,7 @@ jobs:
         PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         TESTPYPI_TOKEN: ${{ secrets.TESTPYPI_TOKEN }}
       run: |
-        git fetch --tags
+        git fetch --tags >/dev/null
         shut pkg update --verify-tag "$GITHUB_REF"
         shut pkg publish warehouse:pypi --test
         #shut pkg publish warehouse:pypi
