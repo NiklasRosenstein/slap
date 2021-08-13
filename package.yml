@@ -42,5 +42,6 @@ entrypoints:
   - shut = shut.commands:shut
 package-data:
 - include: data/license_templates/*.txt
-test-driver:
-  type: pytest
+test-drivers:
+  - type: pytest
+  - type: mypy

@@ -23,6 +23,7 @@ import ast
 import os
 import re
 import shlex
+import warnings
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
 from typing_extensions import Annotated
@@ -118,7 +119,14 @@ class PackageModel(AbstractProjectModel):
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
   publish: PublishConfiguration = field(default_factory=PublishConfiguration)
+
+  #: Deprecated, use #test_drivers instead.
   test_driver: Annotated[Optional[BaseTestDriver], A.alias('test-driver')] = None
+  test_drivers: Annotated[List[BaseTestDriver], A.alias('test-drivers')] = field(default_factory=list)
+
+  def validate(self) -> None:
+    if self.test_driver:
+      warnings.warn(f'({self._filename}) $.test-driver is deprecated since version 0.17.0, please use $test-drivers instead.')
 
   def get_modulename(self) -> str:
     if self.modulename:
@@ -232,6 +240,13 @@ class PackageModel(AbstractProjectModel):
 
   def get_source_directory(self) -> str:
     return os.path.join(self.get_directory(), self.source_directory)
+
+  def get_test_drivers(self) -> List[BaseTestDriver]:
+    result = []
+    if self.test_driver:
+      result.append(self.test_driver)
+    result += self.test_drivers
+    return result
 
   # AbstractProjectModel
 

@@ -165,6 +165,7 @@ class Project:
     obj.project = self
     obj.unknown_keys = list(Stream(collect_unknowns.entries)
         .flatmap(lambda e: (e.location.push_unknown(k).format(e.location.Format.PLAIN) for k in e.keys)))
+    obj.validate()
     return obj
 
   def _load_monorepo(self, filename: str) -> 'MonorepoModel':

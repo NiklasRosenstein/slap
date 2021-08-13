@@ -23,10 +23,12 @@ import logging
 import os
 import subprocess as sp
 import sys
-from typing import Optional
+from typing import List, Optional
 
 import click
 import typing as t
+from databind.core.annotations import typeinfo
+from nr.stream import Stream
 from termcolor import colored
 
 from shut.commands import shut
@@ -44,9 +46,18 @@ def test_package(
   keep_test_env: bool = False,
   capture: bool = True,
   install_test_reqs: t.Optional[bool] = None,
-) -> TestRun:
-  if not package.test_driver:
+  only: Optional[List[str]] = None,
+) -> t.Iterator[TestRun]:
+  drivers = package.get_test_drivers()
+  if not drivers:
     raise RuntimeError('package has no test driver configured')
+
+  if only is not None:
+    drivers_by_name = {typeinfo.get_name(type(d)): d for d in drivers}
+    try:
+      drivers = [drivers_by_name[k] for k in only]
+    except KeyError as exc:
+      raise RuntimeError(f'package has no "{exc}" test driver configured')
 
   venv: Optional[Virtualenv] = None
   if isolate:
@@ -76,12 +87,16 @@ def test_package(
         'Python environment (environment: %s)', runtime.get_environment())
 
   if install_test_reqs:
-    test_reqs = [req.to_setuptools() for req in package.test_driver.get_test_requirements()]
+    test_reqs = Stream(
+      [req.to_setuptools() for req in driver.get_test_requirements()]
+      for driver in drivers).concat().collect()
     if test_reqs:
       log.info('Installing test requirements %s...', test_reqs)
       sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
+
   try:
-    return package.test_driver.test_package(package, runtime, capture)
+    for driver in drivers:
+      yield driver.test_package(package, runtime, capture)
   finally:
     if venv and not keep_test_env:
       venv.rm()
@@ -172,6 +187,12 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  test_run = test_package(package, isolate, keep_test_env, capture, install)
-  print_test_run(test_run)
-  sys.exit(0 if test_run.status == TestStatus.PASSED else 1)
+  num_passed = 0
+  num_tests = 0
+  for test_run in test_package(package, isolate, keep_test_env, capture, install):
+    num_tests += 1
+    print_test_run(test_run)
+    if test_run.status in (TestStatus.PASSED, TestStatus.SKIPPED):
+      num_passed += 1
+
+  sys.exit(0 if num_passed == num_tests else 1)

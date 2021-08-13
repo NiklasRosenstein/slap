@@ -49,6 +49,8 @@ class AbstractProjectModel(abc.ABC):
     self._filename: Optional[str] = None
     self.unknown_keys: List[str] = []
 
+  def validate(self) -> None: ...
+
   @property
   def project(self) -> 'Project':
     if self._project is None:

@@ -47,7 +47,7 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, only: str) -> None:
   Run unit tests for all packages in the mono repository.
   """
 
-  monorepo = project.load_or_exit(expect=MonorepoModel)
+  project.load_or_exit(expect=MonorepoModel)
 
   if only:
     packages = []
@@ -56,11 +56,11 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, only: str) -> None:
       if package_name not in package_map:
         sys.exit(f'error: package "{package_name}" does not exist')
       package = package_map[package_name]
-      if not package.test_driver:
+      if not package.get_test_drivers():
         sys.exit(f'error: package "{package_name}" has no test driver configured')
       packages.append(package)
   else:
-    packages = list(filter(lambda p: p.test_driver, project.packages))
+    packages = list(filter(lambda p: p.get_test_drivers(), project.packages))
 
   packages = sorted(packages, key=lambda p: p.name)
 
@@ -80,13 +80,13 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, only: str) -> None:
       print()
     print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
     print()
-    test_run = test_package(package, isolate, keep_test_env, capture)
-    all_tests += test_run.tests
-    all_errors += test_run.errors
-    print_test_run(test_run)
-    if test_run.status != TestStatus.PASSED:
-      exit_code = 1
-    package_statuses.append((package, test_run.status))
+    for test_run in test_package(package, isolate, keep_test_env, capture):
+      all_tests += test_run.tests
+      all_errors += test_run.errors
+      print_test_run(test_run)
+      if test_run.status not in (TestStatus.PASSED, TestStatus.SKIPPED):
+        exit_code = 1
+      package_statuses.append((package, test_run.status))
 
   n_passed = sum(1 for t in all_tests if t.status == TestStatus.PASSED)
   n_skipped = sum(1 for t in all_tests if t.status == TestStatus.SKIPPED)

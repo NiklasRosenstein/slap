@@ -13,3 +13,8 @@ changes:
   component: api
   description: add `Package.get_source_directory()`
   fixes: []
+- type: feature
+  component: general
+  description: add `$.test-drivers` field in package model and deprecate `$.test-driver`
+    for it.
+  fixes: []
