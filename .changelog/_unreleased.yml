@@ -41,3 +41,8 @@ changes:
   description: package `$.author` data can now be de-serialized from a mapping again
     (as used to be possible before migrating to `databind.core^1.x`
   fixes: []
+- type: fix
+  component: general
+  description: fix printing of `Failed test details:` when there were no failures
+    but at least one skipped test case
+  fixes: []

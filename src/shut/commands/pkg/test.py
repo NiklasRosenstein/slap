@@ -195,7 +195,7 @@ def print_test_run(test_run: TestRun) -> None:
   if sorted_tests:
     print()
 
-  if n_passed < len(test_run.tests):
+  if (n_passed + n_skipped) < len(test_run.tests):
     # Print error details.
     print('Failed test details:')
     print('====================')
