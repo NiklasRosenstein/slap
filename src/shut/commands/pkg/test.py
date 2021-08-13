@@ -26,6 +26,7 @@ import json
 import os
 import subprocess as sp
 import sys
+import traceback
 from pathlib import Path
 from typing import List, Optional
 
@@ -153,6 +154,7 @@ def test_package(
   try:
     for driver in drivers:
       driver_name = typeinfo.get_name(type(driver))
+      started = datetime.datetime.now()
       try:
         print('[{time}] Running test driver {driver} for package {pkg}'.format(
           driver=colored(driver_name, 'cyan'),
@@ -160,7 +162,15 @@ def test_package(
           time=datetime.datetime.now()))
         yield driver_name, driver.test_package(package, runtime, capture)
       except Exception:
-        log.exception('Unhandled exception in driver "%s" for package "%s"', driver_name, package.name)
+        yield driver_name, TestRun(
+          started=started,
+          duration=(datetime.datetime.now() - started).total_seconds(),
+          status=TestStatus.ERROR,
+          environment=runtime.get_environment(),
+          tests=[],
+          errors=[],
+          error=traceback.format_exc()
+        )
   finally:
     if venv and not keep_test_env:
       venv.rm()
