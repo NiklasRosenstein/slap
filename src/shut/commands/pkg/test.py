@@ -91,7 +91,7 @@ def test_package(
   capture: bool = True,
   install_test_reqs: t.Optional[bool] = None,
   only: Optional[List[str]] = None,
-) -> t.Iterator[TestRun]:
+) -> t.Iterator[t.Tuple[str, TestRun]]:
   drivers = package.get_test_drivers()
   if not drivers:
     raise RuntimeError('package has no test driver configured')
@@ -158,7 +158,7 @@ def test_package(
           driver=colored(driver_name, 'cyan'),
           pkg=colored(package.name, 'cyan', attrs=['bold']),
           time=datetime.datetime.now()))
-        yield driver.test_package(package, runtime, capture)
+        yield driver_name, driver.test_package(package, runtime, capture)
       except Exception:
         log.exception('Unhandled exception in driver "%s" for package "%s"', driver_name, package.name)
   finally:
@@ -255,7 +255,7 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[
   package = project.load_or_exit(expect=PackageModel)
   num_passed = 0
   num_tests = 0
-  for test_run in test_package(package, isolate, keep_test_env, capture, install):
+  for _driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install):
     num_tests += 1
     print_test_run(test_run)
     print()

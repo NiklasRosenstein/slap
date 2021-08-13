@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+from os import name
 import sys
 import time
 from typing import Optional
@@ -87,13 +88,13 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, only: str, install: 
       print()
     print(f'Testing package {colored(package.name, "yellow", attrs=["bold"])}:')
     print()
-    for test_run in test_package(package, isolate, keep_test_env, capture, install):
+    for driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install):
       all_tests += test_run.tests
       all_errors += test_run.errors
       print_test_run(test_run)
       if test_run.status not in (TestStatus.PASSED, TestStatus.SKIPPED):
         exit_code = 1
-      package_statuses.append((package, test_run.status))
+      package_statuses.append((package, driver_name, test_run.status))
 
   n_passed = sum(1 for t in all_tests if t.status == TestStatus.PASSED)
   n_skipped = sum(1 for t in all_tests if t.status == TestStatus.SKIPPED)
@@ -106,8 +107,8 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, only: str, install: 
         f'{n_skipped} skipped, {len(all_tests) - n_passed} failed, {len(all_errors)} error(s)). '
         f'{"PASSED" if exit_code == 0 else "FAILED"}')
   print()
-  for package, status in package_statuses:
+  for package, run_name, status in package_statuses:
     color = {TestStatus.PASSED: 'green', TestStatus.SKIPPED: 'yellow', TestStatus.FAILED: 'red', TestStatus.ERROR: 'red'}[status]
-    print(f'  {colored(package.name, color, attrs=["bold"])} {status.name}')
+    print(f'  {colored(package.name, color, attrs=["bold"])} ({run_name}): {status.name}')
 
   sys.exit(exit_code)
