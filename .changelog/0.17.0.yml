@@ -31,3 +31,29 @@ changes:
     test` in addition to the test-driver requirements. Update some output formatting
     of `shut mono|pkg test`
   fixes: []
+- type: fix
+  component: general
+  description: lines in `MANIFEST.in` outside the shut-specific block are not kept
+    on `shut pkg update` (fixed in `VirtualFiles.write_all()`)
+  fixes: []
+- type: fix
+  component: general
+  description: package `$.author` data can now be de-serialized from a mapping again
+    (as used to be possible before migrating to `databind.core^1.x`
+  fixes: []
+- type: fix
+  component: general
+  description: fix printing of `Failed test details:` when there were no failures
+    but at least one skipped test case
+  fixes: []
+- type: feature
+  component: general
+  description: '`pytest` driver now supports a `$.parallelism` option which automatically
+    pulls in `pytest-xdist` as a test requirement'
+  fixes: []
+- type: feature
+  component: general
+  description: '`shut mono|pkg bump --tag|--push|--dry` options now have short versions
+    `-t|-p|-d` respectively'
+  fixes: []
+release_date: '2021-08-13'

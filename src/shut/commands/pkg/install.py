@@ -57,7 +57,7 @@ def collect_requirement_args(
   if extra and 'dev' in extra:
     reqs += package.dev_requirements
 
-  if skip_main_requirements:
+  if not skip_main_requirements:
     reqs.append(VendoredRequirement(VendoredRequirement.Type.Path, package.get_directory()))
     reqs += package.requirements.vendored_reqs()
 

@@ -22,7 +22,7 @@
 import contextlib
 import io
 import os
-from typing import Any, Callable, ContextManager, IO, Iterable, Optional, Set, Union
+from typing import Any, Callable, ContextManager, IO, Iterable, Optional, Set, TextIO, Union
 
 
 class VirtualFiles:
@@ -95,11 +95,14 @@ class VirtualFiles:
         if create_directories:
           os.makedirs(os.path.dirname(filename) or '.', exist_ok=True)
         if file_['inplace']:
+          src: Optional[TextIO] = None
+          if exists:
+            with open(filename, 'r' + mode) as raw_src:
+              src = io.StringIO(raw_src.read())
           with open_func(filename, 'w' + mode) as dst:
             if exists:
-              # TODO: This needs to use an atomic file actually..
-              with open(filename, 'r' + mode) as src:
-                file_['render_func'](dst, src, *file_['args'])
+              assert src is not None
+              file_['render_func'](dst, src, *file_['args'])
             else:
               file_['render_func'](dst, None, *file_['args'])
         else:

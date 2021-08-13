@@ -56,8 +56,10 @@ def load_report_file(report_file: str) -> TestRun:
   tests: List[TestCase] = []
 
   # Map the nodes to the line and function that they are defined in.
+  # NOTE (NiklasRosenstein): This key is not present when there are no test cases or
+  #   when parallelizing tests with pytest-xdist.
   testid_to_source: Dict[str, Tuple[str, int]] = {}
-  for node in raw['collectors']:
+  for node in raw.get('collectors', []):
     if node['nodeid'] and node['result']:
       for result in node['result']:
         if 'lineno' in result:
@@ -81,11 +83,16 @@ def load_report_file(report_file: str) -> TestRun:
       )
       stdout = failed_stage.get('stdout')
     test_status = {'passed': TestStatus.PASSED, 'failed': TestStatus.FAILED, 'skipped': TestStatus.SKIPPED}[test['outcome'].lstrip('x')]
+    if test['nodeid'] in testid_to_source:
+      filename, lineno = testid_to_source[test['nodeid']]
+    else:
+      filename = test['nodeid'].partition('::')[0]
+      lineno = test['lineno']
     tests.append(TestCase(
       name=test['nodeid'],
       duration=sum(test[k]['duration'] for k in ('setup', 'call', 'teardown') if k in test),
-      filename=testid_to_source[test['nodeid']][0],
-      lineno=testid_to_source[test['nodeid']][1],
+      filename=filename,
+      lineno=lineno,
       status=test_status,
       crash=crash,
       stdout=stdout,
@@ -106,6 +113,7 @@ class PytestDriver(BaseTestDriver):
   directory: Optional[str] = None
   args: List[str] = field(default_factory=lambda: ['-vv'])
   report_file: Annotated[str, A.alias('report-file')] = '.pytest-report.json'
+  parallelism: int = 1
 
   # BaseTestDriver
 
@@ -114,6 +122,8 @@ class PytestDriver(BaseTestDriver):
     test_dir = os.path.join(package.get_directory(), test_dir)
     command = runtime.python + ['-m', 'pytest', test_dir]
     command += ['--json-report', '--json-report-file', self.report_file]
+    if self.parallelism != 1:
+      command += ['-n', str(self.parallelism)]
     command += self.args
 
     if os.path.isfile(self.report_file):
@@ -143,7 +153,10 @@ class PytestDriver(BaseTestDriver):
     return test_run
 
   def get_test_requirements(self) -> List[Requirement]:
-    return [
+    reqs = [
       Requirement.parse('pytest'),
       Requirement.parse('pytest-json-report ^1.2.1'),
     ]
+    if self.parallelism > 1:
+      reqs += [Requirement.parse('pytest-xdist')]
+    return reqs

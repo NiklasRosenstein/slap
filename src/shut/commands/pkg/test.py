@@ -26,6 +26,7 @@ import json
 import os
 import subprocess as sp
 import sys
+import traceback
 from pathlib import Path
 from typing import List, Optional
 
@@ -72,14 +73,14 @@ class _TestReqsInstalledTracker:
     filename = self.get_cache_filename()
     if not filename.exists():
       return None
-    return json.loads(filename.read_text()).get(self.runtime.get_executable_path())
+    return json.loads(filename.read_text()).get(self.runtime.get_executable_path(), {}).get(self.package.name)
 
   def store_hash(self, hash: str) -> None:
     " Stores a new hash in the cache. "
 
     filename = self.get_cache_filename()
     data = json.loads(filename.read_text()) if filename.exists() else {}
-    data[self.runtime.get_executable_path()] = hash
+    data.setdefault(self.runtime.get_executable_path(), {})[self.package.name] = hash
     filename.parent.mkdir(parents=True, exist_ok=True)
     filename.write_text(json.dumps(data))
 
@@ -91,7 +92,8 @@ def test_package(
   capture: bool = True,
   install_test_reqs: t.Optional[bool] = None,
   only: Optional[List[str]] = None,
-) -> t.Iterator[TestRun]:
+  quiet: bool = False,
+) -> t.Iterator[t.Tuple[str, TestRun]]:
   drivers = package.get_test_drivers()
   if not drivers:
     raise RuntimeError('package has no test driver configured')
@@ -103,6 +105,7 @@ def test_package(
     except KeyError as exc:
       raise RuntimeError(f'package has no "{exc}" test driver configured')
 
+  q = ['-q'] if quiet else []
   venv: Optional[Virtualenv] = None
   if isolate:
     if install_test_reqs is not None and not install_test_reqs:
@@ -119,7 +122,7 @@ def test_package(
     try:
       orig_cwd = os.getcwd()
       os.chdir(package.get_directory())
-      shut(['pkg', '--no-checks', 'install', '--pip', venv.bin('pip'), '-q'], standalone_mode=False)
+      shut(['pkg', '--no-checks', 'install', '--pip', venv.bin('pip')] + q, standalone_mode=False)
     except SystemExit as exc:
       os.chdir(orig_cwd)
       if exc.code != 0:
@@ -147,20 +150,29 @@ def test_package(
 
   if install_test_reqs and test_reqs:
     log.info('Installing test driver requirements %s...', test_reqs)
-    sp.check_call(runtime.pip + ['install', '-q'] + test_reqs)
+    sp.check_call(runtime.pip + ['install'] + q + test_reqs)
     helper.store_hash(reqs_hash)
 
   try:
     for driver in drivers:
       driver_name = typeinfo.get_name(type(driver))
+      started = datetime.datetime.now()
       try:
         print('[{time}] Running test driver {driver} for package {pkg}'.format(
           driver=colored(driver_name, 'cyan'),
           pkg=colored(package.name, 'cyan', attrs=['bold']),
           time=datetime.datetime.now()))
-        yield driver.test_package(package, runtime, capture)
+        yield driver_name, driver.test_package(package, runtime, capture)
       except Exception:
-        log.exception('Unhandled exception in driver "%s" for package "%s"', driver_name, package.name)
+        yield driver_name, TestRun(
+          started=started,
+          duration=(datetime.datetime.now() - started).total_seconds(),
+          status=TestStatus.ERROR,
+          environment=runtime.get_environment(),
+          tests=[],
+          errors=[],
+          error=traceback.format_exc()
+        )
   finally:
     if venv and not keep_test_env:
       venv.rm()
@@ -195,7 +207,7 @@ def print_test_run(test_run: TestRun) -> None:
   if sorted_tests:
     print()
 
-  if n_passed < len(test_run.tests):
+  if (n_passed + n_skipped) < len(test_run.tests):
     # Print error details.
     print('Failed test details:')
     print('====================')
@@ -247,7 +259,8 @@ def print_test_run(test_run: TestRun) -> None:
        'it skips the installation if it appears to have installed the dependencies before (you can '
        'pass --install explicitly to ensure that the test driver requirements are installed before invoking '
        'the test drivers).')
-def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[bool]) -> None:
+@click.option('-q', '--quiet', is_flag=True, help='Quiet Pip install of test requirements.')
+def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[bool], quiet: bool) -> None:
   """
   Run the package's unit tests.
   """
@@ -255,7 +268,7 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[
   package = project.load_or_exit(expect=PackageModel)
   num_passed = 0
   num_tests = 0
-  for test_run in test_package(package, isolate, keep_test_env, capture, install):
+  for _driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install, None, quiet):
     num_tests += 1
     print_test_run(test_run)
     print()
