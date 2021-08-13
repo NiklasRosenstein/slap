@@ -62,7 +62,7 @@ def update_package(
 ) -> VirtualFiles:
 
   result = 0
-  if tag and not verify_tag(package, tag):
+  if tag is not None and not verify_tag(package, tag):
     result = 1
   files = get_files(package)
   if verify and not verify_integrity(package, files):
@@ -87,4 +87,4 @@ def update(dry, verify, verify_tag):
   """
 
   package = project.load_or_exit(expect=PackageModel)
-  update_package(package, verify=verify or bool(verify_tag), tag=verify_tag)
+  update_package(package, verify=verify or verify_tag is not None, tag=verify_tag)

@@ -1,0 +1,5 @@
+changes:
+- type: fix
+  component: general
+  description: '`shut pkg update --verify-tag ""` does not show an error when it should'
+  fixes: []
