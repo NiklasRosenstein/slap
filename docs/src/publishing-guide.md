@@ -57,3 +57,10 @@ numbers. If you want to publish snapshots, you need an alternative package regis
 __Important__: Many CI systems may not fetch tags when cloning your repository. This means `bump --snapshot`
 can not figure out the commit distance and the generated snapshot version number will begin with `0.0.0`. If
 you encounter this issue, run `git fetch --tags` before Shut.
+
+If you do try to use snapshot versions with PyPI, you will see this type of error:
+
+```
+HTTPError: 400 Bad Request from https://test.pypi.org/legacy/
+'0.17.1+1.g986bed6' is an invalid value for Version. Error: Can't use PEP 440 local versions. See https://packaging.python.org/specifications/core-metadata for more information.
+```
