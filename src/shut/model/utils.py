@@ -18,8 +18,8 @@ class StringConverter(Converter):
       return str(ctx.value)
     else:
       if isinstance(ctx.value, t.Mapping):
-        ctx = ctx.push(ObjectType(dataclass_to_schema(ctx.type.type, ctx.type_hint_adapter), []), ctx.value, None)
-        return self._fallback.convert(ctx)
+        return self._fallback.convert(ctx.push(ObjectType(
+          dataclass_to_schema(ctx.type.type, ctx.type_hint_adapter), []), ctx.value, None))
       elif not isinstance(ctx.value, str):
         raise ctx.type_error(expected=str)
       if self._loader:
