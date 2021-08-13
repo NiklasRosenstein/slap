@@ -72,14 +72,14 @@ class _TestReqsInstalledTracker:
     filename = self.get_cache_filename()
     if not filename.exists():
       return None
-    return json.loads(filename.read_text()).get(self.runtime.get_executable_path())
+    return json.loads(filename.read_text()).get(self.runtime.get_executable_path(), {}).get(self.package.name)
 
   def store_hash(self, hash: str) -> None:
     " Stores a new hash in the cache. "
 
     filename = self.get_cache_filename()
     data = json.loads(filename.read_text()) if filename.exists() else {}
-    data[self.runtime.get_executable_path()] = hash
+    data.setdefault(self.runtime.get_executable_path(), {})[self.package.name] = hash
     filename.parent.mkdir(parents=True, exist_ok=True)
     filename.write_text(json.dumps(data))
 
