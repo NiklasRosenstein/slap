@@ -1,4 +1,4 @@
-# shut
+# Welcome to Shut
 
 Shut is an opinionated tool that allows you to configure everything around the Python
 packaging and release process from a single source of truth. It is intended to simplify
