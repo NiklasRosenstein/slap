@@ -93,4 +93,4 @@ def update(dry, verify, verify_tag):
     verify_tag = verify_tag[10:]
 
   package = project.load_or_exit(expect=PackageModel)
-  update_package(package, verify=verify or verify_tag is not None, tag=verify_tag)
+  update_package(package, dry, verify=verify or verify_tag is not None, tag=verify_tag)
