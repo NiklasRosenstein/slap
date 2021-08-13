@@ -56,3 +56,4 @@ changes:
   description: '`shut mono|pkg bump --tag|--push|--dry` options now have short versions
     `-t|-p|-d` respectively'
   fixes: []
+release_date: '2021-08-13'
