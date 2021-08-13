@@ -1,2 +1,5 @@
 steps:
 - shut changelog -a --markdown > docs/docs/changelog.md
+- echo "============="
+- echo mkdocs "$@"
+- mkdocs "$@"
