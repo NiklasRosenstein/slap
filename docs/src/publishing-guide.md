@@ -26,7 +26,7 @@ publish:
 When you're ready to publish from the CI checks, make it run the following commands:
 
 ```yml
-- pip install shut==0.1.0
+- pip install shut
 - shut pkg update --verify-tag "$CI_TAG"
 - shut pkg publish warehouse:pypi
 ```
@@ -36,12 +36,31 @@ to flag to allow that the value passed to `--verify-tag` can be empty. This is i
 most commits won't be tagged during development.
 
 ```yml
-- pip install shut==0.1.0
+- pip install shut
+- shut pkg update --verify-tag "$CI_TAG" --allow-empty-tag
+- shut pkg publish warehouse:pypi --test
+```
+
+### Publishing Snapshots
+
+The `bump` command can be used with the `--snapshot` option to update the version to one that
+indicates the Git commit distance since the last tagged version. This is useful to publish
+development snapshots. __Note__ that PyPI/Warehouse does not actually (yet?) support snapshot version
+numbers. If you want to publish snapshots, you need an alternative package registry such as Artifactory).
+
+```yaml
 - shut pkg update --verify-tag "$CI_TAG" --allow-empty-tag
 - shut pkg bump --snapshot
 - shut pkg publish warehouse:pypi --test
 ```
 
-> __Note__: PyPI/Warehouse does not actually (yet?) support snapshot version numbers. If you want
-> to test publishing a package with a snapshot, you need an alternative package registry (such
-> as Artifactory).
+__Important__: Many CI systems may not fetch tags when cloning your repository. This means `bump --snapshot`
+can not figure out the commit distance and the generated snapshot version number will begin with `0.0.0`. If
+you encounter this issue, run `git fetch --tags` before Shut.
+
+If you do try to use snapshot versions with PyPI, you will see this type of error:
+
+```
+HTTPError: 400 Bad Request from https://test.pypi.org/legacy/
+'0.17.1+1.g986bed6' is an invalid value for Version. Error: Can't use PEP 440 local versions. See https://packaging.python.org/specifications/core-metadata for more information.
+```

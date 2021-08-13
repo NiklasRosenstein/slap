@@ -45,3 +45,10 @@ package-data:
 test-drivers:
   - type: pytest
   - type: mypy
+publish:
+  pypi:
+    credentials:
+      username: __token__
+      password: '$PYPI_TOKEN'
+      test_username: __token__
+      test_password: '$TESTPYPI_TOKEN'
