@@ -4,3 +4,4 @@ changes:
   description: fix missing test-requirements installation with `shut mono|pkg test
     --isolate` if the comand was run previously
   fixes: []
+release_date: '2021-08-20'
