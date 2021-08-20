@@ -4,3 +4,4 @@ changes:
   description: '`shut mono|pkg test --isolate` no longer installs the main package
     in develop mode'
   fixes: []
+release_date: '2021-08-20'
