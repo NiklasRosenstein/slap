@@ -52,9 +52,10 @@ class _TestReqsInstalledTracker:
   We use this as a performance optimization to avoid kicking off `pip install` if we don't need to.
   """
 
-  def __init__(self, package: PackageModel, runtime: Runtime) -> None:
+  def __init__(self, package: PackageModel, runtime: Runtime, isolate: bool) -> None:
     self.package = package
     self.runtime = runtime
+    self.isolate = True
 
   def get_cache_filename(self) -> Path:
     if self.package.project.monorepo:
@@ -70,6 +71,9 @@ class _TestReqsInstalledTracker:
   def get_stored_hash(self) -> Optional[str]:
     " Retrieves the currently stored hash. "
 
+    if self.isolate:
+      return None
+
     filename = self.get_cache_filename()
     if not filename.exists():
       return None
@@ -77,6 +81,9 @@ class _TestReqsInstalledTracker:
 
   def store_hash(self, hash: str) -> None:
     " Stores a new hash in the cache. "
+
+    if self.isolate:
+      return
 
     filename = self.get_cache_filename()
     data = json.loads(filename.read_text()) if filename.exists() else {}
@@ -135,7 +142,7 @@ def test_package(
     for driver in drivers).concat().collect()
   test_reqs += collect_requirement_args(package, develop=False, inter_deps=False, extra={'test'},
     skip_main_requirements=True)
-  helper = _TestReqsInstalledTracker(package, runtime)
+  helper = _TestReqsInstalledTracker(package, runtime, isolate)
   reqs_hash = helper.get_requirements_hash(test_reqs)
 
   if install_test_reqs is None and test_reqs:
@@ -214,9 +221,10 @@ def print_test_run(test_run: TestRun) -> None:
     not_passed_not_skipped = lambda t: t.status not in (TestStatus.PASSED, TestStatus.SKIPPED)
     for i, test in enumerate(filter(not_passed_not_skipped, sorted_tests)):
       print()
+      uncolored_line = f'  {test.name} ({test.filename}:{test.lineno})'
       line = f'  {colored(test.name, "red", attrs=["bold"])} ({test.filename}:{test.lineno})'
       print(line)
-      print('  ' + '-' * (len(line) - 2))
+      print('  ' + '-' * (len(uncolored_line) - 2))
       print()
       if test.crash:
         print(indent_text(test.crash.longrepr, 6))

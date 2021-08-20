@@ -1,0 +1,6 @@
+changes:
+- type: fix
+  component: general
+  description: fix missing test-requirements installation with `shut mono|pkg test
+    --isolate` if the comand was run previously
+  fixes: []

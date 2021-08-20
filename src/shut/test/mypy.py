@@ -26,8 +26,9 @@ class MypyTestDriver(BaseTestDriver):
   args: t.List[str] = dataclasses.field(default_factory=lambda: ['--check-untyped-defs'])
 
   def test_package(self, package: 'PackageModel', runtime: Runtime, capture: bool) -> TestRun:
+    source_dir = package.get_source_directory()
     command = runtime.python + ['-m', 'mypy']
-    command += [package.get_source_directory()] + self.args
+    command += [source_dir] + self.args
     log.debug('Running command %s', command)
 
     env = os.environ.copy()
@@ -53,7 +54,7 @@ class MypyTestDriver(BaseTestDriver):
       tests=[TestCase(
         name='mypy',
         duration=duration,
-        filename=package.get_source_directory(),
+        filename=source_dir,
         lineno=0,
         status=status,
         crash=crash,
