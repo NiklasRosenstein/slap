@@ -1,0 +1,6 @@
+changes:
+- type: fix
+  component: general
+  description: '`shut mono|pkg test --isolate` no longer installs the main package
+    in develop mode'
+  fixes: []
