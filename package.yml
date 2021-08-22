@@ -43,8 +43,9 @@ entrypoints:
 package-data:
 - include: data/license_templates/*.txt
 test-drivers:
-  - type: pytest
-  - type: mypy
+- type: mypy
+- type: pylint
+- type: pytest
 publish:
   pypi:
     credentials:

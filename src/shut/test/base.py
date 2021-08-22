@@ -24,6 +24,7 @@ import enum
 import datetime
 import hashlib
 import json
+import logging
 import os
 import shlex
 import shutil
@@ -42,6 +43,8 @@ from shut.model.requirements import Requirement
 
 if TYPE_CHECKING:
   from shut.model.package import PackageModel
+
+log = logging.getLogger(__name__)
 
 __all__ = [
   'TestStatus',
@@ -247,3 +250,58 @@ class BaseTestDriver(abc.ABC):
   @abc.abstractmethod
   def get_test_requirements(self) -> List[Requirement]:
     pass
+
+
+def run_program_as_testcase(
+  environment: TestEnvironment,
+  filename: str,
+  test_run_name: str,
+  command: List[str],
+  env: Dict[str, str],
+  cwd: Optional[str] = None,
+  capture: bool = True,
+) -> TestRun:
+  """
+  Run a program as a #TestRun.
+  """
+
+  proc_env = os.environ.copy()
+  proc_env.update(env)
+
+  log.debug('Running command %s in %s', command, cwd or os.getcwd())
+
+  crash: Optional[TestCrashReport] = None
+  started = datetime.datetime.now()
+
+  if capture:
+    stdout, stderr, stdin = sp.PIPE, sp.STDOUT, sp.DEVNULL
+  else:
+    stdout, stderr, stdin = 1, 2, sp.DEVNULL
+
+  try:
+    proc = sp.Popen(command, stdout=stdout, stderr=stderr, stdin=stdin, env=proc_env, cwd=cwd)
+    output = (proc.communicate()[0] or b'').decode()
+  except OSError:
+    status = TestStatus.ERROR
+    crash = TestCrashReport.current_exception()
+    output = ''
+  else:
+    status = TestStatus.PASSED if proc.returncode == 0 else TestStatus.FAILED
+
+  duration = (datetime.datetime.now() - started).total_seconds()
+
+  return TestRun(
+    started=started,
+    duration=duration,
+    status=status,
+    environment=environment,
+    tests=[TestCase(
+      name=test_run_name,
+      duration=duration,
+      filename=filename,
+      lineno=0,
+      status=status,
+      crash=crash,
+      stdout=output,
+    )]
+  )

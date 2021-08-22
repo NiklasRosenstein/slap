@@ -37,7 +37,7 @@ from nr.stream import Stream
 from termcolor import colored
 
 from shut.commands import shut
-from shut.commands.pkg.install import collect_requirement_args
+from shut.commands.pkg.install import collect_requirement_args, split_extras
 from shut.model.package import PackageModel
 from shut.test import Runtime, TestRun, TestStatus, Virtualenv
 from shut.utils.text import indent_text
@@ -98,7 +98,7 @@ def test_package(
   keep_test_env: bool = False,
   capture: bool = True,
   install_test_reqs: t.Optional[bool] = None,
-  only: Optional[List[str]] = None,
+  only: Optional[t.Collection[str]] = None,
   quiet: bool = False,
 ) -> t.Iterator[t.Tuple[str, TestRun]]:
   drivers = package.get_test_drivers()
@@ -110,7 +110,7 @@ def test_package(
     try:
       drivers = [drivers_by_name[k] for k in only]
     except KeyError as exc:
-      raise RuntimeError(f'package has no "{exc}" test driver configured')
+      raise RuntimeError(f'package has no {colored(str(exc), "red")} test driver configured')
 
   q = ['-q'] if quiet else []
   venv: Optional[Virtualenv] = None
@@ -267,8 +267,16 @@ def print_test_run(test_run: TestRun) -> None:
        'it skips the installation if it appears to have installed the dependencies before (you can '
        'pass --install explicitly to ensure that the test driver requirements are installed before invoking '
        'the test drivers).')
+@click.option('--only', type=split_extras, help='A command-separated list of drivers names to run only.')
 @click.option('-q', '--quiet', is_flag=True, help='Quiet Pip install of test requirements.')
-def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[bool], quiet: bool) -> None:
+def test(
+  isolate: bool,
+  keep_test_env: bool,
+  capture: bool,
+  install: t.Optional[bool],
+  only: t.Optional[t.Set[str]],
+  quiet: bool
+) -> None:
   """
   Run the package's unit tests.
   """
@@ -276,7 +284,8 @@ def test(isolate: bool, keep_test_env: bool, capture: bool, install: t.Optional[
   package = project.load_or_exit(expect=PackageModel)
   num_passed = 0
   num_tests = 0
-  for _driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install, None, quiet):
+
+  for _driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install, only, quiet):
     num_tests += 1
     print_test_run(test_run)
     print()

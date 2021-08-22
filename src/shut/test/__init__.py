@@ -20,4 +20,4 @@
 # IN THE SOFTWARE.
 
 from .base import *
-from . import pytest, mypy
+from . import mypy, pylint, pytest

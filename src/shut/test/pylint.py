@@ -15,23 +15,24 @@ if t.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-@A.union.subtype(BaseTestDriver, 'mypy')
+@A.union.subtype(BaseTestDriver, 'pylint')
 @dataclasses.dataclass
-class MypyTestDriver(BaseTestDriver):
+class PylintTestDriver(BaseTestDriver):
   """
-  Runs Mypy.
+  Runs Pylint.
   """
 
-  env: t.Dict[str, str] = dataclasses.field(default_factory=lambda: {'MYPY_FORCE_COLOR': '1'})
-  args: t.List[str] = dataclasses.field(default_factory=lambda: ['--check-untyped-defs'])
+  env: t.Dict[str, str] = dataclasses.field(default_factory=dict)
+  args: t.List[str] = dataclasses.field(default_factory=list)
 
   def test_package(self, package: 'PackageModel', runtime: Runtime, capture: bool) -> TestRun:
     source_dir = package.get_source_directory()
-    command = runtime.python + ['-m', 'mypy']
-    command += [source_dir] + self.args
+    metadata = package.get_python_package_metadata()
+    path = metadata.package_directory if not metadata.is_single_module else metadata.filename
+    command = runtime.python + ['-m', 'pylint', path] + self.args
     return run_program_as_testcase(
-      runtime.get_environment(), source_dir, 'mypy',
-      command=command, env=self.env, cwd=package.get_directory(), capture=capture)
+      runtime.get_environment(), source_dir, 'pylint',
+      command=command, env=self.env, cwd=source_dir, capture=capture)
 
   def get_test_requirements(self) -> t.List[Requirement]:
-    return [Requirement('mypy')]
+    return [Requirement('pylint')]
