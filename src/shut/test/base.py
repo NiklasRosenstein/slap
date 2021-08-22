@@ -237,7 +237,7 @@ class Virtualenv:
     return Runtime.from_python3([self.bin('python')])
 
 
-@A.union(style=A.union.Style.flat)
+@A.union(A.union.Subtypes.entrypoint('shut.test_drivers'), style=A.union.Style.flat)
 class BaseTestDriver(abc.ABC):
   """
   Base class for drivers that can run unit tests for a package.

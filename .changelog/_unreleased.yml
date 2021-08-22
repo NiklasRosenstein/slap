@@ -9,3 +9,8 @@ changes:
     and just always install test requirements, now shut knows per driver selection
     whether dependencies have been installed before or not
   fixes: []
+- type: feature
+  component: general
+  description: test drivers are now loaded via the `shut.test_drivers` entrypoint,
+    allowing plugins to be registered from external packages
+  fixes: []

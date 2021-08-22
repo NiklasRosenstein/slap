@@ -40,6 +40,10 @@ test-requirements:
 entrypoints:
   console_scripts:
   - shut = shut.commands:shut
+  shut.test_drivers:
+  - mypy = shut.test.mypy:MypyTestDriver
+  - pylint = shut.test.pylint:PylintTestDriver
+  - pytest = shut.test.pytest:PytestDriver
 package-data:
 - include: data/license_templates/*.txt
 test-drivers:

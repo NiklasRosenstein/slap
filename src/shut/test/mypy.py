@@ -15,7 +15,6 @@ if t.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-@A.union.subtype(BaseTestDriver, 'mypy')
 @dataclasses.dataclass
 class MypyTestDriver(BaseTestDriver):
   """

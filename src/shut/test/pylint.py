@@ -15,7 +15,6 @@ if t.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-@A.union.subtype(BaseTestDriver, 'pylint')
 @dataclasses.dataclass
 class PylintTestDriver(BaseTestDriver):
   """

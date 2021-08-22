@@ -101,7 +101,6 @@ def load_report_file(report_file: str) -> TestRun:
   return TestRun(started_time, duration, status, environment, tests, errors)
 
 
-@A.union.subtype(BaseTestDriver, 'pytest')
 @dataclass
 class PytestDriver(BaseTestDriver):
   """

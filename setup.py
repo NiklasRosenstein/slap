@@ -73,6 +73,11 @@ setuptools.setup(
   entry_points = {
     'console_scripts': [
       'shut = shut.commands:shut',
+    ],
+    'shut.test_drivers': [
+      'mypy = shut.test.mypy:MypyTestDriver',
+      'pylint = shut.test.pylint:PylintTestDriver',
+      'pytest = shut.test.pytest:PytestDriver',
     ]
   },
   cmdclass = {},
