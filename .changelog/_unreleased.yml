@@ -3,3 +3,9 @@ changes:
   component: general
   description: add `pylint` test driver
   fixes: []
+- type: fix
+  component: general
+  description: the fix from `0.17.4` actually made the install cache not work at all
+    and just always install test requirements, now shut knows per driver selection
+    whether dependencies have been installed before or not
+  fixes: []

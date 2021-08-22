@@ -52,10 +52,14 @@ class _TestReqsInstalledTracker:
   We use this as a performance optimization to avoid kicking off `pip install` if we don't need to.
   """
 
-  def __init__(self, package: PackageModel, runtime: Runtime, isolate: bool) -> None:
+  def __init__(self, package: PackageModel, runtime: Runtime, drivers: t.List[str], isolate: bool) -> None:
     self.package = package
     self.runtime = runtime
-    self.isolate = True
+    self.drivers = drivers
+    self.isolate = isolate
+
+  def get_cache_key(self) -> str:
+    return f'{self.package.name}:{self.runtime.get_executable_path()}:' + ','.join(self.drivers) + f':{self.isolate}'
 
   def get_cache_filename(self) -> Path:
     if self.package.project.monorepo:
@@ -77,7 +81,7 @@ class _TestReqsInstalledTracker:
     filename = self.get_cache_filename()
     if not filename.exists():
       return None
-    return json.loads(filename.read_text()).get(self.runtime.get_executable_path(), {}).get(self.package.name)
+    return json.loads(filename.read_text()).get(self.get_cache_key())
 
   def store_hash(self, hash: str) -> None:
     " Stores a new hash in the cache. "
@@ -87,7 +91,7 @@ class _TestReqsInstalledTracker:
 
     filename = self.get_cache_filename()
     data = json.loads(filename.read_text()) if filename.exists() else {}
-    data.setdefault(self.runtime.get_executable_path(), {})[self.package.name] = hash
+    data[self.get_cache_key()] = hash
     filename.parent.mkdir(parents=True, exist_ok=True)
     filename.write_text(json.dumps(data))
 
@@ -142,7 +146,7 @@ def test_package(
     for driver in drivers).concat().collect()
   test_reqs += collect_requirement_args(package, develop=False, inter_deps=False, extra={'test'},
     skip_main_requirements=True)
-  helper = _TestReqsInstalledTracker(package, runtime, isolate)
+  helper = _TestReqsInstalledTracker(package, runtime, sorted(only or []), isolate)
   reqs_hash = helper.get_requirements_hash(test_reqs)
 
   if install_test_reqs is None and test_reqs:
@@ -185,6 +189,15 @@ def test_package(
       venv.rm()
 
 
+def test_status_color(status: TestStatus) -> str:
+  return {
+    TestStatus.PASSED: 'green',
+    TestStatus.SKIPPED: 'yellow',
+    TestStatus.FAILED: 'red',
+    TestStatus.ERROR: 'magenta'
+  }[status]
+
+
 def print_test_run(test_run: TestRun) -> None:
   if test_run.status == TestStatus.ERROR:
     print(f'There was an unexpected error when running the tests.')
@@ -204,13 +217,7 @@ def print_test_run(test_run: TestRun) -> None:
     f'{len(test_run.errors)} error(s)). {test_run.status.name}')
   print()
   for test in sorted_tests:
-    color = {
-      TestStatus.PASSED: 'green',
-      TestStatus.SKIPPED: 'yellow',
-      TestStatus.FAILED: 'red',
-      TestStatus.ERROR: 'magenta'
-    }[test.status]
-    print(f'  {colored(test.name, color, attrs=["bold"])} {test.status.name}')
+    print(f'  {colored(test.name, test_status_color(test.status), attrs=["bold"])} {test.status.name}')
   if sorted_tests:
     print()
 
@@ -285,11 +292,17 @@ def test(
   num_passed = 0
   num_tests = 0
 
-  for _driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install, only, quiet):
+  statuses: List[t.Tuple[str, TestStatus]] = []
+
+  for driver_name, test_run in test_package(package, isolate, keep_test_env, capture, install, only, quiet):
     num_tests += 1
     print_test_run(test_run)
     print()
+    statuses.append((driver_name, test_run.status))
     if test_run.status in (TestStatus.PASSED, TestStatus.SKIPPED):
       num_passed += 1
+
+  for driver_name, status in statuses:
+    print(f'  {colored(driver_name, test_status_color(status), attrs=["bold"])} {status.name}')
 
   sys.exit(0 if num_passed == num_tests else 1)
