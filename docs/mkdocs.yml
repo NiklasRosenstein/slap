@@ -4,3 +4,4 @@ theme:
   name: readthedocs
 markdown_extensions:
 - fenced_code
+repo_url: https://github.com/NiklasRosenstein/shut
