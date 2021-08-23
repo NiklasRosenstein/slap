@@ -46,6 +46,7 @@ entrypoints:
   - pytest = shut.test.pytest:PytestDriver
 package-data:
 - include: data/license_templates/*.txt
+- include: data/pylintrc_templates/*.ini
 test-drivers:
 - type: mypy
 - type: pylint
