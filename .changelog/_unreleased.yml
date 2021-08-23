@@ -14,3 +14,12 @@ changes:
   description: test drivers are now loaded via the `shut.test_drivers` entrypoint,
     allowing plugins to be registered from external packages
   fixes: []
+- type: feature
+  component: internal
+  description: add `AbstractProjectModel.get_auxiliary_renderers()`
+  fixes: []
+- type: feature
+  component: general
+  description: '`pylint` now comes with `.pylintrc` templates (only `shut` for now)
+    and can also render templates from HTTP(S) URLs'
+  fixes: []

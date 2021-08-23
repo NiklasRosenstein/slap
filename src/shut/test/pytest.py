@@ -109,6 +109,8 @@ class PytestDriver(BaseTestDriver):
   [1]: https://docs.pytest.org/en/latest/
   """
 
+  NAME = 'pytest'
+
   directory: Optional[str] = None
   args: List[str] = field(default_factory=lambda: ['-vv'])
   report_file: Annotated[str, A.alias('report-file')] = '.pytest-report.json'

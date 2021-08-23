@@ -21,13 +21,17 @@
 
 import abc
 from dataclasses import dataclass
-from typing import Iterable, Generic, Type, TypeVar
+from typing import TYPE_CHECKING, Iterable, Generic, Type, TypeVar
 
 from shut.utils.io.virtual import VirtualFiles
 from shut.utils.type_registry import TypeRegistry
 
+if TYPE_CHECKING:
+  from shut.model.abstract import AbstractProjectModel
+
 T = TypeVar('T')
 T_co = TypeVar('T_co', covariant=True)
+T_AbstractProjectModel = TypeVar('T_AbstractProjectModel', bound='AbstractProjectModel')
 
 __all__ = [
   'VersionRef',
@@ -46,20 +50,20 @@ class VersionRef:
   value: str
 
 
-class Renderer(Generic[T], metaclass=abc.ABCMeta):
+class Renderer(Generic[T_AbstractProjectModel], metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
-  def get_files(self, files: VirtualFiles, obj: T) -> None:
+  def get_files(self, files: VirtualFiles, obj: T_AbstractProjectModel) -> None:
     pass
 
-  def get_version_refs(self, obj: T) -> Iterable[VersionRef]:
+  def get_version_refs(self, obj: T_AbstractProjectModel) -> Iterable[VersionRef]:
     return; yield
 
 
-registry = TypeRegistry[Renderer[T]]()
+registry = TypeRegistry[Renderer[T_AbstractProjectModel]]()
 
 
-def register_renderer(t: Type[T], renderer: Type[Renderer[T]]) -> None:
+def register_renderer(t: Type[T_AbstractProjectModel], renderer: Type[Renderer[T_AbstractProjectModel]]) -> None:
   """
   Register the *renderer* implementation to run when creating files for *t*.
   """
@@ -67,19 +71,20 @@ def register_renderer(t: Type[T], renderer: Type[Renderer[T]]) -> None:
   registry.put(t, renderer)
 
 
-def get_files(obj: T) -> VirtualFiles:
+def get_files(obj: T_AbstractProjectModel) -> VirtualFiles:
   """
   Gets all the files from the renderers registered to the type of *obj*.
   """
 
   files = VirtualFiles()
-  for renderer in registry.for_type(type(obj)):
-    renderer().get_files(files, obj)
-
+  for renderer in map(lambda r: r(), registry.for_type(type(obj))):
+    renderer.get_files(files, obj)
+  for renderer in obj.get_auxiliary_renderers():
+    renderer.get_files(files, obj)
   return files
 
 
-def get_version_refs(obj: T) -> Iterable[VersionRef]:
+def get_version_refs(obj: T_AbstractProjectModel) -> Iterable[VersionRef]:
   """
   Gets all version refs returned by registered for type *T_co*.
   """

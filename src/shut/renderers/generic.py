@@ -39,7 +39,7 @@ class GenericRenderer(Renderer[AbstractProjectModel]):
     assert obj.project
 
     # Return a reference to the version number in the package or monorepo model.
-    regex = '^\s*version\s*:\s*[\'"]?(.*?)[\'"]?\s*(#.*)?$'
+    regex = r'^\s*version\s*:\s*[\'"]?(.*?)[\'"]?\s*(#.*)?$'
     with open(obj.filename) as fp:
       match = re.search(regex, fp.read(), re.S | re.M)
       if match:

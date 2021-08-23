@@ -110,7 +110,7 @@ def test_package(
     raise RuntimeError('package has no test driver configured')
 
   if only is not None:
-    drivers_by_name = {typeinfo.get_name(type(d)): d for d in drivers}
+    drivers_by_name = {d.NAME: d for d in drivers}
     try:
       drivers = [drivers_by_name[k] for k in only]
     except KeyError as exc:
@@ -166,16 +166,15 @@ def test_package(
 
   try:
     for driver in drivers:
-      driver_name = typeinfo.get_name(type(driver))
       started = datetime.datetime.now()
       try:
         print('[{time}] Running test driver {driver} for package {pkg}'.format(
-          driver=colored(driver_name, 'cyan'),
+          driver=colored(driver.NAME, 'cyan'),
           pkg=colored(package.name, 'cyan', attrs=['bold']),
           time=datetime.datetime.now()))
-        yield driver_name, driver.test_package(package, runtime, capture)
+        yield driver.NAME, driver.test_package(package, runtime, capture)
       except Exception:
-        yield driver_name, TestRun(
+        yield driver.NAME, TestRun(
           started=started,
           duration=(datetime.datetime.now() - started).total_seconds(),
           status=TestStatus.ERROR,

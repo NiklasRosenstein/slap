@@ -35,7 +35,7 @@ import textwrap
 import traceback
 import types
 from dataclasses import dataclass, field
-from typing import Dict, Optional, List, TYPE_CHECKING
+from typing import ClassVar, Dict, Optional, List, TYPE_CHECKING
 
 from nr.preconditions import check_not_none
 from databind.core import annotations as A
@@ -242,6 +242,8 @@ class BaseTestDriver(abc.ABC):
   """
   Base class for drivers that can run unit tests for a package.
   """
+
+  NAME: ClassVar[str]
 
   @abc.abstractmethod
   def test_package(self, package: 'PackageModel', runtime: Runtime, capture: bool) -> TestRun:

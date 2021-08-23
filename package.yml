@@ -49,6 +49,9 @@ package-data:
 test-drivers:
 - type: mypy
 - type: pylint
+  rcfile:
+    template: shut
+    #render: true
 - type: pytest
 publish:
   pypi:

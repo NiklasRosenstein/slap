@@ -21,6 +21,8 @@ class MypyTestDriver(BaseTestDriver):
   Runs Mypy.
   """
 
+  NAME = 'mypy'
+
   env: t.Dict[str, str] = dataclasses.field(default_factory=lambda: {'MYPY_FORCE_COLOR': '1'})
   args: t.List[str] = dataclasses.field(default_factory=lambda: ['--check-untyped-defs'])
 

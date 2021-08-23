@@ -25,7 +25,7 @@ import re
 import shlex
 import warnings
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union, cast
 from typing_extensions import Annotated
 
 from databind.core import annotations as A
@@ -40,6 +40,9 @@ from .publish import PublishConfiguration
 from .requirements import Requirement, RequirementsList
 from ..test import BaseTestDriver
 from .version import Version
+
+if TYPE_CHECKING:
+  from shut.renderers.core import Renderer
 
 
 class PackageError(Exception):
@@ -246,6 +249,14 @@ class PackageModel(AbstractProjectModel):
     if self.test_driver:
       result.append(self.test_driver)
     result += self.test_drivers
+    return result
+
+  def get_auxiliary_renderers(self) -> List['Renderer[PackageModel]']:
+    from shut.renderers.core import Renderer
+    result = []
+    for driver in self.get_test_drivers():
+      if isinstance(driver, Renderer):
+        result.append(cast('Renderer[PackageModel]', driver))
     return result
 
   # AbstractProjectModel

@@ -23,13 +23,18 @@ from dataclasses import dataclass, field
 import abc
 import os
 import warnings
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional, TypeVar
 
 from .author import Author
 from .changelog import ChangelogConfiguration
 from .release import ReleaseConfiguration
 from .version import Version
 from shut.utils.fs import get_file_in_directory
+
+if TYPE_CHECKING:
+  from shut.renderers.core import Renderer
+
+T_AbstractProjectModel = TypeVar('T_AbstractProjectModel', bound='AbstractProjectModel')
 
 
 @dataclass
@@ -107,5 +112,7 @@ class AbstractProjectModel(abc.ABC):
       prefix='LICENSE.',
       preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'])
 
+  def get_auxiliary_renderers(self: T_AbstractProjectModel) -> List['Renderer[T_AbstractProjectModel]']:
+    return []
 
 from . import Project  # pylint: disable=unused-import
