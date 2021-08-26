@@ -120,7 +120,6 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     # Write hook overrides.
     cmdclass = {}
     if install.hooks.any():
-      fp.write('\ncommand = sys.argv[1] if len(sys.argv) >= 2 else None')
       fp.write('\ninstall_hooks = {}\n'.format(json.dumps(install.hooks.as_payload(), indent=2)))
       fp.write(textwrap.dedent('''
         def _run_hooks(event):
@@ -357,6 +356,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
         import atexit, shutil
         if not os.path.isfile(dst):
           if not os.path.isfile(src):
+            command = sys.argv[1] if len(sys.argv) >= 2 else None
             msg = '"{}" does not exist, and cannot copy it from "{}" either'.format(dst, src)
             # NOTE: In dist/build commands that are not invoked by Pip, we enforce that the license file
             #       must be present. See https://github.com/NiklasRosenstein/shut/issues/22

@@ -1,0 +1,8 @@
+changes:
+- type: fix
+  component: general
+  description: 'fix added in `0.18.0` for #33 is actually incorrect, the `command`
+    variable was needed when using the `_tempcopy()` feature. now it is fixed for
+    good'
+  fixes:
+  - '#33'
