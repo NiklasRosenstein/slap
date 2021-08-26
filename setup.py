@@ -7,8 +7,6 @@ import os
 import setuptools
 import sys
 
-command = sys.argv[1] if len(sys.argv) >= 2 else None
-
 readme_file = 'README.md'
 if os.path.isfile(readme_file):
   with io.open(readme_file, encoding='utf8') as fp:

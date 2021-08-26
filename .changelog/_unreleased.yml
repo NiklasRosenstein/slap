@@ -28,3 +28,9 @@ changes:
   description: Shut now recognizes lowercase readme/license files
   fixes:
   - '#31'
+- type: fix
+  component: general
+  description: render `command` variable into `setup.py` only if package `$.install.hooks`
+    is used
+  fixes:
+  - '#33'
