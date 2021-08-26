@@ -23,3 +23,8 @@ changes:
   description: '`pylint` now comes with `.pylintrc` templates (only `shut` for now)
     and can also render templates from HTTP(S) URLs'
   fixes: []
+- type: feature
+  component: general
+  description: Shut now recognizes lowercase readme/license files
+  fixes:
+  - '#31'
