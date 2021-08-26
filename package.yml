@@ -49,10 +49,6 @@ package-data:
 - include: data/pylintrc_templates/*.ini
 test-drivers:
 - type: mypy
-- type: pylint
-  rcfile:
-    template: shut
-    #render: true
 - type: pytest
 publish:
   pypi:
