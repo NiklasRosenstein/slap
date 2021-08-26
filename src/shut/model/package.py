@@ -202,7 +202,8 @@ class PackageModel(AbstractProjectModel):
     return get_file_in_directory(
       directory=directory,
       prefix='README.',
-      preferred=['README.md', 'README.rst', 'README.txt', 'README'])
+      preferred=['README.md', 'README.rst', 'README.txt', 'README'],
+      case_sensitive=False)
 
   def get_py_typed_file(self) -> Optional[str]:
     if not self.typed:
