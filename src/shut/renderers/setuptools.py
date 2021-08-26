@@ -115,13 +115,12 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
       import os
       import setuptools
       import sys
-
-      command = sys.argv[1] if len(sys.argv) >= 2 else None
     ''').lstrip())
 
     # Write hook overrides.
     cmdclass = {}
     if install.hooks.any():
+      fp.write('\ncommand = sys.argv[1] if len(sys.argv) >= 2 else None')
       fp.write('\ninstall_hooks = {}\n'.format(json.dumps(install.hooks.as_payload(), indent=2)))
       fp.write(textwrap.dedent('''
         def _run_hooks(event):

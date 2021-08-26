@@ -23,3 +23,9 @@ changes:
   description: '`pylint` now comes with `.pylintrc` templates (only `shut` for now)
     and can also render templates from HTTP(S) URLs'
   fixes: []
+- type: fix
+  component: general
+  description: render `command` variable into `setup.py` only if package `$.install.hooks`
+    is used
+  fixes:
+  - '#33'
