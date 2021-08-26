@@ -110,7 +110,8 @@ class AbstractProjectModel(abc.ABC):
     return get_file_in_directory(
       directory=os.path.dirname(self.filename),
       prefix='LICENSE.',
-      preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'])
+      preferred=['LICENSE', 'LICENSE.txt', 'LICENSE.rst', 'LICENSE.md'],
+      case_sensitive=False)
 
   def get_auxiliary_renderers(self: T_AbstractProjectModel) -> List['Renderer[T_AbstractProjectModel]']:
     return []
