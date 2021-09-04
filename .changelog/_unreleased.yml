@@ -1,0 +1,6 @@
+changes:
+- type: fix
+  component: general
+  description: min `click` version must be `7.1` for `no_args_is_help` option, also
+    allow `8.x`
+  fixes: []
