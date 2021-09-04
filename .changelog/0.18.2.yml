@@ -4,3 +4,4 @@ changes:
   description: min `click` version must be `7.1` for `no_args_is_help` option, also
     allow `8.x`
   fixes: []
+release_date: '2021-09-04'
