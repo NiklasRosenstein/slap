@@ -29,7 +29,6 @@ jobs:
         python-version: ${"${{"} matrix.python-version }}
     - name: Install dependencies
       run: python -m pip install ${shut_req}
-    - run: git fetch  # Needed if the github-actions template needs to identify the main branch
     - name: Check package configuration
       run: shut pkg checks
     - name: Run unit tests and type checks
