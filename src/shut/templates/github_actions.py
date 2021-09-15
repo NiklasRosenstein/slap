@@ -3,7 +3,9 @@ import dataclasses
 import re
 import subprocess as sp
 import typing as t
+from pathlib import Path
 
+import yaml
 from databind.core.annotations import alias, fieldinfo
 from typing_extensions import Annotated
 
@@ -15,6 +17,7 @@ from shut.model.requirements import Requirement
 from shut.renderers import Renderer
 from shut.utils.io.virtual import VirtualFiles
 
+# Let's be honest, you should not use anything older than this... Even 3.4 may be a stretch.
 PYTHON_VERSIONS = ['3.4', '3.5', '3.6', '3.7', '3.8', '3.9']
 PYTHON_NIGHTLY = '3.x'
 
@@ -39,6 +42,23 @@ def select_python_versions(req: Requirement) -> t.List[str]:
     raise RuntimeError(f'matching non-semver selectors (ie. setuptools style) is not currently supported, please '
       'explicitly specify the python-versions to use in the GitHub Actions template.')
   return [v for v in PYTHON_VERSIONS if req.version.matches(v)] + [PYTHON_NIGHTLY]
+
+
+def detect_branch_in_action_config(filename: Path) -> str:
+  """
+  Looks up the branch in the GitHub Action under *filename*. This is used instead of #identify_main_branch()
+  when the action already exists to work around https://github.com/NiklasRosenstein/shut/issues/40/.
+  """
+
+  with open(filename) as fp:
+    config = yaml.safe_load(fp)
+
+  # True because "on" is interpreted as a boolean in YAML, even if it's a key..?
+  branches = (config.get('on') or config.get(True) or {}).get('push', {}).get('branches', [])
+  if not branches:
+    raise RuntimeError(f'could not detect branch in GitHub Action {filename!r}')
+
+  return branches[0]
 
 
 @dataclasses.dataclass
@@ -86,8 +106,11 @@ class GithubActionsTemplate(Renderer):
 
     workflow_filename = self.workflow_filename or (
       re.sub(r'[^\d\w]+', '-', self.workflow_name).strip('-').lower() + '.yml')
+    relative_path = f'.github/workflows/{workflow_filename}'
+    full_path = Path(obj.get_directory()) / relative_path
 
-    branch = self.branch or identify_main_branch(obj.get_directory())
+    branch = self.branch or (detect_branch_in_action_config(full_path) if
+      full_path.exists() else identify_main_branch(obj.get_directory()))
 
     python_req = obj.get_python_requirement()
     if self.python_versions is None and python_req:
@@ -112,5 +135,5 @@ class GithubActionsTemplate(Renderer):
     }
 
     files.add_dynamic(
-      f'.github/workflows/{workflow_filename}',
+      relative_path,
       lambda fp: render_mako_template(fp, template_string, context_vars))
