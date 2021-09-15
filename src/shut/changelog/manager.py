@@ -64,8 +64,11 @@ class Changelog:
     with open(self.filename) as fp:
       raw_data = yaml.safe_load(fp)
 
-    data: AllChangelogTypes = databind.json.load(raw_data, AllChangelogTypes,
-      filename=self.filename, mapper=mapper)  # type: ignore
+    data: AllChangelogTypes = databind.json.load(
+      raw_data,
+      AllChangelogTypes,  # type: ignore
+      filename=self.filename,
+      mapper=mapper)
     if not isinstance(data, v3.Changelog):
       data = v3.Changelog.migrate(data)
 
