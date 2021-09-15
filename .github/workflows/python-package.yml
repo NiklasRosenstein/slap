@@ -28,7 +28,7 @@ jobs:
     - name: Check package configuration
       run: shut pkg checks
     - name: Run unit tests and type checks
-      run: shut pkg test --install --isolate
+      run: shut pkg test --install --isolate --no-capture
 
   publish:
     if: startsWith(github.ref, 'refs/tags/')

@@ -32,7 +32,7 @@ jobs:
     - name: Check package configuration
       run: shut pkg checks
     - name: Run unit tests and type checks
-      run: shut pkg test --install${" --isolate" if isolated_unit_testing else ""}
+      run: shut pkg test --install${" --isolate" if isolated_unit_testing else ""} --no-capture
 % if pypi_publish:
 
   publish:
