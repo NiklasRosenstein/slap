@@ -48,7 +48,7 @@ class GithubActionsTemplate(Renderer):
   """
 
   #: The name of the GitHub Actions workflow.
-  workflow_name: Annotated[str, alias('workflow-name')] = 'Python Package (Shut)'
+  workflow_name: Annotated[str, alias('workflow-name')] = 'Python Package'
 
   #: The filename of the workflow. Defaults to a name generated from #workflow_name.
   workflow_filename: Annotated[t.Optional[str], alias('workflow-filename')] = None
@@ -107,6 +107,8 @@ class GithubActionsTemplate(Renderer):
       'pull_requests': self.pull_requests,
       'test_publish': self.test_publish,
       'python_versions': python_versions,
+      'isolated_unit_testing': self.isolated_unit_testing,
+      'shut_req': '.' if obj.name == 'shut' else f'shut=={__version__}',
     }
 
     files.add_dynamic(

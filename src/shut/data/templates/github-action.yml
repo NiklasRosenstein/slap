@@ -28,11 +28,11 @@ jobs:
       with:
         python-version: ${"${{"} matrix.python-version }}
     - name: Install dependencies
-      run: python -m pip install .
+      run: python -m pip install ${shut_req}
     - name: Check package configuration
       run: shut pkg checks
     - name: Run unit tests and type checks
-      run: shut pkg test --install ${"--isolate" if isolated_unit_testing else ""}
+      run: shut pkg test --install${" --isolate" if isolated_unit_testing else ""}
 % if pypi_publish:
 
   publish:
@@ -46,14 +46,14 @@ jobs:
       with:
         python-version: "${python_versions[0]}"
     - name: Install dependencies
-      run: python -m pip install .
+      run: python -m pip install ${shut_req}
     - name: Publish
       env:
         PYPI_TOKEN: ${"${{"} secrets.PYPI_TOKEN }}
         TESTPYPI_TOKEN: ${"${{"} secrets.TESTPYPI_TOKEN }}
       run: |
         git fetch --tags -q
-        shut pkg update --verify-tag "$$GITHUB_REF"
+        shut pkg update --verify-tag "$GITHUB_REF"
 % if test_publish:
         shut pkg publish warehouse:pypi --test
 % endif
