@@ -1,0 +1,4 @@
+changes:
+- type: change
+  component: general
+  description: Changelog entry `fixes` is now optional

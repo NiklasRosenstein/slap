@@ -24,7 +24,7 @@ The V3 of changelogs.
 """
 
 import enum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 from typing_extensions import Annotated
 from databind.core import annotations as A
@@ -57,7 +57,7 @@ class Entry:
   type_: Annotated[Type, A.alias('type')]
   component: str
   description: str
-  fixes: List[str]
+  fixes: List[str] = field(default_factory=list)
 
   Type = Type
 
