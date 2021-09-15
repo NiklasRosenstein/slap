@@ -82,7 +82,8 @@ def _terminal(fp: TextIO, changelogs: List[Changelog]) -> None:
         suffix_fmt = ' '.join(filter(bool, (_fmt_issues(entry),)))
         lines[-1] += ' ' + suffix_fmt
         delta = maxw - len(entry.type_.name)
-        fp.write('    {} {}\n'.format(colored((_fmt_types(entry) + ':') + ' ' * delta, attrs=['bold']), _md_term_stylize(lines[0])))
+        fp.write('    {} {}\n'.format(colored((_fmt_types(entry) + ':') + ' ' * delta,
+          attrs=['bold']), _md_term_stylize(lines[0])))
         for line in lines[1:]:
           fp.write('    {}{}\n'.format(' ' * (maxw+2), _md_term_stylize(line)))
     fp.write('\n')

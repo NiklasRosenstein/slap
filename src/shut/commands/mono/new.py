@@ -85,7 +85,7 @@ def new(
   if not version:
     version = version or (Version('0.0.0') if single_version else None)
 
-  package_manifest = MonorepoModel(
+  package_manifest = MonorepoModel(  # type: ignore  # TODO (@NiklasRosenstein): Why does mypy complain about unexpected keyword arguments?
     name=project_name,
     version=version,
     author=author,
@@ -105,8 +105,8 @@ def new(
 
   files = VirtualFiles()
   files.add_static('.gitignore', GITIGNORE_TEMPLATE)
-  files.add_dynamic('README.md', render_mako_template, README_TEMPLATE, template_vars)
+  files.add_dynamic('README.md', lambda fp: render_mako_template(fp, README_TEMPLATE, template_vars))
   files.add_dynamic('monorepo.' + suffix, lambda fp: dump(package_manifest, fp))
   if license:
-    files.add_dynamic('LICENSE.txt', get_license_file_text, license, template_vars)
+    files.add_dynamic('LICENSE.txt', lambda fp: fp.write(get_license_file_text(license, template_vars)))
   write_files(files, target_directory, force, dry)

@@ -114,7 +114,7 @@ def new(
   if not version:
     version = version or Version('0.0.0')
 
-  package_manifest = PackageModel(
+  package_manifest = PackageModel(  # type: ignore  # TODO (@NiklasRosenstein): Why does mypy complain about unexpected keyword arguments?
     name=project_name,
     modulename=module_name,
     version=version,
@@ -139,15 +139,12 @@ def new(
   files = VirtualFiles()
 
   files.add_static('.gitignore', GITIGNORE_TEMPLATE)
-  files.add_dynamic('README.md', render_mako_template, README_TEMPLATE, template_vars)
+  files.add_dynamic('README.md', lambda fp: render_mako_template(fp, README_TEMPLATE, template_vars))
   files.add_dynamic('package.' + suffix, lambda fp: dump(package_manifest, fp))
 
   files.add_dynamic(
     'src/{}/__init__.py'.format(module_name.replace('.', '/')),
-    render_mako_template,
-    INIT_TEMPLATE,
-    template_vars,
-  )
+    lambda fp: render_mako_template(fp, INIT_TEMPLATE, template_vars))
 
   parts = []
   for item in module_name.split('.')[:-1]:
@@ -158,6 +155,6 @@ def new(
     )
 
   if license:
-    files.add_dynamic('LICENSE.txt', get_license_file_text, license, template_vars)
+    files.add_dynamic('LICENSE.txt', lambda fp: fp.write(get_license_file_text(license, template_vars)))
 
   write_files(files, target_directory, force, dry)

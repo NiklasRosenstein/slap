@@ -24,7 +24,6 @@ import subprocess
 from typing import Any, Dict, Optional
 
 import nr.fs  # type: ignore
-from mako.template import Template
 from termcolor import colored
 
 from shut.model.author import Author

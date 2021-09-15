@@ -35,6 +35,7 @@ from shut.utils.fs import get_file_in_directory
 from typing_extensions import Annotated
 
 if TYPE_CHECKING:
+  import shut.renderers
   from shut.renderers.core import Renderer
 
 T_AbstractProjectModel = TypeVar('T_AbstractProjectModel', bound='AbstractProjectModel')

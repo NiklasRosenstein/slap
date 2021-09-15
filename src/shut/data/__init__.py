@@ -1,7 +1,7 @@
 
 import pkg_resources
 import typing as t
-from mako.template import Template
+from mako.template import Template  # type: ignore
 
 
 def load_string(relative_path: str, encoding: t.Optional[str] = None) -> str:

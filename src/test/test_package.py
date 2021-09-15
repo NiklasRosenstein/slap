@@ -4,7 +4,7 @@ from shut.model.requirements import Requirement, VersionSelector
 
 
 def test_package_is_universal():
-  package = PackageModel(name='test', description='')
+  package = PackageModel(name='test', description='')  # type: ignore  # TODO (@NiklasRosenstein): Why does mypy complain about unexpected keyword arguments?
 
   assert not package.get_python_requirement()
   assert package.is_universal()

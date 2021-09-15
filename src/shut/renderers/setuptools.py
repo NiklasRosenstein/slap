@@ -406,7 +406,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
 
     return readme.path, 'long_description'
 
-  def _render_manifest_in(self, fp: TextIO, current: TextIO, package: PackageModel) -> None:
+  def _render_manifest_in(self, fp: TextIO, current: Optional[TextIO], package: PackageModel) -> None:
     """
     Modifies a `MANIFEST.in` file in place, ensuring that the automatically generatd content
     is up to date (or added if it didn't exist before).
@@ -463,11 +463,11 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
   # Renderer[PackageModel] Overrides
 
   def get_files(self, files: VirtualFiles, package: PackageModel) -> None:
-    files.add_dynamic('setup.py', self._render_setup, package)
-    files.add_dynamic('MANIFEST.in', self._render_manifest_in, package, inplace=True)
+    files.add_dynamic('setup.py', lambda fp: self._render_setup(fp, package))
+    files.add_dynamic('MANIFEST.in', lambda fp, old: self._render_manifest_in(fp, old, package), inplace=True)
 
     if package.render_requirements_txt:
-      files.add_dynamic('requirements.txt', self._render_requirements_txt, package)
+      files.add_dynamic('requirements.txt', lambda fp: self._render_requirements_txt(fp, package))
 
     if package.typed:
       directory = package.get_python_package_metadata().package_directory

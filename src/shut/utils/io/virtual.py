@@ -22,16 +22,13 @@
 import contextlib
 import io
 import os
-from typing import TYPE_CHECKING, Any, Callable, ContextManager, IO, Iterable, Optional, Set, TextIO, Union, overload
+from typing import TYPE_CHECKING, Any, BinaryIO, Callable, ContextManager, IO, Iterable, Optional, Set, TextIO, Union, cast, overload
 
 if TYPE_CHECKING:
-  from typing import Protocol, Literal
+  from typing import Literal, Protocol
 
-  class DynamicRendererFunc(Protocol):
-    def __call__(self, fp: IO, *args: Any) -> Any: ...
-
-  class DynamicInplaceRendererFunc(Protocol):
-    def __call__(self, fp: IO, current: Optional[IO], *args: Any) -> Any: ...
+  class OpenerFunc(Protocol):
+    def __call__(self, filename: str, mode: str, *, encoding: Optional[str] = None) -> ContextManager[IO]: ...
 
 
 class VirtualFiles:
@@ -51,45 +48,80 @@ class VirtualFiles:
         item['filename'] = os.path.join(prefix, item['filename'])
       self._files.append(item)
 
-  def add_static(self, filename: str, content: Union[str, bytes]) -> None:
-    def _write(fp):
-      fp.write(content)
-    self.add_dynamic(filename, _write, text=isinstance(content, str))
+  def add_static(self, filename: str, content: Union[str, bytes], encoding: Optional[str] = None) -> None:
+    """
+    Stage static content for rendering into a file with the given *filename*. If the content is text,
+    the file will be written in text mode with the specified *encoding*.
+    """
+
+    self.add_dynamic(filename, lambda fp: fp.write(content), text=isinstance(content, str), encoding=encoding)  # type: ignore
 
   @overload
   def add_dynamic(
     self,
     filename: str,
-    render_func: 'DynamicRendererFunc',
-    *args: Any,
-    text: bool,
-    inplace: 'Literal[False]',
+    render_func: Callable[[TextIO], Any],
+    text: 'Literal[True]' = True,
+    inplace: 'Literal[False]' = False,
+    encoding: Optional[str] = None,
   ) -> None: ...
 
   @overload
   def add_dynamic(
     self,
     filename: str,
-    render_func: 'DynamicInplaceRendererFunc',
-    *args: Any,
-    text: bool,
-    inplace: 'Literal[True]',
+    render_func: Callable[[TextIO, Optional[TextIO]], Any],
+    text: 'Literal[True]' = True,
+    inplace: 'Literal[True]' = True,
+    encoding: Optional[str] = None,
+  ) -> None: ...
+
+  @overload
+  def add_dynamic(
+    self,
+    filename: str,
+    render_func: Callable[[BinaryIO], Any],
+    text: 'Literal[False]' = False,
+    inplace: 'Literal[False]' = False,
+    encoding: Optional[str] = None,
+  ) -> None: ...
+
+  @overload
+  def add_dynamic(
+    self,
+    filename: str,
+    render_func: Callable[[BinaryIO, Optional[BinaryIO]], Any],
+    text: 'Literal[False]' = False,
+    inplace: 'Literal[True]' = True,
+    encoding: Optional[str] = None,
   ) -> None: ...
 
   def add_dynamic(
     self,
     filename: str,
-    render_func: Union['DynamicRendererFunc', 'DynamicInplaceRendererFunc'],
-    *args: Any,
+    render_func: Callable[..., Any],
     text: bool = True,
     inplace: bool = False,
+    encoding: Optional[str] = None,
   ) -> None:
+    """
+    Stage a function to write to a file with the given *filename*. The function will be invoked when the
+    file is actually written to disk (or to memory, see #get_modified_files()).
+
+    If *inplace* is set to #True, the *render_func* must accept two arguments, where the first is the output
+    file and the second is the current file, if it exists. Otherwise, *render_func* must accept only one
+    argument (the output file).
+    """
+
+    if encoding and not text:
+      raise ValueError(f'encoding and text=False are not compatible')
+
     self._files.append({
       'filename': filename,
       'render_func': render_func,
-      'args': args,
       'text': text,
       'inplace': inplace,
+      'encoding': encoding,
     })
 
   def write_all(
@@ -100,8 +132,7 @@ class VirtualFiles:
     overwrite: bool = False,
     create_directories: bool = True,
     dry: bool = False,
-    open_func: Callable[[str, str], ContextManager[IO]] = None,
-
+    open_func: 'OpenerFunc' = None,
   ) -> None:
     """
     Writes all files to disk. Relative files will be written relative to the
@@ -109,7 +140,7 @@ class VirtualFiles:
     """
 
     if open_func is None:
-      open_func = open
+      open_func = cast('OpenerFunc', open)
 
     for file_, filename in zip(self._files, self.abspaths(parent_directory)):
       exists = os.path.isfile(filename)
@@ -123,20 +154,21 @@ class VirtualFiles:
         mode = '' if file_['text'] else 'b'
         if create_directories:
           os.makedirs(os.path.dirname(filename) or '.', exist_ok=True)
+        encoding_kwarg = {'encoding': file_['encoding']} if file_['encoding'] else {}
         if file_['inplace']:
           src: Optional[TextIO] = None
           if exists:
-            with open(filename, 'r' + mode) as raw_src:
+            with open(filename, 'r' + mode, **encoding_kwarg) as raw_src:
               src = io.StringIO(raw_src.read())
-          with open_func(filename, 'w' + mode) as dst:
+          with open_func(filename, 'w' + mode, **encoding_kwarg) as dst:
             if exists:
               assert src is not None
-              file_['render_func'](dst, src, *file_['args'])
+              file_['render_func'](dst, src)
             else:
-              file_['render_func'](dst, None, *file_['args'])
+              file_['render_func'](dst, None)
         else:
-          with open_func(filename, 'w' + mode) as dst:
-            file_['render_func'](dst, *file_['args'])
+          with open_func(filename, 'w' + mode, **encoding_kwarg) as dst:
+            file_['render_func'](dst)
 
   def abspaths(self, parent_directory: str = None) -> Iterable[str]:
     """
@@ -154,13 +186,13 @@ class VirtualFiles:
     modified_files = set()
 
     @contextlib.contextmanager
-    def opener(filename, mode):
+    def opener(filename, mode, **kw):
       fp: Union[io.BytesIO, io.StringIO] = io.BytesIO() if 'b' in mode else io.StringIO()
       yield fp
       if not os.path.isfile(filename):
         modified_files.add(filename)
       else:
-        with open(filename, mode.replace('w', 'r')) as src:
+        with open(filename, mode.replace('w', 'r'), **kw) as src:
           if fp.getvalue() != src.read():
             modified_files.add(filename)
 

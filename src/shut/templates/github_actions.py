@@ -113,6 +113,4 @@ class GithubActionsTemplate(Renderer):
 
     files.add_dynamic(
       f'.github/workflows/{workflow_filename}',
-      render_mako_template,
-      template_string,
-      context_vars)
+      lambda fp: render_mako_template(fp, template_string, context_vars))
