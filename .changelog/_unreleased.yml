@@ -9,3 +9,6 @@ changes:
   component: general
   description: add `$.templates` to `AbstractProjectModel` and the `github-actions`
     template
+- type: change
+  component: general
+  description: '`shut pkg new` now adds the `github-template` to the generated `package.yml`'

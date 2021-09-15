@@ -37,6 +37,7 @@ from shut.model.author import Author
 from shut.model.package import PackageModel
 from shut.model.requirements import Requirement, RequirementsList, VersionSelector
 from shut.model.version import Version
+from shut.templates.github_actions import GithubActionsTemplate
 from shut.utils.io.virtual import VirtualFiles
 from . import pkg
 
@@ -123,6 +124,7 @@ def new(
     requirements=RequirementsList([
       Requirement('python', VersionSelector('^2.7|^3.5' if universal else '^3.5')),
     ]),
+    templates=[GithubActionsTemplate(pypi_publish=True)]
   )
 
   module_name = package_manifest.get_modulename()
