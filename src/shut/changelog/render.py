@@ -24,14 +24,16 @@ Provides functions to render a list of changelogs. Always only supports the newe
 changelog version.
 """
 
-from shut.changelog.v2 import Entry
-from .manager import Changelog
-from nr.stream import Stream
-from termcolor import colored
-from typing import List, TextIO, Tuple
 import re
 import shutil
 import textwrap
+from typing import List, TextIO, Tuple
+
+from nr.stream import Stream
+from termcolor import colored
+
+from shut.changelog.v2 import Entry
+from .manager import Changelog
 
 
 def _group_entries_by_component(entries: List[Entry]) -> List[Tuple[str, List[Entry]]]:
@@ -123,7 +125,7 @@ renderers = {
 }
 
 
-def render(fp: TextIO, format: str, changelogs: List[Changelog]) -> None:
+def render(fp: TextIO, format_: str, changelogs: List[Changelog]) -> None:
   changelogs = list(changelogs)
   unreleased = next((x for x in changelogs if not x.version), None)
   if unreleased:
@@ -132,4 +134,4 @@ def render(fp: TextIO, format: str, changelogs: List[Changelog]) -> None:
   if unreleased:
     changelogs.insert(0, unreleased)
 
-  renderers[format](fp, changelogs)
+  renderers[format_](fp, changelogs)

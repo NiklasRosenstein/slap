@@ -53,6 +53,7 @@ test-drivers:
 - type: mypy
 - type: pytest
 - type: pylint
+  args: [ '--fail-under=8.0' ]
 publish:
   pypi:
     credentials:
