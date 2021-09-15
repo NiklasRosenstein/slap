@@ -4,5 +4,5 @@ include src/shut/py.typed
 include LICENSE.txt
 include README.md
 include src/shut/data/license_templates/*.txt
-include src/shut/data/pylintrc_templates/*.ini
+include src/shut/data/templates/*
 # }

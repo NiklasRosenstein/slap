@@ -48,7 +48,7 @@ entrypoints:
   - pylintrc = shut.templates.pylintrc:PylintRcTemplate
 package-data:
 - include: data/license_templates/*.txt
-- include: data/pylintrc_templates/*.ini
+- include: data/templates/*
 test-drivers:
 - type: mypy
 - type: pytest
