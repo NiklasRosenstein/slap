@@ -16,3 +16,4 @@ changes:
   component: general
   description: remove template rendering capability of `pylint` test driver, instead
     add `pylintrc` template plugin
+release_date: '2021-09-15'
