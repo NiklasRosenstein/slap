@@ -27,11 +27,11 @@ import click
 from shut.commands.commons.new import (
   load_author_from_git,
   get_license_file_text,
-  render_template,
   write_files,
   GITIGNORE_TEMPLATE,
   README_TEMPLATE,
 )
+from shut.data import render_mako_template
 from shut.model import dump
 from shut.model.author import Author
 from shut.model.package import PackageModel
@@ -41,8 +41,8 @@ from shut.utils.io.virtual import VirtualFiles
 from . import pkg
 
 INIT_TEMPLATE = '''
-__author__ = '{{author or "Me <me@me.org>"}}'
-__version__ = '{{version or "0.0.1"}}'
+__author__ = '${author or "Me <me@me.org>"}'
+__version__ = '${version or "0.0.1"}'
 '''
 
 NAMESPACE_INIT_TEMPLATE = '''
@@ -137,12 +137,12 @@ def new(
   files = VirtualFiles()
 
   files.add_static('.gitignore', GITIGNORE_TEMPLATE)
-  files.add_dynamic('README.md', render_template, README_TEMPLATE, template_vars)
+  files.add_dynamic('README.md', render_mako_template, README_TEMPLATE, template_vars)
   files.add_dynamic('package.' + suffix, lambda fp: dump(package_manifest, fp))
 
   files.add_dynamic(
     'src/{}/__init__.py'.format(module_name.replace('.', '/')),
-    render_template,
+    render_mako_template,
     INIT_TEMPLATE,
     template_vars,
   )

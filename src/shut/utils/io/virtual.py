@@ -22,7 +22,16 @@
 import contextlib
 import io
 import os
-from typing import Any, Callable, ContextManager, IO, Iterable, Optional, Set, TextIO, Union
+from typing import TYPE_CHECKING, Any, Callable, ContextManager, IO, Iterable, Optional, Set, TextIO, Union, overload
+
+if TYPE_CHECKING:
+  from typing import Protocol, Literal
+
+  class DynamicRendererFunc(Protocol):
+    def __call__(self, fp: IO, *args: Any) -> Any: ...
+
+  class DynamicInplaceRendererFunc(Protocol):
+    def __call__(self, fp: IO, current: Optional[IO], *args: Any) -> Any: ...
 
 
 class VirtualFiles:
@@ -47,10 +56,30 @@ class VirtualFiles:
       fp.write(content)
     self.add_dynamic(filename, _write, text=isinstance(content, str))
 
+  @overload
   def add_dynamic(
     self,
     filename: str,
-    render_func: Callable,
+    render_func: 'DynamicRendererFunc',
+    *args: Any,
+    text: bool,
+    inplace: 'Literal[False]',
+  ) -> None: ...
+
+  @overload
+  def add_dynamic(
+    self,
+    filename: str,
+    render_func: 'DynamicInplaceRendererFunc',
+    *args: Any,
+    text: bool,
+    inplace: 'Literal[True]',
+  ) -> None: ...
+
+  def add_dynamic(
+    self,
+    filename: str,
+    render_func: Union['DynamicRendererFunc', 'DynamicInplaceRendererFunc'],
     *args: Any,
     text: bool = True,
     inplace: bool = False,

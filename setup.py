@@ -20,7 +20,6 @@ requirements = [
   'databind.core >=1.1.2,<2.0.0',
   'databind.json >=1.1.2,<2.0.0',
   'click >=7.1,<9.0',
-  'jinja2 >=2.11.1,<3.0.0',
   'networkx >=2.4.0,<3.0.0',
   'nr.fs >=1.5.0,<2.0.0',
   'nr.parsing.date >=1.0.3,<2.0.0',
@@ -35,6 +34,7 @@ requirements = [
   'typing-extensions >=3.10.0.0,<4.0.0',
   'twine',
   'wheel',
+  'Mako >=1.1.5,<2.0.0',
 ]
 test_requirements = [
   'pytest',
@@ -42,7 +42,6 @@ test_requirements = [
   'types-beautifulsoup4',
   'types-click',
   'types-requests',
-  'types-jinja2',
   'types-PyYAML',
   'types-setuptools',
   'types-termcolor',

@@ -8,6 +8,7 @@ import tempfile
 import typing as t
 import requests
 from databind.core import annotations as A
+from shut.data import load_string
 from shut.model.requirements import Requirement
 from shut.renderers.core import Renderer
 from shut.test.base import BaseTestDriver, Runtime, TestRun, run_program_as_testcase
@@ -48,7 +49,7 @@ class RcfileSettings:
       response.raise_for_status()
       return response.text
     try:
-      return pkg_resources.resource_string('shut', f'data/pylintrc_templates/{self.template}.ini').decode('utf8')
+      return load_string(f'pylintrc_templates/{self.template}.ini')
     except FileNotFoundError:
       raise ValueError(f'.pylintrc template {self.template!r} does not exist')
 

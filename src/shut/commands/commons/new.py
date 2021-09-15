@@ -23,8 +23,8 @@ import os
 import subprocess
 from typing import Any, Dict, Optional
 
-import jinja2
 import nr.fs  # type: ignore
+from mako.template import Template
 from termcolor import colored
 
 from shut.model.author import Author
@@ -41,11 +41,11 @@ build/
 '''.lstrip()
 
 README_TEMPLATE = '''
-# {{project_name}}
+# ${project_name}
 
 ---
 
-<p align="center">Copyright &copy; {{year}} {{author.name}}</p>
+<p align="center">Copyright &copy; ${year} ${author.name}</p>
 '''.lstrip()
 
 
@@ -69,12 +69,6 @@ def get_license_file_text(license: str, template_vars: Dict[str, Any]) -> str:
   license_text = 'Copyright (c) {year} {author.name}\n\n'.format(**template_vars)
   license_text += wrap_license_text(get_license_metadata(license)['license_text'])
   return license_text
-
-
-def render_template(fp, template_string, template_vars):
-  for data in jinja2.Template(template_string).stream(**template_vars):
-    fp.write(data)
-  fp.write('\n')
 
 
 def write_files(

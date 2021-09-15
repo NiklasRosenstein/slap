@@ -26,6 +26,7 @@ import os
 from pkg_resources import resource_string
 
 from .core import Renderer, register_renderer
+from shut.data import load_string
 from shut.model import AbstractProjectModel, PackageModel
 from shut.utils.io.virtual import VirtualFiles
 
@@ -50,7 +51,7 @@ def get_license_template(license_name: str) -> str:
     for license_identifier in license_identifiers:
       if license_name.lower() == license_identifier.lower():
         # NOTE (NiklasRosenstein): See https://github.com/NiklasRosenstein/shut/issues/17
-        return resource_string('shut', f'data/license_templates/{license_filename}').decode('utf-8').replace('\r\n', '\n')
+        return load_string(f'license_templates/{license_filename}')
   raise LicenseTemplateDoesNotExist('License template not available for supplied license name', license_name)
 
 

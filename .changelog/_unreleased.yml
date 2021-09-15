@@ -2,3 +2,6 @@ changes:
 - type: change
   component: general
   description: Changelog entry `fixes` is now optional
+- type: change
+  component: general
+  description: switch to Mako as a template engine from Jinja2

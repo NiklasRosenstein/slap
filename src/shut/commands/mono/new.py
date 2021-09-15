@@ -28,9 +28,9 @@ from shut.commands.commons.new import (
   README_TEMPLATE,
   load_author_from_git,
   get_license_file_text,
-  render_template,
   write_files,
 )
+from shut.data import render_mako_template
 from shut.model import dump
 from shut.model.author import Author
 from shut.model.monorepo import MonorepoModel
@@ -105,7 +105,7 @@ def new(
 
   files = VirtualFiles()
   files.add_static('.gitignore', GITIGNORE_TEMPLATE)
-  files.add_dynamic('README.md', render_template, README_TEMPLATE, template_vars)
+  files.add_dynamic('README.md', render_mako_template, README_TEMPLATE, template_vars)
   files.add_dynamic('monorepo.' + suffix, lambda fp: dump(package_manifest, fp))
   if license:
     files.add_dynamic('LICENSE.txt', get_license_file_text, license, template_vars)

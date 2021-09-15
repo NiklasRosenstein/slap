@@ -12,7 +12,6 @@ requirements:
 - databind.core ^1.1.2
 - databind.json ^1.1.2
 - click >=7.1,<9.0
-- jinja2 ^2.11.1
 - networkx ^2.4
 - nr.fs ^1.5.0
 - nr.parsing.date ^1.0.3
@@ -27,13 +26,13 @@ requirements:
 - typing-extensions ^3.10.0.0
 - twine
 - wheel
+- Mako ^1.1.5
 test-requirements:
 - pytest
 - mypy
 - types-beautifulsoup4
 - types-click
 - types-requests
-- types-jinja2
 - types-PyYAML
 - types-setuptools
 - types-termcolor
