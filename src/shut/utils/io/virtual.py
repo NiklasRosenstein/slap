@@ -23,12 +23,11 @@ import contextlib
 import io
 import os
 from typing import TYPE_CHECKING, Any, BinaryIO, Callable, ContextManager, IO, Iterable, Optional, Set, TextIO, Union, cast, overload
+from typing_extensions import Literal, Protocol
 
-if TYPE_CHECKING:
-  from typing import Literal, Protocol
 
-  class OpenerFunc(Protocol):
-    def __call__(self, filename: str, mode: str, *, encoding: Optional[str] = None) -> ContextManager[IO]: ...
+class OpenerFunc(Protocol):
+  def __call__(self, filename: str, mode: str, *, encoding: Optional[str] = None) -> ContextManager[IO]: ...
 
 
 class VirtualFiles:
