@@ -45,12 +45,14 @@ entrypoints:
   - pytest = shut.test.pytest:PytestDriver
   shut.templates:
   - github-actions = shut.templates.github_actions:GithubActionsTemplate
+  - pylintrc = shut.templates.pylintrc:PylintRcTemplate
 package-data:
 - include: data/license_templates/*.txt
 - include: data/pylintrc_templates/*.ini
 test-drivers:
 - type: mypy
 - type: pytest
+- type: pylint
 publish:
   pypi:
     credentials:
@@ -61,3 +63,5 @@ publish:
 templates:
 - type: github-actions
   pypi-publish: true
+- type: pylintrc
+  use: shut

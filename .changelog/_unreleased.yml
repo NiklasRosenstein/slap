@@ -12,3 +12,7 @@ changes:
 - type: change
   component: general
   description: '`shut pkg new` now adds the `github-template` to the generated `package.yml`'
+- type: change
+  component: general
+  description: remove template rendering capability of `pylint` test driver, instead
+    add `pylintrc` template plugin

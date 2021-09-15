@@ -55,7 +55,7 @@ class RcfileSettings:
 
 
 @dataclasses.dataclass
-class PylintTestDriver(BaseTestDriver, Renderer['PackageModel']):
+class PylintTestDriver(BaseTestDriver):
   """
   Runs Pylint.
   """
@@ -68,40 +68,28 @@ class PylintTestDriver(BaseTestDriver, Renderer['PackageModel']):
   #: Additional arguments when calling Pylint.
   args: t.List[str] = dataclasses.field(default_factory=list)
 
-  #: Options for the .pylintrc file to use when invoking Pylint.
-  rcfile: t.Optional[RcfileSettings] = None
+  #: The pylint RC file to use. If not specified, not explicit rcfile is passed to the pylint CLI.
+  rcfile: t.Optional[str] = None
 
   def test_package(self, package: 'PackageModel', runtime: Runtime, capture: bool) -> TestRun:
-    source_dir = package.get_source_directory()
+    directory = package.get_directory()
     metadata = package.get_python_package_metadata()
     path = metadata.package_directory if not metadata.is_single_module else metadata.filename
-    command = runtime.python + ['-m', 'pylint', path] + self.args
+    command = runtime.python + ['-m', 'pylint', os.path.relpath(path, directory)] + self.args
 
-    with contextlib.ExitStack() as stack:
+    if self.rcfile:
+      command += ['--rcfile', self.rcfile]
 
-      if self.rcfile and (self.rcfile.name or self.rcfile.render):
-        local_rcfile = os.path.join(package.get_directory(), self.rcfile.name or RcfileSettings.DEFAULT_NAME)
-        command += ['--rcfile', local_rcfile]
-
-      elif self.rcfile and self.rcfile.template:
-        fp = stack.enter_context(tempfile.NamedTemporaryFile(delete=False, mode='w'))
-        stack.callback(lambda: os.unlink(fp.name))
-        fp.write(self.rcfile.load_template())
-        fp.close()
-        command += ['--rcfile', fp.name]
-
-      test_run = run_program_as_testcase(
-        runtime.get_environment(), source_dir, 'pylint',
-        command=command, env=self.env, cwd=source_dir, capture=capture)
+    test_run = run_program_as_testcase(
+      environment=runtime.get_environment(),
+      filename=package.get_source_directory(),
+      test_run_name='pylint',
+      command=command,
+      env=self.env,
+      cwd=package.get_directory(),
+      capture=capture)
 
     return test_run
 
   def get_test_requirements(self) -> t.List[Requirement]:
     return [Requirement('pylint')]
-
-  def get_files(self, files: VirtualFiles, obj: 'PackageModel') -> None:
-    if self.rcfile and self.rcfile.render and self.rcfile.template:
-      def render_rcfile(fp: t.TextIO) -> None:
-        assert self.rcfile
-        fp.write(self.rcfile.load_template())
-      files.add_dynamic(self.rcfile.name or RcfileSettings.DEFAULT_NAME, render_rcfile)

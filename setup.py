@@ -78,6 +78,7 @@ setuptools.setup(
     ],
     'shut.templates': [
       'github-actions = shut.templates.github_actions:GithubActionsTemplate',
+      'pylintrc = shut.templates.pylintrc:PylintRcTemplate',
     ]
   },
   cmdclass = {},
