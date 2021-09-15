@@ -58,3 +58,6 @@ publish:
       password: '$PYPI_TOKEN'
       test_username: __token__
       test_password: '$TESTPYPI_TOKEN'
+templates:
+- type: github-actions
+  pypi-publish: true
