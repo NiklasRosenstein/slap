@@ -254,7 +254,7 @@ class PackageModel(AbstractProjectModel):
 
   def get_auxiliary_renderers(self) -> List['Renderer[PackageModel]']:
     from shut.renderers.core import Renderer
-    result = []
+    result = super().get_auxiliary_renderers()
     for driver in self.get_test_drivers():
       if isinstance(driver, Renderer):
         result.append(cast('Renderer[PackageModel]', driver))

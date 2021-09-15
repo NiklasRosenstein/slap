@@ -25,11 +25,14 @@ import os
 import warnings
 from typing import TYPE_CHECKING, List, Optional, TypeVar
 
+import shut
 from .author import Author
 from .changelog import ChangelogConfiguration
 from .release import ReleaseConfiguration
 from .version import Version
+from databind.core.annotations import union
 from shut.utils.fs import get_file_in_directory
+from typing_extensions import Annotated
 
 if TYPE_CHECKING:
   from shut.renderers.core import Renderer
@@ -47,6 +50,9 @@ class AbstractProjectModel(abc.ABC):
   url: Optional[str] = None
   changelog: ChangelogConfiguration = field(default_factory=ChangelogConfiguration)
   release: ReleaseConfiguration = field(default_factory=ReleaseConfiguration)
+  templates: List[Annotated[
+    'shut.renderers.Renderer',
+    union(union.Subtypes.entrypoint('shut.templates'), style=union.Style.flat)]] = field(default_factory=list)
 
   def __post_init__(self) -> None:
     # May be filled during the deserialization process to track additional metadata.
@@ -114,6 +120,7 @@ class AbstractProjectModel(abc.ABC):
       case_sensitive=False)
 
   def get_auxiliary_renderers(self: T_AbstractProjectModel) -> List['Renderer[T_AbstractProjectModel]']:
-    return []
+    return list(self.templates)
+
 
 from . import Project  # pylint: disable=unused-import

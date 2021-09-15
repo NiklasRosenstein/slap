@@ -43,6 +43,8 @@ entrypoints:
   - mypy = shut.test.mypy:MypyTestDriver
   - pylint = shut.test.pylint:PylintTestDriver
   - pytest = shut.test.pytest:PytestDriver
+  shut.templates:
+  - github-actions = shut.templates.github_actions:GithubActionsTemplate
 package-data:
 - include: data/license_templates/*.txt
 - include: data/pylintrc_templates/*.ini

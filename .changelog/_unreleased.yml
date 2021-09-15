@@ -5,3 +5,7 @@ changes:
 - type: change
   component: general
   description: switch to Mako as a template engine from Jinja2
+- type: feature
+  component: general
+  description: add `$.templates` to `AbstractProjectModel` and the `github-actions`
+    template

@@ -75,6 +75,9 @@ setuptools.setup(
       'mypy = shut.test.mypy:MypyTestDriver',
       'pylint = shut.test.pylint:PylintTestDriver',
       'pytest = shut.test.pytest:PytestDriver',
+    ],
+    'shut.templates': [
+      'github-actions = shut.templates.github_actions:GithubActionsTemplate',
     ]
   },
   cmdclass = {},
