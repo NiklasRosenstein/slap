@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Configuration - Shut</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Configuration";
+    var mkdocs_page_input_path = "configuration.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Shut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Welcome to Shut</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../changelog/">Changelog</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Configuration</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#packageyml">package.yml</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#package-metadata">Package Metadata</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#code-runtime">Code Runtime</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#packaging">Packaging</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#releasing">Releasing</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#monorepoyml">monorepo.yml</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../publishing-guide/">Publishing with Shut</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Shut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Configuration</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/NiklasRosenstein/shut/edit/master/docs/configuration.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="configuration">Configuration</h1>
+<p>Shut uses YAML configuration files to configure Python packages and monorepositories. When invoking the <code>shut</code> CLI,
+the configuration file for the entity you want to work with must be in your current working directory (ie.
+<code>package.yml</code> when using <code>shut pkg</code> and <code>monorepo.yml</code> when using <code>shut mono</code>). Configuration files may use the <code>.yaml</code>
+suffix instead of <code>.yml</code>.</p>
+<h2 id="packageyml"><code>package.yml</code></h2>
+<h3 id="package-metadata">Package Metadata</h3>
+<p><strong>Example</strong></p>
+<pre><code class="language-yml">name: my-package
+version: 0.1.0
+description: This is my package.
+license: MIT
+author: Me &lt;me@me.org&gt;
+url: https://github.com/me/my-package
+readme: README.md  # default
+license_file: LICENSE.txt  # default
+classifiers: []  # default
+keywords: []  # default
+</code></pre>
+<p><strong>Fields</strong></p>
+<ul>
+<li><code>name</code> &ndash; The name of the package. This name is also passed to the <code>setuptools.set(name)</code> parameter
+  in the generated <code>setup.py</code> file.</li>
+<li>
+<p><code>version</code> &ndash; The version of the package. This field may be unset if the package is part of a single-version
+  monorepository. A semantic version should be used here (e.g. <code>0.0.1</code>, <code>1.4.2.post1</code> or <code>52.0.1.rc4</code>).</p>
+<p><strong>Checks</strong></p>
+<ul>
+<li>Shut checks if the version given here matches the <code>__version__</code> in your package's main source file (e.g. either the <code>__init__.py</code>
+  of your package or your module file in case of a single-module package).</li>
+</ul>
+</li>
+<li>
+<p><code>author</code> &ndash; The author of the package, either as a string in the form <code>First Last &lt;mail@email.org&gt;</code> or in the
+  form of a mapping as in <code>{name: "First Last", email: "mail@email.org"}</code>.</p>
+<p><strong>Checks</strong></p>
+<ul>
+<li>Similar to the check for <code>version</code>, Shut will check that the author given here matches the <code>__author__</code> given in
+  your package's main source file.</li>
+</ul>
+</li>
+<li>
+<p><code>license</code> &ndash; An <a href="https://spdx.org/licenses/">SPDX Open Source license identifier</a> for the license of the package.</p>
+<p><strong>Checks</strong></p>
+<ul>
+<li>Shut delivers license templates for some known license identifiers (e.g. <code>MIT</code>, <code>BSD2</code>, <code>BSD3</code>, <code>Apache2</code>) and will
+  use it to generate a <code>LICENSE.txt</code> file for you. If the content of the current <code>LICENSE.txt</code> file does not match
+  with the template or if the file does not exist, a check will indicate this.</li>
+</ul>
+</li>
+<li>
+<p><code>description</code> &ndash; A short description for the package which is included in the package metadata when publishing.</p>
+</li>
+<li>
+<p><code>readme</code> &ndash; The path to the readme file relative to the <code>package.yml</code> configuration file. If the path points to
+  a parent directory, Shut will generate code in <code>setup.py</code> to temporarily copy the readme into the package directory
+  during distribution to ensure the readme is included in the archive(s). Defaults to the first file of the following
+  list that exists in the same directory: <code>README.md</code>, <code>README.rst</code>, <code>README.txt</code>,<code>README</code>. (See
+  <code>PackageModel.get_readme_file()</code>)</p>
+<p><strong>Checks</strong></p>
+<ul>
+<li>A check will trigger if the readme file does not exist.</li>
+</ul>
+</li>
+<li>
+<p><code>license_file</code> &ndash; The path to the license file relative to the <code>package.yml</code> configuration file. Similar to
+  the <code>readme</code> option, if the <code>license_file</code> points to a file not in the same project directory, Shut will generate
+  code to temporarily copy the file into the package directory during distribution building. Defaults to the first
+  file of the following list that exists in the same directory: <code>LICENSE</code>, <code>LICENSE.txt</code>, <code>LICENSE.rst</code>, <code>LICENSE.md</code>.
+  If the package is part of a monorepository and the monorepository has a license file, it will default to that license
+  file instead. (See <code>PackageModel.get_license_file()</code>)</p>
+<p><strong>Checks</strong></p>
+<ul>
+<li>A check will trigger if the license file does not exist.</li>
+</ul>
+</li>
+<li>
+<p><code>classifiers</code> &ndash; A list of classifiers for the package. Defaults to an empty list.</p>
+<p><strong>Checks</strong></p>
+<ul>
+<li>A check will trigger if any of the listed classifiers are not known as per the the PyPI
+  classifiers <a href="https://pypi.org/classifiers/">reference</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>keywords</code> &ndash; A list of keywords for the package. Defaults to an empty list.</p>
+</li>
+</ul>
+<h3 id="code-runtime">Code Runtime</h3>
+<p><strong>Example</strong></p>
+<pre><code class="language-yml">modulename: my_package
+source-directory: src  # default
+typed: True
+requirements:
+- python ^2.7|^3.5
+- requests ^2.22.0
+test-requirements:
+- pandas
+extra-requirements:
+  pdf:
+  - pyPdf ~1.13
+dev-requirements:
+- pylint
+render-requirements-txt: False  # default
+</code></pre>
+<p><strong>Fields</strong></p>
+<p>Todo</p>
+<h3 id="packaging">Packaging</h3>
+<p><strong>Example</strong></p>
+<pre><code class="language-yml">exclude: ['test', 'tests', 'docs']  # default
+entrypoints:
+  console_scripts:
+  - my-cli = my_package.__main__:main
+package-data:
+  - include: data/ssl.pem
+  - exclude: data/generated
+install:
+  hooks:
+    before-install:
+    - echo &quot;Before install!&quot;
+    after-install:
+    - echo &quot;After install!&quot;
+  index-url: https://pypi.org/simple
+  extra-index-urls:
+  - https://test.pypi.org/simple
+publish:
+  pypi:
+    enabled: true  # default
+    credentials:
+      username: __token__
+      password: '$PYPI_PASSWORD'
+</code></pre>
+<p><strong>Fields</strong></p>
+<p>Todo</p>
+<h3 id="testing">Testing</h3>
+<p><strong>Example</strong></p>
+<pre><code class="language-yml">test-drivers:
+  - type: pytest
+    parallelism: 8
+  - type: mypy
+</code></pre>
+<p><strong>Fields</strong></p>
+<p>Todo</p>
+<h3 id="releasing">Releasing</h3>
+<p><strong>Example</strong></p>
+<pre><code class="language-yml">changelog:
+  directory: '.changelog'  # default
+release:
+  tag-format: '{version}'  # default
+</code></pre>
+<p><strong>Fields</strong></p>
+<ul>
+<li><code>changelog.directory</code> &ndash; The directory where <code>shut changelog</code> reads and writes changelog files to.</li>
+<li><code>release.tag-format</code> &ndash; The template string used to construct the tag name for <code>shut pkg bump --tag</code>. If the
+  package is part of a monorepository, <code>{name}@</code> is automatically prefixed to the value of this field (and <code>{name}</code>
+  expands to the package name).</li>
+</ul>
+<h2 id="monorepoyml"><code>monorepo.yml</code></h2>
+<p>Monorepositories are configured with a <code>monorepo.yml</code> file. Packages in the repository must be
+in folder directly next to the configuration file. Many commands from <code>shut pkg</code> are also available
+for <code>shut mono</code> and will apply over all packages in the monorepository.</p>
+<p>Many of the fields in the monorepository configuration will remind you of those from <code>package.yml</code>. In
+fact some of these fields (indicated with *) are inherited by packages in a monorepository if they are
+not set in the package itself.</p>
+<p><strong>Example</strong></p>
+<pre><code class="language-yaml">name: my-monorepo
+version: 0.1.0
+author:
+  name: First Last
+  email: mail@email.org
+license: MIT
+license_file: LICENSE.txt  # default
+url: https://github.com/me/my-monorepo
+changelog:
+  directory: '.changelog'
+release:
+  tag-format: '{version}'  # default
+  single-version: true
+publish: ...  # same as package.yml
+</code></pre>
+<p><strong>Fields</strong></p>
+<ul>
+<li><code>name</code> &ndash; The name of the monorepository. This is not actually used in a lot of places.</li>
+<li><code>version</code> &ndash; The version of the monorepository. Should only be set for monorepository where
+  <code>release.single-version</code> is enabled.</li>
+<li><code>author</code> * &ndash; The author of the monorepository.</li>
+<li><code>license</code> * &ndash; The license of the monorepository.</li>
+<li><code>license_file</code> * &ndash; The license file of the monorepository.</li>
+<li><code>url</code> * &ndash; The URL where the monorepository source code can be found.</li>
+<li><code>changelog.directory</code> &ndash; The directory where <code>shut changelog</code> reads and writes changelog files to.</li>
+<li><code>release.tag-format</code> &ndash; The template string used to construct the tag name for <code>shut pkg bump --tag</code>. The
+  tag format is only used if <code>release.single-version</code> is enabled.</li>
+<li><code>release.single-version</code> &ndash; If enabled, enforce a consistent version number across all packages in the
+  monorepository. <code>shut mono bump</code> can be used to uniformly bump the version across all packages. The <code>--tag</code> option
+  will create a tag for the entire monorepository (instead of for each package individually).</li>
+<li><code>publish</code> * &ndash; The publish configuration for packages in the monorepository.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../publishing-guide/" class="btn btn-neutral float-right" title="Publishing with Shut">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../changelog/" class="btn btn-neutral" title="Changelog"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/NiklasRosenstein/shut/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../changelog/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../publishing-guide/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

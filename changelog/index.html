@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Changelog - Shut</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Changelog";
+    var mkdocs_page_input_path = "changelog.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Shut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Welcome to Shut</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Changelog</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#unreleased-no-release-date">Unreleased (no release date)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0190-2021-09-15">0.19.0 (2021-09-15)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0182-2021-09-04">0.18.2 (2021-09-04)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0181-2021-08-27">0.18.1 (2021-08-27)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0180-2021-08-26">0.18.0 (2021-08-26)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0174-2021-08-20">0.17.4 (2021-08-20)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0173-2021-08-20">0.17.3 (2021-08-20)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0172-2021-08-14">0.17.2 (2021-08-14)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0171-2021-08-13">0.17.1 (2021-08-13)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0170-2021-08-13">0.17.0 (2021-08-13)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0161-2021-08-12">0.16.1 (2021-08-12)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0160-2021-08-10">0.16.0 (2021-08-10)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0151-2021-08-09">0.15.1 (2021-08-09)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0150-2021-08-09">0.15.0 (2021-08-09)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0143-2021-08-08">0.14.3 (2021-08-08)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0142-2021-08-03">0.14.2 (2021-08-03)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0141-2021-07-23">0.14.1 (2021-07-23)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0140-2021-07-22">0.14.0 (2021-07-22)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0133-2021-06-20">0.13.3 (2021-06-20)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0132-2021-06-20">0.13.2 (2021-06-20)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0131-2021-06-20">0.13.1 (2021-06-20)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0130-2021-06-20">0.13.0 (2021-06-20)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0120-2021-06-08">0.12.0 (2021-06-08)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0114-2021-02-01">0.11.4 (2021-02-01)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0113-2021-01-29">0.11.3 (2021-01-29)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0112-2020-12-19">0.11.2 (2020-12-19)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0111-2020-12-04">0.11.1 (2020-12-04)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0110-2020-12-03">0.11.0 (2020-12-03)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0103-2020-11-27">0.10.3 (2020-11-27)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0102-2020-11-27">0.10.2 (2020-11-27)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0101-2020-11-27">0.10.1 (2020-11-27)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#0100-2020-11-27">0.10.0 (2020-11-27)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#090-2020-11-20">0.9.0 (2020-11-20)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#080-2020-09-09">0.8.0 (2020-09-09)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#073-2020-09-09">0.7.3 (2020-09-09)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#072-2020-09-08">0.7.2 (2020-09-08)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#071-2020-09-08">0.7.1 (2020-09-08)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#070-2020-09-08">0.7.0 (2020-09-08)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#060-2020-09-08">0.6.0 (2020-09-08)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#055-2020-09-05">0.5.5 (2020-09-05)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#054-2020-09-05">0.5.4 (2020-09-05)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#053-2020-09-05">0.5.3 (2020-09-05)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#052-2020-09-05">0.5.2 (2020-09-05)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#051-2020-09-05">0.5.1 (2020-09-05)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#050-2020-09-05">0.5.0 (2020-09-05)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#040-2020-09-04">0.4.0 (2020-09-04)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#030-2020-08-29">0.3.0 (2020-08-29)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#020-2020-08-29">0.2.0 (2020-08-29)</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../configuration/">Configuration</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../publishing-guide/">Publishing with Shut</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Shut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Changelog</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/NiklasRosenstein/shut/edit/master/docs/changelog.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="changelog">Changelog</h1>
+<h2 id="unreleased-no-release-date">Unreleased (no release date)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add <code>shut init</code> command group with initial <code>shut init mkdocs</code>
+  command</li>
+<li><strong>feature</strong>: add <code>documentation</code> job in GitHub Actions template</li>
+<li><strong>feature</strong>: ignore GitHub Actions template when checking package config in
+  GitHub Actions (this is mainly used when using an unreleased version of shut to
+  generate the action template or when needing to do quick modifications to the
+  action config without triggering the shut checks in CI).</li>
+</ul>
+</li>
+</ul>
+<h2 id="0190-2021-09-15">0.19.0 (2021-09-15)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>change</strong>: Changelog entry <code>fixes</code> is now optional</li>
+<li><strong>change</strong>: switch to Mako as a template engine from Jinja2</li>
+<li><strong>feature</strong>: add <code>$.templates</code> to <code>AbstractProjectModel</code> and the <code>github-
+  actions</code> template</li>
+<li><strong>change</strong>: <code>shut pkg new</code> now adds the <code>github-template</code> to the generated
+  <code>package.yml</code></li>
+<li><strong>change</strong>: remove template rendering capability of <code>pylint</code> test driver,
+  instead add <code>pylintrc</code> template plugin</li>
+</ul>
+</li>
+</ul>
+<h2 id="0182-2021-09-04">0.18.2 (2021-09-04)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: min <code>click</code> version must be <code>7.1</code> for <code>no_args_is_help</code> option, also
+  allow <code>8.x</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0181-2021-08-27">0.18.1 (2021-08-27)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix added in <code>0.18.0</code> for #33 is actually incorrect, the <code>command</code>
+  variable was needed when using the <code>_tempcopy()</code> feature. now it is fixed for
+  good (#33)</li>
+</ul>
+</li>
+</ul>
+<h2 id="0180-2021-08-26">0.18.0 (2021-08-26)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add <code>pylint</code> test driver</li>
+<li><strong>fix</strong>: the fix from <code>0.17.4</code> actually made the install cache not work at all
+  and just always install test requirements, now shut knows per driver selection
+  whether dependencies have been installed before or not</li>
+<li><strong>feature</strong>: test drivers are now loaded via the <code>shut.test_drivers</code> entrypoint,
+  allowing plugins to be registered from external packages</li>
+<li><strong>feature</strong>: <code>pylint</code> now comes with <code>.pylintrc</code> templates (only <code>shut</code> for now)
+  and can also render templates from HTTP(S) URLs</li>
+<li><strong>feature</strong>: Shut now recognizes lowercase readme/license files (#31)</li>
+<li><strong>fix</strong>: render <code>command</code> variable into <code>setup.py</code> only if package
+  <code>$.install.hooks</code> is used (#33)</li>
+</ul>
+</li>
+<li><strong>internal</strong><ul>
+<li><strong>feature</strong>: add <code>AbstractProjectModel.get_auxiliary_renderers()</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0174-2021-08-20">0.17.4 (2021-08-20)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix missing test-requirements installation with <code>shut mono|pkg test
+  --isolate</code> if the comand was run previously</li>
+</ul>
+</li>
+</ul>
+<h2 id="0173-2021-08-20">0.17.3 (2021-08-20)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: <code>shut mono|pkg test --isolate</code> no longer installs the main package in
+  develop mode</li>
+</ul>
+</li>
+</ul>
+<h2 id="0172-2021-08-14">0.17.2 (2021-08-14)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: <code>shut mono|pkg update --verify-tag ""</code> does not show an error when it
+  should</li>
+<li><strong>feature</strong>: <code>shut mono|pkg update --verify-tag</code> now accepts strings prefixed
+  with <code>refs/tags/</code> and strips that prefix (useful for GitHub Actions to use the
+  <code>$GITHUB_REF</code> variable)</li>
+<li><strong>fix</strong>: <code>shut pkg update --dry</code> option not respected</li>
+</ul>
+</li>
+</ul>
+<h2 id="0171-2021-08-13">0.17.1 (2021-08-13)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>change</strong>: dd <code>shut mono|pkg test -q,--quiet</code> option to quietly install test
+  requirements with Pip, changed default to not do silent installs</li>
+</ul>
+</li>
+</ul>
+<h2 id="0170-2021-08-13">0.17.0 (2021-08-13)</h2>
+<ul>
+<li><strong>api</strong><ul>
+<li><strong>feature</strong>: add <code>Package.get_source_directory()</code></li>
+</ul>
+</li>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add <code>shut pkg test --install/--no-install</code> which will default to
+  <code>--install</code> if the current Python installation (determined by the <code>PYTHON</code>
+  variable or falling back to just the <code>python</code> command) is a virtual env</li>
+<li><strong>feature</strong>: add support for a <code>mypy</code> test driver</li>
+<li><strong>feature</strong>: add <code>$.test-drivers</code> field in package model and deprecate <code>$.test-
+  driver</code> for it.</li>
+<li><strong>feature</strong>: add <code>shut mono test --install/--no-install</code> option (parallel to the
+  existing option for <code>shut pkg test</code>), without the flag test requirements are
+  only installed if Shut did not install the same requirements into the same
+  environment before</li>
+<li><strong>feature</strong>: make sure <code>$.test-requirements</code> are installed when running <code>shut
+  mono|pkg test</code> in addition to the test-driver requirements. Update some output
+  formatting of <code>shut mono|pkg test</code></li>
+<li><strong>fix</strong>: lines in <code>MANIFEST.in</code> outside the shut-specific block are not kept on
+  <code>shut pkg update</code> (fixed in <code>VirtualFiles.write_all()</code>)</li>
+<li><strong>fix</strong>: package <code>$.author</code> data can now be de-serialized from a mapping again
+  (as used to be possible before migrating to <code>databind.core^1.x</code></li>
+<li><strong>fix</strong>: fix printing of <code>Failed test details:</code> when there were no failures but
+  at least one skipped test case</li>
+<li><strong>feature</strong>: <code>pytest</code> driver now supports a <code>$.parallelism</code> option which
+  automatically pulls in <code>pytest-xdist</code> as a test requirement</li>
+<li><strong>feature</strong>: <code>shut mono|pkg bump --tag|--push|--dry</code> options now have short
+  versions <code>-t|-p|-d</code> respectively</li>
+</ul>
+</li>
+</ul>
+<h2 id="0161-2021-08-12">0.16.1 (2021-08-12)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: pass <code>filename</code> to databind deserializer when loading monorepo/package
+  configuration files</li>
+<li><strong>fix</strong>: Cannot run "pip install" without develop mode on package that inherits
+  monorepo license (#22)</li>
+</ul>
+</li>
+</ul>
+<h2 id="0160-2021-08-10">0.16.0 (2021-08-10)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix missing import for <code>typing.Dict</code> in <code>pytest</code> driver module, which
+  could in some Python versions result in a <code>NameError</code></li>
+<li><strong>change</strong>: add <code>extra_requires[test]</code> in generated <code>setup.py</code></li>
+<li><strong>fix</strong>: fix <code>setup.py</code> rendering for inherit license files (#21)</li>
+<li><strong>change</strong>: <code>_tempcopy()</code> function in <code>setup.py</code> now fails if the file cannot be
+  copied from the source file</li>
+</ul>
+</li>
+</ul>
+<h2 id="0151-2021-08-09">0.15.1 (2021-08-09)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add BSD2, BSD3, BSD4 and Apache2 license templates (@ndjeong)</li>
+</ul>
+</li>
+</ul>
+<h2 id="0150-2021-08-09">0.15.0 (2021-08-09)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add <code>shut mono|pkg status --json --include-config</code> options</li>
+</ul>
+</li>
+</ul>
+<h2 id="0143-2021-08-08">0.14.3 (2021-08-08)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix <code>VendoredRequirement._normpath()</code> which corrupted absolute paths on
+  Windows (e.g. <code>C:/path/to</code> would be converted to <code>./C:\path\to</code> when it should
+  just be <code>C:\path\to</code>). This caused <code>shut pkg install</code> on Windows to fail.</li>
+<li><strong>fix</strong>: <code>No module named setuptools</code> error when using <code>shut pkg install</code> in
+  venv on Windows (#16)</li>
+<li><strong>fix</strong>: fix additional CR in generated <code>LICENSE.txt</code> on Windows when installing
+  Shut from source (#17)</li>
+<li><strong>fix</strong>: <code>py.typed</code> file is rendered into <code>MANIFEST.in</code> with backslashes</li>
+</ul>
+</li>
+</ul>
+<h2 id="0142-2021-08-03">0.14.2 (2021-08-03)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>change</strong>: update how install hooks are rendered into <code>setup.py</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0141-2021-07-23">0.14.1 (2021-07-23)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: <code>TypeError</code> when using --extra and --dev/--test</li>
+</ul>
+</li>
+</ul>
+<h2 id="0140-2021-07-22">0.14.0 (2021-07-22)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add <code>--dev/--no-dev</code> and <code>--test/--no-test</code> options to <code>shut mono
+  install</code> and <code>shut pkg install</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0133-2021-06-20">0.13.3 (2021-06-20)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: exclude python requirements when rendering <code>requirements.txt</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0132-2021-06-20">0.13.2 (2021-06-20)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix format of requirements in requirements.txt</li>
+</ul>
+</li>
+</ul>
+<h2 id="0131-2021-06-20">0.13.1 (2021-06-20)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: also install <code>PackageModel.test_requirements</code> on <code>shut pkg install</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0130-2021-06-20">0.13.0 (2021-06-20)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add <code>PackageModel.dev_requirements</code> which will be installed with
+  <code>shut pkg install</code></li>
+<li><strong>feature</strong>: add <code>PackageModel.render_requirements_txt</code> which will be rendered
+  with <code>shut pkg update</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0120-2021-06-08">0.12.0 (2021-06-08)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>change</strong>: allow running Shut via <code>python -m shut</code></li>
+<li><strong>fix</strong>: fix call to <code>run_install()</code> in <code>shut mono install</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0114-2021-02-01">0.11.4 (2021-02-01)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: <code>shut pkg install</code> now correctly installs transitive package
+  interdependencies in the right order</li>
+</ul>
+</li>
+</ul>
+<h2 id="0113-2021-01-29">0.11.3 (2021-01-29)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix error rendering <code>setup.py</code> if the license file did not exist</li>
+<li><strong>feature</strong>: add <code>get-version</code> command to <code>shut mono</code> and <code>shut pkg</code></li>
+<li><strong>fix</strong>: <code>shut pkg requirements add</code> now adds the InstallConfiguration pip args</li>
+</ul>
+</li>
+</ul>
+<h2 id="0112-2020-12-19">0.11.2 (2020-12-19)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix license_file relative path generation in setuptools renderer, now
+  correctly inherits the license file from the monorepo</li>
+</ul>
+</li>
+</ul>
+<h2 id="0111-2020-12-04">0.11.1 (2020-12-04)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix error in <code>setuptools</code> renderer if no license is configured in the
+  package</li>
+</ul>
+</li>
+</ul>
+<h2 id="0110-2020-12-03">0.11.0 (2020-12-03)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: add <code>$.package-data</code> field to <code>package.yml</code></li>
+<li><strong>fix</strong>: add missing package data that needs to be packaged with <code>shut</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="0103-2020-11-27">0.10.3 (2020-11-27)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: referencing a LICENSE or README outside the package directory now does
+  not fail on install if the source file does not exist, but it will print a
+  warning</li>
+</ul>
+</li>
+</ul>
+<h2 id="0102-2020-11-27">0.10.2 (2020-11-27)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: add <code>PackageModel.license_file</code> and fix license rendering into
+  MANIFEST.in and setup.py</li>
+</ul>
+</li>
+</ul>
+<h2 id="0101-2020-11-27">0.10.1 (2020-11-27)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: remove debug print in "package-url" check</li>
+</ul>
+</li>
+</ul>
+<h2 id="0100-2020-11-27">0.10.0 (2020-11-27)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>feature</strong>: packages now inherit the monorepos license if it is unset (using
+  PackageModel.get_license())</li>
+<li><strong>feature</strong>: If a package inherits the monoreop license, the LICENSE file will
+  not be replicated in the package directory but instead be copied from the
+  monorepo (using <code>_tempcopy()</code> in <code>setup.py</code>)</li>
+<li><strong>feature</strong>: <code>shut {mono,pkg} update</code> commands now produce a LICENSE.txt file if
+  a license template exists for the specified license (currently only <code>MIT</code>)</li>
+<li><strong>feature</strong>: packages now inherit the monorepo <code>author</code> and <code>url</code>, and <code>version</code>
+  if <code>release.single_version == True</code></li>
+<li><strong>feature</strong>: add "shut pkg format" command</li>
+<li><strong>feature</strong>: package <code>author</code> and <code>url</code> are now inherited from the monorepo</li>
+</ul>
+</li>
+</ul>
+<h2 id="090-2020-11-20">0.9.0 (2020-11-20)</h2>
+<ul>
+<li><strong>checks</strong><ul>
+<li><strong>feature</strong>: Add check for namespace files</li>
+</ul>
+</li>
+<li><strong>cli</strong><ul>
+<li><strong>fix</strong>: Fix <code>shut mono bump</code> not updating requirements in package <code>setup.py</code> if
+  packages have inter dependencies (#7)</li>
+<li><strong>feature</strong>: <code>shut pkg install</code> now supports <code>$.install.index-url</code> and
+  <code>$.install.extra-index-urls</code>, added a <code>--pipx</code> option</li>
+</ul>
+</li>
+<li><strong>general</strong><ul>
+<li><strong>fix</strong>: fix order of dependencies in the same mono repository when using <code>shut
+  pkg install</code></li>
+</ul>
+</li>
+<li><strong>shut.model.package</strong><ul>
+<li><strong>feature</strong>: Add <code>$.install.index-url</code> and <code>$.install.extra-index-urls</code> fields</li>
+</ul>
+</li>
+</ul>
+<h2 id="080-2020-09-09">0.8.0 (2020-09-09)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>feature</strong>: Add <code>shut ... test --keep-test-env</code> option</li>
+<li><strong>feature</strong>: Support skipped tests <code>shut ... test</code> output</li>
+</ul>
+</li>
+<li><strong>shut.test.base</strong><ul>
+<li><strong>feature</strong>: Add <code>TestStatus.SKIPPED</code> enumeration value</li>
+</ul>
+</li>
+<li><strong>shut.test.pytest</strong><ul>
+<li><strong>fix</strong>: Support skipped tests instead of failing ungracefully</li>
+</ul>
+</li>
+</ul>
+<h2 id="073-2020-09-09">0.7.3 (2020-09-09)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>fix</strong>: Fix <code>AttributeError</code> when running <code>shut mono bump --snapshot</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="072-2020-09-08">0.7.2 (2020-09-08)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>fix</strong>: Fix <code>shut pkg install</code> command</li>
+</ul>
+</li>
+</ul>
+<h2 id="071-2020-09-08">0.7.1 (2020-09-08)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>fix</strong>: <code>shut mono install</code> now uses topological order to retrieve package
+  requirements</li>
+</ul>
+</li>
+<li><strong>shore.models.monorepo</strong><ul>
+<li><strong>feature</strong>: Add <code>Monorepo.get_inter_dependencies_graph()</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="070-2020-09-08">0.7.0 (2020-09-08)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>change</strong>: Removed <code>-a,--all</code> flag from <code>shut mono update</code>, the command now
+  always behaves like that flag is set</li>
+<li><strong>feature</strong>: Add <code>shut mono update</code> flags <code>--verify</code> and <code>--verify-tag</code></li>
+<li><strong>feature</strong>: Add <code>shut mono install</code> command</li>
+</ul>
+</li>
+<li><strong>shut.renderers.setuptools</strong><ul>
+<li><strong>fix</strong>: Fix rendering of <code>extras_require</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="060-2020-09-08">0.6.0 (2020-09-08)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>feature</strong>: <code>shut ... bump</code> command without version argument or bump mode
+  option will determine the bump mode from the unreleased changelog</li>
+<li><strong>change</strong>: <code>shut pkg build</code> and <code>shut pkg publish</code> will now error if the
+  package uses vendored requirements</li>
+<li><strong>feature</strong>: <code>shut pkg requirements add</code> now supports adding vendored
+  requirements using the <code>-v,--vendor</code> option</li>
+<li><strong>feature</strong>: Add <code>--verify</code> option to <code>shut pkg update</code></li>
+<li><strong>feature</strong>: <code>shut pkg install</code> now supports installing vendored requirements</li>
+<li><strong>feature</strong>: <code>shut pkg bump</code> now prevents bumping if managed files are outdated</li>
+<li><strong>fix</strong>: <code>shut pkg bump</code> now prevents bumping if package version is managed by a
+  monorepo single-version (as was previously already expected to happen)</li>
+<li><strong>improvement</strong>: <code>shut mono bump</code> now includes the packages in the mono repo if
+  <code>$.release.single-version</code> is enabled</li>
+<li><strong>feature</strong>: Add <code>shut mono publish</code> command which delegates to <code>shut pkg
+  publish</code>.</li>
+</ul>
+</li>
+<li><strong>shore.model</strong><ul>
+<li><strong>improvement</strong>: <code>dump()</code> method now uses <code>nr.fs.atomic_file</code> to ensure the
+  original file contents are not modified if the dump operation fails</li>
+</ul>
+</li>
+<li><strong>shore.model.requirements</strong><ul>
+<li><strong>change</strong>: Add <code>BaseRequirement</code> and <code>VendoredRequirement</code> classes, require
+  databind.core and databind.json ^0.4.0 for the <code>@datamodel(serialize_as)</code>
+  feature</li>
+</ul>
+</li>
+<li><strong>shut.changelog</strong><ul>
+<li><strong>feature</strong>: Add <code>breaking_change</code> Changelog type</li>
+</ul>
+</li>
+<li><strong>shut.checkers</strong><ul>
+<li><strong>change</strong>: Change Checkers interface (remove <code>project</code> argument)</li>
+</ul>
+</li>
+<li><strong>shut.checkers.monorepo</strong><ul>
+<li><strong>change</strong>: remove <code>bad-package-directory</code> check again, having a package name
+  differ from the directory name is a valid use case</li>
+</ul>
+</li>
+<li><strong>shut.checkers.package</strong><ul>
+<li><strong>feature</strong>: Add <code>up to date</code> check for packages</li>
+</ul>
+</li>
+<li><strong>shut.model.package</strong><ul>
+<li><strong>feature</strong>: <code>Package.requirements</code> and related properties are now of type
+  <code>BaseRequirement</code>, allowing the use of <code>VendoredRequirement</code>s</li>
+<li><strong>change</strong>: Use new <code>RequirementsList</code> class instead of <code>List[BaseRequirement]</code></li>
+</ul>
+</li>
+<li><strong>shut.model.requirements</strong><ul>
+<li><strong>feature</strong>: <code>Requirement</code> now supports package extras</li>
+</ul>
+</li>
+<li><strong>shut.publishers.warehouse</strong><ul>
+<li><strong>change</strong>: The <code>WarehouseProvider</code> now uses the new
+  <code>PackageModel.get_publish_conf()</code> instead of <code>PackageModel.publish</code> directly,
+  allowing packages to inherit the publish configuration of the mono repository</li>
+</ul>
+</li>
+<li><strong>shut.renderers.setuptools</strong><ul>
+<li><strong>fix</strong>: Fix error when package author was not set</li>
+</ul>
+</li>
+</ul>
+<h2 id="055-2020-09-05">0.5.5 (2020-09-05)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>improvement</strong>: <code>shut mono test</code> now prints a summary of the status for every
+  tested package</li>
+</ul>
+</li>
+<li><strong>shut.test.pytest</strong><ul>
+<li><strong>change</strong>: set altname for <code>PytestDriver.report_file</code> to <code>report-file</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="054-2020-09-05">0.5.4 (2020-09-05)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>feature</strong>: Add <code>shut mono test --only</code> option</li>
+</ul>
+</li>
+<li><strong>shut.test.pytest</strong><ul>
+<li><strong>change</strong>: <code>PytestDriver.args</code> option now defaults to <code>["-vv"]</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="053-2020-09-05">0.5.3 (2020-09-05)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>feature</strong>: Support <code>VIRTUALENV</code> and <code>PIP</code> environment variables in <code>shut pkg
+  test</code> and <code>shut mono test</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="052-2020-09-05">0.5.2 (2020-09-05)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>feature</strong>: add <code>--checks/--no-checks</code> toggle to <code>shut pkg</code> and <code>shut mono</code>
+  commands</li>
+</ul>
+</li>
+<li><strong>shut.test.pytest</strong><ul>
+<li><strong>fix</strong>: Fix parsing of Pytest JSON record for test functions from a
+  <code>unittest.TestCase</code> subclass</li>
+</ul>
+</li>
+</ul>
+<h2 id="051-2020-09-05">0.5.1 (2020-09-05)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>fix</strong>: fix running "shut pkg install" from inside "shut pkg test --isolate"
+  call</li>
+</ul>
+</li>
+</ul>
+<h2 id="050-2020-09-05">0.5.0 (2020-09-05)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>change</strong>: <code>shut mono bump</code> and <code>shut pkg bump</code> no longer run checks, the
+  command group already does it</li>
+<li><strong>feature</strong>: add <code>shut pkg test</code> command which and <code>PackageModel.test_driver</code>
+  configuration, the <code>shore.test</code> sub-package implements test drivers (currently
+  just <code>pytest</code>)</li>
+<li><strong>feature</strong>: add <code>shut mono test</code> command</li>
+</ul>
+</li>
+<li><strong>shore.checkers.package</strong><ul>
+<li><strong>change</strong>: <code>package-author</code> check is now an error level check</li>
+</ul>
+</li>
+<li><strong>shut.model.package</strong><ul>
+<li><strong>change</strong>: Remove <code>PackageData</code> class, merge it's members into <code>PackageModel</code>
+  (this does not change the interface of <code>PackageModel</code>), Removed
+  <code>PackageModel.data</code> property</li>
+</ul>
+</li>
+<li><strong>shut.renderers.setuptools</strong><ul>
+<li><strong>fix</strong>: fix rendering of <code>python_requires</code> option in <code>setup.py</code> if package is
+  universal (i.e. the <code>python</code> requirement uses an OR (|) which we cannot
+  currently translate to setuptools correctly)</li>
+</ul>
+</li>
+<li><strong>tests</strong><ul>
+<li><strong>fix</strong>: fix unit tests</li>
+</ul>
+</li>
+</ul>
+<h2 id="040-2020-09-04">0.4.0 (2020-09-04)</h2>
+<ul>
+<li><strong>cli</strong><ul>
+<li><strong>change</strong>: Updated temrinal output of <code>shut ... checks</code></li>
+<li><strong>improvement</strong>: <code>shut pkg checks</code> now inherits checks from the Monorepo if the
+  check result targets the package directly (e.g. the <code>bad-package-directory</code>
+  check)</li>
+<li><strong>change</strong>: <code>shut pkg</code> and <code>shut mono</code> commands will now print failed checks to
+  stderr before executing the requested subcommand.</li>
+<li><strong>change</strong>: no longer set <code>PYTHONWARNINGS</code> environment variable</li>
+<li><strong>feature</strong>: add <code>shut pkg install</code> command</li>
+</ul>
+</li>
+<li><strong>shut.checkers.core</strong><ul>
+<li><strong>improvement</strong>: Add <code>CheckResult.subject</code> member (default: <code>None</code>)</li>
+</ul>
+</li>
+<li><strong>shut.checkers.generic</strong><ul>
+<li><strong>improvement</strong>: <code>unknown-config-options</code> check no longer shows if it passes</li>
+<li><strong>improvement</strong>: rename <code>unknown-config</code> check to <code>unknown-config-options</code></li>
+</ul>
+</li>
+<li><strong>shut.checkers.monorepo</strong><ul>
+<li><strong>improvement</strong>: Add <code>bad-package-directory</code> check to Monorepo checker</li>
+<li><strong>improvement</strong>: include error message in <code>invalid-package</code> check result</li>
+</ul>
+</li>
+<li><strong>shut.model.monorepo</strong><ul>
+<li><strong>change</strong>: add <code>Monorepo.get_inter_dependencies_for()</code> method</li>
+</ul>
+</li>
+<li><strong>shut.model.package</strong><ul>
+<li><strong>change</strong>: Add <code>PackageError</code> exception class</li>
+</ul>
+</li>
+</ul>
+<h2 id="030-2020-08-29">0.3.0 (2020-08-29)</h2>
+<ul>
+<li><strong>general</strong><ul>
+<li><strong>improvement</strong>: update Changelog typing for databind</li>
+<li><strong>improvement</strong>: update paths printed in <code>shut ... bump</code> when changelog is
+  released</li>
+</ul>
+</li>
+</ul>
+<h2 id="020-2020-08-29">0.2.0 (2020-08-29)</h2>
+<ul>
+<li><strong>docs</strong><ul>
+<li><strong>fix</strong>: fix README example</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../configuration/" class="btn btn-neutral float-right" title="Configuration">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Welcome to Shut"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/NiklasRosenstein/shut/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../configuration/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
