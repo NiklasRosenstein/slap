@@ -1,6 +1,7 @@
 
 import dataclasses
 import re
+import os
 import subprocess as sp
 import typing as t
 from pathlib import Path
@@ -50,7 +51,7 @@ def detect_branch_in_action_config(filename: Path) -> str:
   when the action already exists to work around https://github.com/NiklasRosenstein/shut/issues/40/.
   """
 
-  with open(filename) as fp:
+  with open(filename, encoding='utf8') as fp:
     config = yaml.safe_load(fp)
 
   # True because "on" is interpreted as a boolean in YAML, even if it's a key..?
@@ -99,10 +100,20 @@ class GithubActionsTemplate(Renderer):
   # Whether to do isolated unit tests. Defaults to #True.
   isolated_unit_testing: Annotated[bool, alias('isolated-unit-testing')] = True
 
+  #: Generate a job to generate documentation with MkDocs and publish it to gh-pages.
+  #: If not specified, will check if there's a `docs` folder in the project.
+  #:
+  #: TODO (@NiklasRosenstein): The template is currently a but too opinionated about using
+  #:  mkdocs and where and how to generate the `changelog.md`.
+  docs: t.Optional[bool] = False
+
   def get_files(self, files: VirtualFiles, obj: T_AbstractProjectModel) -> None:
     # TODO (@NiklasRosenstein): Supporting a mono repo shouldn't be a lot more effort.
     if not isinstance(obj, PackageModel):
       raise RuntimeError(f'github-template can only be used in package.yml')
+
+    if os.getenv('IGNORE_GITHUB_ACTIONS_TEMPLATE') == 'true':
+      return
 
     workflow_filename = self.workflow_filename or (
       re.sub(r'[^\d\w]+', '-', self.workflow_name).strip('-').lower() + '.yml')
@@ -122,6 +133,8 @@ class GithubActionsTemplate(Renderer):
         raise RuntimeError(f'no python_versions specified')
       python_versions = self.python_versions
 
+    docs = True if self.docs else (Path(obj.get_directory()) / 'docs').exists()
+
     template_string = load_string('templates/github-action.yml')
     context_vars: t.Dict[str, t.Union[bool, str, t.List[str]]] = {
       'workflow_name': self.workflow_name,
@@ -132,6 +145,7 @@ class GithubActionsTemplate(Renderer):
       'python_versions': python_versions,
       'isolated_unit_testing': self.isolated_unit_testing,
       'shut_req': '.' if obj.name == 'shut' else f'shut=={__version__}',
+      'docs': docs,
     }
 
     files.add_dynamic(

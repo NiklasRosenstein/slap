@@ -2,3 +2,12 @@ changes:
 - type: feature
   component: general
   description: add `shut init` command group with initial `shut init mkdocs` command
+- type: feature
+  component: general
+  description: add `documentation` job in GitHub Actions template
+- type: feature
+  component: general
+  description: ignore GitHub Actions template when checking package config in GitHub
+    Actions (this is mainly used when using an unreleased version of shut to generate
+    the action template or when needing to do quick modifications to the action config
+    without triggering the shut checks in CI).
