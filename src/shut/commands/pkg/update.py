@@ -26,11 +26,10 @@ import click
 from termcolor import colored
 
 from shut.commands import project
-from shut.commands.commons.new import write_files
 from shut.model import AbstractProjectModel
 from shut.model.package import PackageModel
 from shut.renderers import get_files
-from shut.utils.io.virtual import VirtualFiles
+from shut.utils.io.virtual import TerminalWriteCallbacks, VirtualFiles
 from . import pkg
 
 _VERIFY_TAG_HELP = ('Parse the version number from the specified tag and '
@@ -77,7 +76,9 @@ def update_package(
     sys.exit(result)
 
   if not verify:
-    write_files(files, package.get_directory(), force=True, dry=dry, indent=indent)
+    callbacks = TerminalWriteCallbacks(prefix='  ' * indent)
+    files.write_all(package.get_directory(), callbacks=callbacks, overwrite=True, dry=dry)
+
   return files
 
 

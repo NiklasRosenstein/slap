@@ -19,10 +19,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+import abc
 import contextlib
 import io
+import nr.fs  # type: ignore
 import os
 from typing import TYPE_CHECKING, Any, BinaryIO, Callable, ContextManager, IO, Iterable, Optional, Set, TextIO, Union, cast, overload
+
+from termcolor import colored
 from typing_extensions import Literal, Protocol
 
 
@@ -116,6 +120,7 @@ class VirtualFiles:
       raise ValueError(f'encoding and text=False are not compatible')
 
     self._files.append({
+      'type': 'render',
       'filename': filename,
       'render_func': render_func,
       'text': text,
@@ -126,8 +131,7 @@ class VirtualFiles:
   def write_all(
     self,
     parent_directory: str = None,
-    on_write: Callable = None,
-    on_skip: Callable = None,
+    callbacks: Optional['WriteCallbacks'] = None,
     overwrite: bool = False,
     create_directories: bool = True,
     dry: bool = False,
@@ -144,12 +148,18 @@ class VirtualFiles:
     for file_, filename in zip(self._files, self.abspaths(parent_directory)):
       exists = os.path.isfile(filename)
       if exists and not overwrite:
-        if on_skip:
-          on_skip(filename)
+        if callbacks:
+          callbacks.on_skip(filename)
         continue
-      if on_write:
-        on_write(filename)
+      if callbacks:
+        if file_['type'] == 'symlink':
+          callbacks.on_symlink(filename, file_['target'])
+        else:
+          callbacks.on_write(filename)
       if not dry:
+        if file_['type'] == 'symlink':
+          os.symlink(file_['target'], filename)
+          continue
         mode = '' if file_['text'] else 'b'
         if create_directories:
           os.makedirs(os.path.dirname(filename) or '.', exist_ok=True)
@@ -197,3 +207,40 @@ class VirtualFiles:
 
     self.write_all(parent_directory, open_func=opener, overwrite=True, dry=False)
     return {os.path.relpath(f, parent_directory) for f in modified_files}
+
+
+class WriteCallbacks(abc.ABC):
+
+  @abc.abstractmethod
+  def on_skip(self, filename: str) -> None:
+    pass
+
+  @abc.abstractmethod
+  def on_write(self, filename: str) -> None:
+    pass
+
+  @abc.abstractmethod
+  def on_symlink(self, filename: str, source: str) -> None:
+    pass
+
+
+class TerminalWriteCallbacks(WriteCallbacks):
+
+  def __init__(self, relative_to: Optional[str] = None, prefix: str = '') -> None:
+    self._relative_to = relative_to
+    self._prefix = prefix
+
+  def _rel(self, fn: str) -> str:
+    path = os.path.relpath(fn, self._relative_to)
+    if nr.fs.issub(path):
+      return path
+    return fn
+
+  def on_skip(self, filename: str) -> None:
+    print(self._prefix + colored('skip ' + self._rel(filename), 'yellow'))
+
+  def on_write(self, filename: str) -> None:
+    print(self._prefix + colored('write ' + self._rel(filename), 'cyan'))
+
+  def on_symlink(self, filename: str, source: str) -> None:
+    print(self._prefix + colored('link ' + self._rel(filename) + ' to ' + source, 'cyan'))

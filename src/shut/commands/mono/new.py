@@ -28,7 +28,6 @@ from shut.commands.commons.new import (
   README_TEMPLATE,
   load_author_from_git,
   get_license_file_text,
-  write_files,
 )
 from shut.data import render_mako_template
 from shut.model import dump
@@ -36,7 +35,7 @@ from shut.model.author import Author
 from shut.model.monorepo import MonorepoModel
 from shut.model.release import MonorepoReleaseConfiguration
 from shut.model.version import Version
-from shut.utils.io.virtual import VirtualFiles
+from shut.utils.io.virtual import TerminalWriteCallbacks, VirtualFiles
 from . import mono
 
 
@@ -109,4 +108,5 @@ def new(
   files.add_dynamic('monorepo.' + suffix, lambda fp: dump(package_manifest, fp))
   if license:
     files.add_dynamic('LICENSE.txt', lambda fp: fp.write(get_license_file_text(license, template_vars)))
-  write_files(files, target_directory, force, dry)
+
+  files.write_all(target_directory, TerminalWriteCallbacks(), overwrite=force, dry=dry)

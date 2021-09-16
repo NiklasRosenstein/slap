@@ -28,7 +28,7 @@ from termcolor import colored
 
 from shut.model.author import Author
 from shut.utils.external.license import get_license_metadata, wrap_license_text
-from shut.utils.io.virtual import VirtualFiles
+from shut.utils.io.virtual import TerminalWriteCallbacks, VirtualFiles
 
 GITIGNORE_TEMPLATE = '''
 .venv*/
@@ -68,25 +68,3 @@ def get_license_file_text(license: str, template_vars: Dict[str, Any]) -> str:
   license_text = 'Copyright (c) {year} {author.name}\n\n'.format(**template_vars)
   license_text += wrap_license_text(get_license_metadata(license)['license_text'])
   return license_text
-
-
-def write_files(
-  files: VirtualFiles,
-  target_directory: str,
-  force: bool = False,
-  dry: bool = False,
-  indent: int = 0,
-):
-  def _rel(fn: str) -> str:
-    path = os.path.relpath(fn)
-    if nr.fs.issub(path):
-      return path
-    return fn
-  str_indent = '  ' * indent
-  files.write_all(
-    target_directory,
-    on_write=lambda fn: print(str_indent + colored('write ' + _rel(fn), 'cyan')),
-    on_skip=lambda fn: print(str_indent + colored('skip ' + _rel(fn), 'yellow')),
-    overwrite=force,
-    dry=dry,
-  )

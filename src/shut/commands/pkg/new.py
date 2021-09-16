@@ -27,7 +27,6 @@ import click
 from shut.commands.commons.new import (
   load_author_from_git,
   get_license_file_text,
-  write_files,
   GITIGNORE_TEMPLATE,
   README_TEMPLATE,
 )
@@ -38,7 +37,7 @@ from shut.model.package import PackageModel
 from shut.model.requirements import Requirement, RequirementsList, VersionSelector
 from shut.model.version import Version
 from shut.templates.github_actions import GithubActionsTemplate
-from shut.utils.io.virtual import VirtualFiles
+from shut.utils.io.virtual import TerminalWriteCallbacks, VirtualFiles
 from . import pkg
 
 INIT_TEMPLATE = '''
@@ -157,4 +156,4 @@ def new(
   if license:
     files.add_dynamic('LICENSE.txt', lambda fp: fp.write(get_license_file_text(license, template_vars)))
 
-  write_files(files, target_directory, force, dry)
+  files.write_all(target_directory, TerminalWriteCallbacks(), overwrite=force, dry=dry)

@@ -26,11 +26,10 @@ from typing import Optional
 import click
 
 from shut.commands import project
-from shut.commands.commons.new import write_files
 from shut.commands.pkg.update import verify_integrity, verify_tag, _VERIFY_TAG_HELP
 from shut.model import MonorepoModel
 from shut.renderers import get_files
-from shut.utils.io.virtual import VirtualFiles
+from shut.utils.io.virtual import TerminalWriteCallbacks, VirtualFiles
 from . import mono
 
 
@@ -58,7 +57,8 @@ def update_monorepo(
   if result != 0:
     sys.exit(result)
   if not verify:
-    write_files(files, monorepo.get_directory(), force=True, dry=dry, indent=indent)
+    callbacks = TerminalWriteCallbacks(prefix='  ' * indent)
+    files.write_all(monorepo.get_directory(), callbacks=callbacks, overwrite=True, dry=dry)
   return files
 
 
