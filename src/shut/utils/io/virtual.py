@@ -51,6 +51,17 @@ class VirtualFiles:
         item['filename'] = os.path.join(prefix, item['filename'])
       self._files.append(item)
 
+  def add_symlink(self, filename: str, target: str) -> None:
+    """
+    Register a symlink for creation. The *target* should be a relative path.
+    """
+
+    self._files.append({
+      'type': 'symlink',
+      'filename': filename,
+      'target': target,
+    })
+
   def add_static(self, filename: str, content: Union[str, bytes], encoding: Optional[str] = None) -> None:
     """
     Stage static content for rendering into a file with the given *filename*. If the content is text,
