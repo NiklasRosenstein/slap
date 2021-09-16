@@ -1,0 +1,4 @@
+changes:
+- type: feature
+  component: general
+  description: add `shut init` command group with initial `shut init mkdocs` command
