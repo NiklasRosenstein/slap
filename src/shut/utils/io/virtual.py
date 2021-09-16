@@ -130,7 +130,7 @@ class VirtualFiles:
     """
 
     if encoding and not text:
-      raise ValueError(f'encoding and text=False are not compatible')
+      raise ValueError('encoding and text=False are not compatible')
 
     self._files.append({
       'type': 'render',
