@@ -53,7 +53,9 @@ class VirtualFiles:
 
   def add_symlink(self, filename: str, target: str) -> None:
     """
-    Register a symlink for creation. The *target* should be a relative path.
+    Register a symlink for creation. If *target* is a relative path, it will be linked relative to the
+    final path that *filename* is created in (see #write_all()). If it is absolute, a relative path will
+    be constructed for the final path of *filename*.
     """
 
     self._files.append({
@@ -157,6 +159,10 @@ class VirtualFiles:
       open_func = cast('OpenerFunc', open)
 
     for file_, filename in zip(self._files, self.abspaths(parent_directory)):
+      file_ = dict(file_)
+      if file_['type'] == 'symlink':
+        if os.path.isabs(file_['target']):
+          file_['target'] = os.path.relpath(file_['target'], os.path.dirname(os.path.abspath(filename)))
       exists = os.path.isfile(filename)
       if exists and not overwrite:
         if callbacks:
@@ -168,12 +174,12 @@ class VirtualFiles:
         else:
           callbacks.on_write(filename)
       if not dry:
+        if create_directories:
+          os.makedirs(os.path.dirname(filename) or '.', exist_ok=True)
         if file_['type'] == 'symlink':
           os.symlink(file_['target'], filename)
           continue
         mode = '' if file_['text'] else 'b'
-        if create_directories:
-          os.makedirs(os.path.dirname(filename) or '.', exist_ok=True)
         encoding_kwarg = {'encoding': file_['encoding']} if file_['encoding'] else {}
         if file_['inplace']:
           src: Optional[TextIO] = None

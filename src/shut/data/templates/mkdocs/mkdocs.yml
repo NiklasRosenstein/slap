@@ -1,0 +1,5 @@
+site_name: My Project
+repo_url: https://github.com/me/my-project
+docs_dir: src
+markdown_extensions: [ fenced_code ]
+theme: { name: readthedocs }

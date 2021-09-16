@@ -83,6 +83,7 @@ def shut(cwd, verbose, quiet, disable_warnings):
 from . import changelog
 from . import classifiers
 from . import conda_forge
+from . import init
 from . import license
 from . import mono
 from . import pkg
