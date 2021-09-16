@@ -11,3 +11,4 @@ changes:
     Actions (this is mainly used when using an unreleased version of shut to generate
     the action template or when needing to do quick modifications to the action config
     without triggering the shut checks in CI).
+release_date: '2021-09-16'
