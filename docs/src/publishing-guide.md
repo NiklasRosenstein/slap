@@ -20,7 +20,7 @@ publish:
       username: __token__
       password: '$PYPI_TOKEN'
       test_username: __token__
-      test_password: '$PYPI_TEST_TOKEN'
+      test_password: '$TESTPYPI_TOKEN'
 ```
 
 When you're ready to publish from the CI checks, make it run the following commands:
