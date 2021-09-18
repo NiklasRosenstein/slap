@@ -1,0 +1,4 @@
+changes:
+- type: feature
+  component: general
+  description: add `$.scripts` in `package.yml` and `shut pkg run` command

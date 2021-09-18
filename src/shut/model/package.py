@@ -119,6 +119,7 @@ class PackageModel(AbstractProjectModel):
   keywords: List[str] = field(default_factory=list)
   package_data: Annotated[List[Union[Include, Exclude]], A.alias('package-data')] = field(default_factory=list)
 
+  scripts: Dict[str, str] = field(default_factory=dict)
   install: InstallConfiguration = field(default_factory=InstallConfiguration)
   linter: LinterConfiguration = field(default_factory=LinterConfiguration)
   publish: PublishConfiguration = field(default_factory=PublishConfiguration)

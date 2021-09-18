@@ -57,6 +57,7 @@ from . import install
 from . import new
 from . import publish
 from . import requirements
+from . import run
 from . import status
 from . import test
 from . import update
