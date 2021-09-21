@@ -222,7 +222,7 @@ class VirtualFiles:
           if fp.getvalue() != src.read():
             modified_files.add(filename)
 
-    self.write_all(parent_directory, open_func=opener, overwrite=True, dry=False)
+    self.write_all(parent_directory, open_func=opener, overwrite=True, dry=False, create_directories=False)
     return {os.path.relpath(f, parent_directory) for f in modified_files}
 
 

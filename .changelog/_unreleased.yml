@@ -1,0 +1,5 @@
+changes:
+- type: fix
+  component: general
+  description: using `VirtualFiles.get_modified_files()` no longer creates non-existent
+    directories
