@@ -3,3 +3,7 @@ changes:
   component: general
   description: using `VirtualFiles.get_modified_files()` no longer creates non-existent
     directories
+- type: fix
+  component: general
+  description: 'catch malformed ref error when trying to determine main branch name
+    and use `develop` as default (see #40)'

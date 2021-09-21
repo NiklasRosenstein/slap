@@ -23,14 +23,19 @@ PYTHON_VERSIONS = ['3.4', '3.5', '3.6', '3.7', '3.8', '3.9']
 PYTHON_NIGHTLY = '3.x'
 
 
-def identify_main_branch(directory: str) -> str:
+def identify_main_branch(directory: str) -> t.Optional[str]:
   """
   Tries to identify the main branch of a repository by checking which branch the remote HEAD is pointing to.
   Returns the branch name without the remote (i.e. `develop` if Git returns `origin/develop`).
   """
 
   command = ['git', 'branch', '-r', '--points-at', 'refs/remotes/origin/HEAD']
-  output = sp.check_output(command, cwd=directory).decode()
+  try:
+    output = sp.check_output(command, cwd=directory, stderr=sp.PIPE).decode()
+  except sp.CalledProcessError as exc:
+    if b'malformed object name' in exc.stderr:
+      return None
+    raise
   line = next((l for l in output.splitlines() if '->' in l), None)
   if not line:
     raise RuntimeError(f'could not determine main branch of {directory!r}: {output!r}')
@@ -121,7 +126,7 @@ class GithubActionsTemplate(Renderer):
     full_path = Path(obj.get_directory()) / relative_path
 
     branch = self.branch or (detect_branch_in_action_config(full_path) if
-      full_path.exists() else identify_main_branch(obj.get_directory()))
+      full_path.exists() else identify_main_branch(obj.get_directory())) or 'develop'
 
     python_req = obj.get_python_requirement()
     if self.python_versions is None and python_req:
