@@ -7,3 +7,6 @@ changes:
   component: general
   description: 'catch malformed ref error when trying to determine main branch name
     and use `develop` as default (see #40)'
+- type: fix
+  component: general
+  description: '`$package.render-requirements-txt` is now handled correctly'

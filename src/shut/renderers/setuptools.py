@@ -457,7 +457,7 @@ class SetuptoolsRenderer(Renderer[PackageModel]):
     for url in package.install.extra_index_urls:
       fp.write('--extra-index-url %s\n' % url)
     for req in package.requirements:
-      if not (isinstance(req, Requirement) and req.package != 'python'):
+      if not (isinstance(req, Requirement) and req.package == 'python'):
         fp.write(req.to_setuptools() + '\n')
 
   # Renderer[PackageModel] Overrides
