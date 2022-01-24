@@ -1,0 +1,85 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+#
+# Poetry
+#
+
+[tool.poetry]
+name = "shut"
+version = "1.0.0a1"
+description = "Shut is a command-line utility for developing Python applications."
+authors = ["Niklas Rosenstein <rosensteinniklas@gmail.com>"]
+license = "MIT"
+readme = "readme.md"
+packages = [{ include="shut", from="src" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+"databind.core" = "^1.4.0"
+"databind.json" = "^1.4.0"
+"nr.util" = "^0.4.5"
+cleo = ">=1.0.0a4"
+poetry-core = "^1.1.0a6"
+PyYAML = "^6.0"
+requests = "^2.27.1"
+tomli = "^2.0.0"
+
+[tool.poetry.dev-dependencies]
+types-requests = "^2.27.7"
+types-PyYAML = "^6.0.3"
+pytest = "^6.2.5"
+mypy = "^0.931"
+pytest-coverage = "^0.0"
+pylint = "^2.12.2"
+
+[tool.poetry.scripts]
+shut = "shut.console.application:app"
+
+[tool.poetry.plugins."shut.plugins.application"]
+release-command = "shut.console.commands.release:ReleasePlugin"
+link-command = "shut.console.commands.link:LinkPlugin"
+
+#
+# Shut
+#
+
+[tool.shut.test]
+pytest = "pytest --cov=shut"
+mypy = "mypy"
+pylint = "pylint --fail-under=8.0"
+
+#
+# Pylint
+#
+
+[tool.pylint.MASTER]
+disable = """
+  attribute-defined-outside-init,
+  bad-continuation,
+  invalid-name,
+  missing-class-docstring,
+  missing-function-docstring,
+  missing-module-docstring,
+  no-init,
+  no-else-continue,
+  no-else-return,
+  too-few-public-methods,
+  unnecessary-lambda
+"""
+indent-string = '  '
+max-line-length = 120
+
+#
+# Mypy
+#
+
+[tool.mypy]
+pretty = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+show_error_context = true
+show_error_codes = true

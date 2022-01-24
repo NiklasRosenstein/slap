@@ -10,6 +10,7 @@ __Features__
 * Automate releases
 * Sanity check `pyproject.toml` configuration
 * Editable installs for Poetry managed packages
+* Run a set of commands as part of `shut test`
 
 ## Getting started
 
@@ -92,8 +93,8 @@ installs (as of Poetry 1.2.0a2 on 2022-01-14). This is a little helper command t
 `pyproject.toml` to be compatible with [Flit] and make use if it's symlink installation feature (`flit install -s`).
 
     $ shut link
-    # (TODO: Paste output here)
-
+    Extras to install for deps 'all': {'.none'}
+    Symlinking src/my_package -> /home/niklas/.local/venvs/craftr/lib/python3.10/site-packages/my_package
 
   [PEP 621]: https://www.python.org/dev/peps/pep-0621
   [Flit]: https://flit.readthedocs.io/en/latest/
@@ -114,6 +115,18 @@ Using `shut check`, your project configuration will be checked an the results wi
 * Is the `license` in `tool.poetry` a recommended SPDX Open Source License identifier
 * Is the package homepage and documentation URL specified
 * Are the changelog files in proper shape (i.e. can be decoded and are not missing required fields)
+* Does the source code appear to be typed but is missing a `py.typed` filed?
+
+### Run tests
+
+Configure the commands to run with `shut test` under the `tool.shut.test` table:
+
+```toml
+[tool.shut.test]
+pytest = "pytest --cov=shut"
+mypy = "mypy"
+pylint = "pylint --fail-under=8.0"
+```
 
 ---
 

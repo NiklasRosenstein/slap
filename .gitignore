@@ -4,6 +4,9 @@
 /dist
 /build
 __pycache__/
+poetry.lock
 
 # VSCode
 /.vscode
+
+/_old_shut
