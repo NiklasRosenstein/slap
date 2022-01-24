@@ -38,7 +38,7 @@ pylint = "^2.12.2"
 shut = "shut.console.application:app"
 
 [tool.poetry.plugins."shut.plugins.application"]
-release-command = "shut.console.commands.release:ReleasePlugin"
+release-command = "shut.console.commands.release:ReleaseCommandPlugin"
 link-command = "shut.console.commands.link:LinkPlugin"
 test-command = "shut.console.commands.test:TestPlugin"
 
@@ -47,7 +47,7 @@ test-command = "shut.console.commands.test:TestPlugin"
 #
 
 [tool.shut.test]
-mypy = "mypy src"
+mypy = "mypy src --namespace-packages"
 pylint = "pylint --fail-under=8.0 src/"
 pytest = "pytest --cov=shut tests/"
 

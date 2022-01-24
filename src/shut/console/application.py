@@ -2,7 +2,7 @@
 import typing as t
 from pathlib import Path
 
-from cleo.application import Application as _CleoApplication
+from cleo.application import Application as _CleoApplication  # type: ignore[import]
 from nr.util.plugins import load_plugins
 
 from shut import __version__
@@ -23,7 +23,7 @@ class Application:
   def load_plugins(self) -> None:
     """ Load all #ApplicationPlugin#s and activate them. """
 
-    for app in load_plugins(APPLICATION_PLUGIN_ENTRYPOINT, ApplicationPlugin):
+    for app in load_plugins(APPLICATION_PLUGIN_ENTRYPOINT, ApplicationPlugin):  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
       app.activate(self)
 
   def load_pyproject(self, force_reload: bool = False) -> dict[str, t.Any]:

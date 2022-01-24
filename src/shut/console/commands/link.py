@@ -5,10 +5,10 @@ import textwrap
 import typing as t
 from pathlib  import Path
 
-from flit.install import Installer
+from flit.install import Installer  # type: ignore[import]
 from nr.util.algorithm import longest_common_substring
 from nr.util.fs import atomic_swap
-from setuptools import find_namespace_packages
+from setuptools import find_namespace_packages  # type: ignore[import]
 
 from shut.console.command import Command, option
 from shut.console.application import Application
@@ -144,13 +144,15 @@ class LinkCommand(Command):
     if self.option('dump-pyproject'):
       import tomli_w
       print(tomli_w.dumps(config))
-      return
+      return 0
 
     with atomic_swap(PYPROJECT_TOML, 'w', always_revert=True) as fp:
       fp.close()
       self._save_pyproject(config)
       installer = Installer.from_ini_path(PYPROJECT_TOML, python=shutil.which(self.option("python")), symlink=True)
       installer.install()
+
+    return 0
 
 
 class LinkPlugin(ApplicationPlugin):

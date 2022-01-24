@@ -5,7 +5,7 @@ import typing as t
 from pathlib import Path
 
 if t.TYPE_CHECKING:
-  from cleo.io.io import IO
+  from shut.console.command import IO
 
 ENTRYPOINT = 'shut.plugins.release'
 
@@ -29,5 +29,5 @@ class ReleasePlugin(abc.ABC):
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:
     return []
 
-  def bump_to_version(self, target_version: str, dry: bool, io: 'IO') -> list[str]:
+  def bump_to_version(self, target_version: str, dry: bool, io: 'IO') -> t.Sequence[Path]:
     return []

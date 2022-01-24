@@ -11,17 +11,16 @@ import databind.json
 from databind.core.annotations import alias
 from nr.util.plugins import load_plugins
 
-from shut.console.command import Command, argument, option
+from shut.console.command import Command, IO, argument, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
 from shut.plugins.release_plugin import ReleasePlugin, VersionRef, ENTRYPOINT as RELEASE_PLUGIN_ENTRYPOINT
 
 if t.TYPE_CHECKING:
-  from cleo.io.io import IO
   from poetry.core.semver.version import Version
 
 
-def match_version_ref_pattern(filename: str, pattern: str) -> VersionRef:
+def match_version_ref_pattern(filename: Path, pattern: str) -> VersionRef:
   """ Matches a regular expression in the given file and returns the location of the match. The *pattern*
   should contain at least one capturing group. The first capturing group is considered the one that contains
   the version number exactly.
@@ -40,6 +39,8 @@ def match_version_ref_pattern(filename: str, pattern: str) -> VersionRef:
     match = compiled_pattern.search(fp.read())
     if match:
       return VersionRef(filename, match.start(1), match.end(1), match.group(1))
+
+  raise ValueError(f'pattern {pattern!r} does not match in file {filename!r}')
 
 
 @dataclasses.dataclass
@@ -95,7 +96,7 @@ class SourceCodeVersionMatcherPlugin(ReleasePlugin):
   FILENAMES = ['__init__.py', '__about__.py', '_version.py']
 
   #: The `tool.poetry.packages` configuration from `pyproject.toml`.
-  packages_conf: list[dict[str, dict[str, t.Any]]] | None = None
+  packages_conf: list[dict[str, t.Any]] | None = None
 
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:
     results = []
@@ -231,9 +232,9 @@ class ReleaseCommand(Command):
     """ Internal. Prints the version references to the terminal. """
 
     self.line(f'<b>version references:</b> {status_line}')
-    max_length = max(map(len, (ref.filename for ref in version_refs)))
+    max_length = max(len(str(ref.file)) for ref in version_refs)
     for ref in version_refs:
-      self.line(f'  <fg=cyan>{ref.filename.ljust(max_length)}</fg> {ref.value}')
+      self.line(f'  <fg=cyan>{str(ref.file).ljust(max_length)}</fg> {ref.value}')
 
   def _verify_version_refs(self, version_refs: list[VersionRef], version: str | None) -> int:
     """ Internal. Verifies the consistency of the given version references. This is used when `--verify` is set. """
@@ -272,13 +273,13 @@ class ReleaseCommand(Command):
       return False
     return True
 
-  def _check_clean_worktree(self, required_files: list[str]) -> None:
+  def _check_clean_worktree(self, required_files: list[Path]) -> bool:
     """ Internal. Checks that the Git work state is clean and that all the *required_files* are tracked in the repo. """
 
     if not self.is_git_repository or self.option("no-worktree-check"):
       return True
 
-    queried_files = {Path(f).resolve() for f in required_files}
+    queried_files = {f.resolve() for f in required_files}
     tracked_files = {Path(f).resolve() for f in self.git.get_files()}
     if (untracked_files := queried_files - tracked_files):
       self.line_error('error: some of the files with version references are not tracked by Git', 'error')
@@ -299,7 +300,7 @@ class ReleaseCommand(Command):
 
     return True
 
-  def _bump_version(self, version_refs: list[VersionRef], version: str, dry: bool) -> tuple[str, list[str]]:
+  def _bump_version(self, version_refs: list[VersionRef], version: str, dry: bool) -> tuple[str, list[Path]]:
     """ Internal. Replaces the version reference in all files with the specified *version*. """
 
     from nr.util import Stream
@@ -309,14 +310,14 @@ class ReleaseCommand(Command):
 
     current_version = Version.parse(self._get_raw_tool_config()['poetry']['version'])
     target_version = str(self._increment_version(current_version, version))
-    changed_files: list[str] = []
+    changed_files: list[Path] = []
 
-    for filename, refs in Stream(version_refs).groupby(lambda r: r.filename, lambda it: list(it)):
+    for filename, refs in Stream(version_refs).groupby(lambda r: r.file, lambda it: list(it)):
       if len(refs) == 1:
         ref = refs[0]
-        self.line(f'  <fg=cyan>{ref.filename}</fg>: {ref.value} → {target_version}')
+        self.line(f'  <fg=cyan>{ref.file}</fg>: {ref.value} → {target_version}')
       else:
-        self.line(f'  <fg=cyan>{ref.filename}</fg>:')
+        self.line(f'  <fg=cyan>{ref.file}</fg>:')
         for ref in refs:
           self.line(f'    {ref.value} → {target_version}')
 
@@ -336,14 +337,14 @@ class ReleaseCommand(Command):
     # Delegate to the plugins to perform any remaining changes.
     for plugin in self.plugins:
       try:
-        changed_files += plugin.bump_version(target_version, dry, self.io)
+        changed_files.extend(plugin.bump_to_version(target_version, dry, self.io))
       except:
         self.line_error(f'error with {type(plugin).__name__}.bump_version()', 'error')
         raise
 
     return target_version, changed_files
 
-  def _create_tag(self, target_version: str, changed_files: list[str], dry: bool, force: bool) -> str:
+  def _create_tag(self, target_version: str, changed_files: list[Path], dry: bool, force: bool) -> str:
     """ Internal. Used when --tag is specified to create a Git tag. """
 
     assert self.is_git_repository
@@ -358,7 +359,7 @@ class ReleaseCommand(Command):
 
     if not dry:
       commit_message = self.config.commit_message.replace('{version}', target_version)
-      self.git.add(changed_files)
+      self.git.add([str(f) for f in changed_files])
       self.git.commit(commit_message, allow_empty=True)
       self.git.tag(tag_name, force=force)
 
@@ -376,15 +377,10 @@ class ReleaseCommand(Command):
     if not dry:
       self.git.push(remote, branch, tag_name, force=force)
 
-  def _increment_version(self, version: str, rule: str) -> "Version":
+  def _increment_version(self, version: "Version", rule: str) -> "Version":
     """ Internal. Increment a version according to a rule. This is mostly copied from the Poetry `VersionCommand`. """
 
     from poetry.core.semver.version import Version
-
-    try:
-      version = Version.parse(version)
-    except ValueError:
-      raise ValueError("The project's version doesn't seem to follow semver")
 
     if rule in {"major", "premajor"}:
       new = version.next_major()
@@ -400,6 +396,7 @@ class ReleaseCommand(Command):
         new = new.first_prerelease()
     elif rule == "prerelease":
       if version.is_unstable():
+        assert version.pre
         new = Version(version.epoch, version.release, version.pre.next())
       else:
         new = version.next_patch().first_prerelease()
@@ -431,7 +428,7 @@ class ReleaseCommand(Command):
     if version is not None:
       if self.option("tag") and not self._check_on_release_branch():
         return 1
-      if self.option("tag") and not self._check_clean_worktree([x.filename for x in version_refs]):
+      if self.option("tag") and not self._check_clean_worktree([x.file for x in version_refs]):
         return 1
       if self.option("dry"):
         self.line('note: --dry mode enabled, no changes will be commited to disk', 'comment')
@@ -445,9 +442,12 @@ class ReleaseCommand(Command):
       self.line_error(
         '<error>error: no action implied, specify a <info>version</info> argument or the <info>--verify</info> option'
       )
+      return 1
+
+    return 0
 
 
-class ReleasePlugin(ApplicationPlugin):
+class ReleaseCommandPlugin(ApplicationPlugin):
 
   def activate(self, application: Application):
     application.cleo.add(ReleaseCommand())
