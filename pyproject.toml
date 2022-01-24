@@ -40,15 +40,16 @@ shut = "shut.console.application:app"
 [tool.poetry.plugins."shut.plugins.application"]
 release-command = "shut.console.commands.release:ReleasePlugin"
 link-command = "shut.console.commands.link:LinkPlugin"
+test-command = "shut.console.commands.test:TestPlugin"
 
 #
 # Shut
 #
 
 [tool.shut.test]
-pytest = "pytest --cov=shut"
-mypy = "mypy"
-pylint = "pylint --fail-under=8.0"
+mypy = "mypy src"
+pylint = "pylint --fail-under=8.0 src/"
+pytest = "pytest --cov=shut tests/"
 
 #
 # Pylint

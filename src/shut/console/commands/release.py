@@ -8,11 +8,10 @@ import typing as t
 from pathlib import Path
 
 import databind.json
-from cleo.commands.command import Command
-from cleo.helpers import argument, option
 from databind.core.annotations import alias
 from nr.util.plugins import load_plugins
 
+from shut.console.command import Command, argument, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
 from shut.plugins.release_plugin import ReleasePlugin, VersionRef, ENTRYPOINT as RELEASE_PLUGIN_ENTRYPOINT

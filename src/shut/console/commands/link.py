@@ -5,13 +5,12 @@ import textwrap
 import typing as t
 from pathlib  import Path
 
-from cleo.commands.command import Command
-from cleo.helpers import option
 from flit.install import Installer
 from nr.util.algorithm import longest_common_substring
 from nr.util.fs import atomic_swap
 from setuptools import find_namespace_packages
 
+from shut.console.command import Command, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
 
