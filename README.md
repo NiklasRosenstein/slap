@@ -1,121 +1,120 @@
-# Welcome to Shut
+# shut
 
-Shut is an opinionated tool to simplify publishing pure Python packages. 
+Shut is a command-line utility for developing Python applications. It works well with [Poetry][], but is using Poetry
 
-__What can Shut do for you?__
+is not required to make use of Shut.
 
-* Generate setup files (`setup.py`, `MANIFEST.in`, `LICENSE.txt`)
-* Sanity check your package configuration
-* Build and publish source/wheel distributions
-* Execute unit tests and static type checks
-* and more
+__Features__
 
-## Installation
+* Manage structured changelogs via the CLI
+* Automate releases
+* Sanity check `pyproject.toml` configuration
+* Editable installs for Poetry managed packages
 
-Shut requires Python 3.7+ and can be installed from PyPI:
+## Getting started
 
-    $ pip install shut
+### Installation
 
-## Quickstart
+It is recommended to install Shut via Pipx, but you can also install it with Pip directly.
 
-Initialize a new Python package:
+    $ pipx install shut
 
-    $ shut pkg new --name my.package .
-    write .gitignore
-    write README.md
-    write package.yml
-    write src/my/package/__init__.py
-    write src/my/__init__.py
+### Managing changelogs
 
-Generate setuptools files:
+The `shut log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
+but the directory can be changed using the `tool.shut.changelog-dir` option. The CLI allows you to add new entries
+as well as print them in a pretty format in the terminal or render the changelog as Markdown.
 
-    $ shut pkg update
-    write setup.py
-    write MANIFEST.in
+A changelog entry has a unique ID, one or more tags that categorize the type of change, one or more authors,
+a short description, maybe a link to a pull request and links to issues that are fixed by the change.
 
-Create a changelog entry and commit:
-
-    $ shut changelog --add feature --for cli -cm 'Added some useful options.'
-
-Sanity-check the package configuration:
-
-```
-shut pkg checks
-
-  ✔️   classifiers
-  ⚠️   license: not specified
-  ✔️   namespace files
-  ✔️   package-author
-  ⚠️   package-url: missing
-  ✔️   package-version
-  ✔️   readme
-  ✔️   up to date
-
-ran 8 checks for package my.package in 0.003s
+```toml
+$ shut log add -t fix,docs -m 'Fix the documentation' --fixes 231,234
+# Added changelog entry to .changelog/_unreleased.toml
+id = "d0092ba"
+tags = [ "fix", "docs" ]
+message = "Fix the documentation"
+fixes = [
+  "https://github.com/username/repo/issues/231",
+  "https://github.com/username/repo/issues/234",
+]
+pr = null
 ```
 
-Commit the current status:
+The `pr` value can be set manually once a PR was created, or be updated automatically for example through a GitHub
+action or other type of CI job (the `shut log inject-pr-url` command can help with that).
 
-```
-$ git add . && git commit -m 'bootstrapped package'
-```
+### Automating releases
 
-Release a new version:
+The `shut release` command is a much improved version to the `poetry version` command in that is can bump multiple
+references to the version number in the project. It can also be used to verify that the version number is consistent
+and matching a particular value in CI checks using the `--verify` option.
 
-```
-$ shut pkg bump --tag --push
+Shut currently reads the configuration from `tool.poetry`, but support for [PEP 621][]
+metadata is planned. It tries its best to detect the package source code roots, but if the automatic detection fails or
+cannot be detected from other existing configurations, the `tool.shut.packages` and `tool.shut.source-directory`
+options can be set explicitly.
 
-figuring bump mode from changelog
-  1 feature → minor
+The release process will also rename changelogs and insert the release date into changelogs created and managed with
+`shut log`.
 
-bumping 3 version reference(s)
-  package.yml: 0.0.0 → 0.1.0
-  setup.py: 0.0.0 → 0.1.0
-  src/my/package/__init__.py: 0.0.0 → 0.1.0
+    $ shut release patch --tag --push
+    bumping 2 version references:
+      pyproject.toml: 0.1.0 → 0.1.1
+      src/my_package/__init__.py: 0.1.0 → 0.1.1
 
-release staged changelog
-  .changelog/_unreleased.yml → .changelog/0.1.0.yml
+    release staged changelog
+      .changelog/_unreleased.toml → .changelog/0.1.0.toml
 
-updating files
-  write setup.py
-  write MANIFEST.in
+    tagging 0.1.1
+      [develop] ec1e9b3] release 0.1.0
+      3 files changed, 3 insertions(+), 4 deletions(-)
+      rename .changelog/{_unreleased.yml => 0.1.0.yml} (78%)
 
-tagging 0.1.0
-[master ec1e9b3] (my.package) bump version to 0.1.0
- 4 files changed, 4 insertions(+), 4 deletions(-)
- rename .changelog/{_unreleased.yml => 0.1.0.yml} (78%)
-Enumerating objects: 24, done.
-Counting objects: 100% (24/24), done.
-Delta compression using up to 8 threads
-Compressing objects: 100% (17/17), done.
-Writing objects: 100% (24/24), 3.87 KiB | 566.00 KiB/s, done.
-Total 24 (delta 4), reused 0 (delta 0)
-To https://github.com/me/my-package
- * [new branch]      master -> master
- * [new tag]         0.1.0 -> 0.1.0
-```
+    pushing develop, 0.1.1 to origin
+      Enumerating objects: 24, done.
+      Counting objects: 100% (24/24), done.
+      Delta compression using up to 8 threads
+      Compressing objects: 100% (17/17), done.
+      Writing objects: 100% (24/24), 3.87 KiB | 566.00 KiB/s, done.
+      Total 24 (delta 4), reused 0 (delta 0)
+      To https://github.com/username/repo
+      * [new branch]      develop -> develop
+      * [new tag]         0.1.1 -> 0.1.1
 
-Publish the release to PyPI:
+Additional version references can be configured using the `tool.shut.version-references` option or by installing a
+plugin that registers an entrypoint under `tool.shut.plugins.release`.
 
-```
-$ shut pkg publish warehouse:pypi
+### Editable installs
 
-building setuptools:sdist
-  :: build/my.package-0.1.0.tar.gz
+This is particularly interesting when managing the package with [Poetry][] as it does not currently support editable
+installs (as of Poetry 1.2.0a2 on 2022-01-14). This is a little helper command that will temporarily reorganize the
+`pyproject.toml` to be compatible with [Flit] and make use if it's symlink installation feature (`flit install -s`).
 
-building setuptools:wheel
-  :: build/my.package-0.1.0-py3-none-any.whl
+    $ shut link
+    # (TODO: Paste output here)
 
-publishing warehouse:pypi
-  :: build/my.package-0.1.0.tar.gz
-  :: build/my.package-0.1.0-py3-none-any.whl
-```
 
-Shut also makes it easy to publish from within CI jobs. For more information on this,
-check out the [Publishing Guide][0].
+  [PEP 621]: https://www.python.org/dev/peps/pep-0621
+  [Flit]: https://flit.readthedocs.io/en/latest/
+  [Poetry]: https://python-poetry.org/
 
-  [0]: publishing-guide.md
+
+### Sanity checks
+
+Using `shut check`, your project configuration will be checked an the results will be printed. Currently the checks include
+
+* Can Shut determine your package source code (for example `src/my_package`)
+* Can Shut detect the `__version__` in your package source code
+* Is the `readme` in `tool.poetry` configured correctly (does the file exist? does the project use a non-standard
+  readme filename that is not configured in Poetry?)
+* Are the package URLs configured correctly?
+* Is the `vcs-remote` option in `tool.shut` configured (recommended when using `shut log`)
+* Are the `classifiers` in `tool.poetry` standard classifiers
+* Is the `license` in `tool.poetry` a recommended SPDX Open Source License identifier
+* Is the package homepage and documentation URL specified
+* Are the changelog files in proper shape (i.e. can be decoded and are not missing required fields)
 
 ---
 
-<p align="center">Copyright &copy; 2021 Niklas Rosenstein</p>
+<p align="center">Copyright &copy; 2022 Niklas Rosenstein</p>
