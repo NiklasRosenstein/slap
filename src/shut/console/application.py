@@ -51,6 +51,10 @@ class Application:
       data = self._config_cache
     PYPROJECT_TOML.write_text(tomli_w.dumps(data))
 
+  @property
+  def config(self) -> dict[str, t.Any]:
+    return self.load_pyproject().get('tool', {}).get('shut', {})
+
   def __call__(self) -> None:
     self.load_plugins()
     self.cleo.run()

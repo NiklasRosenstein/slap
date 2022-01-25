@@ -68,10 +68,10 @@ class TestCommand(Command):
 
   def __init__(self, app: Application) -> None:
     super().__init__()
-    self.app = app
+    self._app = app
 
   def handle(self) -> int:
-    test_config = self.app.load_pyproject().get('tool', {}).get('shut', {}).get('test', {})
+    test_config = self._app.load_pyproject().get('tool', {}).get('shut', {}).get('test', {})
     if not test_config:
       self.line_error('error: no tests configured in <info>tool.shut.test</info>', 'error')
       return 1

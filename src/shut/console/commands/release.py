@@ -165,6 +165,10 @@ class ReleaseCommand(Command):
 
   # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
+  def __init__(self, app: Application):
+      super().__init__()
+      self._app = app
+
   def _validate_options(self) -> int:
     """ Internal. Ensures that the combination of provided options make sense. """
 
@@ -201,13 +205,12 @@ class ReleaseCommand(Command):
   def _get_raw_tool_config(self) -> dict[str, t.Any]:
     """ Internal. Get the raw `tool` config from the pyproject config. """
 
-    import tomli
-    return tomli.loads(Path('pyproject.toml').read_text()).get('tool', {})
+    return self._app.load_pyproject().get('tool', {})
 
   def _load_config(self) -> ReleaseConfig:
     """ Internal. Extracts the `tool.shut.release` config from the pyproject config. """
 
-    data = self._get_raw_tool_config().get('nr', {}).get('shut', {}).get('release', {})
+    data = self._app.config.get('release', {})
     return databind.json.load(data, ReleaseConfig)
 
   def _load_plugins(self) -> list[ReleasePlugin]:
@@ -450,5 +453,5 @@ class ReleaseCommand(Command):
 
 class ReleaseCommandPlugin(ApplicationPlugin):
 
-  def activate(self, application: Application):
-    application.cleo.add(ReleaseCommand())
+  def activate(self, app: Application):
+    app.cleo.add(ReleaseCommand(app))
