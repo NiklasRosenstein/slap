@@ -305,6 +305,7 @@ class ReleaseCommand(Command):
 
     from nr.util import Stream
     from shut.util.text import substitute_ranges
+    from poetry.core.semver.version import Version
 
     self.line(f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"}')
 
