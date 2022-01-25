@@ -1,12 +1,15 @@
 
 import typing as t
 
-from shut.console.command import Command, IO, argument, option
+from shut.console.command import Command, IO, argument
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
 
 
 class TestRunner:
+
+  _colors = ['blue', 'cyan', 'magenta', 'yellow']
+  _prev_color: t.ClassVar[str | None] = None
 
   def __init__(self, name: str, config: t.Any, io: IO) -> None:
     assert isinstance(config, str), type(config)
@@ -15,10 +18,24 @@ class TestRunner:
     self.io = io
 
   def run(self) -> int:
-    import subprocess as sp
+    from cleo.io.io import OutputType
+    from ptyprocess import PtyProcessUnicode
 
-    self.io.write_line(f'<comment>running test <b>{self.name}</b></comment>:')
-    return sp.call(self.config, shell=True)
+    color = self._colors[0]  if TestRunner._prev_color is None else self._colors[(self._colors.index(TestRunner._prev_color) + 1) % len(self._colors)]
+    TestRunner._prev_color = color
+
+    proc = PtyProcessUnicode.spawn(['bash', '-c', self.config])
+    while not proc.eof():
+      try:
+        line = proc.readline().rstrip()
+      except EOFError:
+        break
+      self.io.write(f'<fg={color}>{self.name}|</fg> ')
+      self.io.write(line + '\n', type=OutputType.NORMAL)
+
+    proc.wait()
+    assert proc.exitstatus is not None
+    return proc.exitstatus
 
 
 class TestCommand(Command):

@@ -25,6 +25,7 @@ poetry-core = "^1.1.0a6"
 PyYAML = "^6.0"
 requests = "^2.27.1"
 tomli = "^2.0.0"
+ptyprocess = "^0.7.0"
 
 [tool.poetry.dev-dependencies]
 types-requests = "^2.27.7"
