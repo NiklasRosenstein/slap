@@ -1,7 +1,9 @@
 
 import typing as t
 
-from shut.console.command import Command, IO, argument
+from nr.util.singleton import NotSet
+
+from shut.console.command import Command, IO, argument, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
 
@@ -11,11 +13,12 @@ class TestRunner:
   _colors = ['blue', 'cyan', 'magenta', 'yellow']
   _prev_color: t.ClassVar[str | None] = None
 
-  def __init__(self, name: str, config: t.Any, io: IO) -> None:
+  def __init__(self, name: str, config: t.Any, io: IO, line_prefixing: bool = True) -> None:
     assert isinstance(config, str), type(config)
     self.name = name
     self.config = config
     self.io = io
+    self.line_prefixing = line_prefixing
 
   def run(self) -> int:
     from cleo.io.io import OutputType  # type: ignore[import]
@@ -30,7 +33,8 @@ class TestRunner:
         line = proc.readline().rstrip()
       except EOFError:
         break
-      self.io.write(f'<fg={color}>{self.name}|</fg> ')
+      if self.line_prefixing:
+        self.io.write(f'<fg={color}>{self.name}|</fg> ')
       self.io.write(line + '\n', type=OutputType.NORMAL)
 
     proc.wait()
@@ -54,6 +58,11 @@ class TestCommand(Command):
   arguments = [
     argument("test", "One or more tests to run (runs all if none are specified)", optional=True, multiple=True),
   ]
+  options = [
+    option("no-line-prefix", "s", "Do not prefix output from the test commands with the test name (default if "
+      "a single argument for <info>test</info> is specified)."),
+  ]
+  options[0]._default = NotSet.Value  # Hack to set a default value for the flag
 
   def __init__(self, app: Application) -> None:
     super().__init__()
@@ -65,7 +74,11 @@ class TestCommand(Command):
       self.line_error('error: no tests configured in <info>tool.shut.test</info>', 'error')
       return 1
 
-    tests = tests if (tests := self.argument("test")) else sorted(test_config.keys())
+    tests: list[str] | None = self.argument("test")
+    if (no_line_prefix := self.option("no-line-prefix")) is NotSet.Value:
+      no_line_prefix = (tests is not None and len(tests) == 1)
+
+    tests = tests if tests else sorted(test_config.keys())
     if (unknown_tests := set(tests) - test_config.keys()):
       self.line_error(
         f'error: unknown test{"" if len(unknown_tests) == 1 else "s"} <b>{", ".join(unknown_tests)}</b>',
@@ -75,7 +88,7 @@ class TestCommand(Command):
 
     results = {}
     for test_name in tests:
-      results[test_name] = TestRunner(test_name, test_config[test_name], self.io).run()
+      results[test_name] = TestRunner(test_name, test_config[test_name], self.io, not no_line_prefix).run()
 
     if len(tests) > 1:
       self.line('\n<comment>test summary:</comment>')
