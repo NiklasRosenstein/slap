@@ -1,4 +1,5 @@
 
+import os
 import typing as t
 
 from nr.util.singleton import NotSet
@@ -27,7 +28,8 @@ class TestRunner:
     color = self._colors[0]  if TestRunner._prev_color is None else self._colors[(self._colors.index(TestRunner._prev_color) + 1) % len(self._colors)]
     TestRunner._prev_color = color
 
-    proc = PtyProcessUnicode.spawn(['bash', '-c', self.config])
+    cols, rows = os.get_terminal_size()
+    proc = PtyProcessUnicode.spawn(['bash', '-c', self.config], dimensions=(rows, cols))
     while not proc.eof():
       try:
         line = proc.readline().rstrip()

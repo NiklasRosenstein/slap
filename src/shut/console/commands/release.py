@@ -151,7 +151,7 @@ class ReleaseCommand(Command):
     option("remote", "r", "The Git remote to push to (only when <info>--push</info> is specified)", False),
     option("dry", "d", "Do not commit changes to disk."),
     option("force", "f", "Force tag creation and push."),
-    option("verify", None, "Instead of bumping the version, verify that all version references are consistent.\n"
+    option("validate", None, "Instead of bumping the version, validate that all version references are consistent.\n"
       "If the <info>version</info> argument is specified, all version references must match it.\n"),
     option("no-branch-check", None, "Do not validate the current Git branch matches the configured release branch."),
     option("no-worktree-check", None, "Do not check the worktree state."),
@@ -168,11 +168,11 @@ class ReleaseCommand(Command):
   def _validate_options(self) -> int:
     """ Internal. Ensures that the combination of provided options make sense. """
 
-    if self.option("dry") and self.option("verify"):
-      self.line_error('error: --dry cannot be combined with --verify', 'error')
+    if self.option("dry") and self.option("validate"):
+      self.line_error('error: --dry cannot be combined with --validate', 'error')
       return 1
-    if self.option("tag") and self.option("verify"):
-      self.line_error('error: --tag cannot be combined with --verify', 'error')
+    if self.option("tag") and self.option("validate"):
+      self.line_error('error: --tag cannot be combined with --validate', 'error')
       return 1
     if self.option("push") and not self.option("tag"):
       self.line_error('error: --push can only be combined with --tag', 'error')
@@ -236,8 +236,8 @@ class ReleaseCommand(Command):
     for ref in version_refs:
       self.line(f'  <fg=cyan>{str(ref.file).ljust(max_length)}</fg> {ref.value}')
 
-  def _verify_version_refs(self, version_refs: list[VersionRef], version: str | None) -> int:
-    """ Internal. Verifies the consistency of the given version references. This is used when `--verify` is set. """
+  def _validate_version_refs(self, version_refs: list[VersionRef], version: str | None) -> int:
+    """ Internal. Verifies the consistency of the given version references. This is used when `--validate` is set. """
 
     versions = set(ref.value for ref in version_refs)
     if len(versions) > 1:
@@ -423,8 +423,8 @@ class ReleaseCommand(Command):
     version_refs = Stream(plugin.get_version_refs(self.io) for plugin in self.plugins).concat().collect()
     version = self.argument("version")
 
-    if self.option("verify"):
-      return self._verify_version_refs(version_refs, version)
+    if self.option("validate"):
+      return self._validate_version_refs(version_refs, version)
 
     if version is not None:
       if self.option("tag") and not self._check_on_release_branch():
@@ -441,7 +441,7 @@ class ReleaseCommand(Command):
 
     else:
       self.line_error(
-        '<error>error: no action implied, specify a <info>version</info> argument or the <info>--verify</info> option'
+        '<error>error: no action implied, specify a <info>version</info> argument or the <info>--validate</info> option'
       )
       return 1
 
