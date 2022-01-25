@@ -18,8 +18,8 @@ class TestRunner:
     self.io = io
 
   def run(self) -> int:
-    from cleo.io.io import OutputType
-    from ptyprocess import PtyProcessUnicode
+    from cleo.io.io import OutputType  # type: ignore[import]
+    from ptyprocess import PtyProcessUnicode  # type: ignore[import]
 
     color = self._colors[0]  if TestRunner._prev_color is None else self._colors[(self._colors.index(TestRunner._prev_color) + 1) % len(self._colors)]
     TestRunner._prev_color = color
