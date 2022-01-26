@@ -31,10 +31,11 @@ class DefaultChecksPlugin(_CheckPlugin):
   def _check_detect_version(self, app: Application) -> Check:
     return Check('__version__', Check.Result.WARNING, 'Not implemented', None)
 
-  def _check_poetry_readme(self, app: Application, poetry: dict[str, t.Any]) -> Check | None:
+  def _check_poetry_readme(self, app: Application, poetry: dict[str, t.Any]) -> Check:
     check_name = 'poetry readme'
     default_readmes = ['README.md', 'README.rst']
-    detected_readme = Optional(app.get_readme_path().resolve().relative_to(Path.cwd())).map(str).or_else(None)
+    detected_readme = Optional(app.get_readme_path())\
+      .map(lambda p: str(p.resolve().relative_to(Path.cwd()))).or_else(None)
     poetry_readme = poetry.get('readme')
 
     if poetry_readme is None and detected_readme in default_readmes:
@@ -61,7 +62,7 @@ class DefaultChecksPlugin(_CheckPlugin):
   def _check_py_typed(self, app: Application) -> Check:
     ...
 
-  def get_checks(self, app: Application) -> list[Check]:
+  def get_checks(self, app: Application) -> t.Iterable[Check]:
     yield self._check_detect_packages(app)
     yield self._check_detect_version(app)
 
@@ -82,7 +83,7 @@ class CheckCommand(Command):
 
   def handle(self) -> int:
     error = False
-    for plugin in load_plugins(CHECK_PLUGIN_ENTRYPOINT, _CheckPlugin):
+    for plugin in load_plugins(CHECK_PLUGIN_ENTRYPOINT, _CheckPlugin):  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
       for check in plugin.get_checks(self.app):
         error = error or check.result != Check.Result.OK
         color = COLORS[check.result]

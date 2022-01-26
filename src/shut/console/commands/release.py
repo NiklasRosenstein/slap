@@ -212,7 +212,7 @@ class ReleaseCommand(Command):
   def _load_config(self) -> ReleaseConfig:
     """ Internal. Extracts the `tool.shut.release` config from the pyproject config. """
 
-    data = self._app.project_config.get('release', {})
+    data = self._app.project_config.extras.get('release', {})
     return databind.json.load(data, ReleaseConfig)
 
   def _load_plugins(self) -> list[_ReleasePlugin]:

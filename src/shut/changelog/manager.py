@@ -84,7 +84,7 @@ class ManagedChangelog:
       if self._content is None:
         raise RuntimeError(f'ManagedChangelog.content was not loaded and no "changelog" parameter was provided')
       changelog = self._content
-    self._manager._save(changelog, self.file)
+    self._manager._save(changelog, self.path)
 
   def release(self, version: str) -> None:
     """ Releases the changelog as the specified version. """
@@ -94,4 +94,4 @@ class ManagedChangelog:
 
     self.path = self._manager.directory / self._manager.VERSIONED.format(version=version)
     self.content.release_date = datetime.date.today()
-    self.save()
+    self.save(None)

@@ -32,13 +32,13 @@ class GithubRemotePlugin(RemotePlugin):
     return parts[-2], parts[-1]
 
   def validate_pull_request_url(self, url: str) -> bool:
-    return fnmatch.fnmatch(f'{self._get_base_url()}/pulls/*')
+    return fnmatch.fnmatch(url, f'{self._get_base_url()}/pulls/*')
 
   def get_pull_request_url_from_id(self, pr_id: str) -> str:
     return f'{self._get_base_url()}/pulls/{pr_id}'
 
   def validate_issue_url(self, url: str) -> bool:
-    return fnmatch.fnmatch(f'{self._get_base_url()}/issues/*')
+    return fnmatch.fnmatch(url, f'{self._get_base_url()}/issues/*')
 
   def get_issue_url_from_id(self, issue_id: str) -> str:
     return f'{self._get_base_url()}/issue/{issue_id}'

@@ -129,7 +129,7 @@ class LogAddCommand(BaseCommand):
       return 1
 
     print(config)
-
+    return 0
 
 
 class LogPrUpdateCommand(BaseCommand):

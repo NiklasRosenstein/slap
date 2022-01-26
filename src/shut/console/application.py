@@ -4,6 +4,7 @@ import typing as t
 from pathlib import Path
 
 from cleo.application import Application as _CleoApplication  # type: ignore[import]
+from nr.util import Optional
 from nr.util.algorithm.longest_common_substring import longest_common_substring
 from nr.util.plugins import load_plugins
 
@@ -86,8 +87,8 @@ class Application:
     if set, otherwise the `src/` directory or alternatively the project directory is used to detect the packages.
     """
 
-    if (directory := self.project_config.source_directory):
-      return directory, detect_packages(Path(directory))
+    if (directory := Optional(self.project_config.source_directory).map(Path).or_else(None)):
+      return Path(directory), detect_packages(Path(directory))
 
     for directory in [Path('src'), Path()]:
       packages = detect_packages(directory)
@@ -96,7 +97,7 @@ class Application:
 
     return directory, packages
 
-  def get_readme_path(self) -> Path:
+  def get_readme_path(self) -> Path | None:
     """ Tries to detect the project readme. If `tool.poetry.readme` is set, that file will be returned. """
 
     if (readme := self.load_pyproject().get('tool', {}).get('poetry', {}).get('readme')) and Path(readme).is_file():

@@ -1,7 +1,7 @@
 
 import dataclasses
 from pathlib import Path
-from setuptools import find_namespace_packages
+from setuptools import find_namespace_packages  # type: ignore[import]
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
 
@@ -29,6 +29,6 @@ def detect_packages(directory: Path) -> list[Package]:
     common = longest_common_substring(*(x.split('.') for x in modules), start_only=True)
     if not common:
       raise ValueError(f'no common root package modules: {modules}')
-    return '.'.join(common)
+    modules = ['.'.join(common)]
 
   return [Package(module, directory / Path(*module.split('/'))) for module in modules]
