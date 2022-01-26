@@ -2,20 +2,26 @@
 import dataclasses
 import typing as t
 
+from databind.core.annotations import alias
+
 from shut.changelog.manager import ChangelogManager
 from shut.console.command import Command, argument, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
 
+DEFAULT_CHANGELOG_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement']
+
 
 @dataclasses.dataclass
 class LogConfig:
   directory: str = '.changelog'
+  valid_types: t.Annotated[list[str], alias('valid-types')] = dataclasses.field(default_factory=lambda: list(DEFAULT_CHANGELOG_TYPES))
+
 
 
 def get_log_config(app: Application) -> LogConfig:
   import databind.json
-  return databind.json.load(app.config.get('log', {}), LogConfig)
+  return databind.json.load(app.project_config.extras.get('log', {}), LogConfig)
 
 
 class BaseCommand(Command):
@@ -26,7 +32,7 @@ class BaseCommand(Command):
 
   @property
   def config(self) -> LogConfig:
-    return get_log_config(self._app.config.get('log'))
+    return get_log_config(self._app)
 
 
 class LogAddCommand(BaseCommand):
@@ -65,6 +71,65 @@ class LogAddCommand(BaseCommand):
     The <fg=green>pr</fg> field is usually set manually after the PR is created or updated automatically by a CI
     action using the <info>shut log update-pr-field</info> command.
   """
+
+  options = [
+    option(
+      "type", "t",
+      f"The type of the changelog. Unless configured differently, one of {', '.join(DEFAULT_CHANGELOG_TYPES)}",
+      flag=False,
+    ),
+    option(
+      "description", "d",
+      "A Markdown formatted description of the changelog entry.",
+      flag=False,
+    ),
+    option(
+      "author", "a",
+      "Your username or email address. By default, this will be your configured Git name and email address.",
+      flag=False,
+    ),
+    option(
+      "pr", None,
+      "The pull request that the change is introduced to the main branch with. This is not usually "
+        "known at the time the changelog entry is created, so this option is not often used. If the remote "
+        "repository is well supported by Shut, a pull request number may be specified and converted to a full "
+        "URL by Shut, otherwise a full URL must be specified.",
+      flag=False,
+    ),
+    option(
+      "fixes", "f",
+      "An issue that the change fixes. If the remote repository is well supported by Shut, an issue number may "
+        "be specified and converted to a full URL by Shut, otherwise a full URL must be specified.",
+      flag=False,
+      multiple=True,
+    )
+  ]
+
+  def handle(self) -> int:
+    change_type: str | None = self.option("type")
+    description: str | None = self.option("description")
+    author: str | None = self.option("author")
+    pr: str | None = self.option("pr")
+    fixes: list[str] | None = self.option("fixes")
+
+    if not change_type:
+      self.line_error('error: missing --type,-t', 'error')
+      return 1
+    if not description:
+      self.line_error('error: missing --description,-d', 'error')
+      return 1
+    if not author:
+      self.line_error('error: missing --author,-a', 'error')
+      return 1
+
+    config = self.config
+
+    if change_type not in config.valid_types:
+      self.line_error(f'error: bad changelog type: <b>{change_type}</b>', 'error')
+      return 1
+
+    print(config)
+
 
 
 class LogPrUpdateCommand(BaseCommand):

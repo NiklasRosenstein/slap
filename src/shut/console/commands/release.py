@@ -14,7 +14,9 @@ from nr.util.plugins import load_plugins
 from shut.console.command import Command, IO, argument, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
-from shut.plugins.release_plugin import ReleasePlugin, VersionRef, ENTRYPOINT as RELEASE_PLUGIN_ENTRYPOINT
+from shut.plugins.release_plugin import (
+  ReleasePlugin as _ReleasePlugin, VersionRef, ENTRYPOINT as RELEASE_PLUGIN_ENTRYPOINT
+)
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version
@@ -58,7 +60,7 @@ class ReleaseConfig:
 
 
 @dataclasses.dataclass
-class VersionRefConfigMatcherPlugin(ReleasePlugin):
+class VersionRefConfigMatcherPlugin(_ReleasePlugin):
   """ This plugin matches a list of #VersionRefConfig definitions and returns the matched version references. This
   plugin is used to match the `tool.shut.release.references` config option and is always used. It should not be
   registered in the `shut.plugins.release` entrypoint group.
@@ -79,7 +81,7 @@ class VersionRefConfigMatcherPlugin(ReleasePlugin):
 
 
 @dataclasses.dataclass
-class SourceCodeVersionMatcherPlugin(ReleasePlugin):
+class SourceCodeVersionMatcherPlugin(_ReleasePlugin):
   """ This plugin searches for a `__version__` key in the source code of the project and return it as a version
   reference. Based on the Poetry configuration (considering `tool.poetry.packages` and searching in the `src/`
   folder if it exists), the following source files will be checked:
@@ -210,10 +212,10 @@ class ReleaseCommand(Command):
   def _load_config(self) -> ReleaseConfig:
     """ Internal. Extracts the `tool.shut.release` config from the pyproject config. """
 
-    data = self._app.config.get('release', {})
+    data = self._app.project_config.get('release', {})
     return databind.json.load(data, ReleaseConfig)
 
-  def _load_plugins(self) -> list[ReleasePlugin]:
+  def _load_plugins(self) -> list[_ReleasePlugin]:
     """ Internal. Loads the plugins to be used in the run of `poetry release`.
 
     If `SHUT_RELEASE_NO_PLUGINS` is set in the environment, no plugins will be loaded from entrypoints.
@@ -221,7 +223,7 @@ class ReleaseCommand(Command):
 
     tool = self._get_raw_tool_config()
 
-    plugins: list[ReleasePlugin] = [
+    plugins: list[_ReleasePlugin] = [
       VersionRefConfigMatcherPlugin(self.config.references),
       SourceCodeVersionMatcherPlugin(tool.get('poetry', {}).get('packages')),
     ]
@@ -229,7 +231,7 @@ class ReleaseCommand(Command):
     if os.getenv('SHUT_RELEASE_NO_PLUGINS') is not None:
       return plugins
 
-    return plugins + load_plugins(RELEASE_PLUGIN_ENTRYPOINT, ReleasePlugin)
+    return plugins + load_plugins(RELEASE_PLUGIN_ENTRYPOINT, _ReleasePlugin)
 
   def _show_version_refs(self, version_refs: list[VersionRef], status_line: str = '') -> None:
     """ Internal. Prints the version references to the terminal. """
@@ -451,7 +453,7 @@ class ReleaseCommand(Command):
     return 0
 
 
-class ReleaseCommandPlugin(ApplicationPlugin):
+class ReleasePlugin(ApplicationPlugin):
 
   def activate(self, app: Application):
     app.cleo.add(ReleaseCommand(app))
