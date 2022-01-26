@@ -1,4 +1,6 @@
 
+import dataclasses
+import pkg_resources
 import typing as t
 from pathlib import Path
 
@@ -17,26 +19,31 @@ COLORS = {
 }
 
 
-class DefaultChecksPlugin(_CheckPlugin):
+@dataclasses.dataclass
+class CheckConfig:
+  plugins: list[str] = dataclasses.field(default_factory=lambda: ['shut', 'poetry'])
 
-  def _check_detect_packages(self, app: Application) -> Check:
-    source_directory, packages = app.get_packages()
-    return Check(
-      'detect packages',
-      Check.Result.OK if packages else Check.Result.ERROR,
-      ", ".join(f'<b>{p.name}</b>' for p in packages) + f' (source directory: {source_directory})',
-      None,
-    )
 
-  def _check_detect_version(self, app: Application) -> Check:
-    return Check('__version__', Check.Result.WARNING, 'Not implemented', None)
+class PoetryChecksPlugin(_CheckPlugin):
+  """ Check plugin to validate the Poetry configuration and compare it with Shut's expectations. """
 
-  def _check_poetry_readme(self, app: Application, poetry: dict[str, t.Any]) -> Check:
+  def get_checks(self, app: 'Application') -> t.Iterable[Check]:
+    self.app = app
+    self.poetry = app.load_pyproject().get('tool', {}).get('poetry')
+    if self.poetry is None:
+      return; yield
+
+    yield self._check_poetry_readme()
+    yield self._check_poetry_urls()
+    yield self._check_poetry_classifiers()
+    yield self._check_poetry_license()
+
+  def _check_poetry_readme(self) -> Check:
     check_name = 'poetry readme'
     default_readmes = ['README.md', 'README.rst']
-    detected_readme = Optional(app.get_readme_path())\
+    detected_readme = Optional(self.app.get_readme_path())\
       .map(lambda p: str(p.resolve().relative_to(Path.cwd()))).or_else(None)
-    poetry_readme = poetry.get('readme')
+    poetry_readme = self.poetry.get('readme')
 
     if poetry_readme is None and detected_readme in default_readmes:
       return Check(check_name, Check.Result.OK, None, f'Poetry will autodetect your readme ({detected_readme})')
@@ -45,31 +52,44 @@ class DefaultChecksPlugin(_CheckPlugin):
     return Check(check_name, Check.Result.WARNING, f'Poetry readme appears to be misconfigured',
       f'Detected readme: {detected_readme}\nConfigured in Poetry: {poetry_readme}')
 
-  def _check_poetry_urls(self, app: Application, poetry: dict[str, t.Any]) -> Check:
+  def _check_poetry_urls(self) -> Check:
     return Check('poetry urls', Check.Result.WARNING, 'Not implemented', None)
+
+  def _check_poetry_classifiers(self) -> Check:
+    return Check('poetry classifiers', Check.Result.WARNING, 'Not implemented', None)
+
+  def _check_poetry_license(self) -> Check:
+    return Check('poetry license', Check.Result.WARNING, 'Not implemented', None)
+
+
+class ShutChecksPlugin(_CheckPlugin):
 
   # TODO (@NiklasRosenstein): Check if VCS remote is configured?
 
-  def _check_poetry_classifiers(self, app: Application) -> Check:
-    ...
+  def get_checks(self, app: 'Application') -> t.Iterable[Check]:
+    self.app = app
+    yield self._check_detect_packages()
+    yield self._check_detect_version()
+    yield self._check_changelogs()
+    yield self._check_py_typed()
 
-  def _check_poetry_license(self, app: Application) -> Check:
-    ...
+  def _check_detect_packages(self) -> Check:
+    source_directory, packages = self.app.get_packages()
+    return Check(
+      'detect packages',
+      Check.Result.OK if packages else Check.Result.ERROR,
+      ", ".join(f'<b>{p.name}</b>' for p in packages) + f' (source directory: {source_directory})',
+      None,
+    )
 
-  def _check_changelogs(self, app: Application) -> Check:
-    ...
+  def _check_detect_version(self) -> Check:
+    return Check('__version__', Check.Result.WARNING, 'Not implemented', None)
 
-  def _check_py_typed(self, app: Application) -> Check:
-    ...
+  def _check_changelogs(self) -> Check:
+    return Check('changelogs', Check.Result.WARNING, 'Not implemented', None)
 
-  def get_checks(self, app: Application) -> t.Iterable[Check]:
-    yield self._check_detect_packages(app)
-    yield self._check_detect_version(app)
-
-    poetry = app.load_pyproject().get('tool', {}).get('poetry')
-    if poetry is not None:
-      yield self._check_poetry_readme(app, poetry)
-      yield self._check_poetry_urls(app, poetry)
+  def _check_py_typed(self) -> Check:
+    return Check('py.typed', Check.Result.WARNING, 'Not implemented', None)
 
 
 class CheckCommand(Command):
@@ -82,8 +102,11 @@ class CheckCommand(Command):
     self.app = app
 
   def handle(self) -> int:
+    import databind.json
+    config = databind.json.load(self.app.project_config.extras.get('check', {}), CheckConfig)
+
     error = False
-    for plugin in load_plugins(CHECK_PLUGIN_ENTRYPOINT, _CheckPlugin):  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
+    for plugin in load_plugins(CHECK_PLUGIN_ENTRYPOINT, _CheckPlugin, names=config.plugins).values():  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
       for check in plugin.get_checks(self.app):
         error = error or check.result != Check.Result.OK
         color = COLORS[check.result]
@@ -95,6 +118,7 @@ class CheckCommand(Command):
           for line in check.details.splitlines():
             indent = ' ' * (5 + len(check.result.name))
             self.io.write_line(f'{indent}{line}')
+
     return 1 if error else 0
 
 

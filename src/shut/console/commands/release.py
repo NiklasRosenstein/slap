@@ -231,7 +231,7 @@ class ReleaseCommand(Command):
     if os.getenv('SHUT_RELEASE_NO_PLUGINS') is not None:
       return plugins
 
-    return plugins + load_plugins(RELEASE_PLUGIN_ENTRYPOINT, _ReleasePlugin)
+    return plugins + list(load_plugins(RELEASE_PLUGIN_ENTRYPOINT, _ReleasePlugin).values())
 
   def _show_version_refs(self, version_refs: list[VersionRef], status_line: str = '') -> None:
     """ Internal. Prints the version references to the terminal. """

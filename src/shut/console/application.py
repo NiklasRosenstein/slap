@@ -33,8 +33,8 @@ class Application:
   def load_plugins(self) -> None:
     """ Load all #ApplicationPlugin#s and activate them. """
 
-    for app in load_plugins(APPLICATION_PLUGIN_ENTRYPOINT, ApplicationPlugin):  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
-      app.activate(self)
+    for plugin in load_plugins(APPLICATION_PLUGIN_ENTRYPOINT, ApplicationPlugin).values():  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
+      plugin.activate(self)
 
   def load_pyproject(self, force_reload: bool = False) -> dict[str, t.Any]:
     """ Load the `pyproject.toml` configuration in the current working directory and return it.
