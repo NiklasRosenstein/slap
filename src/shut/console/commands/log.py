@@ -36,10 +36,10 @@ class ChangelogApplication:
     if entry.type not in self.config.valid_types:
       raise ValueError(f'bad changelog type: {entry.type}')
     remote = self.shut_app.project_config.remote
-    if entry.pr and not remote.validate_pull_request_url(entry.pr):
+    if entry.pr and remote and not remote.validate_pull_request_url(entry.pr):
       raise ValueError(f'bad pr url: {entry.pr}')
     for issue_url in entry.issues or []:
-      if not remote.validate_issue_url(issue_url):
+      if remote and not remote.validate_issue_url(issue_url):
         raise ValueError(f'bad issue url: {issue_url}')
 
 

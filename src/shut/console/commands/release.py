@@ -98,7 +98,7 @@ class SourceCodeVersionMatcherPlugin(_ReleasePlugin):
   VERSION_REGEX = r'^__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
   FILENAMES = ['__init__.py', '__about__.py', '_version.py']
 
-  packages: list[Package] = None
+  packages: list[Package]
 
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:
     results = []

@@ -3,7 +3,6 @@ import dataclasses
 import typing as t
 from pathlib import Path
 
-from cleo.io.io import IO
 from nr.util import Optional
 from nr.util.plugins import load_plugins
 
@@ -30,13 +29,11 @@ class PoetryChecksPlugin(_CheckPlugin):
   def get_checks(self, app: 'Application') -> t.Iterable[Check]:
     self.app = app
     self.poetry = app.load_pyproject().get('tool', {}).get('poetry')
-    if self.poetry is None:
-      return; yield
-
-    yield self._check_poetry_readme()
-    yield self._check_poetry_urls()
-    yield self._check_poetry_classifiers()
-    yield self._check_poetry_license()
+    if self.poetry is not None:
+      yield self._check_poetry_readme()
+      yield self._check_poetry_urls()
+      yield self._check_poetry_classifiers()
+      yield self._check_poetry_license()
 
   def _check_poetry_readme(self) -> Check:
     check_name = 'poetry:readme'
@@ -101,7 +98,7 @@ class ShutChecksPlugin(_CheckPlugin):
     )
 
   def _check_source_version(self) -> Check:
-    from cleo.io.null_io import NullIO
+    from cleo.io.null_io import NullIO  # type: ignore[import]
     from shut.console.commands.release import SourceCodeVersionMatcherPlugin
     check_name = 'shut:version-in-code'
     packages = self.app.get_packages()
@@ -124,15 +121,16 @@ class ShutChecksPlugin(_CheckPlugin):
   def _check_changelogs(self) -> Check:
     from databind.core import ConversionError
     from shut.console.commands.log import ChangelogApplication
-    changelog = ChangelogApplication(self.app)
+    app = ChangelogApplication(self.app)
     bad_changelogs = []
     count = 0
-    for entry in changelog.manager.all():
+    for changelog in app.manager.all():
       count += 1
       try:
-        changelog.validate_entry(entry.load())
+        for entry in changelog.load().entries:
+          app.validate_entry(entry)
       except (ConversionError, ValueError):
-        bad_changelogs.append(entry.path.name)
+        bad_changelogs.append(changelog.path.name)
     check_name = 'shut:validate-changelogs'
     if not count:
       return Check(check_name, Check.Result.SKIPPED, None)
@@ -149,8 +147,8 @@ class ShutChecksPlugin(_CheckPlugin):
     if expect_typed is None:
       return Check(check_name, Check.Result.WARNING, '<b>tool.shut.typed</b> is not set')
 
-    has_py_typed = set()
-    has_no_py_typed = set()
+    has_py_typed = set[str]()
+    has_no_py_typed = set[str]()
     for package in self.app.get_packages():
       (has_py_typed if (package.path / 'py.typed').is_file() else has_no_py_typed).add(package.name)
 
