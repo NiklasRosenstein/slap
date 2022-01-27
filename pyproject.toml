@@ -63,7 +63,7 @@ typed = true
 [tool.shut.test]
 mypy = "mypy src --namespace-packages"
 pylint = "pylint --fail-under=8.0 src/"
-pytest = "pytest --cov=shut tests/"
+#pytest = "pytest --cov=shut tests/"
 check = "shut check"
 
 #
