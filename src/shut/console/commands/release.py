@@ -20,7 +20,7 @@ from shut.plugins.release_plugin import (
 from shut.util.python_package import Package
 
 if t.TYPE_CHECKING:
-  from poetry.core.semver.version import Version
+  from poetry.core.semver.version import Version  # type: ignore[import]
 
 
 def match_version_ref_pattern(filename: Path, pattern: str) -> VersionRef:
