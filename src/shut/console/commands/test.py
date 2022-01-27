@@ -1,5 +1,6 @@
 
 import os
+import subprocess as sp
 import typing as t
 
 from nr.util.singleton import NotSet
@@ -27,21 +28,25 @@ class TestRunner:
 
     color = self._colors[0]  if TestRunner._prev_color is None else self._colors[(self._colors.index(TestRunner._prev_color) + 1) % len(self._colors)]
     TestRunner._prev_color = color
+    command = ['bash', '-c', self.config]
 
-    cols, rows = os.get_terminal_size()
-    proc = PtyProcessUnicode.spawn(['bash', '-c', self.config], dimensions=(rows, cols))
-    while not proc.eof():
-      try:
-        line = proc.readline().rstrip()
-      except EOFError:
-        break
-      if self.line_prefixing:
-        self.io.write(f'<fg={color}>{self.name}|</fg> ')
-      self.io.write(line + '\n', type=OutputType.NORMAL)
-
-    proc.wait()
-    assert proc.exitstatus is not None
-    return proc.exitstatus
+    try:
+      cols, rows = os.get_terminal_size()
+    except OSError:
+      return sp.call(command)
+    else:
+      proc = PtyProcessUnicode.spawn(command, dimensions=(rows, cols))
+      while not proc.eof():
+        try:
+          line = proc.readline().rstrip()
+        except EOFError:
+          break
+        if self.line_prefixing:
+          self.io.write(f'<fg={color}>{self.name}|</fg> ')
+        self.io.write(line + '\n', type=OutputType.NORMAL)
+      proc.wait()
+      assert proc.exitstatus is not None
+      return proc.exitstatus
 
 
 class TestCommand(Command):
