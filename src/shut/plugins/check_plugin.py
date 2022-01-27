@@ -14,6 +14,7 @@ class CheckResult(enum.Enum):
   OK = enum.auto()
   WARNING = enum.auto()
   ERROR = enum.auto()
+  SKIPPED = enum.auto()
 
 
 @dataclasses.dataclass
@@ -22,7 +23,6 @@ class Check:
   name: str
   result: Result
   description: str | None
-  details: str | None
 
 
 class CheckPlugin(abc.ABC):

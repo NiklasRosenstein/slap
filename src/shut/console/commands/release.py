@@ -17,6 +17,7 @@ from shut.plugins.application_plugin import ApplicationPlugin
 from shut.plugins.release_plugin import (
   ReleasePlugin as _ReleasePlugin, VersionRef, ENTRYPOINT as RELEASE_PLUGIN_ENTRYPOINT
 )
+from shut.util.python_package import Package
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version
@@ -97,14 +98,13 @@ class SourceCodeVersionMatcherPlugin(_ReleasePlugin):
   VERSION_REGEX = r'^__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
   FILENAMES = ['__init__.py', '__about__.py', '_version.py']
 
-  #: The `tool.poetry.packages` configuration from `pyproject.toml`.
-  packages_conf: list[dict[str, t.Any]] | None = None
+  packages: list[Package] = None
 
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:
     results = []
-    for directory in self.get_package_roots():
+    for package in self.packages:
       for filename in self.FILENAMES:
-        path = directory / filename
+        path = package.path / filename
         if path.exists():
           version_ref = match_version_ref_pattern(path, self.VERSION_REGEX)
           if version_ref:
@@ -112,27 +112,7 @@ class SourceCodeVersionMatcherPlugin(_ReleasePlugin):
             break
     if not results:
       message = '<fg=yellow>warning: unable to detect <b>__version__</b> in a source file'
-      if not self.packages_conf:
-        message += ' (if your package is a PEP420 namespacepackage, configure <info>tool.poetry.packages</info>)'
       io.write_error_line(message + '</fg>')
-    return results
-
-  def get_package_roots(self) -> list[Path]:
-    """ Tries to identify the package roots that may contain source files with a `__version__`. """
-
-    src_dir = Path('.')
-    if (sub_dir := src_dir / 'src').is_dir():
-      src_dir = sub_dir
-
-    results = []
-    if self.packages_conf:
-      for conf in self.packages_conf:
-        results.append(src_dir / conf['include'])
-    else:
-      for item in src_dir.iterdir():
-        if item.is_dir():
-          results.append(item)
-
     return results
 
 

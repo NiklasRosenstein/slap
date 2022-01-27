@@ -56,6 +56,11 @@ class ChangelogManager:
   def version(self, version: str) -> 'ManagedChangelog':
     return ManagedChangelog(self, self.directory / self.VERSIONED.format(version=version), version)
 
+  def all(self) -> t.Iterator['ManagedChangelog']:
+    for path in self.directory.iterdir():
+      if path.suffix == '.toml':
+        yield ManagedChangelog(self, path, path.name if path.name != self.UNRELEASED else None)
+
 
 class ManagedChangelog:
 

@@ -21,7 +21,6 @@ PYPROJECT_TOML = Path('pyproject.toml')
 GLOBAL_CONFIG_TOML = Path('~/.config/shut/config.toml').expanduser()
 
 
-
 class Application:
   """ The central management unit for the Shut CLI. """
 
@@ -81,21 +80,21 @@ class Application:
     data = self.load_global_config()
     return databind.json.load(data, GlobalConfig)
 
-  def get_packages(self) -> tuple[Path, list[Package]]:
+  def get_packages(self) -> list[Package]:
     """ Tries to detect the packages in the project directory. Uses `tool.poetry.packages` if that configuration
     exists, otherwise it attempts to automatically determine it. The `tool.shut.source-directory` option is used
     if set, otherwise the `src/` directory or alternatively the project directory is used to detect the packages.
     """
 
     if (directory := Optional(self.project_config.source_directory).map(Path).or_else(None)):
-      return Path(directory), detect_packages(Path(directory))
+      return detect_packages(Path(directory))
 
     for directory in [Path('src'), Path()]:
       packages = detect_packages(directory)
       if packages:
         break
 
-    return directory, packages
+    return packages
 
   def get_readme_path(self) -> Path | None:
     """ Tries to detect the project readme. If `tool.poetry.readme` is set, that file will be returned. """

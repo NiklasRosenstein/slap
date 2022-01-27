@@ -12,7 +12,7 @@ version = "1.0.0a1"
 description = "Shut is a command-line utility for developing Python applications."
 authors = ["Niklas Rosenstein <rosensteinniklas@gmail.com>"]
 license = "MIT"
-readme = "README.md"
+readme = "readme.md"
 packages = [{ include="shut", from="src" }]
 
 [tool.poetry.dependencies]
@@ -55,6 +55,9 @@ shut = "shut.console.commands.check:ShutChecksPlugin"
 #
 # Shut
 #
+
+[tool.shut]
+typed = true
 
 [tool.shut.test]
 mypy = "mypy src --namespace-packages"

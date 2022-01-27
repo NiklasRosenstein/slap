@@ -1,10 +1,12 @@
 
 import dataclasses
 import typing as t
+from pathlib import Path
 
 from databind.core.annotations import alias
+from shut.changelog.changelog import ChangelogEntry
 
-from shut.changelog.manager import ChangelogManager
+from shut.changelog.manager import ChangelogManager, TomlChangelogDeser
 from shut.console.command import Command, argument, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
@@ -18,10 +20,27 @@ class LogConfig:
   valid_types: t.Annotated[list[str], alias('valid-types')] = dataclasses.field(default_factory=lambda: list(DEFAULT_CHANGELOG_TYPES))
 
 
-
 def get_log_config(app: Application) -> LogConfig:
   import databind.json
   return databind.json.load(app.project_config.extras.get('log', {}), LogConfig)
+
+
+class ChangelogApplication:
+
+  def __init__(self, shut_app: Application) -> None:
+    self.shut_app = shut_app
+    self.config = get_log_config(shut_app)
+    self.manager = ChangelogManager(Path(self.config.directory), TomlChangelogDeser())
+
+  def validate_entry(self, entry: ChangelogEntry) -> None:
+    if entry.type not in self.config.valid_types:
+      raise ValueError(f'bad changelog type: {entry.type}')
+    remote = self.shut_app.project_config.remote
+    if entry.pr and not remote.validate_pull_request_url(entry.pr):
+      raise ValueError(f'bad pr url: {entry.pr}')
+    for issue_url in entry.issues or []:
+      if not remote.validate_issue_url(issue_url):
+        raise ValueError(f'bad issue url: {issue_url}')
 
 
 class BaseCommand(Command):

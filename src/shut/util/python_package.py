@@ -8,13 +8,15 @@ from nr.util.algorithm.longest_common_substring import longest_common_substring
 
 @dataclasses.dataclass
 class Package:
-  name: str
-  path: Path
+  name: str   #: The name of the package. Contains periods in case of a namespace package.
+  path: Path  #: The path to the package directory. This points to the namespace package if applicable.
+  root: Path  #: The root directory that contains the package.
 
 
 def detect_packages(directory: Path) -> list[Package]:
   """ Detects the Python packages in *directory*, making an effort to identify namespace packages correctly. """
 
+  assert isinstance(directory, Path)
   modules = find_namespace_packages(directory)
   if not modules:
     raise ValueError(f'no modules discovered in {directory}')
@@ -31,4 +33,4 @@ def detect_packages(directory: Path) -> list[Package]:
       raise ValueError(f'no common root package modules: {modules}')
     modules = ['.'.join(common)]
 
-  return [Package(module, directory / Path(*module.split('/'))) for module in modules]
+  return [Package(module, directory / Path(*module.split('/')), directory) for module in modules]
