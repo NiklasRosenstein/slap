@@ -12,6 +12,7 @@ from shut import __version__
 from shut.config.global_ import GlobalConfig
 from shut.config.project import ProjectConfig
 from shut.plugins.application_plugin import ApplicationPlugin, ENTRYPOINT as APPLICATION_PLUGIN_ENTRYPOINT
+from shut.plugins.remote_plugin import RemotePlugin, detect_remote
 from shut.util.python_package import Package, detect_packages
 from shut.util.fs import get_file_in_directory
 
@@ -28,6 +29,7 @@ class Application:
     self.cleo = _CleoApplication('shut', __version__)
     self._pyproject_cache: dict[str, t.Any] | None = None
     self._global_config_cache: dict[str, t.Any] | None = None
+    self._remote: RemotePlugin | None = None
 
   def load_plugins(self) -> None:
     """ Load all #ApplicationPlugin#s and activate them. """
@@ -64,8 +66,10 @@ class Application:
     """ Load the `~/.config/shut/config.toml` configuration file. """
 
     import tomli
-    if self._global_config_cache is None:
-      self._global_config_cache = tomli.loads(PYPROJECT_TOML.read_text())
+    if self._global_config_cache is None and GLOBAL_CONFIG_TOML.is_file():
+      self._global_config_cache =  tomli.loads(GLOBAL_CONFIG_TOML.read_text())
+    elif self._global_config_cache is None:
+      self._global_config_cache = {}
     return self._global_config_cache
 
   @property
@@ -79,6 +83,12 @@ class Application:
     import databind.json
     data = self.load_global_config()
     return databind.json.load(data, GlobalConfig)
+
+  @property
+  def remote(self) -> RemotePlugin | None:
+    if self._remote is None:
+      self._remote = self.project_config.remote or detect_remote(Path.cwd())
+    return self._remote
 
   def get_packages(self) -> list[Package]:
     """ Tries to detect the packages in the project directory. Uses `tool.poetry.packages` if that configuration

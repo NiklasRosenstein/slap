@@ -1,16 +1,19 @@
 
 import abc
+import typing as t
+from pathlib import Path
 
 from databind.core.annotations import union
+from nr.util.plugins import load_plugins
 
 ENTRYPOINT = 'shut.plugins.remote'
 
 
 @union(
-  union.Subtypes.entrypoint(ENTRYPOINT),
+  union.Subtypes.entrypoint(ENTRYPOINT + '_implementation'),
   style=union.Style.flat
 )
-class RemotePlugin(abc.ABC):
+class Remote(abc.ABC):
   " Interface for Shut plugins that want to provide capabilities for interfacing with the remote repository. "
 
   @abc.abstractmethod
@@ -33,3 +36,16 @@ class RemotePlugin(abc.ABC):
 
   @abc.abstractmethod
   def get_main_branch(self) -> str: ...
+
+
+class RemotePlugin(abc.ABC):
+
+  @abc.abstractmethod
+  def detect(self, directory: Path) -> t.Optional['RemotePlugin']: ...
+
+
+def detect_remote(directory: Path) -> t.Optional['RemotePlugin']:
+  for plugin in load_plugins(ENTRYPOINT, RemotePlugin).values():
+    if (remote := plugin.detect(directory)):
+      return remote
+  return None

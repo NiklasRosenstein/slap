@@ -4,8 +4,9 @@ import typing as t
 from pathlib import Path
 
 from databind.core.annotations import alias
-from shut.changelog.changelog import ChangelogEntry
+from nr.util.git import Git
 
+from shut.changelog.changelog import ChangelogEntry
 from shut.changelog.manager import ChangelogManager, TomlChangelogDeser
 from shut.console.command import Command, argument, option
 from shut.console.application import Application
@@ -18,6 +19,10 @@ DEFAULT_CHANGELOG_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene
 class LogConfig:
   directory: str = '.changelog'
   valid_types: t.Annotated[list[str], alias('valid-types')] = dataclasses.field(default_factory=lambda: list(DEFAULT_CHANGELOG_TYPES))
+
+
+def is_url(s: str) -> bool:
+  return s.startswith('http://') or s.startswith('https://')
 
 
 def get_log_config(app: Application) -> LogConfig:
@@ -43,18 +48,7 @@ class ChangelogApplication:
         raise ValueError(f'bad issue url: {issue_url}')
 
 
-class BaseCommand(Command):
-
-  def __init__(self, app: Application):
-      super().__init__()
-      self._app = app
-
-  @property
-  def config(self) -> LogConfig:
-    return get_log_config(self._app)
-
-
-class LogAddCommand(BaseCommand):
+class LogAddCommand(Command):
 
   name = "log add"
   description = "Add an entry to the unreleased changelog."
@@ -124,12 +118,27 @@ class LogAddCommand(BaseCommand):
     )
   ]
 
+  def __init__(self, app: Application) -> None:
+    super().__init__()
+    self.app = app
+
   def handle(self) -> int:
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
     author: str | None = self.option("author")
     pr: str | None = self.option("pr")
     fixes: list[str] | None = self.option("fixes")
+
+    remote = self.app.remote
+    if not author and (remote and not (author := self.app.global_config.author)):
+      email = Git().get_config('user.email')
+      if not email:
+        self.line_error('error: could not determine author from VCS; please pass --author,-a', 'error')
+        return 1
+      author = remote.get_username_from_email(email)
+    elif not author and not remote:
+      self.line_error('error: no VCS configured, no author configured, use --author,-a', 'error')
+      return 1
 
     if not change_type:
       self.line_error('error: missing --type,-t', 'error')
@@ -141,17 +150,27 @@ class LogAddCommand(BaseCommand):
       self.line_error('error: missing --author,-a', 'error')
       return 1
 
-    config = self.config
+    changelog = ChangelogApplication(self.app)
 
-    if change_type not in config.valid_types:
-      self.line_error(f'error: bad changelog type: <b>{change_type}</b>', 'error')
+    if remote:
+      if pr and not is_url(pr):
+        pr = remote.get_pull_request_url_from_id(pr)
+      for i, issue in enumerate(fixes or []):
+        if not is_url(pr):
+          fixes[i] = remote.get_issue_url_from_id(issue)
+
+    entry = ChangelogEntry(change_type, description, author, pr, fixes)
+    try:
+      changelog.validate_entry(entry)
+    except ValueError:
+      self.line_error(b'error: {exc}', 'error')
       return 1
 
-    print(config)
+    print(entry)
     return 0
 
 
-class LogPrUpdateCommand(BaseCommand):
+class LogPrUpdateCommand(Command):
 
   name = "log pr update"
   description = "Update the <fg=green>pr</fg> field of changelog entries in a commit range."
@@ -162,7 +181,7 @@ class LogPrUpdateCommand(BaseCommand):
   """
 
 
-class LogFormatComand(BaseCommand):
+class LogFormatComand(Command):
 
   name = "log format"
   description = "Format the changelog."
@@ -176,5 +195,5 @@ class LogPlugin(ApplicationPlugin):
 
   def activate(self, app: 'Application') -> None:
     app.cleo.add(LogAddCommand(app))
-    app.cleo.add(LogPrUpdateCommand(app))
-    app.cleo.add(LogFormatComand(app))
+    app.cleo.add(LogPrUpdateCommand())
+    app.cleo.add(LogFormatComand())

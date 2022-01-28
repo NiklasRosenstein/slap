@@ -49,6 +49,9 @@ test-command = "shut.console.commands.test:TestPlugin"
 [tool.poetry.plugins."shut.plugins.remote"]
 github = "shut.remotes.github:GithubRemotePlugin"
 
+[tool.poetry.plugins."shut.plugins.remote_implementation"]
+github = "shut.remotes.github:GithubRemote"
+
 [tool.poetry.plugins."shut.plugins.check"]
 poetry = "shut.console.commands.check:PoetryChecksPlugin"
 shut = "shut.console.commands.check:ShutChecksPlugin"
