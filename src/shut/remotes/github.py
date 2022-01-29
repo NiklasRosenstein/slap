@@ -8,11 +8,11 @@ from pathlib import Path
 import requests
 from nr.util.git import Git
 
-from shut.plugins.remote_plugin import Remote, RemotePlugin
+from shut.plugins.remote_plugin import VcsRemote, RemotePlugin
 
 
 @dataclasses.dataclass
-class GithubRemote(Remote):
+class GithubRemote(VcsRemote):
 
   repo: str
 
@@ -67,6 +67,12 @@ class GithubRemote(Remote):
     response.raise_for_status()
     result = response.json()
     return result['default_branch']
+
+  def get_recommended_author(self) -> str | None:
+    email = Git().get_config('user.email')
+    if email:
+      return self.get_username_from_email(email)
+    return None
 
 
 @dataclasses.dataclass

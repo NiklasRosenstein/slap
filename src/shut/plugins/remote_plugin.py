@@ -13,7 +13,7 @@ ENTRYPOINT = 'shut.plugins.remote'
   union.Subtypes.entrypoint(ENTRYPOINT + '_implementation'),
   style=union.Style.flat
 )
-class Remote(abc.ABC):
+class VcsRemote(abc.ABC):
   " Interface for Shut plugins that want to provide capabilities for interfacing with the remote repository. "
 
   @abc.abstractmethod
@@ -36,6 +36,9 @@ class Remote(abc.ABC):
 
   @abc.abstractmethod
   def get_main_branch(self) -> str: ...
+
+  @abc.abstractmethod
+  def get_recommended_author(self) -> str | None: ...
 
 
 class RemotePlugin(abc.ABC):

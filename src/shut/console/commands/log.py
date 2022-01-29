@@ -6,46 +6,22 @@ from pathlib import Path
 from databind.core.annotations import alias
 from nr.util.git import Git
 
-from shut.changelog.changelog import ChangelogEntry
-from shut.changelog.manager import ChangelogManager, TomlChangelogDeser
-from shut.console.command import Command, argument, option
+from shut.changelog.changelog import Changelog
+from shut.changelog.manager import ChangelogManager, DEFAULT_VALID_TYPES
+from shut.console.command import Command, option
 from shut.console.application import Application
 from shut.plugins.application_plugin import ApplicationPlugin
-
-DEFAULT_CHANGELOG_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement']
 
 
 @dataclasses.dataclass
 class LogConfig:
   directory: str = '.changelog'
-  valid_types: t.Annotated[list[str], alias('valid-types')] = dataclasses.field(default_factory=lambda: list(DEFAULT_CHANGELOG_TYPES))
-
-
-def is_url(s: str) -> bool:
-  return s.startswith('http://') or s.startswith('https://')
+  valid_types: t.Annotated[list[str] | None, alias('valid-types')] = dataclasses.field(default_factory=lambda: list(DEFAULT_VALID_TYPES))
 
 
 def get_log_config(app: Application) -> LogConfig:
   import databind.json
   return databind.json.load(app.project_config.extras.get('log', {}), LogConfig)
-
-
-class ChangelogApplication:
-
-  def __init__(self, shut_app: Application) -> None:
-    self.shut_app = shut_app
-    self.config = get_log_config(shut_app)
-    self.manager = ChangelogManager(Path(self.config.directory), TomlChangelogDeser())
-
-  def validate_entry(self, entry: ChangelogEntry) -> None:
-    if entry.type not in self.config.valid_types:
-      raise ValueError(f'bad changelog type: {entry.type}')
-    remote = self.shut_app.project_config.remote
-    if entry.pr and remote and not remote.validate_pull_request_url(entry.pr):
-      raise ValueError(f'bad pr url: {entry.pr}')
-    for issue_url in entry.issues or []:
-      if remote and not remote.validate_issue_url(issue_url):
-        raise ValueError(f'bad issue url: {issue_url}')
 
 
 class LogAddCommand(Command):
@@ -88,7 +64,7 @@ class LogAddCommand(Command):
   options = [
     option(
       "type", "t",
-      f"The type of the changelog. Unless configured differently, one of {', '.join(DEFAULT_CHANGELOG_TYPES)}",
+      f"The type of the changelog. Unless configured differently, one of {', '.join(DEFAULT_VALID_TYPES)}",
       flag=False,
     ),
     option(
@@ -110,8 +86,8 @@ class LogAddCommand(Command):
       flag=False,
     ),
     option(
-      "fixes", "f",
-      "An issue that the change fixes. If the remote repository is well supported by Shut, an issue number may "
+      "issue", "i",
+      "An issue related to this chagnelog. If the remote repository is well supported by Shut, an issue number may "
         "be specified and converted to a full URL by Shut, otherwise a full URL must be specified.",
       flag=False,
       multiple=True,
@@ -123,22 +99,14 @@ class LogAddCommand(Command):
     self.app = app
 
   def handle(self) -> int:
+    config = get_log_config(self.app)
+    manager = ChangelogManager(Path.cwd() / config.directory, self.app.remote, valid_types=config.valid_types)
+
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
     author: str | None = self.option("author")
     pr: str | None = self.option("pr")
-    fixes: list[str] | None = self.option("fixes")
-
-    remote = self.app.remote
-    if not author and (remote and not (author := self.app.global_config.author)):
-      email = Git().get_config('user.email')
-      if not email:
-        self.line_error('error: could not determine author from VCS; please pass --author,-a', 'error')
-        return 1
-      author = remote.get_username_from_email(email)
-    elif not author and not remote:
-      self.line_error('error: no VCS configured, no author configured, use --author,-a', 'error')
-      return 1
+    issues: list[str] | None = self.option("issue")
 
     if not change_type:
       self.line_error('error: missing --type,-t', 'error')
@@ -146,27 +114,24 @@ class LogAddCommand(Command):
     if not description:
       self.line_error('error: missing --description,-d', 'error')
       return 1
-    if not author:
-      self.line_error('error: missing --author,-a', 'error')
-      return 1
 
-    changelog = ChangelogApplication(self.app)
-
-    if remote:
-      if pr and not is_url(pr):
-        pr = remote.get_pull_request_url_from_id(pr)
-      for i, issue in enumerate(fixes or []):
-        if not is_url(pr):
-          fixes[i] = remote.get_issue_url_from_id(issue)
-
-    entry = ChangelogEntry(change_type, description, author, pr, fixes)
     try:
-      changelog.validate_entry(entry)
-    except ValueError:
-      self.line_error(b'error: {exc}', 'error')
-      return 1
+      entry = manager.make_entry(change_type, description, author, pr, issues)
+    except ValueError as exc:
+      if 'author' in str(exc):
+        self.line_error('error: author could not be automatically detected, specify --author,-a', 'error')
+        return 1
+      raise
 
-    print(entry)
+    unreleased = manager.unreleased()
+    changelog = unreleased.content if unreleased.exists() else Changelog()
+    changelog.entries.append(entry)
+    unreleased.save(changelog)
+
+    import databind.json
+    import tomli_w
+    print(tomli_w.dumps(databind.json.dump(entry)))
+
     return 0
 
 
