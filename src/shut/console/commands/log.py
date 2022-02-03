@@ -10,7 +10,9 @@ from shut.changelog.changelog import Changelog
 from shut.changelog.manager import ChangelogManager, DEFAULT_VALID_TYPES
 from shut.console.command import Command, option
 from shut.console.application import Application
+from shut.console.commands.check import Check, CheckPlugin
 from shut.plugins.application_plugin import ApplicationPlugin
+from shut.plugins.remote_plugin import VcsRemote
 
 
 @dataclasses.dataclass
@@ -94,13 +96,13 @@ class LogAddCommand(Command):
     )
   ]
 
-  def __init__(self, app: Application) -> None:
+  def __init__(self, config: LogConfig, remote: VcsRemote | None) -> None:
     super().__init__()
-    self.app = app
+    self.config = config
+    self.remote = remote
 
   def handle(self) -> int:
-    config = get_log_config(self.app)
-    manager = ChangelogManager(Path.cwd() / config.directory, self.app.remote, valid_types=config.valid_types)
+    manager = ChangelogManager(Path.cwd() / self.config.directory, self.remote, valid_types=self.config.valid_types)
 
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
@@ -156,9 +158,45 @@ class LogFormatComand(Command):
   """
 
 
+class ChangelogConsistencyCheck(CheckPlugin):
+
+
+  def _check_changelogs(self) -> Check:
+    from databind.core import ConversionError
+    from shut.changelog.manager import ChangelogManager
+    manager = ChangelogManager(self.app)
+    bad_changelogs = []
+    count = 0
+    for changelog in manager.all():
+      count += 1
+      try:
+        for entry in changelog.load().entries:
+          manager.validate_entry(entry)
+      except (ConversionError, ValueError):
+        bad_changelogs.append(changelog.path.name)
+    check_name = 'shut:validate-changelogs'
+    if not count:
+      return Check(check_name, Check.Result.SKIPPED, None)
+    return Check(
+      check_name,
+      Check.Result.ERROR if bad_changelogs else Check.Result.OK,
+      f'Broken or invalid changelogs: {", ".join(bad_changelogs)}' if bad_changelogs else
+        f'All {count} changelogs are valid.',
+    )
+
+
 class LogPlugin(ApplicationPlugin):
 
-  def activate(self, app: 'Application') -> None:
-    app.cleo.add(LogAddCommand(app))
+  def load_config(self, app: Application) -> ChangelogManager:
+    import databind.json
+    data = app.project_config.extras.get('log', {})
+    config = databind.json.load(data, LogConfig)
+    manager = ChangelogManager(Path.cwd() / config.directory, app.remote, valid_types=config.valid_types)
+    return manager
+
+  def activate(self, app: 'Application', manager: ChangelogManager) -> None:
+
+    app.registry(CheckPlugin.ID).register_plugin('shut:changelog', ChangelogConsistencyCheck(manager))
+    app.cleo.add(LogAddCommand(config, app.remote))
     app.cleo.add(LogPrUpdateCommand())
     app.cleo.add(LogFormatComand())

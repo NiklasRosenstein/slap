@@ -157,5 +157,8 @@ class LinkCommand(Command):
 
 class LinkPlugin(ApplicationPlugin):
 
-  def activate(self, application: Application):
+  def load_config(self, app: 'Application') -> None:
+    return None
+
+  def activate(self, application: Application, config: None):
     application.cleo.add(LinkCommand())

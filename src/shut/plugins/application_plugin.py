@@ -11,5 +11,7 @@ ENTRYPOINT = 'shut.plugins.application'
 class ApplicationPlugin(abc.ABC):
 
   @abc.abstractmethod
-  def activate(self, app: 'Application') -> None:
-    ...
+  def load_config(self, app: 'Application') -> t.Any: ...
+
+  @abc.abstractmethod
+  def activate(self, app: 'Application', config: t.Any) -> None: ...

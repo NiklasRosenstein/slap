@@ -147,9 +147,10 @@ class ReleaseCommand(Command):
 
   # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
-  def __init__(self, app: Application):
-      super().__init__()
-      self._app = app
+  def __init__(self, config: ReleaseConfig, pyproject: dict[str, t.Any]):
+    super().__init__()
+    self.config = config
+    self.pyproject = pyproject
 
   def _validate_options(self) -> int:
     """ Internal. Ensures that the combination of provided options make sense. """
@@ -187,13 +188,7 @@ class ReleaseCommand(Command):
   def _get_raw_tool_config(self) -> dict[str, t.Any]:
     """ Internal. Get the raw `tool` config from the pyproject config. """
 
-    return self._app.load_pyproject().get('tool', {})
-
-  def _load_config(self) -> ReleaseConfig:
-    """ Internal. Extracts the `tool.shut.release` config from the pyproject config. """
-
-    data = self._app.project_config.extras.get('release', {})
-    return databind.json.load(data, ReleaseConfig)
+    return self.pyproject.get('tool', {})
 
   def _load_plugins(self) -> list[_ReleasePlugin]:
     """ Internal. Loads the plugins to be used in the run of `poetry release`.
@@ -403,7 +398,6 @@ class ReleaseCommand(Command):
     if (err := self._validate_options()) != 0:
       return err
 
-    self.config = self._load_config()
     self.plugins = self._load_plugins()
     version_refs = Stream(plugin.get_version_refs(self.io) for plugin in self.plugins).concat().collect()
     version = self.argument("version")
@@ -435,5 +429,9 @@ class ReleaseCommand(Command):
 
 class ReleasePlugin(ApplicationPlugin):
 
-  def activate(self, app: Application):
-    app.cleo.add(ReleaseCommand(app))
+  def load_config(self, app: Application) -> ReleaseConfig:
+    data = app.project_config.extras.get('release', {})
+    return databind.json.load(data, ReleaseConfig)
+
+  def activate(self, app: Application, config: ReleaseConfig) -> None:
+    app.cleo.add(ReleaseCommand(config, app.load_pyproject()))

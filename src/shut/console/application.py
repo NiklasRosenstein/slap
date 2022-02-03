@@ -13,6 +13,7 @@ from shut.config.global_ import GlobalConfig
 from shut.config.project import ProjectConfig
 from shut.plugins.application_plugin import ApplicationPlugin, ENTRYPOINT as APPLICATION_PLUGIN_ENTRYPOINT
 from shut.plugins.remote_plugin import RemotePlugin, detect_remote
+from shut.plugins.plugin_registry import PluginRegistry
 from shut.util.python_package import Package, detect_packages
 from shut.util.fs import get_file_in_directory
 
@@ -30,12 +31,17 @@ class Application:
     self._pyproject_cache: dict[str, t.Any] | None = None
     self._global_config_cache: dict[str, t.Any] | None = None
     self._remote: RemotePlugin | None = None
+    self._registries: dict[str, PluginRegistry] = {}
+
+  def registry(self, registry_id: str) -> PluginRegistry:
+    return self._registries.setdefault(registry_id, PluginRegistry())
 
   def load_plugins(self) -> None:
     """ Load all #ApplicationPlugin#s and activate them. """
 
     for plugin in load_plugins(APPLICATION_PLUGIN_ENTRYPOINT, ApplicationPlugin).values():  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
-      plugin.activate(self)
+      config = plugin.load_config(self)
+      plugin.activate(self, config)
 
   def load_pyproject(self, force_reload: bool = False) -> dict[str, t.Any]:
     """ Load the `pyproject.toml` configuration in the current working directory and return it.

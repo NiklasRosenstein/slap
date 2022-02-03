@@ -71,13 +71,12 @@ class TestCommand(Command):
   ]
   options[0]._default = NotSet.Value  # Hack to set a default value for the flag
 
-  def __init__(self, app: Application) -> None:
+  def __init__(self, config: dict[str, str]) -> None:
     super().__init__()
-    self._app = app
+    self.config = config
 
   def handle(self) -> int:
-    test_config = self._app.load_pyproject().get('tool', {}).get('shut', {}).get('test', {})
-    if not test_config:
+    if not self.config:
       self.line_error('error: no tests configured in <info>tool.shut.test</info>', 'error')
       return 1
 
@@ -85,8 +84,8 @@ class TestCommand(Command):
     if (no_line_prefix := self.option("no-line-prefix")) is NotSet.Value:
       no_line_prefix = (tests is not None and len(tests) == 1)
 
-    tests = tests if tests else sorted(test_config.keys())
-    if (unknown_tests := set(tests) - test_config.keys()):
+    tests = tests if tests else sorted(self.config.keys())
+    if (unknown_tests := set(tests) - self.config.keys()):
       self.line_error(
         f'error: unknown test{"" if len(unknown_tests) == 1 else "s"} <b>{", ".join(unknown_tests)}</b>',
         'error'
@@ -95,7 +94,7 @@ class TestCommand(Command):
 
     results = {}
     for test_name in tests:
-      results[test_name] = TestRunner(test_name, test_config[test_name], self.io, not no_line_prefix).run()
+      results[test_name] = TestRunner(test_name, self.config[test_name], self.io, not no_line_prefix).run()
 
     if len(tests) > 1:
       self.line('\n<comment>test summary:</comment>')
@@ -108,5 +107,9 @@ class TestCommand(Command):
 
 class TestPlugin(ApplicationPlugin):
 
-  def activate(self, app: 'Application') -> None:
-    app.cleo.add(TestCommand(app))
+  def load_config(self, app: 'Application') -> dict[str, str]:
+    test_config = app.project_config.extras.get('test', {})
+    return test_config
+
+  def activate(self, app: 'Application', config: dict[str, str]) -> None:
+    app.cleo.add(TestCommand(config))

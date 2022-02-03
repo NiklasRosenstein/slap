@@ -118,29 +118,6 @@ class ShutChecksPlugin(_CheckPlugin):
         if packages_without_version else
         f'Found <b>__version__</b> in <b>{", ".join(x.name for x in packages)}</b>')
 
-  def _check_changelogs(self) -> Check:
-    from databind.core import ConversionError
-    from shut.console.commands.log import ChangelogApplication
-    app = ChangelogApplication(self.app)
-    bad_changelogs = []
-    count = 0
-    for changelog in app.manager.all():
-      count += 1
-      try:
-        for entry in changelog.load().entries:
-          app.validate_entry(entry)
-      except (ConversionError, ValueError):
-        bad_changelogs.append(changelog.path.name)
-    check_name = 'shut:validate-changelogs'
-    if not count:
-      return Check(check_name, Check.Result.SKIPPED, None)
-    return Check(
-      check_name,
-      Check.Result.ERROR if bad_changelogs else Check.Result.OK,
-      f'Broken or invalid changelogs: {", ".join(bad_changelogs)}' if bad_changelogs else
-        f'All {count} changelogs are valid.',
-    )
-
   def _check_py_typed(self) -> Check:
     check_name = 'shut:typed'
     expect_typed = self.app.project_config.typed
@@ -174,17 +151,16 @@ class CheckCommand(Command):
   name = "check"
   description = "Perform sanity checks of your project configuration."
 
-  def __init__(self, app: Application):
+  def __init__(self, app: Application, config: CheckConfig):
     super().__init__()
     self.app = app
+    self.config = config
 
   def handle(self) -> int:
-    import databind.json
-    config = databind.json.load(self.app.project_config.extras.get('check', {}), CheckConfig)
 
     error = False
     checks = []
-    for plugin in load_plugins(CHECK_PLUGIN_ENTRYPOINT, _CheckPlugin, names=config.plugins).values():  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
+    for plugin in load_plugins(CHECK_PLUGIN_ENTRYPOINT, _CheckPlugin, names=self.config.plugins).values():  # type: ignore[misc]  # https://github.com/python/mypy/issues/5374
       for check in plugin.get_checks(self.app):
         checks.append(check)
 
@@ -203,5 +179,9 @@ class CheckCommand(Command):
 
 class CheckPlugin(ApplicationPlugin):
 
-  def activate(self, app: 'Application') -> None:
-    app.cleo.add(CheckCommand(app))
+  def load_config(self, app: 'Application') -> CheckConfig:
+    import databind.json
+    return databind.json.load(app.project_config.extras.get('check', {}), CheckConfig)
+
+  def activate(self, app: 'Application', config: CheckConfig) -> None:
+    app.cleo.add(CheckCommand(app, config))
