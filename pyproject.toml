@@ -41,9 +41,9 @@ shut = "shut.__main__:app"
 
 [tool.poetry.plugins."shut.application.ApplicationPlugin"]
 link-command = "shut.commands.link:LinkCommandPlugin"
+release-command = "shut.commands.release:ReleaseCommandPlugin"
 test-command = "shut.commands.test:TestCommandPlugin"
 # check-command = "shut.console.commands.check:CheckPlugin"
-# release-command = "shut.console.commands.release:ReleasePlugin"
 # log-command = "shut.console.commands.log:LogPlugin"
 
 # [tool.poetry.plugins."shut.plugins.remote"]

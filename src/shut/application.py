@@ -11,11 +11,14 @@ from cleo.application import Application as CleoApplication
 from cleo.commands.command import Command as _BaseCommand  # type: ignore[import]
 from cleo.helpers import argument, option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
+from nr.util import Optional
 from nr.util.functional import Once
 from nr.util.generic import T
 from nr.util.plugins import load_plugins_from_entrypoints, PluginRegistry
+from nr.util.fs import get_file_in_directory
 
 from shut import __version__
+from shut.util.python_package import Package, detect_packages
 from shut.util.toml_file import TomlFile
 
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
@@ -87,6 +90,29 @@ class Application:
 
     self.load_plugins()
     self.cleo.run()
+
+  def get_packages(self) -> list[Package]:
+    """ Tries to detect the packages in the project directory. Uses `tool.poetry.packages` if that configuration
+    exists, otherwise it attempts to automatically determine it. The `tool.shut.source-directory` option is used if
+    set, otherwise the `src/` directory or alternatively the project directory is used to detect the packages. """
+
+    if (directory := Optional(self.project_config.source_directory).map(Path).or_else(None)):
+      return detect_packages(Path(directory))
+
+    for directory in [Path('src'), Path()]:
+      packages = detect_packages(directory)
+      if packages:
+        break
+
+    return packages
+
+  def get_readme_path(self) -> Path | None:
+    """ Tries to detect the project readme. If `tool.poetry.readme` is set, that file will be returned. """
+
+    if (readme := self.load_pyproject().get('tool', {}).get('poetry', {}).get('readme')) and Path(readme).is_file():
+      return Path(readme)
+
+    return get_file_in_directory(Path.cwd(), 'README', ['README.md', 'README.rst'], case_sensitive=False)
 
 
 class ApplicationPlugin(abc.ABC):

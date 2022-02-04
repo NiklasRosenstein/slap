@@ -1,119 +1,21 @@
 
-import dataclasses
 import os
-import re
 import sys
 import textwrap
 import typing as t
 from pathlib import Path
 
 import databind.json
-from databind.core.annotations import alias
 from nr.util.plugins import load_plugins
 
-from shut.console.command import Command, IO, argument, option
-from shut.console.application import Application
-from shut.plugins.application_plugin import ApplicationPlugin
-from shut.plugins.release_plugin import (
-  ReleasePlugin as _ReleasePlugin, VersionRef, ENTRYPOINT as RELEASE_PLUGIN_ENTRYPOINT
-)
-from shut.util.python_package import Package
+from shut.application import Application, ApplicationPlugin, Command, argument, option
+from shut.commands.release.api import ReleasePlugin
+from shut.util.toml_file import TomlFile
+from .builtin import SourceCodeVersionMatcherPlugin, VersionRefConfigMatcherPlugin
+from .config import ReleaseConfig
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
-
-
-def match_version_ref_pattern(filename: Path, pattern: str) -> VersionRef:
-  """ Matches a regular expression in the given file and returns the location of the match. The *pattern*
-  should contain at least one capturing group. The first capturing group is considered the one that contains
-  the version number exactly.
-
-  :param filename: The file of which the contents will be checked against the pattern.
-  :param pattern: The regular expression that contains at least one capturing group.
-  """
-
-  compiled_pattern = re.compile(pattern, re.M | re.S)
-  if not compiled_pattern.groups:
-    raise ValueError(
-      f'pattern must contain at least one capturing group (filename: {filename!r}, pattern: {pattern!r})'
-    )
-
-  with open(filename) as fp:
-    match = compiled_pattern.search(fp.read())
-    if match:
-      return VersionRef(filename, match.start(1), match.end(1), match.group(1))
-
-  raise ValueError(f'pattern {pattern!r} does not match in file {filename!r}')
-
-
-@dataclasses.dataclass
-class VersionRefConfig:
-  file: str
-  pattern: str
-
-
-@dataclasses.dataclass
-class ReleaseConfig:
-  branch: str = 'develop'
-  commit_message: t.Annotated[str, alias('commit-message')] = 'release {version}'
-  tag_format: t.Annotated[str, alias('tag-format')] = '{version}'
-  references: list[VersionRefConfig] = dataclasses.field(default_factory=list)
-
-
-@dataclasses.dataclass
-class VersionRefConfigMatcherPlugin(_ReleasePlugin):
-  """ This plugin matches a list of #VersionRefConfig definitions and returns the matched version references. This
-  plugin is used to match the `tool.shut.release.references` config option and is always used. It should not be
-  registered in the `shut.plugins.release` entrypoint group.
-  """
-
-  PYPROJECT_CONFIG = VersionRefConfig('pyproject.toml', r'^version\s*=\s*[\'"]?(.*?)[\'"]')
-
-  references: list[VersionRefConfig]
-
-  def get_version_refs(self, io: 'IO') -> list[VersionRef]:
-    results = []
-    for config in [self.PYPROJECT_CONFIG] + self.references:
-      pattern = config.pattern.replace('{version}', r'(.*)')
-      version_ref = match_version_ref_pattern(Path(config.file), pattern)
-      if version_ref is not None:
-        results.append(version_ref)
-    return results
-
-
-@dataclasses.dataclass
-class SourceCodeVersionMatcherPlugin(_ReleasePlugin):
-  """ This plugin searches for a `__version__` key in the source code of the project and return it as a version
-  reference. Based on the Poetry configuration (considering `tool.poetry.packages` and searching in the `src/`
-  folder if it exists), the following source files will be checked:
-
-  * `__init__.py`
-  * `__about__.py`
-  * `_version.py`
-
-  Note that configuring `tool.poetry.packages` is needed for the detection to work correctly with PEP420
-  namespace packages.
-  """
-
-  VERSION_REGEX = r'^__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
-  FILENAMES = ['__init__.py', '__about__.py', '_version.py']
-
-  packages: list[Package]
-
-  def get_version_refs(self, io: 'IO') -> list[VersionRef]:
-    results = []
-    for package in self.packages:
-      for filename in self.FILENAMES:
-        path = package.path / filename
-        if path.exists():
-          version_ref = match_version_ref_pattern(path, self.VERSION_REGEX)
-          if version_ref:
-            results.append(version_ref)
-            break
-    if not results:
-      message = '<fg=yellow>warning: unable to detect <b>__version__</b> in a source file'
-      io.write_error_line(message + '</fg>')
-    return results
 
 
 class ReleaseCommand(Command):
@@ -147,7 +49,7 @@ class ReleaseCommand(Command):
 
   # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
-  def __init__(self, config: ReleaseConfig, pyproject: dict[str, t.Any]):
+  def __init__(self, config: ReleaseConfig, pyproject: TomlFile):
     super().__init__()
     self.config = config
     self.pyproject = pyproject
@@ -188,9 +90,9 @@ class ReleaseCommand(Command):
   def _get_raw_tool_config(self) -> dict[str, t.Any]:
     """ Internal. Get the raw `tool` config from the pyproject config. """
 
-    return self.pyproject.get('tool', {})
+    return self.pyproject.value().get('tool', {})
 
-  def _load_plugins(self) -> list[_ReleasePlugin]:
+  def _load_plugins(self) -> list[ReleasePlugin]:
     """ Internal. Loads the plugins to be used in the run of `poetry release`.
 
     If `SHUT_RELEASE_NO_PLUGINS` is set in the environment, no plugins will be loaded from entrypoints.
@@ -198,7 +100,7 @@ class ReleaseCommand(Command):
 
     tool = self._get_raw_tool_config()
 
-    plugins: list[_ReleasePlugin] = [
+    plugins: list[ReleasePlugin] = [
       VersionRefConfigMatcherPlugin(self.config.references),
       SourceCodeVersionMatcherPlugin(tool.get('poetry', {}).get('packages')),
     ]
@@ -206,7 +108,7 @@ class ReleaseCommand(Command):
     if os.getenv('SHUT_RELEASE_NO_PLUGINS') is not None:
       return plugins
 
-    return plugins + list(load_plugins(RELEASE_PLUGIN_ENTRYPOINT, _ReleasePlugin).values())
+    return plugins + list(load_plugins(RELEASE_PLUGIN_ENTRYPOINT, ReleasePlugin).values())
 
   def _show_version_refs(self, version_refs: list[VersionRef], status_line: str = '') -> None:
     """ Internal. Prints the version references to the terminal. """
@@ -427,11 +329,13 @@ class ReleaseCommand(Command):
     return 0
 
 
-class ReleasePlugin(ApplicationPlugin):
+class ReleaseCommandPlugin(ApplicationPlugin):
 
-  def load_config(self, app: Application) -> ReleaseConfig:
+  def load_configuration(self, app: Application) -> ReleaseConfig:
     data = app.project_config.extras.get('release', {})
     return databind.json.load(data, ReleaseConfig)
 
   def activate(self, app: Application, config: ReleaseConfig) -> None:
-    app.cleo.add(ReleaseCommand(config, app.load_pyproject()))
+    app.plugins.register(ReleasePlugin, lambda: SourceCodeVersionMatcherPlugin(app.get_packages()))
+    app.plugins.register(ReleasePlugin, lambda: VersionRefConfigMatcherPlugin(config.references))
+    app.cleo.add(ReleaseCommand(config, app.pyproject))
