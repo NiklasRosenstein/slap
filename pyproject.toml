@@ -37,24 +37,24 @@ pytest-coverage = "^0.0"
 pylint = "^2.12.2"
 
 [tool.poetry.scripts]
-shut = "shut.console.application:app"
+shut = "shut.__main__:app"
 
-[tool.poetry.plugins."shut.plugins.application"]
-check-command = "shut.console.commands.check:CheckPlugin"
-release-command = "shut.console.commands.release:ReleasePlugin"
-link-command = "shut.console.commands.link:LinkPlugin"
-log-command = "shut.console.commands.log:LogPlugin"
-test-command = "shut.console.commands.test:TestPlugin"
+[tool.poetry.plugins."shut.application.ApplicationPlugin"]
+link-command = "shut.commands.link:LinkCommandPlugin"
+# check-command = "shut.console.commands.check:CheckPlugin"
+# release-command = "shut.console.commands.release:ReleasePlugin"
+# log-command = "shut.console.commands.log:LogPlugin"
+# test-command = "shut.console.commands.test:TestPlugin"
 
-[tool.poetry.plugins."shut.plugins.remote"]
-github = "shut.remotes.github:GithubRemotePlugin"
+# [tool.poetry.plugins."shut.plugins.remote"]
+# github = "shut.remotes.github:GithubRemotePlugin"
 
-[tool.poetry.plugins."shut.plugins.remote_implementation"]
-github = "shut.remotes.github:GithubRemote"
+# [tool.poetry.plugins."shut.plugins.remote_implementation"]
+# github = "shut.remotes.github:GithubRemote"
 
-[tool.poetry.plugins."shut.plugins.check"]
-poetry = "shut.console.commands.check:PoetryChecksPlugin"
-shut = "shut.console.commands.check:ShutChecksPlugin"
+# [tool.poetry.plugins."shut.plugins.check"]
+# poetry = "shut.console.commands.check:PoetryChecksPlugin"
+# shut = "shut.console.commands.check:ShutChecksPlugin"
 
 #
 # Shut

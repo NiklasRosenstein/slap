@@ -10,9 +10,7 @@ from nr.util.algorithm import longest_common_substring
 from nr.util.fs import atomic_swap
 from setuptools import find_namespace_packages  # type: ignore[import]
 
-from shut.console.command import Command, option
-from shut.console.application import Application
-from shut.plugins.application_plugin import ApplicationPlugin
+from shut.application import Application, ApplicationPlugin, Command, option
 
 PYPROJECT_TOML = Path('pyproject.toml')
 
@@ -155,10 +153,10 @@ class LinkCommand(Command):
     return 0
 
 
-class LinkPlugin(ApplicationPlugin):
+class LinkCommandPlugin(ApplicationPlugin):
 
-  def load_config(self, app: 'Application') -> None:
+  def load_configuration(self) -> None:
     return None
 
-  def activate(self, application: Application, config: None):
-    application.cleo.add(LinkCommand())
+  def activate(self, app: Application, config: None):
+    app.cleo.add(LinkCommand())

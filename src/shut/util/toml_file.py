@@ -38,7 +38,7 @@ class TomlFile(t.MutableMapping[str, t.Any]):
   def load(self, force_reload: bool = False) -> dict[str, t.Any]:
     import tomli
     if self._data is None or force_reload:
-      with self._path.open() as fp:
+      with self._path.open('rb') as fp:
         self._data = tomli.load(fp)
     return self._data
 
@@ -57,7 +57,7 @@ class TomlFile(t.MutableMapping[str, t.Any]):
 
   def value(self, data: dict[str, t.Any] | None = None) -> None:
     if data is None:
-      return self._data
+      return self.load()
     else:
       self._data = data
 
