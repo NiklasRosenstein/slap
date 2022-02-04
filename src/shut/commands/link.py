@@ -155,7 +155,7 @@ class LinkCommand(Command):
 
 class LinkCommandPlugin(ApplicationPlugin):
 
-  def load_configuration(self) -> None:
+  def load_configuration(self, app: Application) -> None:
     return None
 
   def activate(self, app: Application, config: None):

@@ -79,7 +79,7 @@ class Application:
         (disable is not None and plugin_name not in self.DEFAULT_PLUGINS)
       )
       if activate_this_plugin:
-        config = plugin.load_configuration()
+        config = plugin.load_configuration(self)
         plugin.activate(self, config)
 
   def __call__(self) -> None:
@@ -89,10 +89,10 @@ class Application:
     self.cleo.run()
 
 
-class ApplicationPlugin:
+class ApplicationPlugin(abc.ABC):
 
   @abc.abstractmethod
-  def load_configuration(self) -> T: ...
+  def load_configuration(self, app: Application) -> T: ...
 
   @abc.abstractmethod
   def activate(self, app: Application, config: T) -> None: ...

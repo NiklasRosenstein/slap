@@ -5,9 +5,7 @@ import typing as t
 
 from nr.util.singleton import NotSet
 
-from shut.console.command import Command, IO, argument, option
-from shut.console.application import Application
-from shut.plugins.application_plugin import ApplicationPlugin
+from shut.application import Application, ApplicationPlugin, Command, IO, argument, option
 
 
 class TestRunner:
@@ -105,11 +103,10 @@ class TestCommand(Command):
     return 0 if set(results.values()) == {0} else 1
 
 
-class TestPlugin(ApplicationPlugin):
+class TestCommandPlugin(ApplicationPlugin):
 
-  def load_config(self, app: 'Application') -> dict[str, str]:
-    test_config = app.project_config.extras.get('test', {})
-    return test_config
+  def load_configuration(self, app: Application) -> dict[str, str]:
+    return app.raw_config().get('test', {})
 
-  def activate(self, app: 'Application', config: dict[str, str]) -> None:
+  def activate(self, app: Application, config: dict[str, str]) -> None:
     app.cleo.add(TestCommand(config))
