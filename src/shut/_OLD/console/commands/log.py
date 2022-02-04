@@ -6,8 +6,8 @@ from pathlib import Path
 from databind.core.annotations import alias
 from nr.util.git import Git
 
-from shut.changelog.changelog import Changelog
-from shut.changelog.manager import ChangelogManager, DEFAULT_VALID_TYPES
+from shut.changelog.model import Changelog
+from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES
 from shut.console.command import Command, option
 from shut.console.application import Application
 from shut.console.commands.check import Check, CheckPlugin
@@ -163,7 +163,7 @@ class ChangelogConsistencyCheck(CheckPlugin):
 
   def _check_changelogs(self) -> Check:
     from databind.core import ConversionError
-    from shut.changelog.manager import ChangelogManager
+    from shut.changelog.changelog_manager import ChangelogManager
     manager = ChangelogManager(self.app)
     bad_changelogs = []
     count = 0

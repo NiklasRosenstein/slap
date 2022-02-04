@@ -1,0 +1,169 @@
+
+import abc
+import dataclasses
+import enum
+import re
+import typing as t
+from pathlib import Path
+
+from nr.util.functional import Consumer
+from nr.util.git import Git as _Git, NoCurrentBranchError
+
+
+class FileStatus(enum.Enum):
+  NONE = enum.auto()
+  ADDED = enum.auto()
+  MODIFIED = enum.auto()
+  RENAMED = enum.auto()
+  DELETED = enum.auto()
+  UNKNOWN = enum.auto()
+
+
+@dataclasses.dataclass
+class FileInfo:
+  path: Path
+  staging: FileStatus
+  disk: FileStatus
+
+
+@dataclasses.dataclass
+class Remote:
+  name: str
+  url: str
+  default: bool
+
+
+@dataclasses.dataclass
+class Author:
+  name: str | None
+  email: str | None
+
+
+class Vcs(abc.ABC):
+  """ Interface to perform actions on a local version control system and its remote counterpart. """
+
+  @abc.abstractmethod
+  def get_web_url(self) -> str | None:
+    """ Try to identify the web URL of the repository. """
+
+  @abc.abstractmethod
+  def get_remotes(self) -> t.Sequence[Remote]:
+    """ Return a sequence of the known remote copies that the local version can be synced with. At least one of the
+    returned remotes should be marked as the default remote via {@link Remote.default}. """
+
+  @abc.abstractmethod
+  def get_current_branch(self) -> str | None:
+    """ Return the name of the current branch in the local repository. This is used by Shut to ensure that the user
+    is on the right branch before creating a new release. """
+
+  @abc.abstractmethod
+  def get_author(self) -> Author:
+    """ Determine the author details from the repository settings. """
+
+  @abc.abstractmethod
+  def get_all_files(self) -> t.Sequence[Path]:
+    """ Return a sequence of all the files known to the VCS. """
+
+  @abc.abstractmethod
+  def get_changed_files(self) -> t.Sequence[FileInfo]:
+    """ Return the status of all files in the version control repository that have been changed or are unknown to the
+    VCS (and not ignored). """
+
+  @abc.abstractmethod
+  def commit_files(
+    self,
+    files: t.Sequence[Path],
+    commit_message: str,
+    tag_name: str | None = None,
+    push: Remote | None = None,
+    force: bool = False,
+    allow_empty: bool = False,
+    log_line: Consumer[str] | None = None,
+  ) -> None:
+    """ Commit the given files into the VCS, and optionally create a tag with the given name. If a remote is specified
+    for the *push* argument, the commit that was just created on the current branch as well as the tag name if one was
+    specified will be pushed to the remote. """
+
+
+class Git(Vcs):
+
+  def __init__(self, directory: Path) -> None:
+    self._git = _Git(directory)
+    assert self._git.get_toplevel() is not None, f'Not a Git repository: {directory}'
+
+  def get_web_url(self) -> str | None:
+    remote = next((r for r in self._git.remotes() if r.name == 'origin'), None)
+    if not remote:
+      return None
+    url = remote.fetch
+    if url.endswith('.git'):
+      url = url[:-4]
+    if url.startswith('http'):
+      return url
+    match = re.match(r'\w+@(.*)$', url)
+    if match:
+      return 'https://' + match.group(1)
+    return None
+
+  def get_remotes(self) -> t.Sequence[Remote]:
+    result = []
+    for remote in self._git.remotes():
+      default = remote.name == 'origin'
+      result.append(Remote(remote.name, remote.push, default))
+    return result
+
+  def get_current_branch(self) -> str | None:
+    try:
+      return self._git.get_current_branch_name()
+    except NoCurrentBranchError:
+      return None
+
+  def get_author(self) -> Author:
+    name = self._git.get_config('user.name')
+    email = self._git.get_config('user.email')
+    return Author(name, email)
+
+  def get_all_files(self) -> t.Sequence[Path]:
+    return [self._git.path / f for f in self._git.get_files()]
+
+  def get_changed_files(self) -> t.Sequence[FileInfo]:
+    result = []
+    for file in self._git.get_status():
+      result.append(FileInfo(
+        Path(file.filename),
+        self._git_file_status(file.mode[0]),
+        self._git_file_status(file.mode[1])
+      ))
+    return result
+
+  def commit_files(
+    self,
+    files: t.Sequence[Path],
+    commit_message: str,
+    tag_name: str | None = None,
+    push: Remote | None = None,
+    force: bool = False,
+    allow_empty: bool = False,
+    log_line: Consumer[str] | None = None,
+  ) -> None:
+    # TODO (@NiklasRosenstein): Capture stdout from Git subprocess and redirect to log_line().
+    self._git.add([str(f.resolve()) for f in files])
+    self._git.commit(commit_message, allow_empty=allow_empty)
+    if tag_name is not None:
+      self._git.tag(tag_name, force)
+    if push is not None:
+      refs = [self._git.get_current_branch_name()]
+      if tag_name is not None:
+        refs.append(tag_name)
+      self._git.push(push.name, *refs, force=force)
+
+  @staticmethod
+  def _git_file_status(mode: str) -> FileStatus:
+    return {
+      ' ': FileStatus.NONE,
+      'A': FileStatus.ADDED,
+      'M': FileStatus.MODIFIED,
+      'R': FileStatus.RENAMED,
+      'D': FileStatus.DELETED,
+      '?': FileStatus.UNKNOWN,
+    }[mode]

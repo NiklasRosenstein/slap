@@ -18,6 +18,5 @@ class ChangelogEntry:
 
 @dataclasses.dataclass
 class Changelog:
-
   entries: list[ChangelogEntry] = dataclasses.field(default_factory=list)
   release_date: t.Annotated[datetime.date | None, alias("release-date")] = None

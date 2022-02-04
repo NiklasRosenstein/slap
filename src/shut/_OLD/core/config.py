@@ -13,3 +13,8 @@ class ProjectConfig:
   remote: RemotePlugin | None = None
   typed: bool | None = None
   extras: t.Annotated[dict[str, t.Any], fieldinfo(flat=True)] = dataclasses.field(default_factory=dict)
+
+
+@dataclasses.dataclass
+class GlobalConfig:
+  author: str | None = None
