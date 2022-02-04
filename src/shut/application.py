@@ -41,10 +41,8 @@ class Application:
     self.cleo = CleoApplication(name, version)
 
     self.cleo._initialized = True
-    from cleo.commands.list_command import ListCommand
-    list_command = ListCommand()
-    list_command.name = 'help'
-    self.cleo.add(list_command)
+    from shut.commands.help import HelpCommand
+    self.cleo.add(HelpCommand())
     self.cleo._default_command = 'help'
 
   def get_raw_configuration(self) -> dict[str, t.Any]:
