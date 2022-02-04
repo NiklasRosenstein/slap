@@ -36,9 +36,16 @@ class Application:
     self.pyproject = TomlFile(project_directory / 'pyproject.toml')
     self.projectcfg = TomlFile(project_directory / 'shut.toml')
     self.usercfg = TomlFile(Path('~/.config/shut/config.toml').expanduser())
-    self.cleo = CleoApplication(name, version)
     self.raw_config = Once(self.get_raw_configuration)
     self.plugins = PluginRegistry()
+    self.cleo = CleoApplication(name, version)
+
+    self.cleo._initialized = True
+    from cleo.commands.list_command import ListCommand
+    list_command = ListCommand()
+    list_command.name = 'help'
+    self.cleo.add(list_command)
+    self.cleo._default_command = 'help'
 
   def get_raw_configuration(self) -> dict[str, t.Any]:
     """ Loads the raw configuration data for Shut from either the `shut.toml` configuration file or `pyproject.toml`
