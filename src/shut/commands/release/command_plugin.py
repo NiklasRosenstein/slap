@@ -150,6 +150,9 @@ class ReleaseCommand(Command):
 
     from poetry.core.semver.version import Version
 
+    if version is not None:
+      Version.parse(version)
+
     versions = set(ref.value for ref in version_refs)
     if not versions:
       self.line(f'<info>no version numbers detected</info>')
@@ -162,7 +165,6 @@ class ReleaseCommand(Command):
 
     has_version = next(iter(versions))
     if version is not None:
-      Version.parse(version)
       if version != has_version:
         self.line(f'<error>version mismatch, expected <b>{version}</b>, got <b>{has_version}</b></error>')
         return 1
