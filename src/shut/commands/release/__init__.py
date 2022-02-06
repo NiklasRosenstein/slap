@@ -1,2 +1,2 @@
 
-from .release_command import ReleaseCommandPlugin
+from .command_plugin import ReleaseCommandPlugin

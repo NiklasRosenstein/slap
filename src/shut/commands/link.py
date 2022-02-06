@@ -45,43 +45,37 @@ def identify_flit_module(directory: Path) -> str:
 
 class LinkCommand(Command):
   """
-  Poetry natively does not support editable installs (as of writing this on Jan 22, 2022). This
-  command makes use of the <fg=green>Flit</fg> backend to leverage its excellent symlink support. Relevant parts of
-  the Poetry configuration will by adpated such that no Flit related configuration needs to be added
-  to <fg=cyan>pyproject.toml</fg>.
+  Install your Python package in development mode.
+
+  This command uses <u>Flit [0]</u> to symlink the Python package you are currently
+  working on into your Python environment's site-packages. This is particulary
+  useful if your project is using a <u>PEP 518 [1]</u> compatible build system that does
+  not support editable installs.
+
+  When you run this command, the <u>pyproject.toml</u> will be temporarily rewritten such
+  that Flit can understand it. The following ways to describe a Python project are
+  currently supported be the rewriter:
+
+  1. <u>Poetry [2]</u>
+
+    Supported configurations:
+      - <fg=cyan>plugins</fg> (aka. "entrypoints")
+      - <fg=cyan>scripts</fg>
+      - <fg=cyan>packages</fg>
 
   <b>Example usage:</b>
 
-    <fg=cyan>$ poetry link</fg>
-    Discovered modules in /projects/poetry-link/src: my_package
+    <fg=yellow>$</fg> shut link
+    <fg=dark_gray>Discovered modules in /projects/my_package/src: my_package
     Extras to install for deps 'all': {{'.none'}}
-    Symlinking src/my_package -> .venv/lib/python3.10/site-packages/my_package
+    Symlinking src/my_package -> .venv/lib/python3.10/site-packages/my_package</fg>
 
-  <b>How it works</b>
-
-    First, the Poetry configuration in <fg=cyan>pyproject.toml</fg> will be updated temporarily to contain the
-    relevant parts in the format that Flit understands. The changes to the configuration include
-
-      • copy <fg=cyan>tool.poetry.plugins</fg> -> <b>tool.flit.entrypoints</b>
-      • copy <fg=cyan>tool.poetry.scripts</fg> -> <b>tool.flit.scripts</b>
-      • add <b>project</b>
-        • the <b>module</b> is derived automatically using <fg=cyan>setuptools.find_namespace_packages()</fg> on the
-          <b>src/</b> directory, if it exists, or otherwise on the current directory. Note that Flit
-          only supports installing one package at a time, so it will be an error if setuptools
-          discovers more than one package.
-
-    Then, while the configuration is in an updated state, <fg=cyan>$ flit install -s --python `which python`</fg> is
-    invoked. This will symlink your package into your currently active Python environment. (Note that right
-    now, the plugin does not support auto-detecting the virtual environment automatically created for you by
-    Poetry and the environment in which you want to symlink the package to needs to be active).
-
-    Finally, the configuration is reverted to its original state.
-
-  <info>This command is available because you have the <b>poetry-link</b> package installed.</info>
+  <u>[0]: https://flit.readthedocs.io/en/latest/</u>
+  <u>[1]: https://www.python.org/dev/peps/pep-0518/</u>
+  <u>[2]: https://python-poetry.org/</u>
   """
 
   name = "link"
-  description = "Install your package in development mode using Flit."
   help = textwrap.dedent(__doc__)
   options = [
     option(

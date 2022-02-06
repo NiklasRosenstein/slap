@@ -49,17 +49,24 @@ class TestRunner:
 
 class TestCommand(Command):
   """
-  Execute the tests configured in <info>tool.shut.test</info>.
+  Execute commands configured in <fg=green>[tool.shut.test]</fg>.
 
-  <b>Example</b>
+  <b>Example configuration:</b>
 
     <fg=cyan>[tool.shut.test]</fg>
     <fg=green>pytest</fg> = <fg=yellow>"pytest --cov=my_package tests/"</fg>
     <fg=green>mypy</fg> = <fg=yellow>"mypy src"</fg>
+
+  <b>Example usage:</b>
+
+    <fg=yellow>$</fg> shut test
+    <fg=dark_gray>mypy | Success: no issues found in 12 source files
+    pytest | ===================================== test session starts ======================================
+    pytest | platform linux -- Python 3.10.2, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+    ...</fg>
   """
 
   name = "test"
-  description = "Execute all tests configured in <info>tool.shut.test</info>"
   arguments = [
     argument("test", "One or more tests to run (runs all if none are specified)", optional=True, multiple=True),
   ]

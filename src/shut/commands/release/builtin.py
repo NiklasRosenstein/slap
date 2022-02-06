@@ -3,6 +3,7 @@ import dataclasses
 from pathlib import Path
 
 from shut.application import IO
+from shut.util.python_package import Package
 from .api import ReleasePlugin, VersionRef, match_version_ref_pattern
 from .config import VersionRefConfig
 

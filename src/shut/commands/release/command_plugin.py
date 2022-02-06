@@ -1,4 +1,5 @@
 
+from email.mime import application
 import os
 import sys
 import textwrap
@@ -6,11 +7,11 @@ import typing as t
 from pathlib import Path
 
 import databind.json
-from nr.util.plugins import load_plugins
 
 from shut.application import Application, ApplicationPlugin, Command, argument, option
 from shut.commands.release.api import ReleasePlugin
 from shut.util.toml_file import TomlFile
+from .api import VersionRef
 from .builtin import SourceCodeVersionMatcherPlugin, VersionRefConfigMatcherPlugin
 from .config import ReleaseConfig
 
@@ -19,6 +20,35 @@ if t.TYPE_CHECKING:
 
 
 class ReleaseCommand(Command):
+  """
+  Create a new release of your Python package.
+
+  This command can perform the following operations in sequence (most of them need
+  to be enabled explicitly with flags):
+
+  1. Bump the version number in <u>pyproject.toml</u> and in other files
+  2. Add the changed files to Git, create a commit and a tag (<opt>--tag, -t</opt>)
+  3. Push the commit and tag to the remote repository (<opt>--push, -p</opt>)
+  4. Create a new release on the repository host (eg. <u>GitHub</u>) (<opt>--create-release, -R</opt>)
+
+  In addition to the <u>pyproject.toml</u>, the command will automatically detect the file(s)
+  in your Python source code that contain a <b>__version__</b> member and update it as well.
+  Additional files can be updated by configuring the <fg=green>[tool.shut.release.references]</fg>
+  option:
+
+    <fg=green>[tool.shut.release]</fg>
+    <fg=dark_gray>references</fg> = [
+      {{ <fg=dark_gray>file</fg> = <fg=yellow>"../frontend/package.json"</fg>, <fg=dark_gray>pattern</fg> = <fg=yellow>"  \\"version\\": \\"{{VERSION}}\\""</fg> }}
+    ]
+
+  Furthermore, the <opt>--validate</opt> option can be used in CI to ensure that the version numbers
+  are consistent across the project. This is particularly useful when automating publishing
+  from CI builds.
+
+  <b>Environment variables</b>
+
+    <u>SHUT_RELEASE_NO_PLUGINS</u>: If set, no release plugins will be loaded besides the builtin.
+  """
 
   name = "release"
   description = (
@@ -41,17 +71,12 @@ class ReleaseCommand(Command):
     option("no-worktree-check", None, "Do not check the worktree state."),
   ]
 
-  help = textwrap.dedent("""
-    The release command bumps the version number in <info>pyproject.toml</info>, much like the version
-    command, but also in other places. Optionally, it will create a Git tag and push the changes to the
-    remote repository.
-  """)
-
   # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
-  def __init__(self, config: ReleaseConfig, pyproject: TomlFile):
+  def __init__(self, config: ReleaseConfig, app: Application, pyproject: TomlFile):
     super().__init__()
     self.config = config
+    self.app = app
     self.pyproject = pyproject
 
   def _validate_options(self) -> int:
@@ -102,18 +127,20 @@ class ReleaseCommand(Command):
 
     plugins: list[ReleasePlugin] = [
       VersionRefConfigMatcherPlugin(self.config.references),
-      SourceCodeVersionMatcherPlugin(tool.get('poetry', {}).get('packages')),
+      SourceCodeVersionMatcherPlugin(self.app.get_packages()),
     ]
 
     if os.getenv('SHUT_RELEASE_NO_PLUGINS') is not None:
       return plugins
 
-    return plugins + list(load_plugins(RELEASE_PLUGIN_ENTRYPOINT, ReleasePlugin).values())
+    for plugin_name, plugin in self.app.plugins.group(ReleasePlugin, ReleasePlugin):
+      plugins.append(plugin)
+
+    return plugins
 
   def _show_version_refs(self, version_refs: list[VersionRef], status_line: str = '') -> None:
     """ Internal. Prints the version references to the terminal. """
 
-    self.line(f'<b>version references:</b> {status_line}')
     max_length = max(len(str(ref.file)) for ref in version_refs)
     for ref in version_refs:
       self.line(f'  <fg=cyan>{str(ref.file).ljust(max_length)}</fg> {ref.value}')
@@ -121,16 +148,27 @@ class ReleaseCommand(Command):
   def _validate_version_refs(self, version_refs: list[VersionRef], version: str | None) -> int:
     """ Internal. Verifies the consistency of the given version references. This is used when `--validate` is set. """
 
+    from poetry.core.semver.version import Version
+
     versions = set(ref.value for ref in version_refs)
-    if len(versions) > 1:
-      self._show_version_refs(version_refs, '<error>inconsistencies detected</error>')
+    if not versions:
+      self.line(f'<info>no version numbers detected</info>')
       return 1
+
+    if len(versions) > 1:
+      self.line('<error>versions are inconsistent</error>')
+      self._show_version_refs(version_refs)
+      return 1
+
+    has_version = next(iter(versions))
     if version is not None:
       Version.parse(version)
-      if version not in versions:
-        self._show_version_refs(version_refs, f'<error>expected <b>{version}</b>, but got</error>')
+      if version != has_version:
+        self.line(f'<error>version mismatch, expected <b>{version}</b>, got <b>{has_version}</b></error>')
         return 1
-    self._show_version_refs(version_refs, '<comment>in good shape</comment>')
+
+    self.line(f'<comment>versions are ok</comment>')
+    self._show_version_refs(version_refs)
     return 0
 
   def _check_on_release_branch(self) -> bool:
@@ -295,7 +333,7 @@ class ReleaseCommand(Command):
     from nr.util.git import Git
 
     self.git = Git()
-    self.is_git_repository = self.git.is_repository()
+    self.is_git_repository = self.git.get_toplevel() is not None
 
     if (err := self._validate_options()) != 0:
       return err
@@ -325,17 +363,19 @@ class ReleaseCommand(Command):
         '<error>error: no action implied, specify a <info>version</info> argument or the <info>--validate</info> option'
       )
       return 1
-
+    self.add_style
     return 0
 
 
 class ReleaseCommandPlugin(ApplicationPlugin):
 
   def load_configuration(self, app: Application) -> ReleaseConfig:
-    data = app.project_config.extras.get('release', {})
+    data = app.raw_config().get('release', {})
     return databind.json.load(data, ReleaseConfig)
 
   def activate(self, app: Application, config: ReleaseConfig) -> None:
-    app.plugins.register(ReleasePlugin, lambda: SourceCodeVersionMatcherPlugin(app.get_packages()))
-    app.plugins.register(ReleasePlugin, lambda: VersionRefConfigMatcherPlugin(config.references))
-    app.cleo.add(ReleaseCommand(config, app.pyproject))
+    app.plugins.register(ReleasePlugin, 'builtins.SourceCodeVersionMatcherPlugin',
+      lambda: SourceCodeVersionMatcherPlugin(app.get_packages()))
+    app.plugins.register(ReleasePlugin, 'builtins.VersionRefConfigMatcherPlugin',
+      lambda: VersionRefConfigMatcherPlugin(config.references))
+    app.cleo.add(ReleaseCommand(config, app, app.pyproject))

@@ -7,7 +7,7 @@ import textwrap
 import typing as t
 from pathlib import Path
 
-from cleo.application import Application as CleoApplication
+from cleo.application import Application as BaseCleoApplication
 from cleo.commands.command import Command as _BaseCommand  # type: ignore[import]
 from cleo.helpers import argument, option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
@@ -28,6 +28,41 @@ class Command(_BaseCommand):
 
   def __init_subclass__(cls) -> None:
     cls.help = textwrap.dedent(cls.help or cls.__doc__ or '')
+    cls.description = cls.description or cls.help.strip().splitlines()[0]
+
+
+class CleoApplication(BaseCleoApplication):
+
+  from cleo.io.inputs.input import Input
+  from cleo.io.outputs.output import Output
+
+  def __init__(self, name: str = "console", version: str = "") -> None:
+    super().__init__(name, version)
+    self._styles = {}
+
+    self._initialized = True
+    from shut.commands.help import HelpCommand
+    self.add(HelpCommand())
+    self._default_command = 'help'
+
+    self.add_style('u', options=['underline'])
+    self.add_style('opt', 'cyan', options=['italic'])
+
+  def add_style(self, name, fg=None, bg=None, options=None):
+    from cleo.formatters.style import Style
+    self._styles[name] = Style(fg, bg, options)
+
+  def create_io(
+    self,
+    input: Optional[Input] = None,
+    output: Optional[Output] = None,
+    error_output: Optional[Output] = None
+  ) -> IO:
+    io = super().create_io(input, output, error_output)
+    for style_name, style in self._styles.items():
+      io.output.formatter.set_style(style_name, style)
+      io.error_output.formatter.set_style(style_name, style)
+    return io
 
 
 class Application:
@@ -42,11 +77,6 @@ class Application:
     self.raw_config = Once(self.get_raw_configuration)
     self.plugins = PluginRegistry()
     self.cleo = CleoApplication(name, version)
-
-    self.cleo._initialized = True
-    from shut.commands.help import HelpCommand
-    self.cleo.add(HelpCommand())
-    self.cleo._default_command = 'help'
 
   def get_raw_configuration(self) -> dict[str, t.Any]:
     """ Loads the raw configuration data for Shut from either the `shut.toml` configuration file or `pyproject.toml`
@@ -96,7 +126,9 @@ class Application:
     exists, otherwise it attempts to automatically determine it. The `tool.shut.source-directory` option is used if
     set, otherwise the `src/` directory or alternatively the project directory is used to detect the packages. """
 
-    if (directory := Optional(self.project_config.source_directory).map(Path).or_else(None)):
+    source_directory: str | None = self.raw_config().get('source-directory')
+
+    if (directory := Optional(source_directory).map(Path).or_else(None)):
       return detect_packages(Path(directory))
 
     for directory in [Path('src'), Path()]:
