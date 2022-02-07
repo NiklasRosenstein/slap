@@ -4,6 +4,8 @@
 import typing as t
 from pathlib import Path
 
+from nr.util.generic import T
+
 
 class TomlFile(t.MutableMapping[str, t.Any]):
 
@@ -60,6 +62,13 @@ class TomlFile(t.MutableMapping[str, t.Any]):
       return self.load()
     else:
       self._data = data
+
+  def value_or(self, default: T) -> dict[str, t.Any] | T:
+    if self._data is not None:
+      return self._data
+    if self.exists():
+      return self.load()
+    return default
 
   @property
   def path(self) -> Path:

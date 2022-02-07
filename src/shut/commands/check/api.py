@@ -5,9 +5,7 @@ import dataclasses
 import typing as t
 
 if t.TYPE_CHECKING:
-  from shut.console.application import Application
-
-ENTRYPOINT = "shut.plugins.check"
+  from shut.application import Application
 
 
 class CheckResult(enum.Enum):
@@ -20,6 +18,11 @@ class CheckResult(enum.Enum):
 @dataclasses.dataclass
 class Check:
   Result: t.ClassVar = CheckResult
+  OK: t.ClassVar = CheckResult.OK
+  WARNING: t.ClassVar = CheckResult.WARNING
+  ERROR: t.ClassVar = CheckResult.ERROR
+  SKIPPED: t.ClassVar = CheckResult.SKIPPED
+
   name: str
   result: Result
   description: str | None

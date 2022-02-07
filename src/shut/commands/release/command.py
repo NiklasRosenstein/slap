@@ -1,18 +1,18 @@
 
-from email.mime import application
 import os
 import sys
-import textwrap
 import typing as t
 from pathlib import Path
 
 import databind.json
 
 from shut.application import Application, ApplicationPlugin, Command, argument, option
+from shut.commands.check.api import CheckPlugin
 from shut.commands.release.api import ReleasePlugin
 from shut.util.toml_file import TomlFile
 from .api import VersionRef
 from .builtin import SourceCodeVersionMatcherPlugin, VersionRefConfigMatcherPlugin
+from .checks import ReleaseChecksPlugin
 from .config import ReleaseConfig
 
 if t.TYPE_CHECKING:
@@ -380,4 +380,5 @@ class ReleaseCommandPlugin(ApplicationPlugin):
       lambda: SourceCodeVersionMatcherPlugin(app.get_packages()))
     app.plugins.register(ReleasePlugin, 'builtins.VersionRefConfigMatcherPlugin',
       lambda: VersionRefConfigMatcherPlugin(config.references))
+    app.plugins.register(CheckPlugin, 'release', ReleaseChecksPlugin())
     app.cleo.add(ReleaseCommand(config, app, app.pyproject))
