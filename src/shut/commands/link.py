@@ -59,9 +59,9 @@ class LinkCommand(Command):
   1. <u>Poetry [2]</u>
 
     Supported configurations:
+      - <fg=cyan>version</fg>
       - <fg=cyan>plugins</fg> (aka. "entrypoints")
       - <fg=cyan>scripts</fg>
-      - <fg=cyan>packages</fg>
 
   <b>Example usage:</b>
 
@@ -105,7 +105,7 @@ class LinkCommand(Command):
     return directory
 
   def _setup_flit_config(self, data: dict[str, t.Any]) -> bool:
-    """ Intenral. Makes sure the configuration in *data* is compatible with Flit. """
+    """ Internal. Makes sure the configuration in *data* is compatible with Flit. """
 
     poetry = data['tool'].get('poetry', {})
     plugins = poetry.get('plugins', {})
@@ -118,8 +118,11 @@ class LinkCommand(Command):
       project['scripts'] = scripts
 
     # TODO (@NiklasRosenstein): Do we need to support gui-scripts as well?
+    # TODO (@NiklasRosenstein): Support [tool.poetry.packages] which may contain multiple modules.
 
-    module = identify_flit_module(self._get_source_directory())
+    src_directory = self._get_source_directory()
+    module = identify_flit_module(src_directory)
+    self.line(f'Discovered modules in {src_directory}: <fg=cyan>{module}</fg>')
     project['name'] = module
     project['version'] = poetry['version']
     project['description'] = ''

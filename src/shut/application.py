@@ -18,6 +18,7 @@ from nr.util.plugins import load_plugins_from_entrypoints, PluginRegistry
 from nr.util.fs import get_file_in_directory
 
 from shut import __version__
+from shut.util.cleo import add_style
 from shut.util.python_package import Package, detect_packages
 from shut.util.toml_file import TomlFile
 
@@ -62,8 +63,7 @@ class CleoApplication(BaseCleoApplication):
   ) -> IO:
     io = super().create_io(input, output, error_output)
     for style_name, style in self._styles.items():
-      io.output.formatter.set_style(style_name, style)
-      io.error_output.formatter.set_style(style_name, style)
+      add_style(io, style_name, style)
     return io
 
 
