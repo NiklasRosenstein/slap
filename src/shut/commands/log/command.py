@@ -11,41 +11,42 @@ from .checks import ChangelogConsistencyCheck
 
 
 class LogAddCommand(Command):
+  """
+  This command allows you to add structured changelog via the CLI.
+
+  A changelog is a TOML file, usually in the <u>.changelog/</u> directory, named with
+  the version number it refers to and containing changelog entries. Changes that
+  are currently not released in a version are stored in a file called
+  <u>_unreleased.toml</u>.
+
+  Changelog entries contain at least one author, a type (e.g. whether the entry
+  describes a feature, enhancement, bug fix, etc.) and optionally a subject (e.g.
+  whether the change is related to docs or a particular component of the code), a
+  Markdown description, possibly a link to a pull request with which the change
+  was introduced and links to issues that the changelog addresses.
+
+  <b>Example:</b>
+
+    <fg=blue># .changelog/0.1.1.toml</fg>
+    <fg=cyan>[changelog]</fg>
+    <fg=green>release-date</fg> = <fg=yellow>"2022-01-17"</fg>
+
+    <fg=cyan>[[changelog.entries]]</fg>
+    <fg=green>id</fg> = <fg=yellow>"a7bc01f"</fg>
+    <fg=green>type</fg> = <fg=yellow>"improvement"</fg>
+    <fg=green>description</fg> = <fg=yellow>"Improvement to `my_package.util`"</fg>
+    <fg=green>author</fg> = <fg=yellow>"username"</fg>
+    <fg=green>pr</fg> = <fg=yellow>"https://github.com/username/my_package/pulls/13"</fg>
+
+  Changelog entries can be managed easily using the <info>shut log</info> command.
+
+    <fg=yellow>$</fg> shut log add -t feature -d 'Improvement to `my_package.util`"
+
+  The <fg=green>pr</fg> field is usually set manually after the PR is created or updated
+  automatically by a CI action using the <info>shut log update-pr-field</info> command.
+  """
 
   name = "log add"
-  description = "Add an entry to the unreleased changelog."
-  help = """
-    The <info>shut log add</info> command allows you to add structured changelog via the CLI.
-
-    A changelog is a TOML file, usually in the <fg=cyan>.changelog/</fg> directory, named with the version number
-    it refers to and containing changelog entries. Changes that are currently not released in a version are stored
-    in a file called <fg=cyan>_unreleased.toml</fg>.
-
-    Changelog entries contain at least one author, a type (e.g. whether the entry describes a feature, enhancement,
-    bug fix, etc.) and optionally a subject (e.g. whether the change is related to docs or a particular component of
-    the code), a Markdown description, possibly a link to a pull request with which the change was introduced and
-    links to issues that the changelog addresses.
-
-    <b>Example</b>
-
-        <fg=blue># .changelog/0.1.1.toml</fg>
-        <fg=cyan>[changelog]</fg>
-        <fg=green>release-date</fg> = <fg=yellow>"2022-01-17"</fg>
-
-        <fg=cyan>[[changelog.entries]]</fg>
-        <fg=green>id</fg> = <fg=yellow>"a7bc01f"</fg>
-        <fg=green>type</fg> = <fg=yellow>"improvement"</fg>
-        <fg=green>description</fg> = <fg=yellow>"Improvement to `my_package.util`"</fg>
-        <fg=green>author</fg> = <fg=yellow>"username"</fg>
-        <fg=green>pr</fg> = <fg=yellow>"https://github.com/username/my_package/pulls/13"</fg>
-
-    Changelog entries can be managed easily using the <info>shut log</info> command.
-
-        <fg=cyan>$ shut log add -t feature -d 'Improvement to `my_package.util`"</fg>
-
-    The <fg=green>pr</fg> field is usually set manually after the PR is created or updated automatically by a CI
-    action using the <info>shut log update-pr-field</info> command.
-  """
 
   options = [
     option(
