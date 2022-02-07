@@ -1,5 +1,4 @@
 
-import os
 import sys
 import typing as t
 from pathlib import Path
@@ -62,11 +61,12 @@ class ReleaseCommand(Command):
   options = [
     option("tag", "t", "Create a Git tag after the version numbers were updated."),
     option("push", "p", "Push the changes to the Git remote repository."),
-    option("remote", "r", "The Git remote to push to (only when <info>--push</info> is specified)", False),
+    option("create-release", "R", "Create a release on the repository service (e.g. GitHub)."),
+    option("remote", "r", "The Git remote to push to (only when <opt>--push</opt> is specified).", False),
     option("dry", "d", "Do not commit changes to disk."),
     option("force", "f", "Force tag creation and push."),
     option("validate", None, "Instead of bumping the version, validate that all version references are consistent.\n"
-      "If the <info>version</info> argument is specified, all version references must match it.\n"),
+      "If the <opt>version</opt> argument is specified, all version references must match it."),
     option("no-branch-check", None, "Do not validate the current Git branch matches the configured release branch."),
     option("no-worktree-check", None, "Do not check the worktree state."),
   ]
@@ -112,21 +112,15 @@ class ReleaseCommand(Command):
 
     return 0
 
-  def _get_raw_tool_config(self) -> dict[str, t.Any]:
-    """ Internal. Get the raw `tool` config from the pyproject config. """
-
-    return self.pyproject.value().get('tool', {})
-
   def _load_plugins(self) -> list[ReleasePlugin]:
     """ Internal. Loads the plugins to be used in the run of `poetry release`. """
 
-    tool = self._get_raw_tool_config()
     plugins = []
     for plugin_name, plugin in self.app.plugins.group(ReleasePlugin, ReleasePlugin):
       plugins.append(plugin)
     return plugins
 
-  def _show_version_refs(self, version_refs: list[VersionRef], status_line: str = '') -> None:
+  def _show_version_refs(self, version_refs: list[VersionRef]) -> None:
     """ Internal. Prints the version references to the terminal. """
 
     max_length = max(len(str(ref.file)) for ref in version_refs)
@@ -205,21 +199,28 @@ class ReleaseCommand(Command):
       self.line(
         '<fg=yellow>found modified files in the staging area. these files will be committed into the release tag.</fg>'
       )
-      if not self.confirm('continue anyway?'):
+      if not self.confirm('continue?'):
         return False
 
     return True
+
+  def _get_current_version(self, version_refs: list[VersionRef]) -> 'Version':
+    from poetry.core.semver.version import Version
+    current_version = next((r.value for r in version_refs if r.file.name == 'pyproject.toml'), None)
+    if current_version is None:
+      self.line_error(f'error: could not find version in <u>pyproject.toml</u>', 'error')
+      sys.exit(1)
+    return Version.parse(current_version)
 
   def _bump_version(self, version_refs: list[VersionRef], version: str, dry: bool) -> tuple[str, list[Path]]:
     """ Internal. Replaces the version reference in all files with the specified *version*. """
 
     from nr.util import Stream
     from shut.util.text import substitute_ranges
-    from poetry.core.semver.version import Version
 
     self.line(f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"}')
 
-    current_version = Version.parse(self._get_raw_tool_config()['poetry']['version'])
+    current_version = self._get_current_version(version_refs)
     target_version = str(self._increment_version(current_version, version))
     changed_files: list[Path] = []
 
@@ -334,7 +335,7 @@ class ReleaseCommand(Command):
     version = self.argument("version")
 
     if self.option("validate"):
-      return self._validate_version_refs(version_refs, version)
+      return self._validate_version_refs(version_refs, version or str(self._get_current_version(version_refs)))
 
     if version is not None:
       if self.option("tag") and not self._check_on_release_branch():
@@ -342,7 +343,7 @@ class ReleaseCommand(Command):
       if self.option("tag") and not self._check_clean_worktree([x.file for x in version_refs]):
         return 1
       if self.option("dry"):
-        self.line('note: --dry mode enabled, no changes will be commited to disk', 'comment')
+        self.line('dry mode enabled, no changes will be committed to disk', 'comment')
       target_version, changed_files = self._bump_version(version_refs, version, self.option("dry"))
       if self.option("tag"):
         tag_name = self._create_tag(target_version, changed_files, self.option("dry"), self.option("force"))
