@@ -10,9 +10,9 @@ from cleo.formatters.style import Style  # type: ignore[import]
 def add_style(
   io: IO | Formatter,
   name: str,
-  foreground: str | None = None,
-  background: str | None = None,
-  options: list[str] | None = None,
+  foreground: str | None = ...,
+  background: str | None = ...,
+  options: list[str] | None = ...,
 ) -> None: ...
 
 
@@ -24,18 +24,22 @@ def add_style(
 ) -> None: ...
 
 
-def add_style(
+def add_style(  # type: ignore[misc]
   io: IO | Formatter,
   name: str,
   foreground: str | Style | None = None,
   background: str | None = None,
   options: list[str] | None = None,
+  *,
+  style: Style | None = None,
 ) -> None:
   """
   Add a style to a Cleo IO or Formatter instance.
   """
 
-  if isinstance(foreground, Style):
+  if style is not None:
+    assert foreground is None and background is None and options is None
+  elif isinstance(foreground, Style):
     style = foreground
     assert background is None and options is None
   else:
