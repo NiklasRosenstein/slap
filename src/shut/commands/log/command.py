@@ -12,7 +12,7 @@ from .checks import ChangelogConsistencyCheck
 
 class LogAddCommand(Command):
   """
-  This command allows you to add structured changelog via the CLI.
+  Allows you to add structured changelog via the CLI.
 
   A changelog is a TOML file, usually in the <u>.changelog/</u> directory, named with
   the version number it refers to and containing changelog entries. Changes that
@@ -114,7 +114,14 @@ class LogAddCommand(Command):
 
     import databind.json
     import tomli_w
-    print(tomli_w.dumps(databind.json.dump(entry)))
+    import pygments, pygments.lexers, pygments.formatters
+
+    highlighted = pygments.highlight(
+      tomli_w.dumps(databind.json.dump(entry)),
+      pygments.lexers.get_lexer_by_name('toml'),
+      pygments.formatters.get_formatter_by_name('terminal')
+    )
+    print(highlighted)
 
     return 0
 
