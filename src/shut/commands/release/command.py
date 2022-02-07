@@ -40,9 +40,54 @@ class ReleaseCommand(Command):
       {{ <fg=dark_gray>file</fg> = <fg=yellow>"../frontend/package.json"</fg>, <fg=dark_gray>pattern</fg> = <fg=yellow>"  \\"version\\": \\"{{VERSION}}\\""</fg> }}
     ]
 
-  Furthermore, the <opt>--validate</opt> option can be used in CI to ensure that the version numbers
-  are consistent across the project. This is particularly useful when automating publishing
-  from CI builds.
+  Furthermore, the <opt>--validate</opt> option can be used in CI to ensure that the version
+  numbers are consistent across the project. This is particularly useful when
+  automating publishing from CI builds.
+
+  <b>Bumping the version number</b>
+
+    Specifying an explicit version number or a version bump rule for the <opt>version</opt>
+    argument will update the version across all references that can be detected.
+    You can use <opt>--validate</opt> to show all files in which version numbers are found.
+
+    The supported rules are <u>major</u>, <u>premajor</u>, <u>minor</u>, <u>preminor</u>, <u>patch</u>, <u>prepatch</u> and
+    <u>prerelease</u>.
+
+    <u>[Git]</u>: The command will prevent you from bumping the version unless you are on
+    the branch configured under <fg=green>[tool.shut.release.branch]</fg> or "develop" by default.
+    If you want to skip that check, pass <opt>--no-branch-check</opt>.
+
+  <b>Commit & tag</b>
+
+    <u>[Git]</u>: You can use the <opt>--tag, -t</opt> flag to automatically add the updated files,
+    create a new commit and tag the commit with the version number. The tag name
+    by default will just be the version number, but can be changed by setting the
+    <fg=green>[tool.shut.release.tag_format]</fg>. Similarly, the commit message used can be
+    configured with <fg=green>[tool.shut.release.commit_message]</fg>.
+
+  <b>Push to remote</b>
+
+    <u>[Git]</u>: Using the <opt>--push, -p</opt> in combination with <opt>--tag, -t</opt> will push the new
+    commit and tag to the remote Git repository immediately. You can specify the
+    <opt>--remote, -r</opt> option to change the remote which will be pushed to (defaults
+    to "origin").
+
+  <b>Create a release</b>
+
+    You can use the <opt>--create-release, -R</opt> flag to enable creating a release on the
+    repository hosting service. The following hosting services are supported and
+    can be automatically detected or explicitly configured.
+
+    If you make use of changelogs, the changelog contents will be included in the
+    release description.
+
+    <u>[GitHub]</u>: Creates a GitHub release on the repository. Automatically detected
+    for repositories that have a <u>github.com</u> "origin" remote. Otherwise, it can be
+    configured like this:
+
+      <fg=green>[tool.shut.remote]</fg>
+      <fg=dark_gray>type</fg> = <fg=yellow>"github"</fg>
+      <fg=dark_gray>repo</fg> = <fg=yellow>"my-github-enterprise.com/owner/repo"</fg>
 
   <b>Environment variables</b>
 
@@ -50,14 +95,9 @@ class ReleaseCommand(Command):
   """
 
   name = "release"
-  description = (
-    "Bumps the version number in pyproject.toml and in other places."
-  )
-
   arguments = [
     argument("version", "The target version number or rule to apply to the current version.", True),
   ]
-
   options = [
     option("tag", "t", "Create a Git tag after the version numbers were updated."),
     option("push", "p", "Push the changes to the Git remote repository."),
