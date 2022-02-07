@@ -118,24 +118,12 @@ class ReleaseCommand(Command):
     return self.pyproject.value().get('tool', {})
 
   def _load_plugins(self) -> list[ReleasePlugin]:
-    """ Internal. Loads the plugins to be used in the run of `poetry release`.
-
-    If `SHUT_RELEASE_NO_PLUGINS` is set in the environment, no plugins will be loaded from entrypoints.
-    """
+    """ Internal. Loads the plugins to be used in the run of `poetry release`. """
 
     tool = self._get_raw_tool_config()
-
-    plugins: list[ReleasePlugin] = [
-      VersionRefConfigMatcherPlugin(self.config.references),
-      SourceCodeVersionMatcherPlugin(self.app.get_packages()),
-    ]
-
-    if os.getenv('SHUT_RELEASE_NO_PLUGINS') is not None:
-      return plugins
-
+    plugins = []
     for plugin_name, plugin in self.app.plugins.group(ReleasePlugin, ReleasePlugin):
       plugins.append(plugin)
-
     return plugins
 
   def _show_version_refs(self, version_refs: list[VersionRef], status_line: str = '') -> None:
@@ -342,6 +330,7 @@ class ReleaseCommand(Command):
 
     self.plugins = self._load_plugins()
     version_refs = Stream(plugin.get_version_refs(self.io) for plugin in self.plugins).concat().collect()
+    version_refs.sort(key=lambda r: r.file)
     version = self.argument("version")
 
     if self.option("validate"):
@@ -365,7 +354,7 @@ class ReleaseCommand(Command):
         '<error>error: no action implied, specify a <info>version</info> argument or the <info>--validate</info> option'
       )
       return 1
-    self.add_style
+
     return 0
 
 
