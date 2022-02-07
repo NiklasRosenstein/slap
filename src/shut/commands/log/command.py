@@ -1,12 +1,11 @@
 
 from pathlib import Path
 
-from shut.application import Application, ApplicationPlugin, Command, option
+from shut.application import Application, ApplicationPlugin, Command, argument, option
 from shut.changelog.model import Changelog
-from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES
-from shut.commands.check.api import Check, CheckPlugin
+from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
+from shut.commands.check.api import CheckPlugin
 from shut.commands.log.config import get_changelog_manager
-from shut.util.vcs import Vcs
 from .checks import ChangelogConsistencyCheck
 
 
@@ -103,7 +102,7 @@ class LogAddCommand(Command):
       entry = self.manager.make_entry(change_type, description, author, pr, issues)
     except ValueError as exc:
       if 'author' in str(exc):
-        self.line_error('error: author could not be automatically detected, specify --author,-a', 'error')
+        self.line_error('error: author could not be automatically detected, specify <opt>--author, -a</opt>', 'error')
         return 1
       raise
 
@@ -127,24 +126,73 @@ class LogAddCommand(Command):
 
 
 class LogPrUpdateCommand(Command):
+  """
+  Update the <u>pr</u> field of changelog entries in a commit range.
+
+  Updates all changelog entries that were added in a given commit range. This is
+  useful to run in CI for a pull request to avoid having to manually update the
+  changelog entry after the PR has been created.
+  """
 
   name = "log pr update"
-  description = "Update the <fg=green>pr</fg> field of changelog entries in a commit range."
-  help = """
-    The <info>shut log pr update</info> updates all changelog entries that were added in a given commit range. This
-    is useful to run in CI for a pull request to avoid having to manually update the changelog entry after the PR
-    has been created.
-  """
 
 
 class LogFormatComand(Command):
+  """
+  Format the changelog in the terminal or in Markdown format.
+  """
 
   name = "log format"
-  description = "Format the changelog."
-  help = """
-    The <info>shut log format</info> command formats one or all changelogs in a more readable format. The
-    supported formats are optimized for the <b>terminal</b> and for <b>Markdown</b>.
-  """
+  options = [
+    option("markdown", "m", "Render the changelog in Markdown format."),
+    option("all", "a", "Render all changelogs in reverse chronological order."),
+  ]
+  arguments = [
+    argument("version", "The changelog version to format.", optional=True),
+  ]
+
+  def __init__(self, manager: ChangelogManager):
+    super().__init__()
+    self.manager = manager
+
+  def handle(self) -> int:
+    if not self._validate_arguments():
+      return 1
+
+    if (version := self.argument("version")):
+      changelog = self.manager.version(version)
+      if not changelog.exists():
+        self.line_error(f'error: Changelog for <opt>version</opt> "{version}" does not exist.', 'error')
+        return 1
+    else:
+      changelog = self.manager.unreleased()
+
+    if self.option("markdown"):
+      self._render_markdown(changelog)
+    else:
+      self._render_terminal(changelog)
+
+    return 0
+
+  def _validate_arguments(self) -> bool:
+    if self.option("all") and self.argument("version"):
+      self.line_error(f'error: <opt>--all, -a</opt> is incompatible with <opt>version</opt> argument', 'error')
+      return False
+    return True
+
+  def _render_terminal(self, changelog: ManagedChangelog) -> None:
+    if changelog.version:
+      self.line(f'<b>{changelog.version}</b> (<u>{changelog.content.release_date}</u>)')
+    else:
+      self.line(f'<b>{changelog.version or "Unreleased"}</b>')
+      if not changelog.exists():
+        return
+
+    for entry in changelog.content.entries:
+      self.line(f'  <fg=cyan;options=italic>{entry.type}</fg> — {entry.description} (<fg=yellow>{entry.author}</fg>)')
+
+  def _render_markdown(self, changelog: ManagedChangelog) -> None:
+    pass
 
 
 class LogCommandPlugin(ApplicationPlugin):
@@ -156,4 +204,4 @@ class LogCommandPlugin(ApplicationPlugin):
     app.plugins.register(CheckPlugin, 'log', ChangelogConsistencyCheck(manager))
     app.cleo.add(LogAddCommand(manager))
     app.cleo.add(LogPrUpdateCommand())
-    app.cleo.add(LogFormatComand())
+    app.cleo.add(LogFormatComand(manager))
