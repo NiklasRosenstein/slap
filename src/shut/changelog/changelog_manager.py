@@ -9,7 +9,6 @@ from pathlib import Path
 from nr.util.weak import weak_property
 
 from .model import Changelog, ChangelogEntry
-from .deser import ChangelogDeser, TomlChangelogDeser
 
 DEFAULT_VALID_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement']
 

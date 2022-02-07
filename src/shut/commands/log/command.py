@@ -1,29 +1,13 @@
 
-import dataclasses
-import typing as t
 from pathlib import Path
 
-from databind.core.annotations import alias
-from nr.util.git import Git
-
+from shut.application import Application, ApplicationPlugin, Command, option
 from shut.changelog.model import Changelog
 from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES
-from shut.console.command import Command, option
-from shut.console.application import Application
-from shut.console.commands.check import Check, CheckPlugin
-from shut.plugins.application_plugin import ApplicationPlugin
-from shut.plugins.remote_plugin import VcsRemote
-
-
-@dataclasses.dataclass
-class LogConfig:
-  directory: str = '.changelog'
-  valid_types: t.Annotated[list[str] | None, alias('valid-types')] = dataclasses.field(default_factory=lambda: list(DEFAULT_VALID_TYPES))
-
-
-def get_log_config(app: Application) -> LogConfig:
-  import databind.json
-  return databind.json.load(app.project_config.extras.get('log', {}), LogConfig)
+from shut.commands.check.api import Check, CheckPlugin
+from shut.commands.log.config import get_changelog_manager
+from shut.util.vcs import Vcs
+from .checks import ChangelogConsistencyCheck
 
 
 class LogAddCommand(Command):
@@ -96,14 +80,11 @@ class LogAddCommand(Command):
     )
   ]
 
-  def __init__(self, config: LogConfig, remote: VcsRemote | None) -> None:
+  def __init__(self, manager: ChangelogManager) -> None:
     super().__init__()
-    self.config = config
-    self.remote = remote
+    self.manager = manager
 
   def handle(self) -> int:
-    manager = ChangelogManager(Path.cwd() / self.config.directory, self.remote, valid_types=self.config.valid_types)
-
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
     author: str | None = self.option("author")
@@ -118,14 +99,14 @@ class LogAddCommand(Command):
       return 1
 
     try:
-      entry = manager.make_entry(change_type, description, author, pr, issues)
+      entry = self.manager.make_entry(change_type, description, author, pr, issues)
     except ValueError as exc:
       if 'author' in str(exc):
         self.line_error('error: author could not be automatically detected, specify --author,-a', 'error')
         return 1
       raise
 
-    unreleased = manager.unreleased()
+    unreleased = self.manager.unreleased()
     changelog = unreleased.content if unreleased.exists() else Changelog()
     changelog.entries.append(entry)
     unreleased.save(changelog)
@@ -158,45 +139,13 @@ class LogFormatComand(Command):
   """
 
 
-class ChangelogConsistencyCheck(CheckPlugin):
+class LogCommandPlugin(ApplicationPlugin):
 
-
-  def _check_changelogs(self) -> Check:
-    from databind.core import ConversionError
-    from shut.changelog.changelog_manager import ChangelogManager
-    manager = ChangelogManager(self.app)
-    bad_changelogs = []
-    count = 0
-    for changelog in manager.all():
-      count += 1
-      try:
-        for entry in changelog.load().entries:
-          manager.validate_entry(entry)
-      except (ConversionError, ValueError):
-        bad_changelogs.append(changelog.path.name)
-    check_name = 'shut:validate-changelogs'
-    if not count:
-      return Check(check_name, Check.Result.SKIPPED, None)
-    return Check(
-      check_name,
-      Check.Result.ERROR if bad_changelogs else Check.Result.OK,
-      f'Broken or invalid changelogs: {", ".join(bad_changelogs)}' if bad_changelogs else
-        f'All {count} changelogs are valid.',
-    )
-
-
-class LogPlugin(ApplicationPlugin):
-
-  def load_config(self, app: Application) -> ChangelogManager:
-    import databind.json
-    data = app.project_config.extras.get('log', {})
-    config = databind.json.load(data, LogConfig)
-    manager = ChangelogManager(Path.cwd() / config.directory, app.remote, valid_types=config.valid_types)
-    return manager
+  def load_configuration(self, app: Application) -> ChangelogManager:
+    return get_changelog_manager(app)
 
   def activate(self, app: 'Application', manager: ChangelogManager) -> None:
-
-    app.registry(CheckPlugin.ID).register_plugin('shut:changelog', ChangelogConsistencyCheck(manager))
-    app.cleo.add(LogAddCommand(config, app.remote))
+    app.plugins.register(CheckPlugin, 'log', ChangelogConsistencyCheck(manager))
+    app.cleo.add(LogAddCommand(manager))
     app.cleo.add(LogPrUpdateCommand())
     app.cleo.add(LogFormatComand())
