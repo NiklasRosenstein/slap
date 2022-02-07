@@ -46,16 +46,10 @@ log-command = "shut.commands.log.command:LogCommandPlugin"
 release-command = "shut.commands.release.command:ReleaseCommandPlugin"
 test-command = "shut.commands.test:TestCommandPlugin"
 poetry = "shut.poetry.plugin:PoetryPlugin"
+github = "shut.ext.changelog.github:GithubApplicationPlugin"
 
-# [tool.poetry.plugins."shut.plugins.remote"]
-# github = "shut.remotes.github:GithubRemotePlugin"
-
-# [tool.poetry.plugins."shut.plugins.remote_implementation"]
-# github = "shut.remotes.github:GithubRemote"
-
-# [tool.poetry.plugins."shut.plugins.check"]
-# poetry = "shut.console.commands.check:PoetryChecksPlugin"
-# shut = "shut.console.commands.check:ShutChecksPlugin"
+[tool.poetry.plugins."shut.commands.log.config.RemoteProvider"]
+github = "shut.ext.changelog.github:GithubRemoteProvider"
 
 #
 # Shut

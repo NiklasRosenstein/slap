@@ -53,6 +53,22 @@ class ChangelogValidator(abc.ABC):
   def normalize_author(self, author: str) -> str:
     """ Called to normalize the author name that was specified. """
 
+  @staticmethod
+  def null() -> 'ChangelogValidator':
+    return NullChangelogValidator()
+
+
+class NullChangelogValidator(ChangelogValidator):
+
+  def normalize_pr_reference(self, pr: str) -> str:
+    return pr
+
+  def normalize_issue_reference(self, issue: str) -> str:
+    return issue
+
+  def normalize_author(self, author: str) -> str:
+    return author
+
 
 class ManagedChangelog:
 
