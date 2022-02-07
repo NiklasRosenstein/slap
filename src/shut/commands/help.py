@@ -1,6 +1,6 @@
 
-from cleo.commands.help_command import HelpCommand as _HelpCommand
-from cleo.commands.list_command import ListCommand
+from cleo.commands.help_command import HelpCommand as _HelpCommand  # type: ignore[import]
+from cleo.commands.list_command import ListCommand  # type: ignore[import]
 
 
 class HelpCommand(_HelpCommand, ListCommand):

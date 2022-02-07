@@ -33,7 +33,7 @@ class CheckCommand(Command):
 
     error = False
     checks: list[tuple[str, Check]] = []
-    for plugin_name, plugin in self.app.plugins.group(CheckPlugin, CheckPlugin):
+    for plugin_name, plugin in self.app.plugins.group(CheckPlugin, CheckPlugin):  # type: ignore[misc]
       # TODO (@NiklasRosenstein): Take into account enabled/disabled checks.
       for check in plugin.get_checks(self.app):
         checks.append((plugin_name + ':' + check.name, check))

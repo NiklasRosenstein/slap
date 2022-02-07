@@ -7,7 +7,7 @@ import textwrap
 import typing as t
 from pathlib import Path
 
-from cleo.application import Application as BaseCleoApplication
+from cleo.application import Application as BaseCleoApplication  # type: ignore[import]
 from cleo.commands.command import Command as _BaseCommand  # type: ignore[import]
 from cleo.helpers import argument, option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
@@ -33,8 +33,11 @@ class Command(_BaseCommand):
 
 class CleoApplication(BaseCleoApplication):
 
-  from cleo.io.inputs.input import Input
-  from cleo.io.outputs.output import Output
+  from cleo.io.inputs.input import Input  # type: ignore[import]
+  from cleo.io.outputs.output import Output  # type: ignore[import]
+  from cleo.formatters.style import Style  # type: ignore[import]
+
+  _styles: dict[str, Style]
 
   def __init__(self, name: str = "console", version: str = "") -> None:
     super().__init__(name, version)
@@ -49,8 +52,7 @@ class CleoApplication(BaseCleoApplication):
     self.add_style('opt', 'cyan', options=['italic'])
 
   def add_style(self, name, fg=None, bg=None, options=None):
-    from cleo.formatters.style import Style
-    self._styles[name] = Style(fg, bg, options)
+    self._styles[name] = self.Style(fg, bg, options)
 
   def create_io(
     self,
@@ -67,7 +69,7 @@ class CleoApplication(BaseCleoApplication):
 
 class Application:
 
-  DEFAULT_PLUGINS = []
+  DEFAULT_PLUGINS: list[str] = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
 
   def __init__(self, project_directory: Path, name: str = 'shut', version: str = __version__) -> None:
     self.project_directory = project_directory
@@ -104,7 +106,7 @@ class Application:
     if enable is not None:
       enable = set(list(enable) + self.DEFAULT_PLUGINS)
 
-    plugins = load_plugins_from_entrypoints('shut.application.ApplicationPlugin', ApplicationPlugin)
+    plugins = load_plugins_from_entrypoints('shut.application.ApplicationPlugin', ApplicationPlugin)  # type: ignore[misc]
     for plugin_name, plugin in plugins.items():
       activate_this_plugin = (
         (enable is None and disable is None) or
@@ -143,7 +145,8 @@ class Application:
 
     # TODO (@NiklasRosenstein): Support other config styles that specify a readme.
 
-    poetry = self.pyproject.value_or({}).get('tool', {}).get('poetry', {})
+    poetry: dict = self.pyproject.value_or({})
+    poetry = poetry.get('tool', {}).get('poetry', {})
 
     if (readme := poetry.get('readme')) and Path(readme).is_file():
       return Path(readme)
@@ -151,7 +154,7 @@ class Application:
     return get_file_in_directory(Path.cwd(), 'README', ['README.md', 'README.rst'], case_sensitive=False)
 
 
-class ApplicationPlugin(abc.ABC):
+class ApplicationPlugin(t.Generic[T]):
 
   @abc.abstractmethod
   def load_configuration(self, app: Application) -> T: ...

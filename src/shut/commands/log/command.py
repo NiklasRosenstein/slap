@@ -1,5 +1,5 @@
 
-from pathlib import Path
+import typing as t
 
 from shut.application import Application, ApplicationPlugin, Command, argument, option
 from shut.changelog.model import Changelog
@@ -116,7 +116,7 @@ class LogAddCommand(Command):
     import pygments, pygments.lexers, pygments.formatters
 
     highlighted = pygments.highlight(
-      tomli_w.dumps(databind.json.dump(entry)),
+      tomli_w.dumps(t.cast(dict, databind.json.dump(entry))),
       pygments.lexers.get_lexer_by_name('toml'),
       pygments.formatters.get_formatter_by_name('terminal')
     )

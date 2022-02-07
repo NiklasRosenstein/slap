@@ -8,7 +8,7 @@ from pathlib  import Path
 from flit.install import Installer  # type: ignore[import]
 from nr.util.algorithm import longest_common_substring
 from nr.util.fs import atomic_swap
-from setuptools import find_namespace_packages  # type: ignore[import]
+from setuptools import find_namespace_packages
 
 from shut.application import Application, ApplicationPlugin, Command, option
 
@@ -26,7 +26,7 @@ def identify_flit_module(directory: Path) -> str:
   and then tries to identify the one main module name that should be passed to the `tool.flit.metadata.module`
   option. """
 
-  modules = find_namespace_packages(directory)
+  modules = find_namespace_packages(str(directory))
   if not modules:
     raise ValueError(f'no modules discovered in {directory}')
 

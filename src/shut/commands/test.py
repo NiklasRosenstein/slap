@@ -110,7 +110,7 @@ class TestCommand(Command):
     return 0 if set(results.values()) == {0} else 1
 
 
-class TestCommandPlugin(ApplicationPlugin):
+class TestCommandPlugin(ApplicationPlugin[dict[str, str]]):
 
   def load_configuration(self, app: Application) -> dict[str, str]:
     return app.raw_config().get('test', {})

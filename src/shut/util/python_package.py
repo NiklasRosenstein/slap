@@ -1,7 +1,7 @@
 
 import dataclasses
 from pathlib import Path
-from setuptools import find_namespace_packages  # type: ignore[import]
+from setuptools import find_namespace_packages
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
 
@@ -17,7 +17,7 @@ def detect_packages(directory: Path) -> list[Package]:
   """ Detects the Python packages in *directory*, making an effort to identify namespace packages correctly. """
 
   assert isinstance(directory, Path)
-  modules = find_namespace_packages(directory)
+  modules = find_namespace_packages(str(directory))
   if not modules:
     raise ValueError(f'no modules discovered in {directory}')
 

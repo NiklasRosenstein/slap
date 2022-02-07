@@ -76,7 +76,7 @@ class GithubChangelogValidator(ChangelogValidator):
 
 class GithubRemoteDetector(RemoteDetector):
 
-  def detect_changelog_validator(self, app: Application) -> ChangelogValidator:
+  def detect_changelog_validator(self, app: Application) -> ChangelogValidator | None:
     # TODO (@NiklasRosenstein): Catch the right exception if its not a Git directory
     remotes = Git(app.project_directory).remotes()
     for remote in remotes:

@@ -57,11 +57,12 @@ class TomlFile(t.MutableMapping[str, t.Any]):
   @t.overload
   def value(self, data: dict[str, t.Any]) -> None: ...
 
-  def value(self, data: dict[str, t.Any] | None = None) -> None:
+  def value(self, data: dict[str, t.Any] | None = None) -> dict[str, t.Any] | None:
     if data is None:
       return self.load()
     else:
       self._data = data
+      return None
 
   def value_or(self, default: T) -> dict[str, t.Any] | T:
     if self._data is not None:

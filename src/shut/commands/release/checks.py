@@ -16,7 +16,7 @@ class ReleaseChecksPlugin(CheckPlugin):
     check_name = 'versions'
     packages = app.get_packages()
     if not packages:
-      return Check(check_name, Check.Result.WARNING, 'No packages detected')
+      return [Check(check_name, Check.Result.WARNING, 'No packages detected')]
 
     matcher = SourceCodeVersionMatcherPlugin(packages)
     version_refs = matcher.get_version_refs(NullIO())

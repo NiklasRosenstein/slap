@@ -41,8 +41,8 @@ def get_changelog_manager(app: Application) -> ChangelogManager:
   if config.remote:
     validator = config.remote.get_changelog_validator(app)
   else:
-    for plugin_name, plugin in app.plugins.group(RemoteDetector, RemoteDetector):
+    for plugin_name, plugin in app.plugins.group(RemoteDetector, RemoteDetector):  # type: ignore[misc]
       if (validator := plugin.detect_changelog_validator(app)):
         break
 
-  return ChangelogManager(config.directory, validator, None, valid_types=config.valid_types)
+  return ChangelogManager(config.directory, validator or ChangelogValidator.null(), None, valid_types=config.valid_types)

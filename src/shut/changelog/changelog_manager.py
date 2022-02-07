@@ -192,11 +192,9 @@ class ChangelogManager:
     return ChangelogEntry(changelog_id, change_type, description, author, pr, issues or None)
 
   def validate_entry(self, entry: ChangelogEntry) -> None:
-    if entry.type not in self.config.valid_types:
+    if self.valid_types is not None and entry.type not in self.valid_types:
       raise ValueError(f'invalid change type: {entry.type}')
-    remote = self.shut_app.project_config.remote
-    if entry.pr and remote and not remote.validate_pull_request_url(entry.pr):
-      raise ValueError(f'invalid pr: {entry.pr}')
+    if entry.pr:
+      self.validator.normalize_pr_reference(entry.pr)
     for issue_url in entry.issues or []:
-      if remote and not remote.validate_issue_url(issue_url):
-        raise ValueError(f'invalid issue: {issue_url}')
+      self.validator.normalize_issue_reference(issue_url)
