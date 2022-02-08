@@ -25,8 +25,8 @@ class ChangelogConsistencyCheck(CheckPlugin):
       try:
         for entry in changelog.load().entries:
           self.manager.validate_entry(entry)
-      except (ConversionError, ValueError):
-        bad_changelogs.append(changelog.path.name)
+      except (ConversionError, ValueError) as exc:
+        bad_changelogs.append((changelog.path.name, str(exc), entry.id))
 
     check_name = 'shut:validate-changelogs'
     if not count:
@@ -35,6 +35,7 @@ class ChangelogConsistencyCheck(CheckPlugin):
     return Check(
       check_name,
       Check.ERROR if bad_changelogs else Check.Result.OK,
-      f'Broken or invalid changelogs: {", ".join(bad_changelogs)}' if bad_changelogs else
+      f'Broken or invalid changelogs' if bad_changelogs else
         f'All {count} changelogs are valid.',
+      '\n'.join(f'<i>{fn}</i>: id=<fg=yellow>"{entry_id}"</fg>: {err}' for fn, err, entry_id in bad_changelogs) if bad_changelogs else None,
     )
