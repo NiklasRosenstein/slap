@@ -194,6 +194,12 @@ class ChangelogManager:
   def validate_entry(self, entry: ChangelogEntry) -> None:
     if self.valid_types is not None and entry.type not in self.valid_types:
       raise ValueError(f'invalid change type: {entry.type}')
+    if entry.authors is not None and entry.author is not None:
+      raise ValueError(f'entry has "author" and "authors", only one should be present')
+    if not entry.get_authors():
+      raise ValueError(f'entry has no "author" or "authors"')
+    if not all(entry.get_authors()):
+      raise ValueError(f'empty string in author(s)')
     if entry.pr:
       self.validator.normalize_pr_reference(entry.pr)
     for issue_url in entry.issues or []:

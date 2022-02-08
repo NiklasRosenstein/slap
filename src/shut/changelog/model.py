@@ -11,9 +11,18 @@ class ChangelogEntry:
   id: str
   type: str
   description: str
-  author: str
+  author: str | None = None
+  authors: list[str] | None = None
   pr: str | None = None
   issues: list[str] | None = None
+
+  def get_authors(self) -> list[str]:
+    result = []
+    if self.author is not None:
+      result.append(self.author)
+    if self.authors is not None:
+      result += self.authors
+    return result
 
 
 @dataclasses.dataclass
