@@ -171,7 +171,9 @@ class ChangelogManager:
       if path.suffix == '.toml' and path.name != self.unreleased_fn:
         changelogs.append(ManagedChangelog(self, path, path.stem))
     changelogs.sort(key=lambda c: c.version, reverse=True)
-    changelogs.insert(0, self.unreleased())
+    unreleased = self.unreleased()
+    if unreleased.exists():
+      changelogs.insert(0, unreleased)
     return changelogs
 
   def make_entry(
