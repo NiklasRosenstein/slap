@@ -43,10 +43,13 @@ class CheckCommand(Command):
         continue
       error = error or check.result != Check.Result.OK
       color = COLORS[check.result]
-      self.io.write(f'<fg={color};options=bold>{check.result.name.ljust(7)}</fg> <u>{check_id}</u>')
+      self.io.write(f'<fg={color};options=bold>{check.result.name.ljust(7)}</fg> <b>{check_id}</b>')
       if check.description:
         self.io.write(f' — {check.description}')
       self.io.write('\n')
+      if check.details:
+        for line in check.details.splitlines():
+          self.io.write_line(f'  {line}')
 
     return 1 if error else 0
 

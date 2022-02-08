@@ -26,6 +26,7 @@ class Check:
   name: str
   result: Result
   description: str | None
+  details: str | None = None
 
 
 class CheckPlugin(abc.ABC):
