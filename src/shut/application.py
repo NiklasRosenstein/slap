@@ -50,6 +50,7 @@ class CleoApplication(BaseCleoApplication):
     self._default_command = 'help'
 
     self.add_style('u', options=['underline'])
+    self.add_style('i', options=['italic'])
     self.add_style('opt', 'cyan', options=['italic'])
 
   def add_style(self, name, fg=None, bg=None, options=None):
