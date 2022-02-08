@@ -15,7 +15,7 @@ from .checks import ReleaseChecksPlugin
 from .config import ReleaseConfig
 
 if t.TYPE_CHECKING:
-  from poetry.core.semver.version import Version
+  from poetry.core.semver.version import Version  # type: ignore[import]
 
 
 class ReleaseCommand(Command):
