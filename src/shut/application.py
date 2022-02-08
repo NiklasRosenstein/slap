@@ -65,6 +65,8 @@ class CleoApplication(BaseCleoApplication):
     self.add(HelpCommand())
     self._default_command = 'help'
 
+    self.add_style('code', 'dark_gray')
+    self.add_style('warning', 'magenta')
     self.add_style('u', options=['underline'])
     self.add_style('i', options=['italic'])
     self.add_style('opt', 'cyan', options=['italic'])

@@ -38,7 +38,7 @@ mypy = "^0.931"
 pytest-coverage = "^0.0"
 pylint = "^2.12.2"
 
-[tool.poetry.optional-dependencies]
+[tool.poetry.extras]
 rtd = [ "mkdocs", "pygments", "readthedocs-custom-steps" ]
 
 [tool.poetry.scripts]

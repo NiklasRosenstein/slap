@@ -7,6 +7,7 @@ from shut.changelog.model import Changelog
 from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
 from shut.commands.check.api import CheckPlugin
 from shut.commands.log.config import get_changelog_manager
+from shut.util.pygments import toml_highlight
 from .checks import ChangelogConsistencyCheck
 
 
@@ -51,22 +52,22 @@ class LogAddCommand(Command):
   options = [
     option(
       "type", "t",
-      f"The type of the changelog. Unless configured differently, one of {', '.join(DEFAULT_VALID_TYPES)}",
+      description=f"The type of the changelog. Unless configured differently, one of {', '.join(DEFAULT_VALID_TYPES)}",
       flag=False,
     ),
     option(
       "description", "d",
-      "A Markdown formatted description of the changelog entry.",
+      description="A Markdown formatted description of the changelog entry.",
       flag=False,
     ),
     option(
       "author", "a",
-      "Your username or email address. By default, this will be your configured Git name and email address.",
+      description="Your username or email address. By default, this will be your configured Git name and email address.",
       flag=False,
     ),
     option(
       "pr", None,
-      "The pull request that the change is introduced to the main branch with. This is not usually "
+      description="The pull request that the change is introduced to the main branch with. This is not usually "
         "known at the time the changelog entry is created, so this option is not often used. If the remote "
         "repository is well supported by Shut, a pull request number may be specified and converted to a full "
         "URL by Shut, otherwise a full URL must be specified.",
@@ -74,16 +75,16 @@ class LogAddCommand(Command):
     ),
     option(
       "issue", "i",
-      "An issue related to this changelog. If the remote repository is well supported by Shut, an issue number may "
-        "be specified and converted to a full URL by Shut, otherwise a full URL must be specified.",
+      description="An issue related to this changelog. If the remote repository is well supported by Shut, an issue "
+        "number may be specified and converted to a full URL by Shut, otherwise a full URL must be specified.",
       flag=False,
       multiple=True,
     ),
     option(
       "commit", "c",
-      "Commit the currently staged changes in the VCS as well as the updated changelog file to disk. The commit "
-        "message is a concatenation of the <opt>--type, -t</opt> and <opt>--description, -d</opt>, as well as the "
-        "directory relative to the VCS toplevel if the changelog is created not in the toplevel directory of the "
+      description="Commit the currently staged changes in the VCS as well as the updated changelog file to disk. The "
+        "commit message is a concatenation of the <opt>--type, -t</opt> and <opt>--description, -d</opt>, as well as "
+        "the directory relative to the VCS toplevel if the changelog is created not in the toplevel directory of the "
         "repository."
     ),
   ]
@@ -94,6 +95,8 @@ class LogAddCommand(Command):
     self.manager = manager
 
   def handle(self) -> int:
+    import databind.json
+
     vcs = self.app.get_vcs()
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
@@ -111,30 +114,17 @@ class LogAddCommand(Command):
     if not description:
       self.line_error('error: missing <opt>--description,-d</opt>', 'error')
       return 1
+    if not author:
+      self.line_error('error: missing <opt>--author,-a</opt>', 'error')
+      return 1
 
-    try:
-      entry = self.manager.make_entry(change_type, description, author, pr, issues)
-    except ValueError as exc:
-      if 'author' in str(exc):
-        self.line_error('error: author could not be automatically detected, specify <opt>--author, -a</opt>', 'error')
-        return 1
-      raise
-
+    entry = self.manager.make_entry(change_type, description, author, pr, issues)
     unreleased = self.manager.unreleased()
     changelog = unreleased.content if unreleased.exists() else Changelog()
     changelog.entries.append(entry)
     unreleased.save(changelog)
 
-    import databind.json
-    import tomli_w
-    import pygments, pygments.lexers, pygments.formatters
-
-    highlighted = pygments.highlight(
-      tomli_w.dumps(t.cast(dict, databind.json.dump(entry))),
-      pygments.lexers.get_lexer_by_name('toml'),
-      pygments.formatters.get_formatter_by_name('terminal')
-    )
-    print(highlighted)
+    print(toml_highlight(t.cast(dict, databind.json.dump(entry))))
 
     if self.option("commit"):
       assert vcs is not None
@@ -168,8 +158,14 @@ class LogFormatComand(Command):
 
   name = "log format"
   options = [
-    option("markdown", "m", "Render the changelog in Markdown format."),
-    option("all", "a", "Render all changelogs in reverse chronological order."),
+    option(
+      "markdown", "m",
+      description="Render the changelog in Markdown format.",
+    ),
+    option(
+      "all", "a",
+      description="Render all changelogs in reverse chronological order.",
+    ),
   ]
   arguments = [
     argument("version", "The changelog version to format.", optional=True),
@@ -219,6 +215,126 @@ class LogFormatComand(Command):
     pass
 
 
+class LogConvertCommand(Command):
+  """
+  Convert Shut's old YAML based changelogs to new style TOML changelogs.
+
+  Sometimes the changelog entries in the old style would be suffixed with the
+  author's username in the format of <code>@Name</code> or <code>(@Name)</code>, so this command will
+  attempt to extract that information to figure out the author of the change.
+  """
+
+  name = "log convert"
+  options = [
+    option(
+      "author", "a",
+      description="The author to fall back to. If not specified, the current VCS queried for the "
+        "author name instead and their email will be used (depending on the normalization of the "
+        "repository remote, this will be converted to a username, for example in the case of GitHub).",
+      flag=True,
+    ),
+    option(
+      "directory", "d",
+      description="The directory from which to load the old changelogs. Defaults to the same directory that the "
+        "new changelogs will be written to.",
+    ),
+    option(
+      "dry",
+      description="Do not make changes on disk."
+    ),
+    option(
+      "fail-fast", "x",
+      description="If this flag is enabled, exit as soon as an error is encountered with any file.",
+    ),
+  ]
+
+  CHANGELOG_TYPE_MAPPING_TABLE = {
+    'change': 'improvement',
+    'breaking_change': 'breaking change',
+    'refactor': 'hygiene',
+  }
+
+  def __init__(self, app: Application, manager: ChangelogManager) -> None:
+    super().__init__()
+    self.app = app
+    self.manager = manager
+
+  def handle(self) -> int:
+    import yaml
+
+    vcs = self.app.get_vcs()
+    author = self.option("author") or (vcs.get_author().email if vcs else None)
+
+    if not author:
+      self.line_error('error: missing <opt>--author,-a</opt>', 'error')
+      return 1
+
+    directory = self.option("directory") or self.manager.directory
+    has_failures = False
+    for filename in directory.iterdir():
+      if has_failures and self.option("fail-fast"):
+        break
+      if filename.suffix in ('.yaml', '.yml'):
+        try:
+          self._convert_changelog(author, filename)
+        except yaml.error.YAMLError as exc:
+          has_failures = True
+          self.line_error(f'warn: cannot parse "{filename}"', 'warning')
+          continue
+        except Exception as exc:
+          has_failures = True
+          self.line_error(f'warn: could not convert "{filename}": {exc}', 'warning')
+          if self.io.is_very_verbose:
+            import traceback
+            self.line_error(traceback.format_exc())
+          continue
+
+    return 1 if has_failures else 0
+
+  def _convert_changelog(self, default_author: str, source: Path) -> None:
+    import datetime
+    import databind.json
+    import yaml
+
+    data = yaml.safe_load(source.read_text())
+    entries = []
+    for original_entry in data['changes']:
+      change_type = original_entry['type']
+      component = original_entry['component']
+      prefix = f'{component}: ' if component != 'general' else ''
+      author, original_entry['description'] = self._match_author_in_description(original_entry['description'])
+      new_entry = self.manager.make_entry(
+        change_type=self.CHANGELOG_TYPE_MAPPING_TABLE.get(change_type, change_type),
+        description=prefix + original_entry['description'],
+        author=author or default_author,
+        pr=None,
+        issues=original_entry.get('fixes', None) or None,
+      )
+      entries.append(new_entry)
+
+    if source.stem == '_unreleased':
+      dest = self.manager.unreleased()
+    else:
+      dest = self.manager.version(source.stem)
+
+    changelog = dest.content if dest.exists() else Changelog()
+    changelog.release_date = datetime.datetime.strptime(data['release_date'], '%Y-%m-%d').date()
+    changelog.entries = entries
+
+    if self.option("dry"):
+      self.io.write_line(f'<fg=cyan;options=underline># {dest.path}</fg>')
+      print(toml_highlight(t.cast(dict, databind.json.dump(changelog))))
+    else:
+      dest.save(changelog)
+
+  def _match_author_in_description(self, description: str) -> tuple[str | None, str]:
+    """ Internal. Tries to find the @Author at the end of a changelog entry description. """
+
+    import re
+    match = re.search(r'(.*)\((@[\w\-_ ]+)\)$', description)
+    return match.group(2) if match else None, match.group(1).strip() if match else description
+
+
 class LogCommandPlugin(ApplicationPlugin):
 
   def load_configuration(self, app: Application) -> ChangelogManager:
@@ -229,3 +345,4 @@ class LogCommandPlugin(ApplicationPlugin):
     app.cleo.add(LogAddCommand(app, manager))
     app.cleo.add(LogPrUpdateCommand())
     app.cleo.add(LogFormatComand(manager))
+    app.cleo.add(LogConvertCommand(app, manager))

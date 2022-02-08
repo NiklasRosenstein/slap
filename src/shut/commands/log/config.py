@@ -45,4 +45,4 @@ def get_changelog_manager(app: Application) -> ChangelogManager:
       if (validator := plugin.detect_changelog_validator(app)):
         break
 
-  return ChangelogManager(config.directory, validator or ChangelogValidator.null(), None, valid_types=config.valid_types)
+  return ChangelogManager(config.directory, validator or ChangelogValidator.null(), valid_types=config.valid_types)

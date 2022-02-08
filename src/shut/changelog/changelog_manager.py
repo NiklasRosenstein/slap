@@ -10,7 +10,7 @@ from nr.util.weak import weak_property
 
 from .model import Changelog, ChangelogEntry
 
-DEFAULT_VALID_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement']
+DEFAULT_VALID_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement', 'tests']
 
 def is_url(s: str) -> bool:
   return s.startswith('http://') or s.startswith('https://')
@@ -126,9 +126,6 @@ class ChangelogManager:
   #: An instance for validation and normalization of issue and PR references.
   validator: ChangelogValidator
 
-  #: The preferred author to use if no author is specified in {@link make_entry()}.
-  author: str | None = None
-
   #: The name of the file that contains the unreleased changes.
   unreleased_fn: str = '_unreleased.toml'
 
@@ -165,7 +162,7 @@ class ChangelogManager:
     self,
     change_type: str,
     description: str,
-    author: str | None,
+    author: str,
     pr: str | None,
     issues: list[str] | None,
   ) -> ChangelogEntry:
@@ -175,9 +172,6 @@ class ChangelogManager:
     author is specified, it will be read from the *author* option or otherwise obtained via the #VcsRemote,
     if available. """
 
-    author = author or self.author
-    if not author:
-      raise ValueError('no author specified')
     author = self.validator.normalize_author(author)
 
     if self.valid_types is not None and change_type not in self.valid_types:
@@ -189,7 +183,13 @@ class ChangelogManager:
       issues = [self.validator.normalize_issue_reference(i) for i in issues]
 
     changelog_id = str(uuid.uuid4())
-    return ChangelogEntry(changelog_id, change_type, description, author, pr, issues or None)
+    return ChangelogEntry(
+      id=changelog_id,
+      type=change_type,
+      description=description,
+      author=author,
+      pr=pr,
+      issues=issues or None)
 
   def validate_entry(self, entry: ChangelogEntry) -> None:
     if self.valid_types is not None and entry.type not in self.valid_types:

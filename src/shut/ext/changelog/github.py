@@ -30,6 +30,9 @@ class GithubChangelogValidator(ChangelogValidator):
   #: domain of the GHE instance must precede the owner and repository name by another slash (e.g. `ghe.io/owner/repo`).
   repo: str
 
+  def __post_init__(self) -> None:
+    self._author_cache: dict[str, str | None] = {}
+
   def _get_base_url(self) -> str:
     parts = self.repo.split('/')
     if len(parts) == 3:
@@ -50,6 +53,7 @@ class GithubChangelogValidator(ChangelogValidator):
     return parts[-2], parts[-1]
 
   def normalize_issue_reference(self, issue: str) -> str:
+    issue = issue.lstrip('#')
     if issue.isnumeric():
       return f'{self._get_repo_url()}/issues/{issue}'
     elif is_url(issue):
@@ -57,6 +61,7 @@ class GithubChangelogValidator(ChangelogValidator):
     raise ValueError(f'invalid issue: {issue}')
 
   def normalize_pr_reference(self, pr: str) -> str:
+    pr = pr.lstrip('#')
     if pr.isnumeric():
       return f'{self._get_repo_url()}/pulls/{pr}'
     elif is_url(pr):
@@ -67,10 +72,15 @@ class GithubChangelogValidator(ChangelogValidator):
     # If it is an email address, try to see if we can resolve it to a GitHub username.
     # TODO (@NiklasRosenstein): Detect emails in a syntax such as "Full Name <email@address.org>" which is very common.
     if '@' in author and not author.startswith('@'):
+      if author in self._author_cache:
+        return self._author_cache[author] or author
       try:
-        return '@' + github_get_username_from_email(self._get_api_url(), author)
+        resolved = '@' + github_get_username_from_email(self._get_api_url(), author)
       except ValueError:
+        self._author_cache[author] = None
         return author  # Return the email address unchanged.
+      self._author_cache[author] = resolved
+      return resolved
     return author
 
 
