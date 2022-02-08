@@ -237,6 +237,7 @@ class LogConvertCommand(Command):
       "directory", "d",
       description="The directory from which to load the old changelogs. Defaults to the same directory that the "
         "new changelogs will be written to.",
+      flag=False,
     ),
     option(
       "dry",
@@ -299,9 +300,15 @@ class LogConvertCommand(Command):
     data = yaml.safe_load(source.read_text())
     entries = []
     for original_entry in data['changes']:
-      change_type = original_entry['type']
+      prefix = ''
       component = original_entry['component']
-      prefix = f'{component}: ' if component != 'general' else ''
+      if component == 'docs':
+        change_type = 'docs'
+      elif component in ('test', 'tests'):
+        change_type = 'tests'
+      else:
+        change_type = original_entry['type']
+        prefix = f'{component}: ' if component != 'general' else ''
       author, original_entry['description'] = self._match_author_in_description(original_entry['description'])
       new_entry = self.manager.make_entry(
         change_type=self.CHANGELOG_TYPE_MAPPING_TABLE.get(change_type, change_type),
