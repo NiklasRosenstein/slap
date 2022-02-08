@@ -6,6 +6,7 @@ from shut.changelog.model import Changelog
 from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
 from shut.commands.check.api import CheckPlugin
 from shut.commands.log.config import get_changelog_manager
+from shut.util.vcs import detect_vcs
 from .checks import ChangelogConsistencyCheck
 
 
@@ -80,22 +81,24 @@ class LogAddCommand(Command):
     )
   ]
 
-  def __init__(self, manager: ChangelogManager) -> None:
+  def __init__(self, app: Application, manager: ChangelogManager) -> None:
     super().__init__()
+    self.app = app
     self.manager = manager
 
   def handle(self) -> int:
+    vcs = detect_vcs(self.app.project_directory)
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
-    author: str | None = self.option("author")
+    author: str | None = self.option("author") or (vcs.get_author().email if vcs else None)
     pr: str | None = self.option("pr")
     issues: list[str] | None = self.option("issue")
 
     if not change_type:
-      self.line_error('error: missing --type,-t', 'error')
+      self.line_error('error: missing <opt>--type,-t</opt>', 'error')
       return 1
     if not description:
-      self.line_error('error: missing --description,-d', 'error')
+      self.line_error('error: missing <opt>--description,-d</opt>', 'error')
       return 1
 
     try:
@@ -202,6 +205,6 @@ class LogCommandPlugin(ApplicationPlugin):
 
   def activate(self, app: 'Application', manager: ChangelogManager) -> None:
     app.plugins.register(CheckPlugin, 'log', ChangelogConsistencyCheck(manager))
-    app.cleo.add(LogAddCommand(manager))
+    app.cleo.add(LogAddCommand(app, manager))
     app.cleo.add(LogPrUpdateCommand())
     app.cleo.add(LogFormatComand(manager))

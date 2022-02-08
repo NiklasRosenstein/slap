@@ -8,6 +8,7 @@ from pathlib import Path
 
 from nr.util.functional import Consumer
 from nr.util.git import Git as _Git, NoCurrentBranchError
+from nr.util.generic import T
 
 
 class FileStatus(enum.Enum):
@@ -58,7 +59,7 @@ class Vcs(abc.ABC):
 
   @abc.abstractmethod
   def get_author(self) -> Author:
-    """ Determine the author details from the repository settings. """
+    """ Determine the author details from the repository or VCS settings. """
 
   @abc.abstractmethod
   def get_all_files(self) -> t.Sequence[Path]:
@@ -83,6 +84,9 @@ class Vcs(abc.ABC):
     """ Commit the given files into the VCS, and optionally create a tag with the given name. If a remote is specified
     for the *push* argument, the commit that was just created on the current branch as well as the tag name if one was
     specified will be pushed to the remote. """
+
+  @abc.abstractclassmethod
+  def detect(cls: type[T], path: Path) -> T | None: ...
 
 
 class Git(Vcs):
@@ -157,6 +161,12 @@ class Git(Vcs):
         refs.append(tag_name)
       self._git.push(push.name, *refs, force=force)
 
+  @classmethod
+  def detect(cls, path: Path) -> t.Union['Git', None]:
+    if (path / '.git').exists():
+      return Git(path)
+    return None
+
   @staticmethod
   def _git_file_status(mode: str) -> FileStatus:
     return {
@@ -167,3 +177,10 @@ class Git(Vcs):
       'D': FileStatus.DELETED,
       '?': FileStatus.UNKNOWN,
     }[mode]
+
+
+def detect_vcs(path: Path) -> Vcs | None:
+  for cls in [Git]:
+    if (vcs := cls.detect(path)):
+      return vcs
+  return None
