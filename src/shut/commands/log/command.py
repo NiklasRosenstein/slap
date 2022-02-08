@@ -179,18 +179,22 @@ class LogFormatComand(Command):
     if not self._validate_arguments():
       return 1
 
-    if (version := self.argument("version")):
-      changelog = self.manager.version(version)
-      if not changelog.exists():
+    if self.option("all"):
+      changelogs = self.manager.all()
+    elif (version := self.argument("version")):
+      changelogs = [self.manager.version(version)]
+      if not changelogs.exists():
         self.line_error(f'error: Changelog for <opt>version</opt> "{version}" does not exist.', 'error')
         return 1
     else:
-      changelog = self.manager.unreleased()
+      changelogs = [self.manager.unreleased()]
 
-    if self.option("markdown"):
-      self._render_markdown(changelog)
-    else:
-      self._render_terminal(changelog)
+    for changelog in changelogs:
+      if self.option("markdown"):
+        self._render_markdown(changelog)
+      else:
+        self._render_terminal(changelog)
+      self.line('')
 
     return 0
 

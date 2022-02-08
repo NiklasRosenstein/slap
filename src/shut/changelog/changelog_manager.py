@@ -10,6 +10,10 @@ from nr.util.weak import weak_property
 
 from .model import Changelog, ChangelogEntry
 
+if t.TYPE_CHECKING:
+  from poetry.core.semver.version import Version  # type: ignore[import]
+
+
 DEFAULT_VALID_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement', 'tests']
 
 def is_url(s: str) -> bool:
@@ -75,8 +79,10 @@ class ManagedChangelog:
   _manager: 'ChangelogManager' = weak_property('_ManagedChangelog__manager')
 
   def __init__(self, manager: 'ChangelogManager', path: Path, version: str | None) -> None:
+    from poetry.core.semver.version import Version
+
     self.path = path
-    self.version = version
+    self.version = Version.parse(version) if version else None
     self._manager = manager
     self._content: Changelog | None = None
 
@@ -153,10 +159,14 @@ class ChangelogManager:
   def version(self, version: str) -> ManagedChangelog:
     return ManagedChangelog(self, self.directory / self.version_fn_template.format(version=version), version)
 
-  def all(self) -> t.Iterator[ManagedChangelog]:
+  def all(self) -> list[ManagedChangelog]:
+    changelogs = []
     for path in self.directory.iterdir():
-      if path.suffix == '.toml':
-        yield ManagedChangelog(self, path, path.name if path.name != self.unreleased_fn else None)
+      if path.suffix == '.toml' and path.name != self.unreleased_fn:
+        changelogs.append(ManagedChangelog(self, path, path.stem))
+    changelogs.sort(key=lambda c: c.version, reverse=True)
+    changelogs.insert(0, self.unreleased())
+    return changelogs
 
   def make_entry(
     self,
