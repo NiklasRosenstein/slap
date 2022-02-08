@@ -1,3 +1,0 @@
-mkdocs
-pygments
-readthedocs-custom-steps

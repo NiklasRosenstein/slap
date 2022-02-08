@@ -4,6 +4,5 @@ mkdocs:
 python:
   version: 3.7
   install:
-  - method: pip
-    path: .
-  - requirements: .readthedocs-requirements.txt
+  - path: .
+    extra_requirements: rtd

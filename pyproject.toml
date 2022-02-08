@@ -38,6 +38,9 @@ mypy = "^0.931"
 pytest-coverage = "^0.0"
 pylint = "^2.12.2"
 
+[tool.poetry.optional-dependencies]
+rtd = [ "mkdocs", "pygments", "readthedocs-custom-steps" ]
+
 [tool.poetry.scripts]
 shut = "shut.__main__:app"
 
@@ -99,3 +102,13 @@ warn_no_return = true
 warn_unreachable = true
 show_error_context = true
 show_error_codes = true
+
+#
+# Readthedocs
+#
+[tool.readthedocs-custom-steps]
+script = """
+shut changelog -a --markdown >docs/src/changelog.md
+cp README.md docs/index.md
+python -m "$@"
+"""
