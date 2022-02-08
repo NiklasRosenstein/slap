@@ -13,6 +13,7 @@ from setuptools import find_namespace_packages
 from shut.application import Application, ApplicationPlugin, Command, option
 
 PYPROJECT_TOML = Path('pyproject.toml')
+IGNORED_MODULES = ['test', 'tests', 'docs']
 
 
 def pick_modules_with_init_py(directory: Path, modules: list[str]) -> list[str]:
@@ -35,9 +36,14 @@ def identify_flit_module(directory: Path) -> str:
 
   if len(modules) > 1:
     # If we stil have multiple modules, we try to find the longest common path.
+    modules = [
+      m for m in modules
+      if m not in IGNORED_MODULES and
+        ('.' not in m or m.split('.')[0] not in IGNORED_MODULES)
+    ]
     common = longest_common_substring(*(x.split('.') for x in modules), start_only=True)
     if not common:
-      raise ValueError(f'no common root package modules: {modules}')
+      raise ValueError(f'no common root package in modules: {modules}')
     return '.'.join(common)
 
   return modules[0]
