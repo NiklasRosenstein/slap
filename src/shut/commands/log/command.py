@@ -230,7 +230,7 @@ class LogFormatComand(Command):
     for entry in changelog.content.entries:
       pr_link = self._html_anchor('pr', entry.pr) if entry.pr else ''
       issues = ', '.join(self._html_anchor('issue', issue) for issue in entry.issues) if entry.issues else ''
-      print(f'  <tr><td>{entry.type.capitalize()}</td><td>{entry.description}</td>'
+      print(f'  <tr><td>{entry.type.capitalize()}</td><td>\n\n{entry.description}</td>'
         f'<td>{pr_link}</td><td>{issues}</td><td>{", ".join(entry.get_authors())}</td></tr>')
     print('</table>')
 
