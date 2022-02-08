@@ -55,7 +55,7 @@ class LinkCommand(Command):
 
   This command uses <u>Flit [0]</u> to symlink the Python package you are currently
   working on into your Python environment's site-packages. This is particulary
-  useful if your project is using a <u>PEP 518 [1]</u> compatible build system that does
+  useful if your project is using a <u>PEP 517 [1]</u> compatible build system that does
   not support editable installs.
 
   When you run this command, the <u>pyproject.toml</u> will be temporarily rewritten such
@@ -77,7 +77,7 @@ class LinkCommand(Command):
     Symlinking src/my_package -> .venv/lib/python3.10/site-packages/my_package</fg>
 
   <u>[0]: https://flit.readthedocs.io/en/latest/</u>
-  <u>[1]: https://www.python.org/dev/peps/pep-0518/</u>
+  <u>[1]: https://www.python.org/dev/peps/pep-0517/</u>
   <u>[2]: https://python-poetry.org/</u>
   """
 
