@@ -83,6 +83,23 @@ class GithubChangelogValidator(ChangelogValidator):
       return resolved
     return author
 
+  def pr_shortform(self, pr: str) -> str | None:
+    return self.issue_shortform(pr)
+
+  def issue_shortform(self, issue: str) -> str | None:
+    match = re.search(r'https?://([\w\-\.]+)/(?:|.+/)([\w\-\.\_]+)/([\w\-\.\_]+)/(?:pulls|issues)/(\d+)', issue)
+    if match:
+      domain, owner, repo, issue_id = match.groups()
+      if domain == 'github.com' and self.repo == (owner + '/' + repo):
+        return issue_id
+      elif self.repo == (domain + '/' + owner + '/' + repo):
+        return issue_id
+      result = owner + '/' + repo + '#' + issue_id
+      if domain != 'github.com':
+        result = domain + '/' + result
+      return result
+    return None
+
 
 class GithubRemoteDetector(RemoteDetector):
 

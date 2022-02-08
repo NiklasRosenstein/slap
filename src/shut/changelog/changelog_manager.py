@@ -57,6 +57,12 @@ class ChangelogValidator(abc.ABC):
   def normalize_author(self, author: str) -> str:
     """ Called to normalize the author name that was specified. """
 
+  def pr_shortform(self, pr: str) -> str | None:
+    return None
+
+  def issue_shortform(self, issue: str) -> str | None:
+    return None
+
   @staticmethod
   def null() -> 'ChangelogValidator':
     return NullChangelogValidator()

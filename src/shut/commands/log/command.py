@@ -206,6 +206,7 @@ class LogFormatComand(Command):
 
   def _render_terminal(self, changelog: ManagedChangelog) -> None:
     if changelog.version:
+      assert changelog.content.release_date
       self.line(f'<b>{changelog.version}</b> (<u>{changelog.content.release_date}</u>)')
     else:
       self.line(f'<b>{changelog.version or "Unreleased"}</b>')
@@ -216,7 +217,31 @@ class LogFormatComand(Command):
       self.line(f'  <fg=cyan;options=italic>{entry.type}</fg> — {entry.description} (<fg=yellow>{entry.author}</fg>)')
 
   def _render_markdown(self, changelog: ManagedChangelog) -> None:
-    pass
+    if changelog.version:
+      assert changelog.content.release_date
+      print(f'## {changelog.version} ({changelog.content.release_date})')
+    else:
+      print(f'## Unreleased')
+      if not changelog.exists():
+        return
+
+    print()
+    print('<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>')
+    for entry in changelog.content.entries:
+      pr_link = self._html_anchor('pr', entry.pr) if entry.pr else ''
+      issues = ', '.join(self._html_anchor('issue', issue) for issue in entry.issues) if entry.issues else ''
+      print(f'  <tr><td>{entry.type.capitalize()}</td><td>{entry.description}</td>'
+        f'<td>{pr_link}</td><td>{issues}</td><td>{", ".join(entry.get_authors())}</td></tr>')
+    print('</table>')
+
+  def _html_anchor(self, type: t.Literal['pr', 'issue'], ref: str) -> str:
+    if type == 'pr':
+      shortform = self.manager.validator.pr_shortform(ref)
+    else:
+      shortform = self.manager.validator.issue_shortform(ref)
+    if shortform is None:
+      shortform = 'Link'
+    return f'<a href="{ref}">{shortform}</a>'
 
 
 class LogConvertCommand(Command):
