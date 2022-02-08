@@ -10,6 +10,8 @@ from pathlib import Path
 from cleo.application import Application as BaseCleoApplication  # type: ignore[import]
 from cleo.commands.command import Command as _BaseCommand  # type: ignore[import]
 from cleo.helpers import argument, option  # type: ignore[import]
+from cleo.io.inputs.argument import Argument  # type: ignore[import]
+from cleo.io.inputs.option import Option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
 from nr.util import Optional
 from nr.util.functional import Once
@@ -21,6 +23,7 @@ from shut import __version__
 from shut.util.cleo import add_style
 from shut.util.python_package import Package, detect_packages
 from shut.util.toml_file import TomlFile
+from shut.util.vcs import Vcs, detect_vcs
 
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
 
@@ -30,6 +33,19 @@ class Command(_BaseCommand):
   def __init_subclass__(cls) -> None:
     cls.help = textwrap.dedent(cls.help or cls.__doc__ or '')
     cls.description = cls.description or cls.help.strip().splitlines()[0]
+
+    # TODO (@NiklasRosenstein): Implement automatic wrapping of description text, but we
+    #   need to ignore HTML tags that are used to colour the output.
+
+    # argument: Argument
+    # for argument in cls.arguments:
+    #   print(argument)
+    #   argument._description = '\n'.join(textwrap.wrap(argument._description or '', 70))
+
+    # option: Option
+    # for option in cls.options:
+    #   print(option)
+    #   option._description = '\n'.join(textwrap.wrap(option._description or '', 70))
 
 
 class CleoApplication(BaseCleoApplication):
@@ -153,6 +169,9 @@ class Application:
       return Path(readme)
 
     return get_file_in_directory(Path.cwd(), 'README', ['README.md', 'README.rst'], case_sensitive=False)
+
+  def get_vcs(self) -> Vcs | None:
+    return detect_vcs(self.project_directory)
 
 
 class ApplicationPlugin(t.Generic[T]):

@@ -6,6 +6,7 @@ import re
 import typing as t
 from pathlib import Path
 
+from nr.util import Optional
 from nr.util.functional import Consumer
 from nr.util.git import Git as _Git, NoCurrentBranchError
 from nr.util.generic import T
@@ -42,6 +43,9 @@ class Author:
 
 class Vcs(abc.ABC):
   """ Interface to perform actions on a local version control system and its remote counterpart. """
+
+  @abc.abstractmethod
+  def get_toplevel(self) -> Path: ...
 
   @abc.abstractmethod
   def get_web_url(self) -> str | None:
@@ -94,6 +98,9 @@ class Git(Vcs):
   def __init__(self, directory: Path) -> None:
     self._git = _Git(directory)
     assert self._git.get_toplevel() is not None, f'Not a Git repository: {directory}'
+
+  def get_toplevel(self) -> Path:
+    return Optional(self._git.get_toplevel()).map(Path).or_else(None)
 
   def get_web_url(self) -> str | None:
     remote = next((r for r in self._git.remotes() if r.name == 'origin'), None)

@@ -1,4 +1,5 @@
 
+from pathlib import Path
 import typing as t
 
 from shut.application import Application, ApplicationPlugin, Command, argument, option
@@ -6,7 +7,6 @@ from shut.changelog.model import Changelog
 from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
 from shut.commands.check.api import CheckPlugin
 from shut.commands.log.config import get_changelog_manager
-from shut.util.vcs import detect_vcs
 from .checks import ChangelogConsistencyCheck
 
 
@@ -74,11 +74,18 @@ class LogAddCommand(Command):
     ),
     option(
       "issue", "i",
-      "An issue related to this chagnelog. If the remote repository is well supported by Shut, an issue number may "
+      "An issue related to this changelog. If the remote repository is well supported by Shut, an issue number may "
         "be specified and converted to a full URL by Shut, otherwise a full URL must be specified.",
       flag=False,
       multiple=True,
-    )
+    ),
+    option(
+      "commit", "c",
+      "Commit the currently staged changes in the VCS as well as the updated changelog file to disk. The commit "
+        "message is a concatenation of the <opt>--type, -t</opt> and <opt>--description, -d</opt>, as well as the "
+        "directory relative to the VCS toplevel if the changelog is created not in the toplevel directory of the "
+        "repository."
+    ),
   ]
 
   def __init__(self, app: Application, manager: ChangelogManager) -> None:
@@ -87,12 +94,16 @@ class LogAddCommand(Command):
     self.manager = manager
 
   def handle(self) -> int:
-    vcs = detect_vcs(self.app.project_directory)
+    vcs = self.app.get_vcs()
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
     author: str | None = self.option("author") or (vcs.get_author().email if vcs else None)
     pr: str | None = self.option("pr")
     issues: list[str] | None = self.option("issue")
+
+    if not vcs and self.option("commit"):
+      self.line_error('error: no VCS detected, but <opt>--commit, -c</opt> was used', 'error')
+      return 1
 
     if not change_type:
       self.line_error('error: missing <opt>--type,-t</opt>', 'error')
@@ -124,6 +135,16 @@ class LogAddCommand(Command):
       pygments.formatters.get_formatter_by_name('terminal')
     )
     print(highlighted)
+
+    if self.option("commit"):
+      assert vcs is not None
+      commit_message = f'{change_type}: {description}'
+      toplevel = vcs.get_toplevel()
+      relative = self.app.project_directory.relative_to(toplevel)
+      if relative != Path('.'):
+        prefix = str(relative).replace("\\", "/").strip("/")
+        commit_message = f'{prefix}/: {commit_message}'
+      vcs.commit_files([unreleased.path], commit_message)
 
     return 0
 
