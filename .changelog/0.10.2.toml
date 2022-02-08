@@ -1,0 +1,7 @@
+release-date = "2020-11-27"
+
+[[entries]]
+id = "8b58da3b-cb36-483f-a94c-3ef269e8f23b"
+type = "fix"
+description = "add `PackageModel.license_file` and fix license rendering into MANIFEST.in and setup.py"
+author = "@NiklasRosenstein"

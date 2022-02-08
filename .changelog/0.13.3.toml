@@ -1,0 +1,7 @@
+release-date = "2021-06-20"
+
+[[entries]]
+id = "2b90774e-46da-4bd7-b4f7-0f5f18980335"
+type = "fix"
+description = "exclude python requirements when rendering `requirements.txt`"
+author = "@NiklasRosenstein"

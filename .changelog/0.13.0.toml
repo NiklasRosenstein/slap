@@ -1,0 +1,13 @@
+release-date = "2021-06-20"
+
+[[entries]]
+id = "31abbcd5-284e-4123-b261-898f38afbbb4"
+type = "feature"
+description = "add `PackageModel.dev_requirements` which will be installed with `shut pkg install`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "e0e97192-5599-4615-9373-bb71856a2657"
+type = "feature"
+description = "add `PackageModel.render_requirements_txt` which will be rendered with `shut pkg update`"
+author = "@NiklasRosenstein"

@@ -1,6 +1,0 @@
-release_date: '2021-08-03'
-changes:
-- type: change
-  component: general
-  description: update how install hooks are rendered into `setup.py`
-  fixes: []

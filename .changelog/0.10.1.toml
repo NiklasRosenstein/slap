@@ -1,0 +1,7 @@
+release-date = "2020-11-27"
+
+[[entries]]
+id = "f79c5c43-e0f4-41b9-8e07-cdc45aad4b15"
+type = "fix"
+description = "remove debug print in \"package-url\" check"
+author = "@NiklasRosenstein"

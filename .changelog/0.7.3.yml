@@ -1,6 +1,0 @@
-release_date: '2020-09-09'
-changes:
-- type: fix
-  component: cli
-  description: Fix `AttributeError` when running `shut mono bump --snapshot`
-  fixes: []

@@ -1,0 +1,13 @@
+release-date = "2020-09-05"
+
+[[entries]]
+id = "5789fa92-bc04-487a-ba2d-67cc889fb9db"
+type = "improvement"
+description = "shut.test.pytest: `PytestDriver.args` option now defaults to `[\"-vv\"]`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "081fba05-a2c0-4d19-baaa-f55a280a6c36"
+type = "feature"
+description = "cli: Add `shut mono test --only` option"
+author = "@NiklasRosenstein"

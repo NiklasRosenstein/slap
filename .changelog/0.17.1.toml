@@ -1,0 +1,7 @@
+release-date = "2021-08-13"
+
+[[entries]]
+id = "8e3394ed-a3c1-4168-be6a-554e5b140772"
+type = "improvement"
+description = "dd `shut mono|pkg test -q,--quiet` option to quietly install test requirements with Pip, changed default to not do silent installs"
+author = "@NiklasRosenstein"

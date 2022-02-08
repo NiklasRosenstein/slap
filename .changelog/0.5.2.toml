@@ -1,0 +1,13 @@
+release-date = "2020-09-05"
+
+[[entries]]
+id = "3181b8ce-da92-4948-aaba-3b2606320fc5"
+type = "feature"
+description = "cli: add `--checks/--no-checks` toggle to `shut pkg` and `shut mono` commands"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "d2cfb268-3732-47be-871a-451e67e3eb11"
+type = "fix"
+description = "shut.test.pytest: Fix parsing of Pytest JSON record for test functions from a `unittest.TestCase` subclass"
+author = "@NiklasRosenstein"

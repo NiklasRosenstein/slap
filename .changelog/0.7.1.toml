@@ -1,0 +1,13 @@
+release-date = "2020-09-08"
+
+[[entries]]
+id = "5d982551-a68c-42f9-84e2-61e838f5e48d"
+type = "feature"
+description = "shore.models.monorepo: Add `Monorepo.get_inter_dependencies_graph()`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "7165b81c-102d-4384-9158-ee42055b47df"
+type = "fix"
+description = "cli: `shut mono install` now uses topological order to retrieve package requirements"
+author = "@NiklasRosenstein"

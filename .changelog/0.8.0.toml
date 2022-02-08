@@ -1,0 +1,25 @@
+release-date = "2020-09-09"
+
+[[entries]]
+id = "fd179760-7132-4446-beaf-04b0ab07393c"
+type = "feature"
+description = "cli: Add `shut ... test --keep-test-env` option"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "65037ae6-baad-425a-871c-83475c2465fb"
+type = "feature"
+description = "shut.test.base: Add `TestStatus.SKIPPED` enumeration value"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "55570104-afc4-4cca-a9ce-bbdc9fb5e221"
+type = "fix"
+description = "shut.test.pytest: Support skipped tests instead of failing ungracefully"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "90b21894-1004-4233-b388-95f693873993"
+type = "feature"
+description = "cli: Support skipped tests `shut ... test` output"
+author = "@NiklasRosenstein"

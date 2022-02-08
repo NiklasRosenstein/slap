@@ -1,0 +1,7 @@
+release-date = "2021-02-01"
+
+[[entries]]
+id = "bdcf272a-48ac-4ae7-9d31-0f948ccce5d8"
+type = "fix"
+description = "`shut pkg install` now correctly installs transitive package interdependencies in the right order"
+author = "@NiklasRosenstein"

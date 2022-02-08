@@ -1,0 +1,28 @@
+release-date = "2021-08-10"
+
+[[entries]]
+id = "aecfe99c-0a36-49d6-958d-61d7170654ac"
+type = "fix"
+description = "fix missing import for `typing.Dict` in `pytest` driver module, which could in some Python versions result in a `NameError`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "504cf094-a7ac-4787-8f6c-2bb8660c2968"
+type = "improvement"
+description = "add `extra_requires[test]` in generated `setup.py`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "94067fd8-9502-46f8-8657-67cbd80d0413"
+type = "fix"
+description = "fix `setup.py` rendering for inherit license files"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/21",
+]
+
+[[entries]]
+id = "a0a604ce-23a5-4996-ad81-d216f36a59c6"
+type = "improvement"
+description = "`_tempcopy()` function in `setup.py` now fails if the file cannot be copied from the source file"
+author = "@NiklasRosenstein"

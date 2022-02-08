@@ -1,0 +1,19 @@
+release-date = "2021-09-16"
+
+[[entries]]
+id = "931c3165-1b8b-4186-9773-9e6d6ded1a61"
+type = "feature"
+description = "add `shut init` command group with initial `shut init mkdocs` command"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "2ea4f693-0040-41f4-8091-0d96f2894f7f"
+type = "feature"
+description = "add `documentation` job in GitHub Actions template"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "ebba5079-ef43-4dc6-930e-6b8249c2164e"
+type = "feature"
+description = "ignore GitHub Actions template when checking package config in GitHub Actions (this is mainly used when using an unreleased version of shut to generate the action template or when needing to do quick modifications to the action config without triggering the shut checks in CI)."
+author = "@NiklasRosenstein"

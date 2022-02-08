@@ -1,0 +1,13 @@
+release-date = "2020-09-05"
+
+[[entries]]
+id = "9598ef35-7c6d-4056-bf2a-73718d30b3db"
+type = "improvement"
+description = "shut.test.pytest: set altname for `PytestDriver.report_file` to `report-file`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "3f78940f-74af-426e-95e3-c78e56a38c8a"
+type = "improvement"
+description = "cli: `shut mono test` now prints a summary of the status for every tested package"
+author = "@NiklasRosenstein"

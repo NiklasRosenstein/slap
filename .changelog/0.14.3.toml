@@ -1,0 +1,31 @@
+release-date = "2021-08-08"
+
+[[entries]]
+id = "38873e70-a1a6-4dc7-8691-146346acf94a"
+type = "fix"
+description = "fix `VendoredRequirement._normpath()` which corrupted absolute paths on Windows (e.g. `C:/path/to` would be converted to `./C:\\path\\to` when it should just be `C:\\path\\to`). This caused `shut pkg install` on Windows to fail."
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "163c5fc3-4362-49eb-8756-98ee6b28dd3c"
+type = "fix"
+description = "`No module named setuptools` error when using `shut pkg install` in venv on Windows"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/16",
+]
+
+[[entries]]
+id = "bc1526be-cb81-4f01-a962-af86a7a3e1a4"
+type = "fix"
+description = "fix additional CR in generated `LICENSE.txt` on Windows when installing Shut from source"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/17",
+]
+
+[[entries]]
+id = "6a1afb87-6db1-4008-92dd-205e226c2580"
+type = "fix"
+description = "`py.typed` file is rendered into `MANIFEST.in` with backslashes"
+author = "@NiklasRosenstein"

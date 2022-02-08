@@ -1,6 +1,0 @@
-release_date: '2021-07-23'
-changes:
-- type: fix
-  component: general
-  description: '`TypeError` when using --extra and --dev/--test'
-  fixes: []

@@ -1,0 +1,7 @@
+release-date = "2020-09-08"
+
+[[entries]]
+id = "908c3908-a2fc-4845-b445-c253c38dbc86"
+type = "fix"
+description = "cli: Fix `shut pkg install` command"
+author = "@NiklasRosenstein"

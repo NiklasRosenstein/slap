@@ -1,0 +1,19 @@
+release-date = "2021-11-21"
+
+[[entries]]
+id = "f6349bc8-8f86-4efb-850c-84eef3011668"
+type = "fix"
+description = "using `VirtualFiles.get_modified_files()` no longer creates non-existent directories"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "3b5b4a64-5ea0-4aa4-b63f-d5743534396b"
+type = "fix"
+description = "catch malformed ref error when trying to determine main branch name and use `develop` as default (see #40)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "85c9c5e2-e19e-4fb5-b3e1-cfbec86c59e5"
+type = "fix"
+description = "`$package.render-requirements-txt` is now handled correctly"
+author = "@NiklasRosenstein"

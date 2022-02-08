@@ -1,0 +1,7 @@
+release-date = "2021-06-20"
+
+[[entries]]
+id = "73308d9b-f600-486a-98c8-1051268c4ee9"
+type = "fix"
+description = "also install `PackageModel.test_requirements` on `shut pkg install`"
+author = "@NiklasRosenstein"

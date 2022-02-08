@@ -1,0 +1,43 @@
+release-date = "2020-09-05"
+
+[[entries]]
+id = "cfc74db5-ca34-4886-8489-f389ebda990f"
+type = "improvement"
+description = "shut.model.package: Remove `PackageData` class, merge it's members into `PackageModel` (this does not change the interface of `PackageModel`), Removed `PackageModel.data` property"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "e93be978-2b58-48b1-8c53-0af2458ffcf9"
+type = "tests"
+description = "fix unit tests"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "eb64cc96-9b79-4a29-abe9-501ddd058ebf"
+type = "improvement"
+description = "shore.checkers.package: `package-author` check is now an error level check"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "b0da2642-9aff-4181-b14a-2a1fe0637f8c"
+type = "improvement"
+description = "cli: `shut mono bump` and `shut pkg bump` no longer run checks, the command group already does it"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "2fdcd037-2e4c-4633-a91d-c7bbcd2e5fb9"
+type = "fix"
+description = "shut.renderers.setuptools: fix rendering of `python_requires` option in `setup.py` if package is universal (i.e. the `python` requirement uses an OR (|) which we cannot currently translate to setuptools correctly)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "21080c05-4ad2-4f28-a1c5-2529d28ead3c"
+type = "feature"
+description = "cli: add `shut pkg test` command which and `PackageModel.test_driver` configuration, the `shore.test` sub-package implements test drivers (currently just `pytest`)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "27e4da05-f7ec-44fb-918a-eda00a2b1a4e"
+type = "feature"
+description = "cli: add `shut mono test` command"
+author = "@NiklasRosenstein"

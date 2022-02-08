@@ -1,0 +1,7 @@
+release-date = "2020-12-04"
+
+[[entries]]
+id = "e2207347-229c-4591-89be-9f8cb4e0d782"
+type = "fix"
+description = "fix error in `setuptools` renderer if no license is configured in the package"
+author = "@NiklasRosenstein"

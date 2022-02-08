@@ -1,0 +1,7 @@
+release-date = "2020-09-05"
+
+[[entries]]
+id = "1bbf3d01-34ee-4a34-9796-df048ec64973"
+type = "feature"
+description = "cli: Support `VIRTUALENV` and `PIP` environment variables in `shut pkg test` and `shut mono test`"
+author = "@NiklasRosenstein"

@@ -1,0 +1,7 @@
+release-date = "2021-08-20"
+
+[[entries]]
+id = "90fd5c6e-8bca-4b1b-a06f-a95b40311487"
+type = "fix"
+description = "fix missing test-requirements installation with `shut mono|pkg test --isolate` if the comand was run previously"
+author = "@NiklasRosenstein"

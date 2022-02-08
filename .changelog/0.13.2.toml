@@ -1,0 +1,7 @@
+release-date = "2021-06-20"
+
+[[entries]]
+id = "cd10f33a-eabd-4c68-a487-8ba2e3c3cb78"
+type = "fix"
+description = "fix format of requirements in requirements.txt"
+author = "@NiklasRosenstein"

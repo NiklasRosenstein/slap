@@ -1,0 +1,16 @@
+release-date = "2021-08-12"
+
+[[entries]]
+id = "4e8d1a4b-1cc3-4cb8-8c28-2eeeaac6217a"
+type = "fix"
+description = "pass `filename` to databind deserializer when loading monorepo/package configuration files"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "3eb47c19-33c9-4921-a750-4e3d3b254a56"
+type = "fix"
+description = "Cannot run \"pip install\" without develop mode on package that inherits monorepo license"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/22",
+]

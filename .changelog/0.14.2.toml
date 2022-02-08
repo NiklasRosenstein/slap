@@ -1,0 +1,7 @@
+release-date = "2021-08-03"
+
+[[entries]]
+id = "1f52c4ad-b3e6-458a-a0b6-df2ea53418b9"
+type = "improvement"
+description = "update how install hooks are rendered into `setup.py`"
+author = "@NiklasRosenstein"

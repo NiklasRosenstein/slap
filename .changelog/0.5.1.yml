@@ -1,7 +1,0 @@
-release_date: '2020-09-05'
-changes:
-- type: fix
-  component: cli
-  description: fix running "shut pkg install" from inside "shut pkg test --isolate"
-    call
-  fixes: []

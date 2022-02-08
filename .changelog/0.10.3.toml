@@ -1,0 +1,7 @@
+release-date = "2020-11-27"
+
+[[entries]]
+id = "4495a424-90a2-4d90-97dd-d52e6345aaa9"
+type = "fix"
+description = "referencing a LICENSE or README outside the package directory now does not fail on install if the source file does not exist, but it will print a warning"
+author = "@NiklasRosenstein"

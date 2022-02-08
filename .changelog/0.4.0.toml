@@ -1,0 +1,73 @@
+release-date = "2020-09-04"
+
+[[entries]]
+id = "0e3f87ff-ee12-45f1-b5b6-72ca4e39e8d6"
+type = "improvement"
+description = "cli: Updated temrinal output of `shut ... checks`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "6a3ddaef-13c8-42b4-b489-e57a74ac5630"
+type = "improvement"
+description = "shut.model.package: Add `PackageError` exception class"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a10443a2-8599-49d2-908b-d99c76d58d9d"
+type = "improvement"
+description = "shut.checkers.monorepo: Add `bad-package-directory` check to Monorepo checker"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "eea8dbfb-a42d-4e10-9e5f-ecca673be409"
+type = "improvement"
+description = "cli: `shut pkg checks` now inherits checks from the Monorepo if the check result targets the package directly (e.g. the `bad-package-directory` check)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "773518a2-a764-4a21-8221-4ccb2dbe6217"
+type = "improvement"
+description = "shut.checkers.core: Add `CheckResult.subject` member (default: `None`)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a041f86c-b8be-4933-936a-4bf4a971bb77"
+type = "improvement"
+description = "cli: `shut pkg` and `shut mono` commands will now print failed checks to stderr before executing the requested subcommand."
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "652aa37b-7649-4ac3-a4e3-0679901045e8"
+type = "improvement"
+description = "shut.checkers.monorepo: include error message in `invalid-package` check result"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "51fd7931-f5ae-4d26-9890-d81b0433f46f"
+type = "improvement"
+description = "shut.checkers.generic: `unknown-config-options` check no longer shows if it passes"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "32067862-b629-4e55-8c76-d3f2d63f1f3e"
+type = "improvement"
+description = "shut.checkers.generic: rename `unknown-config` check to `unknown-config-options`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "4039d28f-3693-4bdb-b5d1-2f595a0e6279"
+type = "improvement"
+description = "cli: no longer set `PYTHONWARNINGS` environment variable"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "1d06586e-d28e-4d22-b6ea-27be360d202b"
+type = "improvement"
+description = "shut.model.monorepo: add `Monorepo.get_inter_dependencies_for()` method"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a497c99d-5462-4ebb-a285-ecb5d7554c05"
+type = "feature"
+description = "cli: add `shut pkg install` command"
+author = "@NiklasRosenstein"

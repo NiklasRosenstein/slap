@@ -1,0 +1,13 @@
+release-date = "2021-06-08"
+
+[[entries]]
+id = "5fb472c9-1bfe-4157-b4a6-adc7489d4f59"
+type = "improvement"
+description = "allow running Shut via `python -m shut`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "c72c7e4a-7827-44c3-a1f8-4147da3ba16d"
+type = "fix"
+description = "fix call to `run_install()` in `shut mono install`"
+author = "@NiklasRosenstein"

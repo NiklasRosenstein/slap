@@ -1,0 +1,19 @@
+release-date = "2021-08-14"
+
+[[entries]]
+id = "b495129f-737b-4853-b860-71d1fbd3fdf2"
+type = "fix"
+description = "`shut mono|pkg update --verify-tag \"\"` does not show an error when it should"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "95492ca5-00e9-4b92-b742-ce3be585f047"
+type = "feature"
+description = "`shut mono|pkg update --verify-tag` now accepts strings prefixed with `refs/tags/` and strips that prefix (useful for GitHub Actions to use the `$GITHUB_REF` variable)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "6fa7e8d8-4d86-4fc9-842a-9b35301594ee"
+type = "fix"
+description = "`shut pkg update --dry` option not respected"
+author = "@NiklasRosenstein"

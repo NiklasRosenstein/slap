@@ -1,0 +1,49 @@
+release-date = "2021-08-26"
+
+[[entries]]
+id = "287e9b95-ef77-4291-9777-55450991c836"
+type = "feature"
+description = "add `pylint` test driver"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "cca2fc74-0e72-4ba0-95df-9dbf73811454"
+type = "fix"
+description = "the fix from `0.17.4` actually made the install cache not work at all and just always install test requirements, now shut knows per driver selection whether dependencies have been installed before or not"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "46347dda-988f-4f40-bfe4-1078e694c03e"
+type = "feature"
+description = "test drivers are now loaded via the `shut.test_drivers` entrypoint, allowing plugins to be registered from external packages"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "5ef2b46e-14cb-442c-9c6f-6542b13b3558"
+type = "feature"
+description = "internal: add `AbstractProjectModel.get_auxiliary_renderers()`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "c47cbd43-0f2c-4a9b-a2a5-0b38545fd231"
+type = "feature"
+description = "`pylint` now comes with `.pylintrc` templates (only `shut` for now) and can also render templates from HTTP(S) URLs"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "5528cc39-dcf7-46c7-803a-77cbcec228c5"
+type = "feature"
+description = "Shut now recognizes lowercase readme/license files"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/31",
+]
+
+[[entries]]
+id = "2d0270e0-49af-4e8c-bc48-022235b86709"
+type = "fix"
+description = "render `command` variable into `setup.py` only if package `$.install.hooks` is used"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/33",
+]

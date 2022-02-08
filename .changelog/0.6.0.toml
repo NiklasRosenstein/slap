@@ -1,0 +1,121 @@
+release-date = "2020-09-08"
+
+[[entries]]
+id = "3f35c7eb-d38c-4931-a5a8-126698a5afe1"
+type = "feature"
+description = "shut.changelog: Add `breaking_change` Changelog type"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f08c39bf-8775-4257-8ba8-a471eb3458e6"
+type = "feature"
+description = "cli: `shut ... bump` command without version argument or bump mode option will determine the bump mode from the unreleased changelog"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "02716c80-0fcc-4cef-aac8-af10fede76c8"
+type = "improvement"
+description = "shore.model: `dump()` method now uses `nr.fs.atomic_file` to ensure the original file contents are not modified if the dump operation fails"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "64a90e57-512c-44b8-8d6c-cfc3944fa6a3"
+type = "improvement"
+description = "shore.model.requirements: Add `BaseRequirement` and `VendoredRequirement` classes, require databind.core and databind.json ^0.4.0 for the `@datamodel(serialize_as)` feature"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a4388e9d-65f8-4e1d-b313-9d34304cd8ac"
+type = "feature"
+description = "shut.model.package: `Package.requirements` and related properties are now of type `BaseRequirement`, allowing the use of `VendoredRequirement`s"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "1f605e90-5f35-432d-b479-79d68fe55316"
+type = "improvement"
+description = "cli: `shut pkg build` and `shut pkg publish` will now error if the package uses vendored requirements"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "86bea854-45b3-4865-a486-deb9d61db90d"
+type = "feature"
+description = "cli: `shut pkg requirements add` now supports adding vendored requirements using the `-v,--vendor` option"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "9efbf7b2-da71-4e18-892a-04814e594144"
+type = "improvement"
+description = "shut.model.package: Use new `RequirementsList` class instead of `List[BaseRequirement]`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "c3c6dc84-2f8d-4993-ad2c-fce6af0e41d7"
+type = "feature"
+description = "shut.model.requirements: `Requirement` now supports package extras"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a3c70b19-44aa-4dad-92e8-b3525757bec3"
+type = "feature"
+description = "cli: Add `--verify` option to `shut pkg update`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "5b3b5692-c1d6-4e93-9a9d-bee456ed09ff"
+type = "feature"
+description = "shut.checkers.package: Add `up to date` check for packages"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "71298f53-cd47-46f4-a4b5-20d7720fdd8c"
+type = "feature"
+description = "cli: `shut pkg install` now supports installing vendored requirements"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "30a5c8cf-78a8-4c49-a40a-f2a57f35c6d4"
+type = "fix"
+description = "shut.renderers.setuptools: Fix error when package author was not set"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "e5838470-7848-4625-a730-9ebf82573d79"
+type = "improvement"
+description = "shut.checkers: Change Checkers interface (remove `project` argument)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "b0f63292-90db-4009-8511-f0f3f316223c"
+type = "feature"
+description = "cli: `shut pkg bump` now prevents bumping if managed files are outdated"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "557f9460-000d-4d7d-a8ee-f1ece9b017aa"
+type = "fix"
+description = "cli: `shut pkg bump` now prevents bumping if package version is managed by a monorepo single-version (as was previously already expected to happen)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "e4bc1898-993b-484a-903b-dd2df073b0a0"
+type = "improvement"
+description = "cli: `shut mono bump` now includes the packages in the mono repo if `$.release.single-version` is enabled"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "8fd9a306-fe41-4c27-9a44-34d3ff34442d"
+type = "improvement"
+description = "shut.checkers.monorepo: remove `bad-package-directory` check again, having a package name differ from the directory name is a valid use case"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "198e30db-6c03-4d73-8d70-3b308e3f3362"
+type = "feature"
+description = "cli: Add `shut mono publish` command which delegates to `shut pkg publish`."
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "e689a29b-47c4-4a55-9176-08d5fba6e9cf"
+type = "improvement"
+description = "shut.publishers.warehouse: The `WarehouseProvider` now uses the new `PackageModel.get_publish_conf()` instead of `PackageModel.publish` directly, allowing packages to inherit the publish configuration of the mono repository"
+author = "@NiklasRosenstein"

@@ -1,0 +1,7 @@
+release-date = "2021-08-20"
+
+[[entries]]
+id = "58676c94-44a1-4d50-ac42-f78d6a448b68"
+type = "fix"
+description = "`shut mono|pkg test --isolate` no longer installs the main package in develop mode"
+author = "@NiklasRosenstein"

@@ -1,0 +1,67 @@
+release-date = "2021-08-13"
+
+[[entries]]
+id = "0af3f005-2ea1-4944-bca5-2840a85260c7"
+type = "feature"
+description = "add `shut pkg test --install/--no-install` which will default to `--install` if the current Python installation (determined by the `PYTHON` variable or falling back to just the `python` command) is a virtual env"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "9e318fd3-9d01-40cc-851a-9862a080fb3a"
+type = "feature"
+description = "add support for a `mypy` test driver"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "0d7b0978-4333-4a48-9712-1e88be17b57e"
+type = "feature"
+description = "api: add `Package.get_source_directory()`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "7686bfff-3540-4256-9ed7-8cd01fbaa436"
+type = "feature"
+description = "add `$.test-drivers` field in package model and deprecate `$.test-driver` for it."
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "c72ff2b1-0c36-479a-aa38-4743fc19418d"
+type = "feature"
+description = "add `shut mono test --install/--no-install` option (parallel to the existing option for `shut pkg test`), without the flag test requirements are only installed if Shut did not install the same requirements into the same environment before"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "dd12e587-2dc7-4372-b494-6bfbd4aa2e49"
+type = "feature"
+description = "make sure `$.test-requirements` are installed when running `shut mono|pkg test` in addition to the test-driver requirements. Update some output formatting of `shut mono|pkg test`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "af6d1ce6-3597-4174-89d3-1d0d78a94139"
+type = "fix"
+description = "lines in `MANIFEST.in` outside the shut-specific block are not kept on `shut pkg update` (fixed in `VirtualFiles.write_all()`)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f071beb4-e838-4d58-a30d-5a50fed6ba4f"
+type = "fix"
+description = "package `$.author` data can now be de-serialized from a mapping again (as used to be possible before migrating to `databind.core^1.x`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "c03550f8-f599-45d6-b6b6-663286c7d012"
+type = "fix"
+description = "fix printing of `Failed test details:` when there were no failures but at least one skipped test case"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "ab2f431e-cc3f-445c-9864-12c7baa5855f"
+type = "feature"
+description = "`pytest` driver now supports a `$.parallelism` option which automatically pulls in `pytest-xdist` as a test requirement"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "14909c6f-63fc-4d2d-a2d0-1104c53a42ed"
+type = "feature"
+description = "`shut mono|pkg bump --tag|--push|--dry` options now have short versions `-t|-p|-d` respectively"
+author = "@NiklasRosenstein"

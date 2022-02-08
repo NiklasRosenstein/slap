@@ -1,0 +1,19 @@
+release-date = "2021-01-29"
+
+[[entries]]
+id = "d301d7ad-75b9-4ff3-b556-a2c618619d2a"
+type = "fix"
+description = "fix error rendering `setup.py` if the license file did not exist"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "66ec16ee-ec8b-4e4e-8578-b31dc13954bf"
+type = "feature"
+description = "add `get-version` command to `shut mono` and `shut pkg`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "87fd558c-78f1-42d3-afbe-19b2719e6aee"
+type = "fix"
+description = "`shut pkg requirements add` now adds the InstallConfiguration pip args"
+author = "@NiklasRosenstein"

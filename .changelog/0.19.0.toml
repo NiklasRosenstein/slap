@@ -1,0 +1,31 @@
+release-date = "2021-09-15"
+
+[[entries]]
+id = "27257b52-912b-47bf-a142-20e82271befa"
+type = "improvement"
+description = "Changelog entry `fixes` is now optional"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "1427644c-8603-472d-9397-ff9587ccb2ad"
+type = "improvement"
+description = "switch to Mako as a template engine from Jinja2"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "5ed6a125-b3b5-4b03-b19c-345a69e19762"
+type = "feature"
+description = "add `$.templates` to `AbstractProjectModel` and the `github-actions` template"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "6ab1779f-26dd-4c1c-81b8-5e7e4ab2f4dd"
+type = "improvement"
+description = "`shut pkg new` now adds the `github-template` to the generated `package.yml`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "32b75d0d-ba4b-430b-b597-513d6b8fe52a"
+type = "improvement"
+description = "remove template rendering capability of `pylint` test driver, instead add `pylintrc` template plugin"
+author = "@NiklasRosenstein"

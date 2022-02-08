@@ -1,0 +1,13 @@
+release-date = "2020-12-03"
+
+[[entries]]
+id = "440c84d1-98cb-460a-82a0-a3de556ad3f2"
+type = "feature"
+description = "add `$.package-data` field to `package.yml`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "0d83b50d-44ce-4fcf-b19c-a61eba056f11"
+type = "fix"
+description = "add missing package data that needs to be packaged with `shut`"
+author = "@NiklasRosenstein"

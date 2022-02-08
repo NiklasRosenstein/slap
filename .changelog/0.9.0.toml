@@ -1,0 +1,34 @@
+release-date = "2020-11-20"
+
+[[entries]]
+id = "c2dc9b8a-678f-45bb-94a1-a5e7a2b7f55a"
+type = "fix"
+description = "cli: Fix `shut mono bump` not updating requirements in package `setup.py` if packages have inter dependencies"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/7",
+]
+
+[[entries]]
+id = "e665b36f-2c40-44ea-b941-500e9473860c"
+type = "feature"
+description = "shut.model.package: Add `$.install.index-url` and `$.install.extra-index-urls` fields"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "e5b1ebf7-8319-4de1-aed7-a9c0a086ed9a"
+type = "feature"
+description = "cli: `shut pkg install` now supports `$.install.index-url` and `$.install.extra-index-urls`, added a `--pipx` option"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f9beed95-d76c-4714-b229-43939340d441"
+type = "feature"
+description = "checks: Add check for namespace files"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "03a946c0-4209-4ec8-97a1-c4b37e88ebe4"
+type = "fix"
+description = "fix order of dependencies in the same mono repository when using `shut pkg install`"
+author = "@NiklasRosenstein"

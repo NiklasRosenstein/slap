@@ -1,0 +1,7 @@
+release-date = "2020-12-19"
+
+[[entries]]
+id = "3d603efa-2877-4da4-878f-238b8bd8ecd4"
+type = "fix"
+description = "fix license_file relative path generation in setuptools renderer, now correctly inherits the license file from the monorepo"
+author = "@NiklasRosenstein"

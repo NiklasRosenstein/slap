@@ -1,0 +1,7 @@
+release-date = "2020-09-05"
+
+[[entries]]
+id = "981defc7-b7ae-4314-ab3e-da635528ecb4"
+type = "fix"
+description = "cli: fix running \"shut pkg install\" from inside \"shut pkg test --isolate\" call"
+author = "@NiklasRosenstein"

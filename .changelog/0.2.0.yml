@@ -1,6 +1,0 @@
-release_date: '2020-08-29'
-changes:
-- type: fix
-  component: docs
-  description: fix README example
-  fixes: []

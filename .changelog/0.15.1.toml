@@ -1,0 +1,7 @@
+release-date = "2021-08-09"
+
+[[entries]]
+id = "ec7ec6a4-c3d4-4176-8c29-2572db2f953c"
+type = "feature"
+description = "add BSD2, BSD3, BSD4 and Apache2 license templates"
+author = "@ndjeong"

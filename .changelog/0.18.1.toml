@@ -1,0 +1,10 @@
+release-date = "2021-08-27"
+
+[[entries]]
+id = "e7db93dd-6f62-414d-9a50-221a9004e16c"
+type = "fix"
+description = "fix added in `0.18.0` for #33 is actually incorrect, the `command` variable was needed when using the `_tempcopy()` feature. now it is fixed for good"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/shut/issues/33",
+]

@@ -1,0 +1,7 @@
+release-date = "2021-09-18"
+
+[[entries]]
+id = "e15729ec-0a3a-41b4-9134-adc0829d2393"
+type = "feature"
+description = "add `$.scripts` in `package.yml` and `shut pkg run` command"
+author = "@NiklasRosenstein"

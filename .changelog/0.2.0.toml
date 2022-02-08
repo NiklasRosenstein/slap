@@ -1,0 +1,7 @@
+release-date = "2020-08-29"
+
+[[entries]]
+id = "259aa30c-1bab-4963-87d9-48a23983e041"
+type = "docs"
+description = "fix README example"
+author = "@NiklasRosenstein"

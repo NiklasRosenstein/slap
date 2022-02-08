@@ -1,6 +1,0 @@
-release_date: '2020-09-08'
-changes:
-- type: fix
-  component: cli
-  description: Fix `shut pkg install` command
-  fixes: []

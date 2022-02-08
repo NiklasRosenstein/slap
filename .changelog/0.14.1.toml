@@ -1,0 +1,7 @@
+release-date = "2021-07-23"
+
+[[entries]]
+id = "a899b9e0-f400-4a77-bc6a-e448e7788c07"
+type = "fix"
+description = "`TypeError` when using --extra and --dev/--test"
+author = "@NiklasRosenstein"

@@ -1,7 +1,0 @@
-release_date: '2021-02-01'
-changes:
-- type: fix
-  component: general
-  description: '`shut pkg install` now correctly installs transitive package interdependencies
-    in the right order'
-  fixes: []

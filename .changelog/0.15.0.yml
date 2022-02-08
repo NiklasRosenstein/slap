@@ -1,6 +1,0 @@
-release_date: '2021-08-09'
-changes:
-- type: feature
-  component: general
-  description: add `shut mono|pkg status --json --include-config` options
-  fixes: []

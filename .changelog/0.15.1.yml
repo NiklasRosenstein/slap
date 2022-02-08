@@ -1,6 +1,0 @@
-release_date: '2021-08-09'
-changes:
-- type: feature
-  component: general
-  description: add BSD2, BSD3, BSD4 and Apache2 license templates (@ndjeong)
-  fixes: []

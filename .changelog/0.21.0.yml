@@ -1,5 +1,0 @@
-changes:
-- type: feature
-  component: general
-  description: add `$.scripts` in `package.yml` and `shut pkg run` command
-release_date: '2021-09-18'

@@ -1,0 +1,7 @@
+release-date = "2021-07-22"
+
+[[entries]]
+id = "ae6475d8-3842-48f2-b005-8ccee5b71d85"
+type = "feature"
+description = "add `--dev/--no-dev` and `--test/--no-test` options to `shut mono install` and `shut pkg install`"
+author = "@NiklasRosenstein"

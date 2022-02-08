@@ -1,0 +1,25 @@
+release-date = "2020-09-08"
+
+[[entries]]
+id = "2d8c0806-d334-473a-aefc-ddbf4d27df9f"
+type = "improvement"
+description = "cli: Removed `-a,--all` flag from `shut mono update`, the command now always behaves like that flag is set"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f733f6a3-27b9-4a7c-bc05-29b7061dd1e7"
+type = "feature"
+description = "cli: Add `shut mono update` flags `--verify` and `--verify-tag`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "16fcd00b-8e75-4c3b-861c-9a6aca371a7f"
+type = "fix"
+description = "shut.renderers.setuptools: Fix rendering of `extras_require`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "ff44ab7b-e562-4629-9b84-d5a4d7d5fd0c"
+type = "feature"
+description = "cli: Add `shut mono install` command"
+author = "@NiklasRosenstein"

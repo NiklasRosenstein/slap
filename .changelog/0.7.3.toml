@@ -1,0 +1,7 @@
+release-date = "2020-09-09"
+
+[[entries]]
+id = "96065c0d-9544-4566-bdf7-b9e415270bab"
+type = "fix"
+description = "cli: Fix `AttributeError` when running `shut mono bump --snapshot`"
+author = "@NiklasRosenstein"
