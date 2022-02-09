@@ -40,7 +40,7 @@ jobs:
     - name: Install mkdocs
       run: pip install mkdocs
     - name: Build docs
-      run: mkdocs build -d html/ -f docs/mkdocs.yml -s
+      run: mkdocs build -d $PWD/html/ -f docs/mkdocs.yml -s
     - uses: actions/upload-artifact@v2
       with:
         name: docs
