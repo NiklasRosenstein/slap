@@ -41,7 +41,7 @@ jobs:
     - name: Install mkdocs
       run: pip install mkdocs
     - name: Build docs
-      run: mkdocs -d html/ -f docs/mkdocs.yml -s
+      run: mkdocs build -d html/ -f docs/mkdocs.yml -s
     - name: Publish generated content to GitHub Pages
       uses: tsunematsu21/actions-publish-gh-pages@v1.0.2
       with:
