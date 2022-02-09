@@ -183,7 +183,7 @@ class LogFormatComand(Command):
       changelogs = self.manager.all()
     elif (version := self.argument("version")):
       changelogs = [self.manager.version(version)]
-      if not changelogs.exists():
+      if not changelogs[0].exists():
         self.line_error(f'error: Changelog for <opt>version</opt> "{version}" does not exist.', 'error')
         return 1
     else:

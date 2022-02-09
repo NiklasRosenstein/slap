@@ -6,7 +6,6 @@ import re
 import typing as t
 from pathlib import Path
 
-from nr.util import Optional
 from nr.util.functional import Consumer
 from nr.util.git import Git as _Git, NoCurrentBranchError
 from nr.util.generic import T
@@ -89,6 +88,7 @@ class Vcs(abc.ABC):
     for the *push* argument, the commit that was just created on the current branch as well as the tag name if one was
     specified will be pushed to the remote. """
 
+  @classmethod
   @abc.abstractclassmethod
   def detect(cls: type[T], path: Path) -> T | None: ...
 
@@ -100,7 +100,9 @@ class Git(Vcs):
     assert self._git.get_toplevel() is not None, f'Not a Git repository: {directory}'
 
   def get_toplevel(self) -> Path:
-    return Optional(self._git.get_toplevel()).map(Path).or_else(None)
+    toplevel = self._git.get_toplevel()
+    assert toplevel is not None
+    return Path(toplevel)
 
   def get_web_url(self) -> str | None:
     remote = next((r for r in self._git.remotes() if r.name == 'origin'), None)

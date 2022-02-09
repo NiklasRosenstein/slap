@@ -66,7 +66,7 @@ typed = true
 [tool.shut.test]
 mypy = "mypy src --namespace-packages"
 pylint = "pylint --fail-under=8.0 src/"
-#pytest = "pytest --cov=shut tests/"
+pytest = "pytest --cov=shut tests/"
 check = "shut check"
 
 #
@@ -97,7 +97,7 @@ max-line-length = 120
 [tool.mypy]
 pretty = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+#warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 show_error_context = true
@@ -106,9 +106,11 @@ show_error_codes = true
 #
 # Readthedocs
 #
+
 [tool.readthedocs-custom-steps]
 script = """
 shut changelog -a --markdown >docs/src/changelog.md
 cp README.md docs/index.md
 python -m "$@"
 """
+ 

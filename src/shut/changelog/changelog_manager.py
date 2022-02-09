@@ -170,7 +170,7 @@ class ChangelogManager:
     for path in self.directory.iterdir():
       if path.suffix == '.toml' and path.name != self.unreleased_fn:
         changelogs.append(ManagedChangelog(self, path, path.stem))
-    changelogs.sort(key=lambda c: c.version, reverse=True)
+    changelogs.sort(key=lambda c: t.cast('Version', c.version), reverse=True)
     unreleased = self.unreleased()
     if unreleased.exists():
       changelogs.insert(0, unreleased)
