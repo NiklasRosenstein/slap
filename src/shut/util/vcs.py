@@ -155,7 +155,7 @@ class Git(Vcs):
 
   def get_file_contents(self, file: Path, revision: str) -> bytes | None:
     try:
-      return self._git.get_file_contents(file, revision)
+      return self._git.get_file_contents(str(file), revision)
     except FileNotFoundError:
       return None
 

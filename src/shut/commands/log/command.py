@@ -161,6 +161,16 @@ class LogPrUpdateCommand(Command):
         "revision and the current version of the unreleased changelog.",
     )
   ]
+  options = [
+    option(
+      "commit", "c",
+      description="Commit the changes, if any.",
+    ),
+    option(
+      "push", "p",
+      description="Push the changes, if any.",
+    )
+  ]
 
   def __init__(self, app: Application, manager: ChangelogManager):
     super().__init__()
@@ -168,9 +178,7 @@ class LogPrUpdateCommand(Command):
     self.manager = manager
 
   def handle(self) -> int:
-    vcs = self.app.get_vcs()
-    if not vcs:
-      self.line_error('error: VCS is not configured or could not be detected', 'error')
+    if not self._validate_arguments():
       return 1
 
     try:
@@ -185,7 +193,7 @@ class LogPrUpdateCommand(Command):
       return 0
 
     rev = self.argument("base_revision")
-    prev_contents = vcs.get_file_contents(unreleased.path, rev)
+    prev_contents = self._vcs.get_file_contents(unreleased.path, rev)
     if prev_contents is None:
       prev_entry_ids = set[str]()
     else:
@@ -202,6 +210,31 @@ class LogPrUpdateCommand(Command):
       if entry.id in new_entry_ids:
         entry.pr = pr
     unreleased.save(None)
+
+    if self.option("commit"):
+      self._vcs.commit_files([unreleased.path], 'Updated PR references.', push=self._remote)
+
+    return 0
+
+  def _validate_arguments(self) -> bool:
+    if self.option("push") and not self.option("commit"):
+      self.line_error(
+        f'error: <opt>--push, -p</opt> can only be used in combination with <opt>--commit, -c</opt>',
+        'error')
+      return False
+
+    vcs = self.app.get_vcs()
+    if not vcs:
+      self.line_error('error: VCS is not configured or could not be detected', 'error')
+      return False
+    self._vcs = vcs
+
+    if self.option("push"):
+      self._remote = next((r for r in self._vcs.get_remotes() if r.default), None)
+    else:
+      self._remote = None
+
+    return True
 
 
 class LogFormatComand(Command):
