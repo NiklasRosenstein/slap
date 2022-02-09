@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.x']
+        python-version: ["3.10", "3.x"]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -28,3 +28,22 @@ jobs:
       run: poetry install
     - name: Test
       run: poetry run shut test
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9"
+    - name: Install mkdocs
+      run: pip install mkdocs
+    - name: Build docs
+      run: mkdocs -d html/ -f docs/mkdocs.yml -s
+    - name: Publish generated content to GitHub Pages
+      uses: tsunematsu21/actions-publish-gh-pages@v1.0.2
+      with:
+        dir: html
+        branch: gh-pages
+        token: ${{ secrets.ACCESS_TOKEN }}
