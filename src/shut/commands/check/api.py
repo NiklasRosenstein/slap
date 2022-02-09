@@ -8,8 +8,9 @@ if t.TYPE_CHECKING:
   from shut.application import Application
 
 
-class CheckResult(enum.Enum):
+class CheckResult(enum.IntEnum):
   OK = enum.auto()
+  RECOMMENDATION = enum.auto()
   WARNING = enum.auto()
   ERROR = enum.auto()
   SKIPPED = enum.auto()
@@ -19,6 +20,7 @@ class CheckResult(enum.Enum):
 class Check:
   Result: t.ClassVar = CheckResult
   OK: t.ClassVar = CheckResult.OK
+  RECOMMENDATION: t.ClassVar = CheckResult.RECOMMENDATION
   WARNING: t.ClassVar = CheckResult.WARNING
   ERROR: t.ClassVar = CheckResult.ERROR
   SKIPPED: t.ClassVar = CheckResult.SKIPPED

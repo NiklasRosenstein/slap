@@ -32,7 +32,9 @@ class PoetryChecksPlugin(CheckPlugin):
     self.poetry = (app.pyproject.value() if app.pyproject.exists() else {}).get('tool', {}).get('poetry')
     if self.poetry is not None:
       yield self._check_poetry_readme()
-      yield self._check_poetry_urls()
+      yield self._check_has_homepage_url()
+      yield self._check_has_repository_url()
+      yield self._check_has_documentation_url()
       yield self._check_poetry_classifiers()
       yield self._check_poetry_license()
 
@@ -63,13 +65,31 @@ class PoetryChecksPlugin(CheckPlugin):
       f'Poetry readme appears to be misconfigured (detected: <b>{detected_readme}</b>, configured: <b>{poetry_readme}</b>)'
     )
 
-  def _check_poetry_urls(self) -> Check:
-    has_homepage = 'homepage' not in self.poetry
+  def _check_has_homepage_url(self) -> Check:
+    has_homepage = 'homepage' in self.poetry or 'homepage' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
     return Check(
-      'urls',
-      Check.Result.OK if has_homepage else Check.Result.WARNING,
-      '<info>tool.poetry.homepage</info> is not configured' if not has_homepage else
-        '<b>tool.poetry.homepage</b> is configured'
+      'urls:homepage',
+      Check.Result.SKIPPED if has_homepage else Check.Result.RECOMMENDATION,
+      '<code>tool.poetry.homepage</code> is not configured' if not has_homepage else
+        'Configuration detected.'
+    )
+
+  def _check_has_repository_url(self) -> Check:
+    has_repository = 'repository' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
+    return Check(
+      'urls:repository',
+      Check.Result.SKIPPED if has_repository else Check.Result.RECOMMENDATION,
+      '<code>tool.poetry.urls.repository</code> should be configured' if not has_repository else
+        'Configuration detected.'
+    )
+
+  def _check_has_documentation_url(self) -> Check:
+    has_documentation = 'documentation' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
+    return Check(
+      'urls:documentation',
+      Check.Result.SKIPPED if has_documentation else Check.Result.RECOMMENDATION,
+      '<code>tool.poetry.urls.documentation</code> should be configured' if not has_documentation else
+        'Configuration detected.'
     )
 
   def _check_poetry_classifiers(self) -> Check:

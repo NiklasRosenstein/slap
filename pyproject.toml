@@ -15,6 +15,11 @@ license = "MIT"
 readme = "readme.md"
 packages = [{ include="shut", from="src" }]
 
+[tool.poetry.urls]
+Documentation = "https://niklasrosenstein.github.io/shut/"
+Homepage = "https://github.com/NiklasRosenstein/shut"
+Repository = "https://github.com/NiklasRosenstein/shut.git"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 "databind.core" = "^1.4.0"
