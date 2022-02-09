@@ -28,7 +28,7 @@ class ChangelogConsistencyCheck(CheckPlugin):
       except (ConversionError, ValueError) as exc:
         bad_changelogs.append((changelog.path.name, str(exc), entry.id))
 
-    check_name = 'shut:validate-changelogs'
+    check_name = 'validate'
     if not count:
       return Check(check_name, Check.Result.SKIPPED, None)
 

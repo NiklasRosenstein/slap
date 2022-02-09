@@ -14,7 +14,7 @@ COLORS = {
 
 @dataclasses.dataclass
 class CheckConfig:
-  plugins: list[str] = dataclasses.field(default_factory=lambda: ['shut', 'poetry'])
+  plugins: list[str] = dataclasses.field(default_factory=lambda: ['shut', 'log', 'poetry', 'release'])
 
 
 class CheckCommand(Command):
@@ -35,8 +35,9 @@ class CheckCommand(Command):
     checks: list[tuple[str, Check]] = []
     for plugin_name, plugin in self.app.plugins.group(CheckPlugin, CheckPlugin):  # type: ignore[misc]
       # TODO (@NiklasRosenstein): Take into account enabled/disabled checks.
-      for check in plugin.get_checks(self.app):
-        checks.append((plugin_name + ':' + check.name, check))
+      if plugin_name in self.config.plugins:
+        for check in plugin.get_checks(self.app):
+          checks.append((plugin_name + ':' + check.name, check))
 
     for check_id, check in sorted(checks, key=lambda c: c[0]):
       if check.result == Check.Result.SKIPPED:

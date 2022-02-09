@@ -13,7 +13,7 @@ from .checks import ChangelogConsistencyCheck
 
 class LogAddCommand(Command):
   """
-  Allows you to add structured changelog via the CLI.
+  Add an entry to the unreleased changelog via the CLI.
 
   A changelog is a TOML file, usually in the <u>.changelog/</u> directory, named with
   the version number it refers to and containing changelog entries. Changes that

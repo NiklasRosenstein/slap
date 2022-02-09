@@ -17,13 +17,13 @@ class ShutChecksPlugin(CheckPlugin):
   def _check_detect_packages(self) -> Check:
     packages = self.app.get_packages()
     return Check(
-      'shut:packages',
+      'packages',
       Check.Result.OK if packages else Check.Result.ERROR,
       'Detected ' + ", ".join(f'<b>{p.root}/{p.name}</b>' for p in packages)
     )
 
   def _check_py_typed(self) -> Check:
-    check_name = 'shut:typed'
+    check_name = 'typed'
     expect_typed = self.app.raw_config().get('typed')
     if expect_typed is None:
       return Check(check_name, Check.Result.WARNING, '<b>tool.shut.typed</b> is not set')

@@ -1,6 +1,7 @@
-# Publishing with Shut
 
-> __Todo__: Describe publishing in more detail.
+> TODO: This guide needs to be updated.
+
+# Publishing with Shut
 
 By default, every package is configured to publish to PyPI using the `warehouse:pypi` publishing
 target. A test publish to `test.pypi.org` can be performed by using the `--test` option when using

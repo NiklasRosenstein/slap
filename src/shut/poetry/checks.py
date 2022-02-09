@@ -4,8 +4,24 @@ from pathlib import Path
 
 from nr.util import Optional
 
+from nr.util.fs import get_file_in_directory
+
 from shut.commands.check.api import Check, CheckPlugin
 from shut.application import Application
+
+
+def get_readme_path(app: Application) -> Path | None:
+  """ Tries to detect the project readme. If `tool.poetry.readme` is set, that file will be returned. """
+
+  # TODO (@NiklasRosenstein): Support other config styles that specify a readme.
+
+  poetry: dict = app.pyproject.value_or({})
+  poetry = poetry.get('tool', {}).get('poetry', {})
+
+  if (readme := poetry.get('readme')) and Path(readme).is_file():
+    return Path(readme)
+
+  return get_file_in_directory(Path.cwd(), 'README', ['README.md', 'README.rst', 'README.txt'], case_sensitive=False)
 
 
 class PoetryChecksPlugin(CheckPlugin):
@@ -23,7 +39,7 @@ class PoetryChecksPlugin(CheckPlugin):
   def _check_poetry_readme(self) -> Check:
     check_name = 'readme'
     default_readmes = ['README.md', 'README.rst']
-    detected_readme = Optional(self.app.get_readme_path())\
+    detected_readme = Optional(get_readme_path(self.app))\
       .map(lambda p: str(p.resolve().relative_to(Path.cwd()))).or_else(None)
     poetry_readme = self.poetry.get('readme')
 

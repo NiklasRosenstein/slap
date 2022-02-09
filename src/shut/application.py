@@ -159,19 +159,6 @@ class Application:
 
     return packages
 
-  def get_readme_path(self) -> Path | None:
-    """ Tries to detect the project readme. If `tool.poetry.readme` is set, that file will be returned. """
-
-    # TODO (@NiklasRosenstein): Support other config styles that specify a readme.
-
-    poetry: dict = self.pyproject.value_or({})
-    poetry = poetry.get('tool', {}).get('poetry', {})
-
-    if (readme := poetry.get('readme')) and Path(readme).is_file():
-      return Path(readme)
-
-    return get_file_in_directory(Path.cwd(), 'README', ['README.md', 'README.rst'], case_sensitive=False)
-
   def get_vcs(self) -> Vcs | None:
     return detect_vcs(self.project_directory)
 

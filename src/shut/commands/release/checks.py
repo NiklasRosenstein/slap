@@ -13,7 +13,7 @@ class ReleaseChecksPlugin(CheckPlugin):
   def get_checks(self, app: 'Application') -> t.Iterable[Check]:
     from cleo.io.null_io import NullIO  # type: ignore[import]
 
-    check_name = 'versions'
+    check_name = 'version'
     packages = app.get_packages()
     if not packages:
       return [Check(check_name, Check.Result.WARNING, 'No packages detected')]

@@ -51,7 +51,7 @@ def identify_flit_module(directory: Path) -> str:
 
 class LinkCommand(Command):
   """
-  Install your Python package in development mode.
+  Symlink your Python package with the help of Flit.
 
   This command uses <u>Flit [0]</u> to symlink the Python package you are currently
   working on into your Python environment's site-packages. This is particulary
