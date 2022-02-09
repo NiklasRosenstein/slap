@@ -8,21 +8,7 @@ from databind.core.annotations import alias, union
 
 from shut.application import Application
 from shut.changelog.changelog_manager import DEFAULT_VALID_TYPES, ChangelogManager, ChangelogValidator
-
-ENTRYPOINT = 'shut.commands.log.config.RemoteProvider'
-
-
-class RemoteDetector(abc.ABC):
-
-  @abc.abstractmethod
-  def detect_changelog_validator(self, app: Application) -> ChangelogValidator | None: ...
-
-
-@union(union.Subtypes.entrypoint(ENTRYPOINT))
-class RemoteProvider(abc.ABC):
-
-  @abc.abstractmethod
-  def get_changelog_validator(self, app: Application) -> ChangelogValidator: ...
+from .api import RemoteDetectorPlugin, RemoteProvider
 
 
 @dataclasses.dataclass
@@ -41,7 +27,7 @@ def get_changelog_manager(app: Application) -> ChangelogManager:
   if config.remote:
     validator = config.remote.get_changelog_validator(app)
   else:
-    for plugin_name, plugin in app.plugins.group(RemoteDetector, RemoteDetector):  # type: ignore[misc]
+    for plugin_name, plugin in app.plugins.group(RemoteDetectorPlugin, RemoteDetectorPlugin):  # type: ignore[misc]
       if (validator := plugin.detect_changelog_validator(app)):
         break
 

@@ -7,7 +7,7 @@ from nr.util.git import Git
 
 from shut.application import Application, ApplicationPlugin
 from shut.changelog.changelog_manager import ChangelogValidator
-from shut.commands.log.config import RemoteDetector, RemoteProvider
+from shut.commands.log.config import RemoteDetectorPlugin, RemoteProvider
 
 
 def is_url(s: str) -> bool:
@@ -101,7 +101,7 @@ class GithubChangelogValidator(ChangelogValidator):
     return None
 
 
-class GithubRemoteDetector(RemoteDetector):
+class GithubRemoteDetector(RemoteDetectorPlugin):
 
   def detect_changelog_validator(self, app: Application) -> ChangelogValidator | None:
     # TODO (@NiklasRosenstein): Catch the right exception if its not a Git directory
@@ -138,4 +138,4 @@ class GithubApplicationPlugin(ApplicationPlugin):
     return None
 
   def activate(self, app: Application, config: None) -> None:
-    app.plugins.register(RemoteDetector, 'github', GithubRemoteDetector())
+    app.plugins.register(RemoteDetectorPlugin, 'github', GithubRemoteDetector())

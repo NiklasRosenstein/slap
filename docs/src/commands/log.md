@@ -44,4 +44,4 @@ A list of strings that are accepted in changelog entries as types.
 __Type__: `RemoteProvider | None`
 __Default__: `None`
 
-If `None`, will be automatically detected using the `RemoteDetector` plugins.
+If `None`, will be automatically detected using the `RemoteDetectorPlugin` plugins.
