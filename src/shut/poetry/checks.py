@@ -1,14 +1,14 @@
 
 import typing as t
 from pathlib import Path
-from xml.dom.minidom import Document
 
+import requests
 from nr.util import Optional
-
 from nr.util.fs import get_file_in_directory
 
-from shut.commands.check.api import Check, CheckPlugin
 from shut.application import Application
+from shut.commands.check.api import Check, CheckPlugin
+from shut.util.external.pypi_classifiers import get_classifiers
 
 
 def get_readme_path(app: Application) -> Path | None:
@@ -86,7 +86,27 @@ class PoetryChecksPlugin(CheckPlugin):
     return Check('urls', result, message)
 
   def _check_poetry_classifiers(self) -> Check:
-    return Check('classifiers', Check.Result.SKIPPED, 'Not implemented')
+    # TODO: Check for recommended classifier topics (Development State, Environment, Programming Language, Topic, Typing, etc.)
+    classifiers = self.poetry.get('classifiers')  # TODO: Support classifiers in [project]
+    details = None
+    if not classifiers:
+      result = Check.RECOMMENDATION
+      message = 'Please configure classifiers.'
+    else:
+      try:
+        good_classifiers = get_classifiers()
+      except requests.RequestException as exc:
+        result = Check.WARNING
+        message = f'Could not validate classifiers because list could not be fetched ({exc})'
+      else:
+        bad_classifiers = set(classifiers) - set(good_classifiers)
+        if bad_classifiers:
+          result = Check.ERROR
+          message = f'Found bad classifiers: ' + ','.join(f'<s>"{c}"</s>' for c in bad_classifiers)
+        else:
+          result = Check.OK
+          message = 'All classifiers are valid.'
+    return Check('classifiers', result, message, details)
 
   def _check_poetry_license(self) -> Check:
     return Check('license', Check.Result.SKIPPED, 'Not implemented')

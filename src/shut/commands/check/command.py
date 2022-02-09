@@ -69,7 +69,7 @@ class CheckCommand(Command):
       self.io.write('\n')
       if check.details:
         for line in check.details.splitlines():
-          self.io.write_line(f'  {line}')
+          self.io.write_line(f'    {line}')
 
     exit_code = 1 if error else 0
     counts = collections.Counter(check.result for _, check in checks)

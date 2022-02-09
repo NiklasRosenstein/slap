@@ -63,7 +63,7 @@ at least one of `Documentation`, `Repository` or `Bug Tracker` are missing, the 
 
 ##### `poetry:classifiers`
 
-__TODO__ Check if all classifiers in `[tool.poetry.classifiers]` are valid.
+Checks if `[tool.poetry] classifiers` are all valid trove classifiers per https://pypi.org/classifiers/.
 
 ##### `poetry:license`
 
