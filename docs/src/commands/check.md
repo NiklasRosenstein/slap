@@ -67,6 +67,8 @@ Checks if `[tool.poetry] classifiers` are all valid trove classifiers per https:
 
 ##### `poetry:license`
 
+Checks if the `[tool.poetry] license` is set and whether it is a valid SPDX license identifier.
+
 __TODO__ Check if the license is a valid SPDX license identifier.
 
 > __Todo__: More of those checks should also support looking into `[project]`.

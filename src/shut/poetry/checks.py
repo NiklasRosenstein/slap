@@ -109,4 +109,16 @@ class PoetryChecksPlugin(CheckPlugin):
     return Check('classifiers', result, message, details)
 
   def _check_poetry_license(self) -> Check:
-    return Check('license', Check.Result.SKIPPED, 'Not implemented')
+    from shut.util.external.licenses import get_spdx_licenses
+    license = self.poetry.get('license')
+    if not license:
+      result = Check.ERROR
+      message = 'Missing license'
+    else:
+      if license not in get_spdx_licenses():
+        result = Check.WARNING
+        message = f'License <s>"{license}"</s> is not a known SPDX license identifier.'
+      else:
+        result = Check.OK
+        message = f'License <s>"{license}"</s> is a valid SPDX identifier.'
+    return Check('license', result, message)
