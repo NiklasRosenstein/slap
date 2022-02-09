@@ -30,6 +30,7 @@ jobs:
       run: poetry run shut test
 
   docs:
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
