@@ -54,9 +54,10 @@ jobs:
       with:
         name: docs
         path: html/
-    - name: Publish generated content to GitHub Pages
-      uses: tsunematsu21/actions-publish-gh-pages@v1.0.2
+    - name: Deploy to GitHub Pages
+      uses: Cecilapp/GitHub-Pages-deploy@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        dir: html
-        branch: gh-pages
-        token: ${{ secrets.GITHUB_TOKEN }}
+        email: rosensteinniklas@gmail.com
+        build_dir: html
