@@ -204,8 +204,9 @@ settings in <code>pyproject.toml</code> and compares it with the readme file tha
 (which is a file called README, case-insensitive with one of the suffixes in the order of <code>.md</code>, <code>.rst</code>, <code>.txt</code>,
 or if that does not match, any file beginning with <code>README.</code>).</p>
 <h5 id="poetryurls"><code>poetry:urls</code></h5>
-<p>Checks if the <code>homepage</code> key is set in <code>[tool.poetry]</code>, <strong>TODO</strong> Also warn for missing issue and
-documentation URL</p>
+<p>Checks if the project URLs are configured properly. For the homepage URL, it will check for <code>[tool.poetry.homepage]</code>
+or the <code>Homepage</code> key in <code>[tool.poetry.urls]</code>. Not having the homepage configured will trigger a warning. If otherwise
+at least one of <code>Documentation</code>, <code>Repository</code> or <code>Bug Tracker</code> are missing, the check shows a recommendation.</p>
 <h5 id="poetryclassifiers"><code>poetry:classifiers</code></h5>
 <p><strong>TODO</strong> Check if all classifiers in <code>[tool.poetry.classifiers]</code> are valid.</p>
 <h5 id="poetrylicense"><code>poetry:license</code></h5>
