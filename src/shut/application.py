@@ -69,6 +69,7 @@ class CleoApplication(BaseCleoApplication):
     self.add_style('warning', 'magenta')
     self.add_style('u', options=['underline'])
     self.add_style('i', options=['italic'])
+    self.add_style('s', 'yellow')
     self.add_style('opt', 'cyan', options=['italic'])
 
   def add_style(self, name, fg=None, bg=None, options=None):

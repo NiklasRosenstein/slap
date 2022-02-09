@@ -57,8 +57,9 @@ or if that does not match, any file beginning with `README.`).
 
 ##### `poetry:urls`
 
-Checks if the `homepage` key is set in `[tool.poetry]`, __TODO__ Also warn for missing issue and
-documentation URL
+Checks if the project URLs are configured properly. For the homepage URL, it will check for `[tool.poetry.homepage]`
+or the `Homepage` key in `[tool.poetry.urls]`. Not having the homepage configured will trigger a warning. If otherwise
+at least one of `Documentation`, `Repository` or `Bug Tracker` are missing, the check shows a recommendation.
 
 ##### `poetry:classifiers`
 

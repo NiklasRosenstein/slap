@@ -1,6 +1,7 @@
 
 import typing as t
 from pathlib import Path
+from xml.dom.minidom import Document
 
 from nr.util import Optional
 
@@ -32,9 +33,7 @@ class PoetryChecksPlugin(CheckPlugin):
     self.poetry = (app.pyproject.value() if app.pyproject.exists() else {}).get('tool', {}).get('poetry')
     if self.poetry is not None:
       yield self._check_poetry_readme()
-      yield self._check_has_homepage_url()
-      yield self._check_has_repository_url()
-      yield self._check_has_documentation_url()
+      yield self._check_urls()
       yield self._check_poetry_classifiers()
       yield self._check_poetry_license()
 
@@ -65,32 +64,26 @@ class PoetryChecksPlugin(CheckPlugin):
       f'Poetry readme appears to be misconfigured (detected: <b>{detected_readme}</b>, configured: <b>{poetry_readme}</b>)'
     )
 
-  def _check_has_homepage_url(self) -> Check:
+  def _check_urls(self) -> Check:
     has_homepage = 'homepage' in self.poetry or 'homepage' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
-    return Check(
-      'urls:homepage',
-      Check.Result.SKIPPED if has_homepage else Check.Result.RECOMMENDATION,
-      '<code>tool.poetry.homepage</code> is not configured' if not has_homepage else
-        'Configuration detected.'
-    )
-
-  def _check_has_repository_url(self) -> Check:
     has_repository = 'repository' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
-    return Check(
-      'urls:repository',
-      Check.Result.SKIPPED if has_repository else Check.Result.RECOMMENDATION,
-      '<code>tool.poetry.urls.repository</code> should be configured' if not has_repository else
-        'Configuration detected.'
-    )
-
-  def _check_has_documentation_url(self) -> Check:
     has_documentation = 'documentation' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
-    return Check(
-      'urls:documentation',
-      Check.Result.SKIPPED if has_documentation else Check.Result.RECOMMENDATION,
-      '<code>tool.poetry.urls.documentation</code> should be configured' if not has_documentation else
-        'Configuration detected.'
-    )
+    has_bug_tracker = 'bug tracker' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
+
+    if has_homepage and has_repository and has_documentation and has_bug_tracker:
+      result = Check.OK
+      message = 'Your project URLs are in top condition.'
+    else:
+      missing = [k for k, v in {
+        'Homepage': has_homepage,
+        'Repository': has_repository,
+        'Documentation': has_documentation,
+        'Bug Tracker': has_bug_tracker
+      }.items() if not v]
+      result = Check.RECOMMENDATION if has_homepage else Check.WARNING
+      message = 'Please configure the following URLs: ' + ', '.join(f'<s>"{k}"</s>' for k in missing)
+
+    return Check('urls', result, message)
 
   def _check_poetry_classifiers(self) -> Check:
     return Check('classifiers', Check.Result.SKIPPED, 'Not implemented')
