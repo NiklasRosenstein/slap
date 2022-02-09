@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>shut release - Shut</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "shut release";
+    var mkdocs_page_input_path = "commands/release.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Shut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">shut</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../configuration/">Configuration</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../plugins/">Plugins</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Commands</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../check/">shut check</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../link/">shut link</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../log/">shut log</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">shut release</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#releasebranch">release.branch</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#releasecommit-message">release.commit-message</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#releasetag-name">release.tag-name</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#releasereferences">release.references</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../test/">shut test</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guides/publishing/">Publishing</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Remotes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../remotes/github/">GitHub</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Shut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Commands &raquo;</li>
+        
+      
+    
+    <li>shut release</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/NiklasRosenstein/shut/edit/master/docs/commands/release.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="shut-release">shut release</h1>
+<p>The <code>shut release</code> command is a much improved version to the <code>poetry version</code> command in that is can bump multiple
+references to the version number in the project. It can also be used to verify that the version number is consistent
+and matching a particular value in CI checks using the <code>--verify</code> option.</p>
+<p>Shut currently reads the configuration from <code>tool.poetry</code>, but support for [PEP 621][]
+metadata is planned. It tries its best to detect the package source code roots, but if the automatic detection fails or
+cannot be detected from other existing configurations, the <code>tool.shut.packages</code> and <code>tool.shut.source-directory</code>
+options can be set explicitly.</p>
+<p>The release process will also rename changelogs and insert the release date into changelogs created and managed with
+<code>shut log</code>.</p>
+<pre><code>$ shut release patch --tag --push
+bumping 2 version references:
+  pyproject.toml: 0.1.0 → 0.1.1
+  src/my_package/__init__.py: 0.1.0 → 0.1.1
+
+release staged changelog
+  .changelog/_unreleased.toml → .changelog/0.1.0.toml
+
+tagging 0.1.1
+  [develop] ec1e9b3] release 0.1.0
+  3 files changed, 3 insertions(+), 4 deletions(-)
+  rename .changelog/{_unreleased.yml =&gt; 0.1.0.yml} (78%)
+
+pushing develop, 0.1.1 to origin
+  Enumerating objects: 24, done.
+  Counting objects: 100% (24/24), done.
+  Delta compression using up to 8 threads
+  Compressing objects: 100% (17/17), done.
+  Writing objects: 100% (24/24), 3.87 KiB | 566.00 KiB/s, done.
+  Total 24 (delta 4), reused 0 (delta 0)
+  To https://github.com/username/repo
+  * [new branch]      develop -&gt; develop
+  * [new tag]         0.1.1 -&gt; 0.1.1
+</code></pre>
+<p>Additional version references can be configured using the <code>tool.shut.version-references</code> option or by installing a
+plugin that registers an entrypoint under <code>tool.shut.plugins.release</code>.</p>
+<blockquote>
+<p><strong>TODO</strong> Support releases on the remote with the <code>shut release --create-release</code> option.</p>
+</blockquote>
+<h2 id="configuration">Configuration</h2>
+<h3 id="releasebranch"><code>release.branch</code></h3>
+<p><strong>Type</strong>: <code>str</code><br />
+<strong>Default</strong>: <code>"develop"</code></p>
+<p>The branch on which releases are created. Unless <code>--no-branch-check</code> is passed to <code>shut release</code>, the command will
+refuse to continue if the current branch name does not match this value.</p>
+<h3 id="releasecommit-message"><code>release.commit-message</code></h3>
+<p><strong>Type</strong>: <code>str</code><br />
+<strong>Default</strong>: <code>"release {version}"</code></p>
+<p>The commit message to use when using the <code>--tag, -t</code> option. The string <code>{version}</code> will be replaced with the new
+version number.</p>
+<h3 id="releasetag-name"><code>release.tag-name</code></h3>
+<p><strong>Type</strong>: <code>str</code><br />
+<strong>Default</strong>: <code>"{version}"</code></p>
+<p>The tag name to use when using the <code>--tag, -t</code> option. The string <code>{version}</code> will be replaced with the new
+version number.</p>
+<h3 id="releasereferences"><code>release.references</code></h3>
+<p><strong>Type</strong>: <code>list[VersionRefConfig]</code><br />
+<strong>Default</strong>: <code>[]</code></p>
+<p>A list of version references that should be considered in addition to the version references that are automatically
+detected by Shut when updating version numbers across the project with the <code>shut release</code> command.</p>
+<p>A <code>VersionRefConfig</code> contains the fields <code>file: str</code> and <code>pattern: str</code>. The <code>file</code> is considered relative to the
+project directory (which is the directory where the <code>shut.toml</code> or <code>pyproject.toml</code> configuration file resides).</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../test/" class="btn btn-neutral float-right" title="shut test">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../log/" class="btn btn-neutral" title="shut log"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/NiklasRosenstein/shut/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../log/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../test/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

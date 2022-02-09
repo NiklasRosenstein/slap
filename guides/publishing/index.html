@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Publishing - Shut</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Publishing";
+    var mkdocs_page_input_path = "guides/publishing.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Shut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">shut</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../configuration/">Configuration</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../plugins/">Plugins</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Commands</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../commands/check/">shut check</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../commands/link/">shut link</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../commands/log/">shut log</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../commands/release/">shut release</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../commands/test/">shut test</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Publishing</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#automate-publishing-in-ci-checls">Automate publishing in CI checls</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#publishing-snapshots">Publishing Snapshots</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Remotes</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../remotes/github/">GitHub</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Shut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Guides &raquo;</li>
+        
+      
+    
+    <li>Publishing</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/NiklasRosenstein/shut/edit/master/docs/guides/publishing.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <blockquote>
+<p>TODO: This guide needs to be updated.</p>
+</blockquote>
+<h1 id="publishing-with-shut">Publishing with Shut</h1>
+<p>By default, every package is configured to publish to PyPI using the <code>warehouse:pypi</code> publishing
+target. A test publish to <code>test.pypi.org</code> can be performed by using the <code>--test</code> option when using
+the <code>shut pkg publish</code> command.</p>
+<h2 id="automate-publishing-in-ci-checls">Automate publishing in CI checls</h2>
+<p>You can specify the username and password in the config as environment variables. Most CI systems
+allow you to securely store a secret as an environment variable.</p>
+<pre><code class="language-yml">name: my-package
+# ...
+publish:
+  pypi:
+    credentials:
+      username: __token__
+      password: '$PYPI_TOKEN'
+      test_username: __token__
+      test_password: '$TESTPYPI_TOKEN'
+</code></pre>
+<p>When you're ready to publish from the CI checks, make it run the following commands:</p>
+<pre><code class="language-yml">- pip install shut
+- shut pkg update --verify-tag &quot;$CI_TAG&quot;
+- shut pkg publish warehouse:pypi
+</code></pre>
+<p>It is also recommended that you add a trial-publish step. Note that we add the <code>--allow-empty-tag</code>
+to flag to allow that the value passed to <code>--verify-tag</code> can be empty. This is important because
+most commits won't be tagged during development.</p>
+<pre><code class="language-yml">- pip install shut
+- shut pkg update --verify-tag &quot;$CI_TAG&quot; --allow-empty-tag
+- shut pkg publish warehouse:pypi --test
+</code></pre>
+<h3 id="publishing-snapshots">Publishing Snapshots</h3>
+<p>The <code>bump</code> command can be used with the <code>--snapshot</code> option to update the version to one that
+indicates the Git commit distance since the last tagged version. This is useful to publish
+development snapshots. <strong>Note</strong> that PyPI/Warehouse does not actually (yet?) support snapshot version
+numbers. If you want to publish snapshots, you need an alternative package registry such as Artifactory).</p>
+<pre><code class="language-yaml">- shut pkg update --verify-tag &quot;$CI_TAG&quot; --allow-empty-tag
+- shut pkg bump --snapshot
+- shut pkg publish warehouse:pypi --test
+</code></pre>
+<p><strong>Important</strong>: Many CI systems may not fetch tags when cloning your repository. This means <code>bump --snapshot</code>
+can not figure out the commit distance and the generated snapshot version number will begin with <code>0.0.0</code>. If
+you encounter this issue, run <code>git fetch --tags</code> before Shut.</p>
+<p>If you do try to use snapshot versions with PyPI, you will see this type of error:</p>
+<pre><code>HTTPError: 400 Bad Request from https://test.pypi.org/legacy/
+'0.17.1+1.g986bed6' is an invalid value for Version. Error: Can't use PEP 440 local versions. See https://packaging.python.org/specifications/core-metadata for more information.
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../remotes/github/" class="btn btn-neutral float-right" title="GitHub">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../commands/test/" class="btn btn-neutral" title="shut test"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/NiklasRosenstein/shut/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../commands/test/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../remotes/github/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
