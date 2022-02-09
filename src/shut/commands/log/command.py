@@ -1,6 +1,7 @@
 
-from pathlib import Path
+import io
 import typing as t
+from pathlib import Path
 
 from shut.application import Application, ApplicationPlugin, Command, argument, option
 from shut.changelog.model import Changelog
@@ -148,7 +149,59 @@ class LogPrUpdateCommand(Command):
   changelog entry after the PR has been created.
   """
 
-  name = "log pr update"
+  name = "log update-pr"
+  arguments = [
+    argument(
+      "base_revision",
+      description="The revision ID to look back to to make out which changelog entries have been added since."
+    ),
+    argument(
+      "pr",
+      description="The reference to the PR that should be inserted into all entries added between the specified "
+        "revision and the current version of the unreleased changelog.",
+    )
+  ]
+
+  def __init__(self, app: Application, manager: ChangelogManager):
+    super().__init__()
+    self.app = app
+    self.manager = manager
+
+  def handle(self) -> int:
+    vcs = self.app.get_vcs()
+    if not vcs:
+      self.line_error('error: VCS is not configured or could not be detected', 'error')
+      return 1
+
+    try:
+      pr = self.manager.validator.normalize_pr_reference(self.argument("pr"))
+    except ValueError as exc:
+      self.line_error(f'error: {exc}', 'error')
+      return 1
+
+    unreleased = self.manager.unreleased()
+    if not unreleased.exists():
+      self.line('no entries to update', 'info')
+      return 0
+
+    rev = self.argument("base_revision")
+    prev_contents = vcs.get_file_contents(unreleased.path, rev)
+    if prev_contents is None:
+      prev_entry_ids = set[str]()
+    else:
+      prev_changelog = self.manager.deser.load(io.StringIO(prev_contents.decode('utf8')), f'{rev}:{unreleased.path}')
+      prev_entry_ids = {e.id for e in prev_changelog.entries}
+
+    new_entry_ids = {e.id for e in unreleased.content.entries} - prev_entry_ids
+    if not new_entry_ids:
+      self.line('no entries to update', 'info')
+      return 0
+
+    self.line(f'Updating PR reference in {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"}', 'comment')
+    for entry in unreleased.content.entries:
+      if entry.id in new_entry_ids:
+        entry.pr = pr
+    unreleased.save(None)
 
 
 class LogFormatComand(Command):
@@ -379,6 +432,6 @@ class LogCommandPlugin(ApplicationPlugin):
   def activate(self, app: 'Application', manager: ChangelogManager) -> None:
     app.plugins.register(CheckPlugin, 'log', ChangelogConsistencyCheck(manager))
     app.cleo.add(LogAddCommand(app, manager))
-    app.cleo.add(LogPrUpdateCommand())
+    app.cleo.add(LogPrUpdateCommand(app, manager))
     app.cleo.add(LogFormatComand(manager))
     app.cleo.add(LogConvertCommand(app, manager))

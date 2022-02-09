@@ -74,6 +74,10 @@ class Vcs(abc.ABC):
     VCS (and not ignored). """
 
   @abc.abstractmethod
+  def get_file_contents(self, file: Path, revision: str) -> bytes | None:
+    """ Return the contents of the file in a given revision. Return `None` if the file does not exist. """
+
+  @abc.abstractmethod
   def commit_files(
     self,
     files: t.Sequence[Path],
@@ -148,6 +152,12 @@ class Git(Vcs):
         self._git_file_status(file.mode[1])
       ))
     return result
+
+  def get_file_contents(self, file: Path, revision: str) -> bytes | None:
+    try:
+      return self._git.get_file_contents(file, revision)
+    except FileNotFoundError:
+      return None
 
   def commit_files(
     self,
