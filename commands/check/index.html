@@ -208,8 +208,9 @@ or if that does not match, any file beginning with <code>README.</code>).</p>
 or the <code>Homepage</code> key in <code>[tool.poetry.urls]</code>. Not having the homepage configured will trigger a warning. If otherwise
 at least one of <code>Documentation</code>, <code>Repository</code> or <code>Bug Tracker</code> are missing, the check shows a recommendation.</p>
 <h5 id="poetryclassifiers"><code>poetry:classifiers</code></h5>
-<p><strong>TODO</strong> Check if all classifiers in <code>[tool.poetry.classifiers]</code> are valid.</p>
+<p>Checks if <code>[tool.poetry] classifiers</code> are all valid trove classifiers per https://pypi.org/classifiers/.</p>
 <h5 id="poetrylicense"><code>poetry:license</code></h5>
+<p>Checks if the <code>[tool.poetry] license</code> is set and whether it is a valid SPDX license identifier.</p>
 <p><strong>TODO</strong> Check if the license is a valid SPDX license identifier.</p>
 <blockquote>
 <p><strong>Todo</strong>: More of those checks should also support looking into <code>[project]</code>.</p>
