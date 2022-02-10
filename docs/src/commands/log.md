@@ -1,5 +1,7 @@
 # shut log
 
+@cleo_command shut shut.commands.log.command.LogAddCommand
+
 The `shut log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
 but the directory can be changed using the `tool.shut.changelog-dir` option. The CLI allows you to add new entries
 as well as print them in a pretty format in the terminal or render the changelog as Markdown.

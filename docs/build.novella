@@ -1,0 +1,22 @@
+
+option "serve", description="Use mkdocs serve", flag=True
+option "site_dir", "d", description="Build directory (not with --serve)", default="_site"
+
+do "copy-files" {
+  paths = [ "src", "mkdocs.yml" ]
+}
+
+do "process-markdown" {
+  use "pydoc" {
+    loader.search_path = [ project_directory / "../src" ]
+  }
+  use "./tags/cleo_describe.py"
+}
+
+do "run" {
+  args = [ "mkdocs" ]
+  if options.get("serve"):
+    args.extend [ "serve" ]
+  else:
+    args.extend [ "build", "-d", project_directory / options.get("site_dir") ]
+}
