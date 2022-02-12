@@ -1,6 +1,6 @@
 
 from pathlib import Path
-from novella.actions.process_markdown.api import novella_tag
+from novella.markdown.processor import novella_tag, NovellaTagContext
 from novella.novella import Novella
 
 

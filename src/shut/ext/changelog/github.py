@@ -105,7 +105,10 @@ class GithubRemoteDetector(RemoteDetectorPlugin):
 
   def detect_changelog_validator(self, app: Application) -> ChangelogValidator | None:
     # TODO (@NiklasRosenstein): Catch the right exception if its not a Git directory
-    remotes = Git(app.project_directory).remotes()
+    git = Git(app.project_directory)
+    if not git.get_toplevel():
+      return None
+    remotes = git.remotes()
     for remote in remotes:
       if remote.name == 'origin' and 'github' in remote.fetch:
         break

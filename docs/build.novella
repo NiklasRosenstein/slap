@@ -9,6 +9,7 @@ do "copy-files" {
 do "process-markdown" {
   use "pydoc" {
     loader.search_path = [ project_directory / "../src" ]
+    options['module_after_header'] = True
   }
   use "./tags/cleo_describe.py"
 }
@@ -16,7 +17,7 @@ do "process-markdown" {
 do "run" {
   args = [ "mkdocs" ]
   if options.get("serve"):
-    args.extend [ "serve" ]
+    args = args + [ "serve" ]
   else:
-    args.extend [ "build", "-d", project_directory / options.get("site_dir") ]
+    args = args + [ "build", "-d", project_directory / options.get("site_dir") ]
 }

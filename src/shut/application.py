@@ -91,6 +91,9 @@ class Application:
 
   DEFAULT_PLUGINS: list[str] = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
 
+  #: Path to the project directory where the Pyproject lies. This is usually the CWD.
+  project_directory: Path
+
   def __init__(self, project_directory: Path, name: str = 'shut', version: str = __version__) -> None:
     self.project_directory = project_directory
     self.pyproject = TomlFile(project_directory / 'pyproject.toml')
@@ -167,7 +170,12 @@ class Application:
 class ApplicationPlugin(t.Generic[T]):
 
   @abc.abstractmethod
-  def load_configuration(self, app: Application) -> T: ...
+  def load_configuration(self, app: Application) -> T:
+    """ Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Shut
+    configuration, which is either loaded from `pyproject.toml` or `shut.toml`. Use {@attr Application.raw_config}
+    to access the Shut configuration. """
 
   @abc.abstractmethod
-  def activate(self, app: Application, config: T) -> None: ...
+  def activate(self, app: Application, config: T) -> None:
+    """ Activate the plugin. Register a {@link Command} to {@attr Application.cleo} or another type of plugin to
+    the {@attr Application.plugins} registry. """

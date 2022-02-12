@@ -29,21 +29,21 @@ action or other type of CI job (the `shut log inject-pr-url` command can help wi
 
 ### `log.directory`
 
-__Type__: `str`
+__Type__: `str`  
 __Default__: `.changelog/`
 
 The directory in which the changelogs are stored.
 
 ### `log.valid-types`
 
-__Type__: `list[str]`
-__Default__: `["breaking change", "docs", "feature", "fix", "hygiene", "improvement", "tests"]
+__Type__: `list[str]`  
+__Default__: `["breaking change", "docs", "feature", "fix", "hygiene", "improvement", "tests"]`
 
 A list of strings that are accepted in changelog entries as types.
 
 ### `log.remote`
 
-__Type__: `RemoteProvider | None`
+__Type__: `RemoteProvider | None`  
 __Default__: `None`
 
 If `None`, will be automatically detected using the `RemoteDetectorPlugin` plugins.

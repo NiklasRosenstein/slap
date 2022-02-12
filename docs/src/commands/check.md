@@ -22,7 +22,7 @@ __Todo__: Error if a specified plugin does not exist.
 
 The `ChangelogConsistencyCheck` checks if the changelogs managed by Shut are in order.
 
-##### `log:validate`
+#### Check `log:validate`
 
 Checks if all structured changelog files managed by Shut can be loaded and are valid.
 
@@ -32,11 +32,11 @@ Checks if all structured changelog files managed by Shut can be loaded and are v
 
 > The `ShutChecksPlugin` provides all Python specific checks.
 
-##### `shut:packages`
+#### Check `shut:packages`
 
 Checks if Shut can detect at least one package.
 
-##### `shut:typed`
+#### Check `shut:typed`
 
 Checks if the project is typed but does not contain a `py.typed` file or the other way round.
 This currently relies on the `$.typed` configuration and does not inspect the code for type hints.
@@ -47,7 +47,7 @@ This currently relies on the `$.typed` configuration and does not inspect the co
 
 > The `PoetryChecksPlugin` will perform some Poetry specific configuration checks.
 
-##### `poetry:readme`
+#### Check `poetry:readme`
 
 Checks if the project readme is configured correctly or if Poetry is able to automatically
 pick up the readme file if it is not configured. This inspects te `[tool.poetry.readme]` or `[project.readme]`
@@ -55,17 +55,17 @@ settings in `pyproject.toml` and compares it with the readme file that was autom
 (which is a file called README, case-insensitive with one of the suffixes in the order of `.md`, `.rst`, `.txt`,
 or if that does not match, any file beginning with `README.`).
 
-##### `poetry:urls`
+#### Check `poetry:urls`
 
 Checks if the project URLs are configured properly. For the homepage URL, it will check for `[tool.poetry.homepage]`
 or the `Homepage` key in `[tool.poetry.urls]`. Not having the homepage configured will trigger a warning. If otherwise
 at least one of `Documentation`, `Repository` or `Bug Tracker` are missing, the check shows a recommendation.
 
-##### `poetry:classifiers`
+#### Check `poetry:classifiers`
 
 Checks if `[tool.poetry] classifiers` are all valid trove classifiers per https://pypi.org/classifiers/.
 
-##### `poetry:license`
+#### Check `poetry:license`
 
 Checks if the `[tool.poetry] license` is set and whether it is a valid SPDX license identifier.
 
@@ -79,11 +79,11 @@ __TODO__ Check if the license is a valid SPDX license identifier.
 
 > The `ReleaseChecksPlugin` performs checks to validate that `shut release` can be used properly.
 
-##### `release:version`
+#### Check `release:version`
 
 Checks if the `__version__` can be detected in the source code of all detected packages.
 
-##### `release:remote`
+#### Check `release:remote`
 
 __TODO__ Checks if the VCS remote is configured or can be detected automatically such that the
 `shut release --create-release` option can be used.
