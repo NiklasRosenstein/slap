@@ -1,0 +1,5 @@
+[[entries]]
+id = "96dbd746-81a5-4a30-99be-30dfb5fd2b62"
+type = "fix"
+description = "fix entrypoint for `slam` script"
+author = "@NiklasRosenstein"
