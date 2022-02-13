@@ -70,7 +70,6 @@ typed = true
   [tool.slam.test]
   mypy = "mypy src --namespace-packages"
   pylint = "pylint --fail-under=8.0 src/"
-  #pytest = "pytest --cov=slam tests/"
   check = "slam check"
 
 [tool.pylint.MASTER]
