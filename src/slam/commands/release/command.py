@@ -260,7 +260,10 @@ class ReleaseCommand(Command):
 
     self.line(f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"}')
 
-    current_version = self._get_current_version(version_refs)
+    if self.app.pyproject.exists():
+      current_version = self._get_current_version(version_refs)
+    else:
+      current_version = None
     target_version = str(self._increment_version(current_version, version))
     changed_files: list[Path] = []
 
@@ -329,10 +332,17 @@ class ReleaseCommand(Command):
     if not dry:
       self.git.push(remote, branch, tag_name, force=force)
 
-  def _increment_version(self, version: "Version", rule: str) -> "Version":
+  def _increment_version(self, version: t.Optional['Version'], rule: str) -> "Version":
     """ Internal. Increment a version according to a rule. This is mostly copied from the Poetry `VersionCommand`. """
 
     from poetry.core.semver.version import Version
+
+    if not version:
+      try:
+        Version.parse(rule)
+      except ValueError:
+        self.line_error('error: current version could not be automatically determined, need explicit version', 'error')
+        sys.exit(1)
 
     if rule in {"major", "premajor"}:
       new = version.next_major()
@@ -375,7 +385,9 @@ class ReleaseCommand(Command):
     version = self.argument("version")
 
     if self.option("validate"):
-      return self._validate_version_refs(version_refs, version or str(self._get_current_version(version_refs)))
+      if not version and self.app.pyproject.exists():
+        version = str(self._get_current_version(version_refs))
+      return self._validate_version_refs(version_refs, version)
 
     if version is not None:
       if self.option("tag") and not self._check_on_release_branch():

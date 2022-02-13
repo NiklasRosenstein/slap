@@ -9,3 +9,15 @@ id = "97db9bc6-4da8-4a53-b228-080524425621"
 type = "fix"
 description = "fix `shut log command --author,-a` option being a flag"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "b5aa999a-b8c4-4587-b249-e61c92d1b74e"
+type = "improvement"
+description = "allow `pyproject.toml` to not exist when using `shut release` command"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "bc4244d6-18e4-4002-809d-08b3a4b9b2e0"
+type = "improvement"
+description = "fix pattern replacing `{version}` string in release references"
+author = "@NiklasRosenstein"

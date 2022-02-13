@@ -21,8 +21,11 @@ class VersionRefConfigMatcherPlugin(ReleasePlugin):
 
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:
     results = []
-    for config in [self.PYPROJECT_CONFIG] + self.references:
-      pattern = config.pattern.replace('{version}', r'(.*)')
+    references = self.references
+    if Path(self.PYPROJECT_CONFIG.file).exists():
+      references = [self.PYPROJECT_CONFIG] + self.references
+    for config in references:
+      pattern = config.pattern.replace('{version}', r'(.*?)')
       version_ref = match_version_ref_pattern(Path(config.file), pattern)
       if version_ref is not None:
         results.append(version_ref)
@@ -49,6 +52,8 @@ class SourceCodeVersionMatcherPlugin(ReleasePlugin):
   packages: list[Package]
 
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:
+    if not self.packages:
+      return []
     results = []
     for package in self.packages:
       for filename in self.FILENAMES:

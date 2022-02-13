@@ -21,7 +21,7 @@ def detect_packages(directory: Path) -> list[Package]:
   assert isinstance(directory, Path)
   modules = find_namespace_packages(str(directory))
   if not modules:
-    raise ValueError(f'no modules discovered in {directory}')
+    return []
 
   if len(modules) > 1:
     def _filter(module: str) -> bool:
@@ -39,7 +39,7 @@ def detect_packages(directory: Path) -> list[Package]:
     # If we stil have multiple modules, we try to find the longest common path.
     common = longest_common_substring(*(x.split('.') for x in modules), start_only=True)
     if not common:
-      raise ValueError(f'no common root package modules: {modules}')
+      return []
     modules = ['.'.join(common)]
 
   return [Package(module, directory / Path(*module.split('/')), directory) for module in modules]
