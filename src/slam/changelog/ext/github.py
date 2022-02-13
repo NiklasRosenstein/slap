@@ -6,7 +6,7 @@ import requests
 from nr.util.git import Git
 
 from slam.application import Application, ApplicationPlugin
-from slam.changelog.changelog_manager import ChangelogValidator
+from slam.changelog.manager import ChangelogValidator
 from slam.commands.log.config import RemoteDetectorPlugin, RemoteProvider
 
 

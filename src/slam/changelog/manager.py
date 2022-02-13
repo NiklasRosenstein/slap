@@ -1,5 +1,6 @@
 
 import abc
+import copy
 import dataclasses
 import datetime
 import typing as t
@@ -118,14 +119,14 @@ class ManagedChangelog:
   def release(self, version: str) -> None:
     """ Releases the changelog as the specified version. """
 
-    if not self.version:
+    if self.version:
       raise RuntimeError('cannot release already released changelog')
 
-    old_path = self.path
-    self.path = self._manager.directory / self._manager.version_fn_template.format(version=version)
-    self.content.release_date = datetime.date.today()
-    self.save(None)
-    old_path.unlink(missing_ok=True)
+    content = copy.deepcopy(self.content)
+    content.release_date = datetime.date.today()
+    target = self._manager.version(version)
+    target.save(content)
+    self.path.unlink()
 
 
 @dataclasses.dataclass

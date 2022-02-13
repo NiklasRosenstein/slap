@@ -4,7 +4,7 @@ import abc
 from databind.core.annotations import union
 
 from slam.application import Application
-from slam.changelog.changelog_manager import ChangelogValidator
+from slam.changelog.manager import ChangelogValidator
 
 
 class RemoteDetectorPlugin(abc.ABC):

@@ -59,10 +59,10 @@ classifiers = [
   release = "slam.commands.release.command:ReleaseCommandPlugin"
   test = "slam.commands.test:TestCommandPlugin"
   poetry = "slam.poetry.plugin:PoetryPlugin"
-  github = "slam.ext.changelog.github:GithubApplicationPlugin"
+  github = "slam.changelog.ext.github:GithubApplicationPlugin"
 
   [tool.poetry.plugins."slam.commands.log.config.RemoteProvider"]
-  github = "slam.ext.changelog.github:GithubRemoteProvider"
+  github = "slam.changelog.ext.github:GithubRemoteProvider"
 
 [tool.slam]
 typed = true

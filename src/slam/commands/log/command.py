@@ -5,11 +5,13 @@ from pathlib import Path
 
 from slam.application import Application, ApplicationPlugin, Command, argument, option
 from slam.changelog.model import Changelog
-from slam.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
+from slam.changelog.manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
 from slam.commands.check.api import CheckPlugin
 from slam.commands.log.config import get_changelog_manager
+from slam.commands.release.api import ReleasePlugin
 from slam.util.pygments import toml_highlight
 from .checks import ChangelogConsistencyCheck
+from .release_plugin import RenameChangelogOnReleasePlugin
 
 
 class LogAddCommand(Command):
@@ -464,6 +466,7 @@ class LogCommandPlugin(ApplicationPlugin):
 
   def activate(self, app: 'Application', manager: ChangelogManager) -> None:
     app.plugins.register(CheckPlugin, 'log', ChangelogConsistencyCheck(manager))
+    app.plugins.register(ReleasePlugin, 'log', RenameChangelogOnReleasePlugin(manager))
     app.cleo.add(LogAddCommand(app, manager))
     app.cleo.add(LogPrUpdateCommand(app, manager))
     app.cleo.add(LogFormatComand(manager))

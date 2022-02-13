@@ -3,7 +3,7 @@ import dataclasses
 import typing as t
 
 from slam.application import Application
-from slam.changelog.changelog_manager import ChangelogManager
+from slam.changelog.manager import ChangelogManager
 from slam.commands.check.api import Check, CheckPlugin
 
 

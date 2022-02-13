@@ -1,0 +1,5 @@
+[[entries]]
+id = "294b1ba5-dfb6-4930-970c-b33b0891ac01"
+type = "breaking change"
+description = "Fully reimplment Shut, rename it to Slam"
+author = "@NiklasRosenstein"
