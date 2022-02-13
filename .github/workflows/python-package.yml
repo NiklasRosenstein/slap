@@ -2,10 +2,10 @@ name: "Python Package"
 
 on:
   push:
-    branches: [ "revamp" ]
+    branches: [ "develop" ]
     tags: [ '*' ]
   pull_request:
-    branches: [ "revamp" ]
+    branches: [ "develop" ]
 
 jobs:
   test:
