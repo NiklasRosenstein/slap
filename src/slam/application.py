@@ -3,6 +3,7 @@
 user and project configuration. """
 
 import abc
+import os
 import textwrap
 import typing as t
 from pathlib import Path
@@ -71,6 +72,7 @@ class CleoApplication(BaseCleoApplication):
     self.add_style('i', options=['italic'])
     self.add_style('s', 'yellow')
     self.add_style('opt', 'cyan', options=['italic'])
+    self.definition.add_option(option("change-directory", "C", "Change to the specified directory.", flag=False))
 
   def add_style(self, name, fg=None, bg=None, options=None):
     self._styles[name] = self.Style(fg, bg, options)

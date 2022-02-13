@@ -50,7 +50,7 @@ classifiers = [
   rtd = [ "mkdocs", "pygments", "readthedocs-custom-steps" ]
 
   [tool.poetry.scripts]
-  slam = "slam.__main__:app"
+  slam = "slam.__main__:__main__code"
 
   [tool.poetry.plugins."slam.application.ApplicationPlugin"]
   check = "slam.commands.check.command:CheckCommandPlugin"
