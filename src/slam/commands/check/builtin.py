@@ -1,11 +1,11 @@
 
 import typing as t
 
-from shut.application import Application
+from slam.application import Application
 from .api import Check, CheckPlugin
 
 
-class ShutChecksPlugin(CheckPlugin):
+class SlamChecksPlugin(CheckPlugin):
 
   # TODO (@NiklasRosenstein): Check if VCS remote is configured?
 
@@ -26,7 +26,7 @@ class ShutChecksPlugin(CheckPlugin):
     check_name = 'typed'
     expect_typed = self.app.raw_config().get('typed')
     if expect_typed is None:
-      return Check(check_name, Check.Result.WARNING, '<b>tool.shut.typed</b> is not set')
+      return Check(check_name, Check.Result.WARNING, '<b>tool.slam.typed</b> is not set')
 
     has_py_typed = set[str]()
     has_no_py_typed = set[str]()

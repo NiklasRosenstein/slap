@@ -3,8 +3,8 @@ import abc
 
 from databind.core.annotations import union
 
-from shut.application import Application
-from shut.changelog.changelog_manager import ChangelogValidator
+from slam.application import Application
+from slam.changelog.changelog_manager import ChangelogValidator
 
 
 class RemoteDetectorPlugin(abc.ABC):
@@ -14,11 +14,11 @@ class RemoteDetectorPlugin(abc.ABC):
   def detect_changelog_validator(self, app: Application) -> ChangelogValidator | None: ...
 
 
-@union(union.Subtypes.entrypoint('shut.commands.log.config.RemoteProvider'))
+@union(union.Subtypes.entrypoint('slam.commands.log.config.RemoteProvider'))
 class RemoteProvider(abc.ABC):
   """
   A plugin class for providing a VCS remote for changelog and release management that can be defined in
-  the Shut configuration.
+  the Slam configuration.
   """
 
   @abc.abstractmethod

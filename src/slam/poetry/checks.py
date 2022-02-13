@@ -6,9 +6,9 @@ import requests
 from nr.util import Optional
 from nr.util.fs import get_file_in_directory
 
-from shut.application import Application
-from shut.commands.check.api import Check, CheckPlugin
-from shut.util.external.pypi_classifiers import get_classifiers
+from slam.application import Application
+from slam.commands.check.api import Check, CheckPlugin
+from slam.util.external.pypi_classifiers import get_classifiers
 
 
 def get_readme_path(app: Application) -> Path | None:
@@ -26,7 +26,7 @@ def get_readme_path(app: Application) -> Path | None:
 
 
 class PoetryChecksPlugin(CheckPlugin):
-  """ Check plugin to validate the Poetry configuration and compare it with Shut's expectations. """
+  """ Check plugin to validate the Poetry configuration and compare it with Slam's expectations. """
 
   def get_checks(self, app: 'Application') -> t.Iterable[Check]:
     self.app = app
@@ -109,7 +109,7 @@ class PoetryChecksPlugin(CheckPlugin):
     return Check('classifiers', result, message, details)
 
   def _check_poetry_license(self) -> Check:
-    from shut.util.external.licenses import get_spdx_licenses
+    from slam.util.external.licenses import get_spdx_licenses
     license = self.poetry.get('license')
     if not license:
       result = Check.ERROR

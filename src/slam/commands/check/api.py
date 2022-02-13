@@ -5,7 +5,7 @@ import dataclasses
 import typing as t
 
 if t.TYPE_CHECKING:
-  from shut.application import Application
+  from slam.application import Application
 
 
 class CheckResult(enum.IntEnum):
@@ -32,7 +32,7 @@ class Check:
 
 
 class CheckPlugin(abc.ABC):
-  """ A plugin to add checks to the `shut check` command. """
+  """ A plugin to add checks to the `slam check` command. """
 
   @abc.abstractmethod
   def get_checks(self, app: 'Application') -> t.Iterable[Check]: ...

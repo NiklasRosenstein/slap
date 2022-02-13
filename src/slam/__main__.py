@@ -1,5 +1,5 @@
 
 from pathlib import Path
-from shut.application import Application
+from slam.application import Application
 
 app = Application(Path.cwd())

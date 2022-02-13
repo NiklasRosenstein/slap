@@ -1,6 +1,6 @@
 
-from shut.application import Application, ApplicationPlugin
-from shut.commands.check.api import CheckPlugin
+from slam.application import Application, ApplicationPlugin
+from slam.commands.check.api import CheckPlugin
 from .checks import PoetryChecksPlugin
 
 

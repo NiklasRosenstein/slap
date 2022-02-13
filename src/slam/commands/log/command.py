@@ -3,12 +3,12 @@ import io
 import typing as t
 from pathlib import Path
 
-from shut.application import Application, ApplicationPlugin, Command, argument, option
-from shut.changelog.model import Changelog
-from shut.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
-from shut.commands.check.api import CheckPlugin
-from shut.commands.log.config import get_changelog_manager
-from shut.util.pygments import toml_highlight
+from slam.application import Application, ApplicationPlugin, Command, argument, option
+from slam.changelog.model import Changelog
+from slam.changelog.changelog_manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
+from slam.commands.check.api import CheckPlugin
+from slam.commands.log.config import get_changelog_manager
+from slam.util.pygments import toml_highlight
 from .checks import ChangelogConsistencyCheck
 
 
@@ -40,12 +40,12 @@ class LogAddCommand(Command):
     <fg=green>author</fg> = <fg=yellow>"username"</fg>
     <fg=green>pr</fg> = <fg=yellow>"https://github.com/username/my_package/pulls/13"</fg>
 
-  Changelog entries can be managed easily using the <info>shut log</info> command.
+  Changelog entries can be managed easily using the <info>slam log</info> command.
 
-    <fg=yellow>$</fg> shut log add -t feature -d 'Improvement to `my_package.util`"
+    <fg=yellow>$</fg> slam log add -t feature -d 'Improvement to `my_package.util`"
 
   The <fg=green>pr</fg> field is usually set manually after the PR is created or updated
-  automatically by a CI action using the <info>shut log update-pr-field</info> command.
+  automatically by a CI action using the <info>slam log update-pr-field</info> command.
   """
 
   name = "log add"
@@ -70,14 +70,14 @@ class LogAddCommand(Command):
       "pr", None,
       description="The pull request that the change is introduced to the main branch with. This is not usually "
         "known at the time the changelog entry is created, so this option is not often used. If the remote "
-        "repository is well supported by Shut, a pull request number may be specified and converted to a full "
-        "URL by Shut, otherwise a full URL must be specified.",
+        "repository is well supported by Slam, a pull request number may be specified and converted to a full "
+        "URL by Slam, otherwise a full URL must be specified.",
       flag=False,
     ),
     option(
       "issue", "i",
-      description="An issue related to this changelog. If the remote repository is well supported by Shut, an issue "
-        "number may be specified and converted to a full URL by Shut, otherwise a full URL must be specified.",
+      description="An issue related to this changelog. If the remote repository is well supported by Slam, an issue "
+        "number may be specified and converted to a full URL by Slam, otherwise a full URL must be specified.",
       flag=False,
       multiple=True,
     ),
@@ -332,7 +332,7 @@ class LogFormatComand(Command):
 
 class LogConvertCommand(Command):
   """
-  Convert Shut's old YAML based changelogs to new style TOML changelogs.
+  Convert Slam's old YAML based changelogs to new style TOML changelogs.
 
   Sometimes the changelog entries in the old style would be suffixed with the
   author's username in the format of <code>@Name</code> or <code>(@Name)</code>, so this command will

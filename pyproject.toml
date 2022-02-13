@@ -2,88 +2,76 @@
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-#
-# Poetry
-#
-
 [tool.poetry]
-name = "shut"
+name = "slam-cli"
 version = "1.0.0a1"
-description = "Shut is a command-line utility for developing Python applications."
+description = "Slam is a command-line utility for developing Python applications."
 authors = ["Niklas Rosenstein <rosensteinniklas@gmail.com>"]
 license = "MIT"
 readme = "readme.md"
-packages = [{ include="shut", from="src" }]
+packages = [{ include="slam", from="src" }]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
   "Programming Language :: Python :: 3.10",
 ]
 
-[tool.poetry.urls]
-Documentation = "https://niklasrosenstein.github.io/shut/"
-Homepage = "https://github.com/NiklasRosenstein/shut"
-Repository = "https://github.com/NiklasRosenstein/shut.git"
+  [tool.poetry.urls]
+  Documentation = "https://niklasrosenstein.github.io/slam/"
+  Homepage = "https://github.com/NiklasRosenstein/slam"
+  Repository = "https://github.com/NiklasRosenstein/slam.git"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-beautifulsoup4 = "^4.10.0"
-"databind.core" = "^1.4.0"
-"databind.json" = "^1.4.0"
-flit = "^3.6.0"
-"nr.util" = "^0.4.8"
-cleo = ">=1.0.0a4"
-poetry-core = "^1.1.0a6"
-pygments = "^2.11.2"
-PyYAML = "^6.0"
-requests = "^2.27.1"
-tomli = "^2.0.0"
-ptyprocess = "^0.7.0"
+  [tool.poetry.dependencies]
+  python = "^3.10"
+  beautifulsoup4 = "^4.10.0"
+  "databind.core" = "^1.4.0"
+  "databind.json" = "^1.4.0"
+  flit = "^3.6.0"
+  "nr.util" = "^0.4.8"
+  cleo = ">=1.0.0a4"
+  poetry-core = "^1.1.0a6"
+  pygments = "^2.11.2"
+  PyYAML = "^6.0"
+  requests = "^2.27.1"
+  tomli = "^2.0.0"
+  ptyprocess = "^0.7.0"
 
-[tool.poetry.dev-dependencies]
-types-beautifulsoup4 = "^4.10.0"
-types-requests = "^2.27.7"
-types-PyYAML = "^6.0.3"
-types-pygments = "^2.9.16"
-pytest = "^6.2.5"
-mypy = "^0.931"
-pytest-coverage = "^0.0"
-pylint = "^2.12.2"
+  [tool.poetry.dev-dependencies]
+  types-beautifulsoup4 = "^4.10.0"
+  types-requests = "^2.27.7"
+  types-PyYAML = "^6.0.3"
+  types-pygments = "^2.9.16"
+  pytest = "^6.2.5"
+  mypy = "^0.931"
+  pytest-coverage = "^0.0"
+  pylint = "^2.12.2"
 
-[tool.poetry.extras]
-rtd = [ "mkdocs", "pygments", "readthedocs-custom-steps" ]
+  [tool.poetry.extras]
+  rtd = [ "mkdocs", "pygments", "readthedocs-custom-steps" ]
 
-[tool.poetry.scripts]
-shut = "shut.__main__:app"
+  [tool.poetry.scripts]
+  slam = "slam.__main__:app"
 
-[tool.poetry.plugins."shut.application.ApplicationPlugin"]
-check = "shut.commands.check.command:CheckCommandPlugin"
-link = "shut.commands.link:LinkCommandPlugin"
-log = "shut.commands.log.command:LogCommandPlugin"
-release = "shut.commands.release.command:ReleaseCommandPlugin"
-test = "shut.commands.test:TestCommandPlugin"
-poetry = "shut.poetry.plugin:PoetryPlugin"
-github = "shut.ext.changelog.github:GithubApplicationPlugin"
+  [tool.poetry.plugins."slam.application.ApplicationPlugin"]
+  check = "slam.commands.check.command:CheckCommandPlugin"
+  link = "slam.commands.link:LinkCommandPlugin"
+  log = "slam.commands.log.command:LogCommandPlugin"
+  release = "slam.commands.release.command:ReleaseCommandPlugin"
+  test = "slam.commands.test:TestCommandPlugin"
+  poetry = "slam.poetry.plugin:PoetryPlugin"
+  github = "slam.ext.changelog.github:GithubApplicationPlugin"
 
-[tool.poetry.plugins."shut.commands.log.config.RemoteProvider"]
-github = "shut.ext.changelog.github:GithubRemoteProvider"
+  [tool.poetry.plugins."slam.commands.log.config.RemoteProvider"]
+  github = "slam.ext.changelog.github:GithubRemoteProvider"
 
-#
-# Shut
-#
-
-[tool.shut]
+[tool.slam]
 typed = true
 
-[tool.shut.test]
-mypy = "mypy src --namespace-packages"
-pylint = "pylint --fail-under=8.0 src/"
-#pytest = "pytest --cov=shut tests/"
-check = "shut check"
-
-#
-# Pylint
-#
+  [tool.slam.test]
+  mypy = "mypy src --namespace-packages"
+  pylint = "pylint --fail-under=8.0 src/"
+  #pytest = "pytest --cov=slam tests/"
+  check = "slam check"
 
 [tool.pylint.MASTER]
 disable = """
@@ -102,10 +90,6 @@ disable = """
 indent-string = '  '
 max-line-length = 120
 
-#
-# Mypy
-#
-
 [tool.mypy]
 pretty = true
 warn_redundant_casts = true
@@ -114,14 +98,3 @@ warn_no_return = true
 warn_unreachable = true
 show_error_context = true
 show_error_codes = true
-
-#
-# Readthedocs
-#
-
-[tool.readthedocs-custom-steps]
-script = """
-shut changelog -a --markdown >docs/src/changelog.md
-cp README.md docs/index.md
-python -m "$@"
-"""

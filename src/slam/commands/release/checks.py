@@ -1,8 +1,8 @@
 
 import typing as t
 
-from shut.application import Application
-from shut.commands.check.api import Check, CheckPlugin
+from slam.application import Application
+from slam.commands.check.api import Check, CheckPlugin
 from .builtin import SourceCodeVersionMatcherPlugin
 
 

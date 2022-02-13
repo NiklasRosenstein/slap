@@ -5,7 +5,7 @@ import typing as t
 
 from nr.util.singleton import NotSet
 
-from shut.application import Application, ApplicationPlugin, Command, IO, argument, option
+from slam.application import Application, ApplicationPlugin, Command, IO, argument, option
 
 
 class TestRunner:
@@ -50,17 +50,17 @@ class TestRunner:
 
 class TestCommand(Command):
   """
-  Execute commands configured in <fg=green>[tool.shut.test]</fg>.
+  Execute commands configured in <fg=green>[tool.slam.test]</fg>.
 
   <b>Example configuration:</b>
 
-    <fg=cyan>[tool.shut.test]</fg>
+    <fg=cyan>[tool.slam.test]</fg>
     <fg=green>pytest</fg> = <fg=yellow>"pytest --cov=my_package tests/"</fg>
     <fg=green>mypy</fg> = <fg=yellow>"mypy src"</fg>
 
   <b>Example usage:</b>
 
-    <fg=yellow>$</fg> shut test
+    <fg=yellow>$</fg> slam test
     <fg=dark_gray>mypy | Success: no issues found in 12 source files
     pytest | ===================================== test session starts ======================================
     pytest | platform linux -- Python 3.10.2, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
@@ -83,7 +83,7 @@ class TestCommand(Command):
 
   def handle(self) -> int:
     if not self.config:
-      self.line_error('error: no tests configured in <info>tool.shut.test</info>', 'error')
+      self.line_error('error: no tests configured in <info>tool.slam.test</info>', 'error')
       return 1
 
     tests: list[str] | None = self.argument("test")

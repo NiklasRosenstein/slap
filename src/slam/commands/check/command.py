@@ -2,9 +2,9 @@
 import collections
 import dataclasses
 
-from shut.application import Application, ApplicationPlugin, Command, option
-from shut.commands.check.api import Check, CheckPlugin
-from .builtin import ShutChecksPlugin
+from slam.application import Application, ApplicationPlugin, Command, option
+from slam.commands.check.api import Check, CheckPlugin
+from .builtin import SlamChecksPlugin
 
 COLORS = {
   Check.Result.OK: 'green',
@@ -17,7 +17,7 @@ COLORS = {
 
 @dataclasses.dataclass
 class CheckConfig:
-  plugins: list[str] = dataclasses.field(default_factory=lambda: ['shut', 'log', 'poetry', 'release'])
+  plugins: list[str] = dataclasses.field(default_factory=lambda: ['slam', 'log', 'poetry', 'release'])
 
 
 class CheckCommand(Command):
@@ -88,5 +88,5 @@ class CheckCommandPlugin(ApplicationPlugin):
     return databind.json.load(app.raw_config().get('check', {}), CheckConfig)
 
   def activate(self, app: 'Application', config: CheckConfig) -> None:
-    app.plugins.register(CheckPlugin, 'shut', ShutChecksPlugin())
+    app.plugins.register(CheckPlugin, 'slam', SlamChecksPlugin())
     app.cleo.add(CheckCommand(app, config))

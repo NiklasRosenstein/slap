@@ -5,10 +5,10 @@ from pathlib import Path
 
 import databind.json
 
-from shut.application import Application, ApplicationPlugin, Command, argument, option
-from shut.commands.check.api import CheckPlugin
-from shut.commands.release.api import ReleasePlugin
-from shut.util.toml_file import TomlFile
+from slam.application import Application, ApplicationPlugin, Command, argument, option
+from slam.commands.check.api import CheckPlugin
+from slam.commands.release.api import ReleasePlugin
+from slam.util.toml_file import TomlFile
 from .api import VersionRef
 from .builtin import SourceCodeVersionMatcherPlugin, VersionRefConfigMatcherPlugin
 from .checks import ReleaseChecksPlugin
@@ -32,10 +32,10 @@ class ReleaseCommand(Command):
 
   In addition to the <u>pyproject.toml</u>, the command will automatically detect the file(s)
   in your Python source code that contain a <b>__version__</b> member and update it as well.
-  Additional files can be updated by configuring the <fg=green>[tool.shut.release.references]</fg>
+  Additional files can be updated by configuring the <fg=green>[tool.slam.release.references]</fg>
   option:
 
-    <fg=green>[tool.shut.release]</fg>
+    <fg=green>[tool.slam.release]</fg>
     <fg=dark_gray>references</fg> = [
       {{ <fg=dark_gray>file</fg> = <fg=yellow>"../frontend/package.json"</fg>, <fg=dark_gray>pattern</fg> = <fg=yellow>"  \\"version\\": \\"{{VERSION}}\\""</fg> }}
     ]
@@ -54,7 +54,7 @@ class ReleaseCommand(Command):
     <u>prerelease</u>.
 
     <u>[Git]</u>: The command will prevent you from bumping the version unless you are on
-    the branch configured under <fg=green>[tool.shut.release.branch]</fg> or "develop" by default.
+    the branch configured under <fg=green>[tool.slam.release.branch]</fg> or "develop" by default.
     If you want to skip that check, pass <opt>--no-branch-check</opt>.
 
   <b>Commit & tag</b>
@@ -62,8 +62,8 @@ class ReleaseCommand(Command):
     <u>[Git]</u>: You can use the <opt>--tag, -t</opt> flag to automatically add the updated files,
     create a new commit and tag the commit with the version number. The tag name
     by default will just be the version number, but can be changed by setting the
-    <fg=green>[tool.shut.release.tag_format]</fg>. Similarly, the commit message used can be
-    configured with <fg=green>[tool.shut.release.commit_message]</fg>.
+    <fg=green>[tool.slam.release.tag_format]</fg>. Similarly, the commit message used can be
+    configured with <fg=green>[tool.slam.release.commit_message]</fg>.
 
   <b>Push to remote</b>
 
@@ -85,13 +85,13 @@ class ReleaseCommand(Command):
     for repositories that have a <u>github.com</u> "origin" remote. Otherwise, it can be
     configured like this:
 
-      <fg=green>[tool.shut.remote]</fg>
+      <fg=green>[tool.slam.remote]</fg>
       <fg=dark_gray>type</fg> = <fg=yellow>"github"</fg>
       <fg=dark_gray>repo</fg> = <fg=yellow>"my-github-enterprise.com/owner/repo"</fg>
 
   <b>Environment variables</b>
 
-    <u>SHUT_RELEASE_NO_PLUGINS</u>: If set, no release plugins will be loaded besides the builtin.
+    <u>SLAM_RELEASE_NO_PLUGINS</u>: If set, no release plugins will be loaded besides the builtin.
   """
 
   name = "release"
@@ -256,7 +256,7 @@ class ReleaseCommand(Command):
     """ Internal. Replaces the version reference in all files with the specified *version*. """
 
     from nr.util import Stream
-    from shut.util.text import substitute_ranges
+    from slam.util.text import substitute_ranges
 
     self.line(f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"}')
 
@@ -304,7 +304,7 @@ class ReleaseCommand(Command):
     # TODO (@NiklasRosenstein): If this step errors, revert the changes made by the command so far?
 
     if '{version}' not in self.config.tag_format:
-      self.line_error('<info>tool.shut.release.tag-format<info> must contain <info>{version}</info>', 'error')
+      self.line_error('<info>tool.slam.release.tag-format<info> must contain <info>{version}</info>', 'error')
       sys.exit(1)
     tag_name = self.config.tag_format.replace('{version}', target_version)
     self.line(f'tagging <fg=cyan>{tag_name}</fg>')

@@ -5,9 +5,9 @@ import re
 import requests
 from nr.util.git import Git
 
-from shut.application import Application, ApplicationPlugin
-from shut.changelog.changelog_manager import ChangelogValidator
-from shut.commands.log.config import RemoteDetectorPlugin, RemoteProvider
+from slam.application import Application, ApplicationPlugin
+from slam.changelog.changelog_manager import ChangelogValidator
+from slam.commands.log.config import RemoteDetectorPlugin, RemoteProvider
 
 
 def is_url(s: str) -> bool:

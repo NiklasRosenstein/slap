@@ -57,7 +57,7 @@ class Vcs(abc.ABC):
 
   @abc.abstractmethod
   def get_current_branch(self) -> str | None:
-    """ Return the name of the current branch in the local repository. This is used by Shut to ensure that the user
+    """ Return the name of the current branch in the local repository. This is used by Slam to ensure that the user
     is on the right branch before creating a new release. """
 
   @abc.abstractmethod

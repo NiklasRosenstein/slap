@@ -2,8 +2,8 @@
 import dataclasses
 from pathlib import Path
 
-from shut.application import IO
-from shut.util.python_package import Package
+from slam.application import IO
+from slam.util.python_package import Package
 from .api import ReleasePlugin, VersionRef, match_version_ref_pattern
 from .config import VersionRefConfig
 
@@ -11,8 +11,8 @@ from .config import VersionRefConfig
 @dataclasses.dataclass
 class VersionRefConfigMatcherPlugin(ReleasePlugin):
   """ This plugin matches a list of #VersionRefConfig definitions and returns the matched version references. This
-  plugin is used to match the `tool.shut.release.references` config option and is always used. It should not be
-  registered in the `shut.plugins.release` entrypoint group.
+  plugin is used to match the `tool.slam.release.references` config option and is always used. It should not be
+  registered in the `slam.plugins.release` entrypoint group.
   """
 
   PYPROJECT_CONFIG = VersionRefConfig('pyproject.toml', r'^version\s*=\s*[\'"]?(.*?)[\'"]')

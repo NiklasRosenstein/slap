@@ -2,9 +2,9 @@
 import dataclasses
 import typing as t
 
-from shut.application import Application
-from shut.changelog.changelog_manager import ChangelogManager
-from shut.commands.check.api import Check, CheckPlugin
+from slam.application import Application
+from slam.changelog.changelog_manager import ChangelogManager
+from slam.commands.check.api import Check, CheckPlugin
 
 
 @dataclasses.dataclass

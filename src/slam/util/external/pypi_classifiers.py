@@ -6,7 +6,7 @@ import time
 
 import requests
 
-CACHE_FILENAME = os.path.expanduser('~/.local/shut/classifiers-cache.txt')
+CACHE_FILENAME = os.path.expanduser('~/.local/slam/classifiers-cache.txt')
 CACHE_TTL = 60 * 60 * 24 * 7  # 7 days
 CLASSIFIERS_URL = 'https://pypi.org/pypi?%3Aaction=list_classifiers'
 logger = logging.getLogger(__name__)

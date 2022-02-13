@@ -6,7 +6,7 @@ import typing as t
 from pathlib import Path
 
 if t.TYPE_CHECKING:
-  from shut.application import IO
+  from slam.application import IO
 
 
 def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef':
@@ -46,7 +46,7 @@ class VersionRef:
 
 
 class ReleasePlugin(abc.ABC):
-  """ Interface for Shut plugins that want to hook into the release process. Should be registered to a Shut
+  """ Interface for Slam plugins that want to hook into the release process. Should be registered to a Slam
   application object from an application plugin under the {@link ReleasePlugin} group. """
 
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:

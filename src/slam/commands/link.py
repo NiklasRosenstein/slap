@@ -10,7 +10,7 @@ from nr.util.algorithm import longest_common_substring
 from nr.util.fs import atomic_swap
 from setuptools import find_namespace_packages
 
-from shut.application import Application, ApplicationPlugin, Command, option
+from slam.application import Application, ApplicationPlugin, Command, option
 
 PYPROJECT_TOML = Path('pyproject.toml')
 IGNORED_MODULES = ['test', 'tests', 'docs']
@@ -71,7 +71,7 @@ class LinkCommand(Command):
 
   <b>Example usage:</b>
 
-    <fg=yellow>$</fg> shut link
+    <fg=yellow>$</fg> slam link
     <fg=dark_gray>Discovered modules in /projects/my_package/src: my_package
     Extras to install for deps 'all': {{'.none'}}
     Symlinking src/my_package -> .venv/lib/python3.10/site-packages/my_package</fg>

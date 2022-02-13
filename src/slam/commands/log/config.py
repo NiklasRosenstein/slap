@@ -6,8 +6,8 @@ from pathlib import Path
 
 from databind.core.annotations import alias, union
 
-from shut.application import Application
-from shut.changelog.changelog_manager import DEFAULT_VALID_TYPES, ChangelogManager, ChangelogValidator
+from slam.application import Application
+from slam.changelog.changelog_manager import DEFAULT_VALID_TYPES, ChangelogManager, ChangelogValidator
 from .api import RemoteDetectorPlugin, RemoteProvider
 
 
