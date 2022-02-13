@@ -5,6 +5,8 @@ from setuptools import find_namespace_packages
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
 
+IGNORED_MODULES = ['test', 'tests', 'docs']
+
 
 @dataclasses.dataclass
 class Package:
@@ -25,6 +27,13 @@ def detect_packages(directory: Path) -> list[Package]:
     def _filter(module: str) -> bool:
       return (directory / module.replace('.', '/') / '__init__.py').is_file()
     modules = list(filter(_filter, modules))
+
+  if len(modules) > 1:
+    modules = [
+      m for m in modules
+      if m not in IGNORED_MODULES and
+        ('.' not in m or m.split('.')[0] not in IGNORED_MODULES)
+    ]
 
   if len(modules) > 1:
     # If we stil have multiple modules, we try to find the longest common path.

@@ -6,47 +6,9 @@ import typing as t
 from pathlib  import Path
 
 from flit.install import Installer  # type: ignore[import]
-from nr.util.algorithm import longest_common_substring
 from nr.util.fs import atomic_swap
-from setuptools import find_namespace_packages
 
 from slam.application import Application, ApplicationPlugin, Command, option
-
-PYPROJECT_TOML = Path('pyproject.toml')
-IGNORED_MODULES = ['test', 'tests', 'docs']
-
-
-def pick_modules_with_init_py(directory: Path, modules: list[str]) -> list[str]:
-  def _filter(module: str) -> bool:
-    return (directory / module.replace('.', '/') / '__init__.py').is_file()
-  return list(filter(_filter, modules))
-
-
-def identify_flit_module(directory: Path) -> str:
-  """ Identifies the name of the module that is contained in *directory*. This uses #find_namespace_packages()
-  and then tries to identify the one main module name that should be passed to the `tool.flit.metadata.module`
-  option. """
-
-  modules = find_namespace_packages(str(directory))
-  if not modules:
-    raise ValueError(f'no modules discovered in {directory}')
-
-  if len(modules) > 1:
-    modules = pick_modules_with_init_py(directory, modules)
-
-  if len(modules) > 1:
-    # If we stil have multiple modules, we try to find the longest common path.
-    modules = [
-      m for m in modules
-      if m not in IGNORED_MODULES and
-        ('.' not in m or m.split('.')[0] not in IGNORED_MODULES)
-    ]
-    common = longest_common_substring(*(x.split('.') for x in modules), start_only=True)
-    if not common:
-      raise ValueError(f'no common root package in modules: {modules}')
-    return '.'.join(common)
-
-  return modules[0]
 
 
 class LinkCommand(Command):
@@ -96,13 +58,16 @@ class LinkCommand(Command):
     )
   ]
 
+  def __init__(self, app: Application):
+    super().__init__()
+    self.app = app
+
   def _load_pyproject(self) -> dict[str, t.Any]:
-    import tomli
-    return tomli.loads(PYPROJECT_TOML.read_text())
+    return self.app.pyproject.value()
 
   def _save_pyproject(self, data: dict[str, t.Any]) -> None:
-    import tomli_w
-    PYPROJECT_TOML.write_text(tomli_w.dumps(data))
+    self.app.pyproject.value(data)
+    self.app.pyproject.save()
 
   def _get_source_directory(self) -> Path:
     directory = Path.cwd()
@@ -127,7 +92,7 @@ class LinkCommand(Command):
     # TODO (@NiklasRosenstein): Support [tool.poetry.packages] which may contain multiple modules.
 
     src_directory = self._get_source_directory()
-    module = identify_flit_module(src_directory)
+    module = self.app.get_packages()[0].name
     self.line(f'Discovered modules in {src_directory}: <fg=cyan>{module}</fg>')
     project['name'] = module
     project['version'] = poetry['version']
@@ -147,10 +112,11 @@ class LinkCommand(Command):
       print(tomli_w.dumps(config))
       return 0
 
-    with atomic_swap(PYPROJECT_TOML, 'w', always_revert=True) as fp:
+    with atomic_swap(self.app.pyproject.path, 'w', always_revert=True) as fp:
       fp.close()
       self._save_pyproject(config)
-      installer = Installer.from_ini_path(PYPROJECT_TOML, python=shutil.which(self.option("python")), symlink=True)
+      installer = Installer.from_ini_path(
+        self.app.pyproject.path, python=shutil.which(self.option("python")), symlink=True)
       installer.install()
 
     return 0
@@ -162,4 +128,4 @@ class LinkCommandPlugin(ApplicationPlugin):
     return None
 
   def activate(self, app: Application, config: None):
-    app.cleo.add(LinkCommand())
+    app.cleo.add(LinkCommand(app))
