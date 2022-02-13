@@ -3,6 +3,8 @@
 Slam is a CLI that provides utilities for developing on Python projects. It works well with
 [Poetry][] projects in particular, but you're not required to use it.
 
+  [Poetry]: https://python-poetry.org/
+
 <!-- Available Commands -->
 ```
 Available commands:
