@@ -3,3 +3,9 @@ id = "e096fd2d-43b4-4e26-819f-e3b03b66a020"
 type = "improvement"
 description = "reduce code duplicity in `shut.commands.link` and `shut.util.python_package`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "97db9bc6-4da8-4a53-b228-080524425621"
+type = "fix"
+description = "fix `shut log command --author,-a` option being a flag"
+author = "@NiklasRosenstein"

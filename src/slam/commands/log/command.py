@@ -348,7 +348,7 @@ class LogConvertCommand(Command):
       description="The author to fall back to. If not specified, the current VCS queried for the "
         "author name instead and their email will be used (depending on the normalization of the "
         "repository remote, this will be converted to a username, for example in the case of GitHub).",
-      flag=True,
+      flag=False,
     ),
     option(
       "directory", "d",
