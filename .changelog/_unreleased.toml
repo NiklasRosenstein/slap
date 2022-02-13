@@ -21,3 +21,15 @@ id = "bc4244d6-18e4-4002-809d-08b3a4b9b2e0"
 type = "improvement"
 description = "fix pattern replacing `{version}` string in release references"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "ec53c3ce-d20e-4dbd-a2de-b44e51fc9fcb"
+type = "improvement"
+description = "Add `Application.load_subapp()` and `Application.subapps`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "18ae011f-46f8-4981-af84-007f08e8abc5"
+type = "improvement"
+description = "`shut release` now has an `include` configuration key that can be used to include the version refs of sub projects, for example in a mono repository where a root `shut.toml` is used to manage the same version number across all components"
+author = "@NiklasRosenstein"

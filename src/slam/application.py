@@ -102,6 +102,7 @@ class Application:
     self.raw_config = Once(self.get_raw_configuration)
     self.plugins = PluginRegistry()
     self.cleo = CleoApplication(name, version)
+    self.subapps: list[Application] = []
 
   def get_raw_configuration(self) -> dict[str, t.Any]:
     """ Loads the raw configuration data for Slam from either the `slam.toml` configuration file or `pyproject.toml`
@@ -165,6 +166,11 @@ class Application:
 
   def get_vcs(self) -> Vcs | None:
     return detect_vcs(self.project_directory)
+
+  def load_subapp(self, path: str | Path) -> None:
+    app = Application(self.project_directory / path)
+    self.subapps.append(app)
+    app.load_plugins()
 
 
 class ApplicationPlugin(t.Generic[T]):

@@ -155,9 +155,14 @@ class ReleaseCommand(Command):
   def _load_plugins(self) -> list[ReleasePlugin]:
     """ Internal. Loads the plugins to be used in the run of `poetry release`. """
 
+    for path in self.config.include:
+      self.app.load_subapp(path)
+
     plugins = []
-    for plugin_name, plugin in self.app.plugins.group(ReleasePlugin, ReleasePlugin):
-      plugins.append(plugin)
+    for app in [self.app] + self.app.subapps:
+      for plugin_name, plugin in app.plugins.group(ReleasePlugin, ReleasePlugin):
+        plugins.append(plugin)
+
     return plugins
 
   def _show_version_refs(self, version_refs: list[VersionRef]) -> None:
@@ -382,6 +387,10 @@ class ReleaseCommand(Command):
     self.plugins = self._load_plugins()
     version_refs = Stream(plugin.get_version_refs(self.io) for plugin in self.plugins).concat().collect()
     version_refs.sort(key=lambda r: r.file)
+    for ref in version_refs:
+      if ref.file == ref.file.absolute():
+        ref.file = ref.file.relative_to(Path.cwd())
+
     version = self.argument("version")
 
     if self.option("validate"):
@@ -421,6 +430,6 @@ class ReleaseCommandPlugin(ApplicationPlugin):
     app.plugins.register(ReleasePlugin, 'builtins.SourceCodeVersionMatcherPlugin',
       lambda: SourceCodeVersionMatcherPlugin(app.get_packages()))
     app.plugins.register(ReleasePlugin, 'builtins.VersionRefConfigMatcherPlugin',
-      lambda: VersionRefConfigMatcherPlugin(config.references))
+      lambda: VersionRefConfigMatcherPlugin(app.pyproject.path, config.references))
     app.plugins.register(CheckPlugin, 'release', ReleaseChecksPlugin())
     app.cleo.add(ReleaseCommand(config, app, app.pyproject))

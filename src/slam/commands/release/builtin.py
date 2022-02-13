@@ -15,15 +15,16 @@ class VersionRefConfigMatcherPlugin(ReleasePlugin):
   registered in the `slam.plugins.release` entrypoint group.
   """
 
-  PYPROJECT_CONFIG = VersionRefConfig('pyproject.toml', r'^version\s*=\s*[\'"]?(.*?)[\'"]')
+  PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
 
+  pyproject_toml: Path
   references: list[VersionRefConfig]
 
   def get_version_refs(self, io: 'IO') -> list[VersionRef]:
     results = []
-    references = self.references
-    if Path(self.PYPROJECT_CONFIG.file).exists():
-      references = [self.PYPROJECT_CONFIG] + self.references
+    references = self.references[:]
+    if self.pyproject_toml.exists():
+      references.insert(0, VersionRefConfig(str(self.pyproject_toml), self.PYPROJECT_TOML_PATTERN))
     for config in references:
       pattern = config.pattern.replace('{version}', r'(.*?)')
       version_ref = match_version_ref_pattern(Path(config.file), pattern)

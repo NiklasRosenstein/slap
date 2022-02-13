@@ -17,3 +17,4 @@ class ReleaseConfig:
   commit_message: t.Annotated[str, alias('commit-message')] = 'release {version}'
   tag_format: t.Annotated[str, alias('tag-format')] = '{version}'
   references: list[VersionRefConfig] = dataclasses.field(default_factory=list)
+  include: list[str] = dataclasses.field(default_factory=list)
