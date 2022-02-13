@@ -26,35 +26,35 @@ jobs:
     - name: Test
       run: poetry run slam test
 
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: "3.9"
-    - name: Install mkdocs
-      run: pip install mkdocs
-    - name: Build docs
-      run: mkdocs build -d $PWD/html/ -f docs/mkdocs.yml -s
-    - uses: actions/upload-artifact@v2
-      with:
-        name: docs
-        path: html/
+  # docs:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Set up Python ${{ matrix.python-version }}
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: "3.9"
+  #   - name: Install mkdocs
+  #     run: pip install mkdocs
+  #   - name: Build docs
+  #     run: mkdocs build -d $PWD/html/ -f docs/mkdocs.yml -s
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       name: docs
+  #       path: html/
 
-  docs-publish:
-    needs: [ test, docs ]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/download-artifact@v2
-      with:
-        name: docs
-        path: html/
-    - name: Deploy to GitHub Pages
-      uses: Cecilapp/GitHub-Pages-deploy@v3
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        email: rosensteinniklas@gmail.com
-        build_dir: html
+  # docs-publish:
+  #   needs: [ test, docs ]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/download-artifact@v2
+  #     with:
+  #       name: docs
+  #       path: html/
+  #   - name: Deploy to GitHub Pages
+  #     uses: Cecilapp/GitHub-Pages-deploy@v3
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     with:
+  #       email: rosensteinniklas@gmail.com
+  #       build_dir: html
