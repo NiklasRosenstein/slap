@@ -52,9 +52,9 @@ classifiers = [
   [tool.poetry.scripts]
   slam = "slam.__main__:main"
 
-  [tool.poetry.plugins."slam.application.ApplicationPlugin"]
+  [tool.poetry.plugins."slam.plugins.application"]
   check = "slam.commands.check.command:CheckCommandPlugin"
-  link = "slam.commands.link:LinkCommandPlugin"
+  link = "slam.ext.application.link:LinkCommandPlugin"
   log = "slam.commands.log.command:LogCommandPlugin"
   release = "slam.commands.release.command:ReleaseCommandPlugin"
   test = "slam.commands.test:TestCommandPlugin"

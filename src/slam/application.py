@@ -2,8 +2,10 @@
 """ With the application object we manage the CLI commands and other types of plugins as well as access to the Slam
 user and project configuration. """
 
-import abc
-import os
+from __future__ import annotations
+
+import dataclasses
+import logging
 import textwrap
 import typing as t
 from pathlib import Path
@@ -16,16 +18,17 @@ from cleo.io.inputs.option import Option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
 from nr.util import Optional
 from nr.util.functional import Once
-from nr.util.generic import T
-from nr.util.plugins import load_plugins_from_entrypoints, PluginRegistry
-from nr.util.fs import get_file_in_directory
 
 from slam import __version__
 from slam.util.cleo import add_style
-from slam.util.python_package import Package, detect_packages
-from slam.util.toml_file import TomlFile
 from slam.util.vcs import Vcs, detect_vcs
 
+from slam.project import Project
+
+if t.TYPE_CHECKING:
+  from nr.util.functional import Once
+
+logger = logging.getLogger(__name__)
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
 
 
@@ -57,8 +60,9 @@ class CleoApplication(BaseCleoApplication):
 
   _styles: dict[str, Style]
 
-  def __init__(self, name: str = "console", version: str = "") -> None:
+  def __init__(self, init: t.Callable[[], t.Any], name: str = "console", version: str = "") -> None:
     super().__init__(name, version)
+    self._init_callback = init
     self._styles = {}
 
     self._initialized = True
@@ -72,7 +76,6 @@ class CleoApplication(BaseCleoApplication):
     self.add_style('i', options=['italic'])
     self.add_style('s', 'yellow')
     self.add_style('opt', 'cyan', options=['italic'])
-    self.definition.add_option(option("change-directory", "C", "Change to the specified directory.", flag=False))
 
   def add_style(self, name, fg=None, bg=None, options=None):
     self._styles[name] = self.Style(fg, bg, options)
@@ -88,34 +91,134 @@ class CleoApplication(BaseCleoApplication):
       add_style(io, style_name, style)
     return io
 
+  def _configure_io(self, io: IO) -> None:
+    import logging
+
+    from nr.util.logging.formatters.terminal_colors import TerminalColorFormatter
+
+    if io.input.has_parameter_option("-vvv") or io.input.has_parameter_option("-vv"):
+      level = logging.DEBUG
+    elif io.input.has_parameter_option("-v"):
+      level = logging.INFO
+    elif io.input.has_parameter_option("-q"):
+      level = logging.ERROR
+    elif io.input.has_parameter_option("-qq"):
+      level = logging.CRITICAL
+    else:
+      level = logging.WARNING
+
+    logging.basicConfig(level=level)
+    formatter = TerminalColorFormatter('%(asctime)s | %(levelname)s | %(name)s | %(message)s')
+    formatter.styles.add_style('subj', 'blue')
+    formatter.styles.add_style('obj', 'yellow')
+    formatter.styles.add_style('val', 'cyan')
+    formatter.install()
+
+    self._init_callback()
+
+    return super()._configure_io(io)
+
+
+DEFAULT_PLUGINS = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
+
+
+@dataclasses.dataclass
+class ApplicationConfig:
+  #: A list of paths pointing to projects to include in the application invokation. This is useful if multuple
+  #: projects should be usable with the Slam CLI in unison. Note that if this option is not set and either no
+  #: configuration file exists in the CWD or the `slam.toml` is used, all immediate subdirectories that contain
+  #: a `pyproject.toml` will be considered included projects.
+  include: list[str] | None = None
+
+  #: A list of plugins to disable from the {@link DEFAULT_PLUGINS}.
+  disable: list[str] = dataclasses.field(default_factory=list)
+
+  #: A list of plugins to enable in addition to the {@link DEFAULT_PLUGINS}.
+  enable: list[str] = dataclasses.field(default_factory=list)
+
 
 class Application:
+  """ The application object is the main hub for command-line interactions. It is responsible for managing the project
+  that is the main subject of the command-line invokation (or multiple of such), provide the {@link cleo} command-line
+  application that {@link ApplicationPlugin}s can register commands to, etc. """
 
-  DEFAULT_PLUGINS: list[str] = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
+  #: A list of projects that are loaded into the application for taking into account by commands.
+  #: Multiple projects may be loaded by the application if the first project that is loaded has a {@link
+  #: ApplicationConfig.include} configuration.
+  projects: list[Project]
 
-  #: Path to the project directory where the Pyproject lies. This is usually the CWD.
-  project_directory: Path
+  #: The application configuration loaded once via {@link get_application_configuration()}.
+  config: Once[ApplicationConfig]
 
-  def __init__(self, project_directory: Path, name: str = 'slam', version: str = __version__) -> None:
-    self.project_directory = project_directory
-    self.pyproject = TomlFile(project_directory / 'pyproject.toml')
-    self.projectcfg = TomlFile(project_directory / 'slam.toml')
-    self.usercfg = TomlFile(Path('~/.config/slam/config.toml').expanduser())
-    self.raw_config = Once(self.get_raw_configuration)
-    self.plugins = PluginRegistry()
-    self.cleo = CleoApplication(name, version)
-    self.subapps: list[Application] = []
+  #: The cleo application to which new commands can be registered via {@link ApplicationPlugin}s.
+  cleo: CleoApplication
 
-  def get_raw_configuration(self) -> dict[str, t.Any]:
-    """ Loads the raw configuration data for Slam from either the `slam.toml` configuration file or `pyproject.toml`
-    under the `[slam.tool]` section. If neither of the files exist or the section in the pyproject does not exist,
-    an empty dictionary will be returned. """
+  #: The version control system that is being used as a {@link Once}.
+  vcs: Once[Vcs | None]
 
-    if self.projectcfg.exists():
-      return self.projectcfg.value()
-    if self.pyproject.exists():
-      return self.pyproject.value().get('tool', {}).get('slam', {})
-    return {}
+  def __init__(self, name: str = 'slam', version: str = __version__) -> None:
+    from nr.util.functional import Once
+
+    self._projects_loaded = False
+    self._plugins_loaded = False
+    self._main_project = Project(Path('.'))
+    self.projects = [self._main_project]
+    self.config = Once(self.get_application_configuration)
+    self.cleo = CleoApplication(lambda: [self.load_projects(), self.load_plugins()], name, version)
+    self.vcs = Once(self.get_vcs)
+
+  @property
+  def directory(self) -> Path:
+    return self._main_project.directory
+
+  def get_application_configuration(self) -> ApplicationConfig:
+    """ Loads the application-level configuration. """
+
+    import databind.json
+    from databind.core.annotations import enable_unknowns
+    return databind.json.load(self._main_project.raw_config(), ApplicationConfig, options=[enable_unknowns()])
+
+  def get_vcs(self) -> Vcs | None:
+    """ Detect the version control system in use in the application. """
+
+    from nr.util.fs import is_relative_to
+
+    assert self._projects_loaded
+    vcs = detect_vcs(self.directory)
+    logger.debug('Detected version control system is <subj>%s</subj>', vcs)
+    if vcs:
+      toplevel = vcs.get_toplevel()
+      for project in self.projects:
+        if not is_relative_to(project.directory, toplevel):
+          logger.error(
+            'Project <subj>%s</subj> is not relative to the VCS toplevel directory <val>%s</val>',
+            self, toplevel
+          )
+          raise ValueError(f'Project {project} is not relative to the VCS toplevel directory {toplevel!r}')
+
+    return vcs
+
+  def load_projects(self) -> None:
+    """ Loads all projects, if any additional aside from the main project need to be loaded. """
+
+    assert not self._projects_loaded
+    self._projects_loaded = True
+
+    config = self.config()
+    if config.include is None:
+      if self._main_project.slam_toml.exists() or not self._main_project.pyproject_toml.exists():
+        # Find immediate subdirectories with a `pyproject.toml` and consider them included.
+        for path in self._main_project.directory.iterdir():
+          if not path.is_dir(): continue
+          project = Project(path)
+          if project.pyproject_toml.exists():
+            self.projects.append(project)
+
+    else:
+      for path in (self._main_project.directory / p for p in config.include):
+        self.projects.append(Project(path))
+
+    logger.debug('Loaded projects <subj>%s</subj>', self.projects)
 
   def load_plugins(self) -> None:
     """ Loads all application plugins (see {@link ApplicationPlugin}) and activates them.
@@ -126,64 +229,25 @@ class Application:
     plugins delivered immediately with Slam are enabled by default unless disabled explicitly with the `disable`
     option. """
 
-    config = self.raw_config()
-    disable: t.Collection[str] | None = config.get('plugins', {}).get('disable')
-    enable: t.Collection[str] | None = config.get('plugins', {}).get('enable')
-    if enable is not None:
-      enable = set(list(enable) + self.DEFAULT_PLUGINS)
+    from nr.util.plugins import load_entrypoint
 
-    plugins = load_plugins_from_entrypoints('slam.application.ApplicationPlugin', ApplicationPlugin)  # type: ignore[misc]
-    for plugin_name, plugin in plugins.items():
-      activate_this_plugin = (
-        (enable is None and disable is None) or
-        (enable is not None and plugin_name in enable) or
-        (disable is not None and plugin_name not in self.DEFAULT_PLUGINS)
-      )
-      if activate_this_plugin:
-        config = plugin.load_configuration(self)
-        plugin.activate(self, config)
+    from slam.plugins import ApplicationPlugin
 
-  def __call__(self) -> None:
+    assert not self._plugins_loaded
+    self._plugins_loaded = True
+
+    config = self.config()
+
+    plugin_names = set(DEFAULT_PLUGINS) - set(config.disable) | set(config.enable)
+    logger.debug('Loading application plugins <subj>%s</subj>', plugin_names)
+
+    for plugin_name in plugin_names:
+      if plugin_name != 'link': continue
+      plugin = load_entrypoint(ApplicationPlugin, plugin_name)()
+      plugin_config = plugin.load_configuration(self)
+      plugin.activate(self, plugin_config)
+
+  def run(self) -> None:
     """ Loads and activates application plugins and then invokes the CLI. """
 
-    self.load_plugins()
     self.cleo.run()
-
-  def get_packages(self) -> list[Package]:
-    """ Tries to detect the packages in the project directory. Uses `tool.poetry.packages` if that configuration
-    exists, otherwise it attempts to automatically determine it. The `tool.slam.source-directory` option is used if
-    set, otherwise the `src/` directory or alternatively the project directory is used to detect the packages. """
-
-    source_directory: str | None = self.raw_config().get('source-directory')
-
-    if (directory := Optional(source_directory).map(Path).or_else(None)):
-      return detect_packages(Path(directory))
-
-    for directory in [Path('src'), Path()]:
-      packages = detect_packages(directory)
-      if packages:
-        break
-
-    return packages
-
-  def get_vcs(self) -> Vcs | None:
-    return detect_vcs(self.project_directory)
-
-  def load_subapp(self, path: str | Path) -> None:
-    app = Application(self.project_directory / path)
-    self.subapps.append(app)
-    app.load_plugins()
-
-
-class ApplicationPlugin(t.Generic[T]):
-
-  @abc.abstractmethod
-  def load_configuration(self, app: Application) -> T:
-    """ Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Slam
-    configuration, which is either loaded from `pyproject.toml` or `slam.toml`. Use {@attr Application.raw_config}
-    to access the Slam configuration. """
-
-  @abc.abstractmethod
-  def activate(self, app: Application, config: T) -> None:
-    """ Activate the plugin. Register a {@link Command} to {@attr Application.cleo} or another type of plugin to
-    the {@attr Application.plugins} registry. """
