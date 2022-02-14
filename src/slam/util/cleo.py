@@ -1,9 +1,11 @@
 
 import typing as t
 
-from cleo.io.io import IO  # type: ignore[import]
+from cleo.commands.help_command import HelpCommand as _HelpCommand  # type: ignore[import]
+from cleo.commands.list_command import ListCommand  # type: ignore[import]
 from cleo.formatters.formatter import Formatter  # type: ignore[import]
 from cleo.formatters.style import Style  # type: ignore[import]
+from cleo.io.io import IO  # type: ignore[import]
 
 
 @t.overload
@@ -52,3 +54,14 @@ def add_style(  # type: ignore[misc]
     io.set_style(name, style)
   else:
     raise TypeError(f'expected IO|Formatter, got {type(io).__name__}')
+
+
+class HelpCommand(_HelpCommand, ListCommand):
+
+  arguments = ListCommand.arguments
+
+  def handle(self) -> int:
+    self.io.input._arguments['namespace'] = None
+    if not self._command:
+      return ListCommand.handle(self)
+    return _HelpCommand.handle(self)

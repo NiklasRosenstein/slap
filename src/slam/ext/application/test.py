@@ -1,11 +1,13 @@
 
 import os
-import subprocess as sp
+from pathlib import Path
 import typing as t
 
 from nr.util.singleton import NotSet
 
-from slam.application import Application, ApplicationPlugin, Command, IO, argument, option
+from slam.application import Application, Command, IO, argument, option
+from slam.plugins import ApplicationPlugin
+from slam.project import Project
 
 
 class TestRunner:
@@ -13,14 +15,16 @@ class TestRunner:
   _colors = ['blue', 'cyan', 'magenta', 'yellow']
   _prev_color: t.ClassVar[str | None] = None
 
-  def __init__(self, name: str, config: t.Any, io: IO, line_prefixing: bool = True) -> None:
+  def __init__(self, name: str, config: t.Any, io: IO, cwd: Path | None = None, line_prefixing: bool = True) -> None:
     assert isinstance(config, str), type(config)
     self.name = name
     self.config = config
     self.io = io
+    self.cwd = cwd
     self.line_prefixing = line_prefixing
 
   def run(self) -> int:
+    import subprocess as sp
     from cleo.io.io import OutputType  # type: ignore[import]
     from ptyprocess import PtyProcessUnicode  # type: ignore[import]
 
@@ -32,9 +36,9 @@ class TestRunner:
     try:
       cols, rows = os.get_terminal_size()
     except OSError:
-      return sp.call(command)
+      return sp.call(command, cwd=self.cwd)
     else:
-      proc = PtyProcessUnicode.spawn(command, dimensions=(rows, cols - len(prefix)))
+      proc = PtyProcessUnicode.spawn(command, dimensions=(rows, cols - len(prefix)), cwd=self.cwd)
       while not proc.eof():
         try:
           line = proc.readline().rstrip()
@@ -46,6 +50,16 @@ class TestRunner:
       proc.wait()
       assert proc.exitstatus is not None
       return proc.exitstatus
+
+
+class Test(t.NamedTuple):
+  project: Project
+  name: str
+  command: str
+
+  @property
+  def id(self) -> str:
+    return f'{self.project.id}:{self.name}'
 
 
 class TestCommand(Command):
@@ -77,30 +91,60 @@ class TestCommand(Command):
   ]
   options[0]._default = NotSet.Value  # Hack to set a default value for the flag
 
-  def __init__(self, config: dict[str, str]) -> None:
+  def __init__(self, tests: list[Test], monorepo: bool) -> None:
     super().__init__()
-    self.config = config
+    self.tests = tests
+    self.monorepo = monorepo
+
+  def _select_tests(self, name: str) -> set[Test]:
+    result = set()
+    for test in self.tests:
+      use_test = (
+        self.monorepo and (
+          name == test.id
+          or (name.startswith(':') and test.name == name[1:])
+          or (test.project.id == name)
+        ) or
+        not self.monorepo and (
+          name == test.name
+        )
+      )
+      if use_test:
+        result.add(test)
+    if not result:
+      raise ValueError(f'{name!r} did not match any tests')
+    return result
 
   def handle(self) -> int:
-    if not self.config:
-      self.line_error('error: no tests configured in <info>tool.slam.test</info>', 'error')
+    if not self.tests:
+      self.line_error('error: no tests configured', 'error')
       return 1
 
-    tests: list[str] | None = self.argument("test")
+    test_names: list[str] = self.argument("test")
+
+    if not test_names:
+      tests = set(self.tests)
+    else:
+      try:
+        tests = {t for a in test_names for t in self._select_tests(a)}
+      except ValueError as exc:
+        self.line_error(f'error: {exc}', 'error')
+        return 1
+
     if (no_line_prefix := self.option("no-line-prefix")) is NotSet.Value:
-      no_line_prefix = (tests is not None and len(tests) == 1)
+      no_line_prefix = (test_names is not None and len(tests) == 1)
 
-    tests = tests if tests else sorted(self.config.keys())
-    if (unknown_tests := set(tests) - self.config.keys()):
-      self.line_error(
-        f'error: unknown test{"" if len(unknown_tests) == 1 else "s"} <b>{", ".join(unknown_tests)}</b>',
-        'error'
-      )
-      return 1
+    single_project = len(set(t.project for t in self.tests)) == 1
 
     results = {}
-    for test_name in tests:
-      results[test_name] = TestRunner(test_name, self.config[test_name], self.io, not no_line_prefix).run()
+    for test in sorted(tests, key=lambda t: t.id):
+      results[test.name if single_project else test.id] = TestRunner(
+        test.name if single_project else test.id,
+        test.command,
+        self.io,
+        test.project.directory,
+        not no_line_prefix
+      ).run()
 
     if len(tests) > 1:
       self.line('\n<comment>test summary:</comment>')
@@ -113,8 +157,12 @@ class TestCommand(Command):
 
 class TestCommandPlugin(ApplicationPlugin[dict[str, str]]):
 
-  def load_configuration(self, app: Application) -> dict[str, str]:
-    return app.raw_config().get('test', {})
+  def load_configuration(self, app: Application) -> list[Test]:
+    tests = []
+    for project in app.projects:
+      for test_name, command in project.raw_config().get('test', {}).items():
+        tests.append(Test(project, test_name, command))
+    return tests
 
-  def activate(self, app: Application, config: dict[str, str]) -> None:
-    app.cleo.add(TestCommand(config))
+  def activate(self, app: Application, config: list[Test]) -> None:
+    app.cleo.add(TestCommand(config, app.is_monorepo))

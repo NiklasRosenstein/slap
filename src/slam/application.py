@@ -16,20 +16,18 @@ from cleo.helpers import argument, option  # type: ignore[import]
 from cleo.io.inputs.argument import Argument  # type: ignore[import]
 from cleo.io.inputs.option import Option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
-from nr.util import Optional
-from nr.util.functional import Once
+from databind.core.annotations import alias
 
 from slam import __version__
-from slam.util.cleo import add_style
-from slam.util.vcs import Vcs, detect_vcs
-
-from slam.project import Project
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
 
-logger = logging.getLogger(__name__)
+  from slam.project import Project
+  from slam.util.vcs import Vcs
+
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
+logger = logging.getLogger(__name__)
 
 
 class Command(_BaseCommand):
@@ -66,7 +64,7 @@ class CleoApplication(BaseCleoApplication):
     self._styles = {}
 
     self._initialized = True
-    from slam.commands.help import HelpCommand
+    from slam.util.cleo import HelpCommand
     self.add(HelpCommand())
     self._default_command = 'help'
 
@@ -82,10 +80,12 @@ class CleoApplication(BaseCleoApplication):
 
   def create_io(
     self,
-    input: Optional[Input] = None,
-    output: Optional[Output] = None,
-    error_output: Optional[Output] = None
+    input: Input | None = None,
+    output: Output | None = None,
+    error_output: Output | None = None
   ) -> IO:
+    from slam.util.cleo import add_style
+
     io = super().create_io(input, output, error_output)
     for style_name, style in self._styles.items():
       add_style(io, style_name, style)
@@ -119,7 +119,8 @@ class CleoApplication(BaseCleoApplication):
     return super()._configure_io(io)
 
 
-DEFAULT_PLUGINS = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
+#DEFAULT_PLUGINS = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
+DEFAULT_PLUGINS = ['link', 'test']
 
 
 @dataclasses.dataclass
@@ -136,6 +137,9 @@ class ApplicationConfig:
   #: A list of plugins to enable in addition to the {@link DEFAULT_PLUGINS}.
   enable: list[str] = dataclasses.field(default_factory=list)
 
+  #: A list of plugins to enable only, causing the default plugins to not be loaded.
+  enable_only: t.Annotated[list[str] | None, alias('enable-only')] = None
+
 
 class Application:
   """ The application object is the main hub for command-line interactions. It is responsible for managing the project
@@ -146,6 +150,9 @@ class Application:
   #: Multiple projects may be loaded by the application if the first project that is loaded has a {@link
   #: ApplicationConfig.include} configuration.
   projects: list[Project]
+
+  #: The root project identified by {@link get_root_project()}.
+  root_project: Once[Project]
 
   #: The application configuration loaded once via {@link get_application_configuration()}.
   config: Once[ApplicationConfig]
@@ -161,31 +168,99 @@ class Application:
 
     self._projects_loaded = False
     self._plugins_loaded = False
-    self._main_project = Project(Path('.'))
-    self.projects = [self._main_project]
+    self.projects = []
+    self.root_project = Once(self.get_root_project)
     self.config = Once(self.get_application_configuration)
     self.cleo = CleoApplication(lambda: [self.load_projects(), self.load_plugins()], name, version)
     self.vcs = Once(self.get_vcs)
 
   @property
   def directory(self) -> Path:
-    return self._main_project.directory
+    return self.root_project().directory
+
+  @property
+  def is_monorepo(self) -> bool:
+    return len(self.projects) > 1
+
+  def get_root_project(self) -> Project:
+    """ Searches for the root project, by going up the directory tree until the VCS toplevel is reached, taking the
+    highest directory that has a `slam.toml` or `pyproject.toml` configuration file. Note that if there is none in
+    the current directory or in any of the parent directories, the current directory will be used nonetheless. """
+
+    from nr.util.fs import walk_up
+
+    from slam.project import Project
+
+    toplevel = self.vcs().get_toplevel().resolve()
+    project: Project | None = None
+
+    for path in walk_up(Path.cwd()):
+      temp_project = Project(path)
+      if temp_project.pyproject_toml.exists() or temp_project.slam_toml.exists():
+        project = temp_project
+      if path == toplevel:
+        break
+
+    if not project:
+      project = Project(Path.cwd())
+
+    logger.info('Root project is <subj>%s</subj>', project)
+    return project
 
   def get_application_configuration(self) -> ApplicationConfig:
     """ Loads the application-level configuration. """
 
     import databind.json
     from databind.core.annotations import enable_unknowns
-    return databind.json.load(self._main_project.raw_config(), ApplicationConfig, options=[enable_unknowns()])
+
+    return databind.json.load(
+      self.root_project().raw_config().get('application', {}),
+      ApplicationConfig,
+      options=[enable_unknowns()]
+    )
 
   def get_vcs(self) -> Vcs | None:
     """ Detect the version control system in use in the application. """
 
-    from nr.util.fs import is_relative_to
+    from slam.util.vcs import detect_vcs
 
     assert self._projects_loaded
-    vcs = detect_vcs(self.directory)
+    vcs = detect_vcs(Path.cwd())
     logger.debug('Detected version control system is <subj>%s</subj>', vcs)
+    return vcs
+
+  def load_projects(self) -> None:
+    """ Loads all projects, if any additional aside from the main project need to be loaded. """
+
+    from nr.util.fs import is_relative_to
+
+    from slam.project import Project
+
+    assert not self._projects_loaded
+    self._projects_loaded = True
+
+    root = self.root_project()
+    self.projects.append(root)
+
+    config = self.config()
+    if config.include is None:
+      if root.slam_toml.exists() or not root.pyproject_toml.exists():
+        # Find immediate subdirectories with a `pyproject.toml` and consider them included.
+        for path in root.directory.iterdir():
+          if not path.is_dir(): continue
+          project = Project(path, root)
+          if project.pyproject_toml.exists():
+            self.projects.append(project)
+
+    else:
+      for path in (root.directory / p for p in config.include):
+        self.projects.append(Project(path))
+
+    if self.projects != [root]:
+      logger.debug('Loaded projects <subj>%s</subj>', self.projects)
+
+    # Ensure that all loaded projects are inside the VCS toplevel directory.
+    vcs = self.vcs()
     if vcs:
       toplevel = vcs.get_toplevel()
       for project in self.projects:
@@ -195,30 +270,6 @@ class Application:
             self, toplevel
           )
           raise ValueError(f'Project {project} is not relative to the VCS toplevel directory {toplevel!r}')
-
-    return vcs
-
-  def load_projects(self) -> None:
-    """ Loads all projects, if any additional aside from the main project need to be loaded. """
-
-    assert not self._projects_loaded
-    self._projects_loaded = True
-
-    config = self.config()
-    if config.include is None:
-      if self._main_project.slam_toml.exists() or not self._main_project.pyproject_toml.exists():
-        # Find immediate subdirectories with a `pyproject.toml` and consider them included.
-        for path in self._main_project.directory.iterdir():
-          if not path.is_dir(): continue
-          project = Project(path)
-          if project.pyproject_toml.exists():
-            self.projects.append(project)
-
-    else:
-      for path in (self._main_project.directory / p for p in config.include):
-        self.projects.append(Project(path))
-
-    logger.debug('Loaded projects <subj>%s</subj>', self.projects)
 
   def load_plugins(self) -> None:
     """ Loads all application plugins (see {@link ApplicationPlugin}) and activates them.
@@ -238,11 +289,13 @@ class Application:
 
     config = self.config()
 
-    plugin_names = set(DEFAULT_PLUGINS) - set(config.disable) | set(config.enable)
+    if config.enable_only is not None:
+      plugin_names = set(config.enable_only)
+    else:
+      plugin_names = set(DEFAULT_PLUGINS) - set(config.disable) | set(config.enable)
     logger.debug('Loading application plugins <subj>%s</subj>', plugin_names)
 
     for plugin_name in plugin_names:
-      if plugin_name != 'link': continue
       plugin = load_entrypoint(ApplicationPlugin, plugin_name)()
       plugin_config = plugin.load_configuration(self)
       plugin.activate(self, plugin_config)

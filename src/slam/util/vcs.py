@@ -103,6 +103,9 @@ class Git(Vcs):
     self._git = _Git(directory)
     assert self._git.get_toplevel() is not None, f'Not a Git repository: {directory}'
 
+  def __repr__(self) -> str:
+    return f'Git("{self._git.path}")'
+
   def get_toplevel(self) -> Path:
     toplevel = self._git.get_toplevel()
     assert toplevel is not None
@@ -182,7 +185,7 @@ class Git(Vcs):
 
   @classmethod
   def detect(cls, path: Path) -> t.Union['Git', None]:
-    if (path / '.git').exists():
+    if _Git(path).get_toplevel() is not None:
       return Git(path)
     return None
 

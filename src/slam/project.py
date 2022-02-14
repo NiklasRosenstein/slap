@@ -64,12 +64,13 @@ class Project:
   #: The packages detected with {@link get_packages()} as a {@link Once}.
   packages: Once[list[Package]]
 
-  def __init__(self, directory: Path) -> None:
+  def __init__(self, directory: Path, parent: Project | None = None) -> None:
     from nr.util.functional import Once
 
     from slam.util.toml_file import TomlFile
 
     self.directory = directory
+    self.parent = parent
     self.pyproject_toml = TomlFile(directory / 'pyproject.toml')
     self.slam_toml = TomlFile(directory / 'slam.toml')
     self.usercfg = TomlFile(Path('~/.config/slam/config.toml').expanduser())
@@ -79,7 +80,7 @@ class Project:
     self.packages = Once(self.get_packages)
 
   def __repr__(self) -> str:
-    return f'Project("{self.directory}")'
+    return f'Project(id="{self.id}", directory="{self.directory}")'
 
   def get_raw_configuration(self) -> dict[str, t.Any]:
     """ Loads the raw configuration data for Slam from either the `slam.toml` configuration file or `pyproject.toml`
@@ -149,5 +150,17 @@ class Project:
       )
     return packages
 
-  def get_dist_name(self) -> str | None:
+  def get_dist_name(self) -> str:
     return self.handler().get_dist_name(self)
+
+  @property
+  def id(self) -> str:
+    if not self.parent:
+      return '$'
+    if self.handler and (name := self.handler().get_dist_name(self)):
+      return name
+    return self.directory.resolve().name
+
+  @id.setter
+  def id(self, value: str) -> None:
+    self._id = value

@@ -6,7 +6,6 @@ from pathlib  import Path
 
 from slam.application import Application, Command, option
 from slam.plugins import ApplicationPlugin
-from slam.project import Project
 
 
 class LinkCommand(Command):
@@ -100,6 +99,8 @@ class LinkCommand(Command):
     from slam.util.pygments import toml_highlight
 
     # logging.basicConfig(level=logging.INFO, format='%(message)s')
+
+    # TODO (@NiklasRosenstein): Ensure that dependencies are installed?
 
     num_projects = 0
     num_skipped = 0
