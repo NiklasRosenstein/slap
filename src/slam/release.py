@@ -1,12 +1,8 @@
 
-import abc
 import dataclasses
 import re
 import typing as t
 from pathlib import Path
-
-if t.TYPE_CHECKING:
-  from slam.application import IO
 
 
 def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef':
@@ -14,8 +10,8 @@ def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef':
   should contain at least one capturing group. The first capturing group is considered the one that contains
   the version number exactly.
 
-  :param filename: The file of which the contents will be checked against the pattern.
-  :param pattern: The regular expression that contains at least one capturing group.
+  @param filename The file of which the contents will be checked against the pattern.
+  @param pattern The regular expression that contains at least one capturing group.
   """
 
   compiled_pattern = re.compile(pattern, re.M | re.S)
@@ -34,7 +30,7 @@ def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef':
 
 @dataclasses.dataclass
 class VersionRef:
-  " Represents a reference to a version number in a file. "
+  """ Represents a reference to a version number in a file. """
 
   file: Path
   start: int
@@ -43,14 +39,3 @@ class VersionRef:
 
   def __post_init__(self) -> None:
     assert isinstance(self.file, Path), self
-
-
-class ReleasePlugin(abc.ABC):
-  """ Interface for Slam plugins that want to hook into the release process. Should be registered to a Slam
-  application object from an application plugin under the {@link ReleasePlugin} group. """
-
-  def get_version_refs(self, io: 'IO') -> list[VersionRef]:
-    return []
-
-  def bump_to_version(self, target_version: str, dry: bool, io: 'IO') -> t.Sequence[Path]:
-    return []

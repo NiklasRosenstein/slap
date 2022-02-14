@@ -120,7 +120,7 @@ class CleoApplication(BaseCleoApplication):
 
 
 #DEFAULT_PLUGINS = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
-DEFAULT_PLUGINS = ['link', 'test']
+DEFAULT_PLUGINS = ['check', 'link', 'test']
 
 
 @dataclasses.dataclass

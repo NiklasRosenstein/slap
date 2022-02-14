@@ -53,7 +53,7 @@ classifiers = [
   slam = "slam.__main__:main"
 
   [tool.poetry.plugins."slam.plugins.application"]
-  # check = "slam.commands.check.command:CheckCommandPlugin"
+  check = "slam.ext.application.check:CheckCommandPlugin"
   link = "slam.ext.application.link:LinkCommandPlugin"
   # log = "slam.commands.log.command:LogCommandPlugin"
   # release = "slam.commands.release.command:ReleaseCommandPlugin"
@@ -61,14 +61,14 @@ classifiers = [
   # poetry = "slam.poetry.plugin:PoetryPlugin"
   # github = "slam.changelog.ext.github:GithubApplicationPlugin"
 
-  [tool.poetry.plugins."slam.commands.log.config.RemoteProvider"]
-  github = "slam.changelog.ext.github:GithubRemoteProvider"
+  [tool.poetry.plugins."slam.plugins.check"]
+  general = "slam.ext.checks.general:GeneralChecksPlugin"
+  poetry = "slam.ext.checks.poetry:PoetryChecksPlugin"
+  # [tool.poetry.plugins."slam.plugins.check"]
+  # github = "slam.changelog.ext.github:GithubRemoteProvider"
 
 [tool.slam]
 typed = true
-
-  [tool.slam.application]
-  enable-only = [ "link", "test" ]
 
   [tool.slam.test]
   mypy = "mypy src --namespace-packages"

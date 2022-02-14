@@ -35,6 +35,9 @@ class ProjectConfig:
   #: handler will search in `"src/"`` and then `"./"``.
   source_directory: t.Annotated[str | None, alias('source-directory')] = None
 
+  #: Whether the project source code is inteded to be typed. Defaults to `true`.
+  typed: bool = True
+
 
 class Project:
   """ Represents one Python project. Slam can work with multiple projects at the same time, for example if the same

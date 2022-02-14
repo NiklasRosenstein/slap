@@ -6,17 +6,18 @@ import requests
 from nr.util import Optional
 from nr.util.fs import get_file_in_directory
 
-from slam.application import Application
-from slam.commands.check.api import Check, CheckPlugin
+from slam.check import Check
+from slam.plugins import CheckPlugin
+from slam.project import Project
 from slam.util.external.pypi_classifiers import get_classifiers
 
 
-def get_readme_path(app: Application) -> Path | None:
+def get_readme_path(project: Project) -> Path | None:
   """ Tries to detect the project readme. If `tool.poetry.readme` is set, that file will be returned. """
 
   # TODO (@NiklasRosenstein): Support other config styles that specify a readme.
 
-  poetry: dict = app.pyproject.value_or({})
+  poetry: dict = project.pyproject_toml.value_or({})
   poetry = poetry.get('tool', {}).get('poetry', {})
 
   if (readme := poetry.get('readme')) and Path(readme).is_file():
@@ -28,9 +29,9 @@ def get_readme_path(app: Application) -> Path | None:
 class PoetryChecksPlugin(CheckPlugin):
   """ Check plugin to validate the Poetry configuration and compare it with Slam's expectations. """
 
-  def get_checks(self, app: 'Application') -> t.Iterable[Check]:
-    self.app = app
-    self.poetry = (app.pyproject.value() if app.pyproject.exists() else {}).get('tool', {}).get('poetry')
+  def get_checks(self, project: Project) -> t.Iterable[Check]:
+    self.project = project
+    self.poetry = project.pyproject_toml.value_or({}).get('tool', {}).get('poetry')
     if self.poetry is not None:
       yield self._check_poetry_readme()
       yield self._check_urls()
@@ -40,7 +41,7 @@ class PoetryChecksPlugin(CheckPlugin):
   def _check_poetry_readme(self) -> Check:
     check_name = 'readme'
     default_readmes = ['README.md', 'README.rst']
-    detected_readme = Optional(get_readme_path(self.app))\
+    detected_readme = Optional(get_readme_path(self.project))\
       .map(lambda p: str(p.resolve().relative_to(Path.cwd()))).or_else(None)
     poetry_readme = self.poetry.get('readme')
 

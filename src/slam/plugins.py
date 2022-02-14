@@ -7,8 +7,11 @@ import typing as t
 from nr.util.generic import T
 
 if t.TYPE_CHECKING:
-  from slam.application import Application
+  from pathlib import Path
+  from slam.application import Application, IO
+  from slam.check import Check
   from slam.project import Package, Project
+  from slam.release import VersionRef
 
 
 class ApplicationPlugin(t.Generic[T], abc.ABC):
@@ -50,3 +53,27 @@ class ProjectHandlerPlugin(abc.ABC):
   @abc.abstractmethod
   def get_packages(self, project: Project) -> list[Package]:
     """ Return a list of packages for the project. """
+
+
+class CheckPlugin(abc.ABC):
+  """ This plugin type can be implemented to add custom checks to the `shut check` command. Note that checks will
+  be grouped and their names prefixed with the plugin name, so that name does not need to be included in the name
+  of the returned checks. """
+
+  ENTRYPOINT = 'slam.plugins.check'
+
+  @abc.abstractmethod
+  def get_checks(self, project: Project) -> t.Iterable[Check]: ...
+
+
+class ReleasePlugin(abc.ABC):
+  """ This plugin can provide additional version references that need to be updated when a release is created or
+  perform custom actions when `shut release` is used. """
+
+  ENTRYPOINT = 'slam.plugins.release'
+
+  def get_version_refs(self, project: Project, io: 'IO') -> list[VersionRef]:
+    return []
+
+  def bump_to_version(self, target_version: str, dry: bool, io: 'IO') -> t.Sequence[Path]:
+    return []

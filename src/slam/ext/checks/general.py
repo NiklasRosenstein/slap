@@ -1,36 +1,36 @@
 
 import typing as t
 
-from slam.application import Application
-from .api import Check, CheckPlugin
+from slam.plugins import CheckPlugin
+from slam.check import Check
+from slam.project import Project
 
 
-class SlamChecksPlugin(CheckPlugin):
+class GeneralChecksPlugin(CheckPlugin):
 
   # TODO (@NiklasRosenstein): Check if VCS remote is configured?
 
-  def get_checks(self, app: 'Application') -> t.Iterable[Check]:
-    self.app = app
-    yield self._check_detect_packages()
-    yield self._check_py_typed()
+  def get_checks(self, project: Project) -> t.Iterable[Check]:
+    yield self._check_detect_packages(project)
+    yield self._check_py_typed(project)
 
-  def _check_detect_packages(self) -> Check:
-    packages = self.app.get_packages()
+  def _check_detect_packages(self, project: Project) -> Check:
+    packages = project.get_packages()
     return Check(
       'packages',
       Check.Result.OK if packages else Check.Result.ERROR,
       'Detected ' + ", ".join(f'<b>{p.root}/{p.name}</b>' for p in packages)
     )
 
-  def _check_py_typed(self) -> Check:
+  def _check_py_typed(self, project: Project) -> Check:
     check_name = 'typed'
-    expect_typed = self.app.raw_config().get('typed')
+    expect_typed = project.config().typed
     if expect_typed is None:
       return Check(check_name, Check.Result.WARNING, '<b>tool.slam.typed</b> is not set')
 
     has_py_typed = set[str]()
     has_no_py_typed = set[str]()
-    for package in self.app.get_packages():
+    for package in project.get_packages():
       (has_py_typed if (package.path / 'py.typed').is_file() else has_no_py_typed).add(package.name)
 
     if expect_typed and has_no_py_typed:

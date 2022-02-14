@@ -1,11 +1,7 @@
 
-import abc
 import enum
 import dataclasses
 import typing as t
-
-if t.TYPE_CHECKING:
-  from slam.application import Application
 
 
 class CheckResult(enum.IntEnum):
@@ -29,10 +25,3 @@ class Check:
   result: Result
   description: str | None
   details: str | None = None
-
-
-class CheckPlugin(abc.ABC):
-  """ A plugin to add checks to the `slam check` command. """
-
-  @abc.abstractmethod
-  def get_checks(self, app: 'Application') -> t.Iterable[Check]: ...
