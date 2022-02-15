@@ -214,6 +214,7 @@ class ChangelogUpdatePrCommand(Command):
         return 0
 
     rev = self.argument("base_revision")
+    num_updates = 0
     for changelog, manager in changelogs:
 
       try:
@@ -231,19 +232,27 @@ class ChangelogUpdatePrCommand(Command):
 
       new_entry_ids = {e.id for e in changelog.content.entries} - prev_entry_ids
       if not new_entry_ids:
-        self.line('no entries to update', 'info')
-        return 0
+        continue
 
-      self.line(f'Updating PR reference in {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"}', 'comment')
+      num_updates += len(new_entry_ids)
+      self.line(
+        f'Updating PR reference in {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"}',
+        'comment'
+      )
+
       for entry in changelog.content.entries:
         if entry.id in new_entry_ids:
           entry.pr = pr
       changelog.save(None)
 
+    if not num_updates:
+      self.line('no entries to update', 'info')
+      return 0
+
     if self.option("commit"):
       self._vcs.commit_files(
         [changelog.path for changelog, _ in changelogs],
-        'Updated PR references.',
+        f'Updated {num_updates} PR reference{"" if num_updates == 0 else "s"}.',
         push=self._remote,
         name=self.option("name"),
         email=self.option("email"),
