@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
   from slam.util.vcs import Vcs
 
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
-DEFAULT_PLUGINS = ['changelog', 'check', 'link', 'release', 'test']
+DEFAULT_PLUGINS = ['changelog', 'check', 'link', 'publish', 'release', 'test']
 logger = logging.getLogger(__name__)
 
 

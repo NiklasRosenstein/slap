@@ -23,18 +23,19 @@ classifiers = [
 
   [tool.poetry.dependencies]
   python = "^3.10"
-  beautifulsoup4 = "^4.10.0"
   "databind.core" = "^1.4.0"
   "databind.json" = "^1.4.0"
-  flit = "^3.6.0"
   "nr.util" = "^0.6.1"
+  beautifulsoup4 = "^4.10.0"
   cleo = ">=1.0.0a4"
+  flit = "^3.6.0"
   poetry-core = "^1.1.0a6"
+  ptyprocess = "^0.7.0"
   pygments = "^2.11.2"
   PyYAML = "^6.0"
   requests = "^2.27.1"
   tomli = "^2.0.0"
-  ptyprocess = "^0.7.0"
+  twine = "^3.7.0"
 
   [tool.poetry.dev-dependencies]
   types-beautifulsoup4 = "^4.10.0"
@@ -50,6 +51,7 @@ classifiers = [
   changelog = "slam.ext.application.changelog:ChangelogCommandPlugin"
   check = "slam.ext.application.check:CheckCommandPlugin"
   link = "slam.ext.application.link:LinkCommandPlugin"
+  publish = "slam.ext.application.publish:PublishCommandPlugin"
   release = "slam.ext.application.release:ReleaseCommandPlugin"
   test = "slam.ext.application.test:TestCommandPlugin"
 
