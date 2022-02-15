@@ -184,12 +184,18 @@ class ChangelogUpdatePrCommand(Command):
     ),
     option(
       "name",
-      description="The Git name to use when committing. Convenient to avoid manually configuring Git in CI first.",
+      description="Override the <code>user.name</code> Git option (only with <opt>--commit, -c</opt>)",
       flag=False,
     ),
     option(
       "email",
-      description="The Git email to use when committing. Convenient to avoid manually configuring Git in CI first.",
+      description="Override the <code>user.email</code> Git option (only with <opt>--commit, -c</opt>).",
+      flag=False,
+    ),
+    option(
+      "token",
+      description="The token when pushing to an HTTPS remote (useful in CI; only with <opt>--push, -p</opt>). "
+        "Note that this option will be ignored if the <code>origin</code> remote is not an HTTPS remote.",
       flag=False,
     )
   ]
@@ -251,6 +257,10 @@ class ChangelogUpdatePrCommand(Command):
       return 0
 
     if self.option("commit"):
+      if self._remote and (token := self.option("token")):
+        # TODO (@NiklasRosenstein): A bit hacky, but that's how we can inject the token into the remote URL.
+        self._remote.name = self._remote.url.replace('https://', f'https://{token}@')
+
       self._vcs.commit_files(
         [changelog.path for changelog, _ in changelogs],
         f'Updated {num_updates} PR reference{"" if num_updates == 0 else "s"}.',
@@ -281,7 +291,20 @@ class ChangelogUpdatePrCommand(Command):
 
     for opt in ('email', 'name'):
       if self.option(opt) and not self.option("commit"):
-        self.line_error(f'error: <opt>--{opt}</opt> is not valid without <opt>--commit</opt>', 'error')
+        self.line_error(f'error: <opt>--{opt}</opt> is not valid without <opt>--commit, -c</opt>', 'error')
+        return False
+
+    if self.option("token"):
+      if not self.option("push"):
+        self.line_error(f'error: <opt>--token</opt> can only be used with <opt>--commit, -c</opt>', 'error')
+        return False
+      assert self._remote
+      if not self._remote.url.startswith('https://'):
+        self.line_error(
+          f'error: <opt>--token</opt> is specified, but remote "{self._remote.name}" does not point to '
+            f'an HTTPS url (<code>{self._remote.url}</code>).',
+          'error'
+        )
         return False
 
     return True
