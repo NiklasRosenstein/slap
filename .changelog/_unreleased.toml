@@ -1,0 +1,5 @@
+[[entries]]
+id = "be9024cb-e2d2-4226-8c22-c0ba6c9b8ed0"
+type = "improvement"
+description = "`Command.help` now treats the first line differently to support docstrings where the first line is on the same line as the quotes"
+author = "@NiklasRosenstein"

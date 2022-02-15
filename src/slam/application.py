@@ -34,7 +34,9 @@ logger = logging.getLogger(__name__)
 class Command(_BaseCommand):
 
   def __init_subclass__(cls) -> None:
-    cls.help = textwrap.dedent(cls.help or cls.__doc__ or '')
+    if not cls.help:
+      first_line, remainder = (cls.__doc__ or '').partition('\n')[::2]
+      cls.help = (first_line.strip() + '\n' + textwrap.dedent(remainder)).strip()
     cls.description = cls.description or cls.help.strip().splitlines()[0]
 
     # TODO (@NiklasRosenstein): Implement automatic wrapping of description text, but we
