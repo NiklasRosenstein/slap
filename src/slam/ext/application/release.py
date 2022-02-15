@@ -328,6 +328,7 @@ class ReleaseCommand(Command):
     changed_files: list[Path] = []
 
     self._show_version_refs(version_refs, target_version)
+    self.line('')
     for filename, refs in Stream(version_refs).groupby(lambda r: r.file):
       with open(filename) as fp:
         content = fp.read()
@@ -365,6 +366,7 @@ class ReleaseCommand(Command):
       self.line_error('<info>tool.slam.release.tag-format<info> must contain <info>{version}</info>', 'error')
       sys.exit(1)
     tag_name = config.tag_format.replace('{version}', str(target_version))
+    self.line('')
     self.line(f'tagging <fg=cyan>{tag_name}</fg>')
 
     if not dry:
@@ -382,6 +384,7 @@ class ReleaseCommand(Command):
 
     branch = self.git.get_current_branch_name()
 
+    self.line('')
     self.line(f'pushing <fg=cyan>{branch}</fg>, <fg=cyan>{tag_name}</fg> to <info>{remote}</info>')
 
     if not dry:
