@@ -76,6 +76,8 @@ class ManagedChangelog:
   def __init__(self, manager: 'ChangelogManager', path: Path, version: str | None) -> None:
     from poetry.core.semver.version import Version
 
+    assert version is None or isinstance(version, str), type(version)
+
     self.path = path
     self.version = Version.parse(version) if version else None
     self._manager = manager

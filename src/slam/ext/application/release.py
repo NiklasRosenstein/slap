@@ -310,7 +310,7 @@ class ReleaseCommand(Command):
       try:
         plugin = load_entrypoint(VersionIncrementingRulePlugin, rule)
       except NoSuchEntrypointError:
-        self.line(f'error: "<b>{rule}</b> is not a valid version incrementing rule', 'error')
+        self.line(f'error: "<b>{rule}</b>" is not a valid version incrementing rule', 'error')
         sys.exit(1)
       return plugin().increment_version(self._get_current_version(version_refs))
 
@@ -345,7 +345,7 @@ class ReleaseCommand(Command):
     for project in self.app.projects:
       for plugin in self._load_plugins(project):
         try:
-          changed_files.extend(plugin.create_release(project, target_version, dry))
+          changed_files.extend(plugin.create_release(project, str(target_version), dry))
         except:
           self.line_error(f'error with {type(plugin).__name__}.bump_version()', 'error')
           raise
@@ -364,11 +364,11 @@ class ReleaseCommand(Command):
     if '{version}' not in config.tag_format:
       self.line_error('<info>tool.slam.release.tag-format<info> must contain <info>{version}</info>', 'error')
       sys.exit(1)
-    tag_name = config.tag_format.replace('{version}', target_version)
+    tag_name = config.tag_format.replace('{version}', str(target_version))
     self.line(f'tagging <fg=cyan>{tag_name}</fg>')
 
     if not dry:
-      commit_message = config.commit_message.replace('{version}', target_version)
+      commit_message = config.commit_message.replace('{version}', str(target_version))
       self.git.add([str(f) for f in changed_files])
       self.git.commit(commit_message, allow_empty=True)
       self.git.tag(tag_name, force=force)
