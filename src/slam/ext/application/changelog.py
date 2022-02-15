@@ -244,7 +244,9 @@ class ChangelogUpdatePrCommand(Command):
       self._vcs.commit_files(
         [changelog.path for changelog, _ in changelogs],
         'Updated PR references.',
-        push=self._remote
+        push=self._remote,
+        name=self.option("name"),
+        email=self.option("email"),
       )
 
     return 0
