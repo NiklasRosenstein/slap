@@ -340,4 +340,13 @@ class Application:
   def run(self) -> None:
     """ Loads and activates application plugins and then invokes the CLI. """
 
-    self.cleo.run()
+    import subprocess as sp
+
+    try:
+      self.cleo.run()
+    except sp.CalledProcessError as exc:
+      logger.error(
+        'Uncaught CalledProcessError of command <subj>%s</subj>. Stdout: <fg=gray>%s</fg>\nStderr: <fg=gray>%s</fg>',
+        exc.args, exc.stdout.read().decode() if exc.stdout else '', exc.stderr.read().decode() if exc.stderr else ''
+      )
+      raise
