@@ -52,16 +52,12 @@ classifiers = [
   link = "slam.ext.application.link:LinkCommandPlugin"
   release = "slam.ext.application.release:ReleaseCommandPlugin"
   test = "slam.ext.application.test:TestCommandPlugin"
-  # poetry = "slam.poetry.plugin:PoetryPlugin"
-  # github = "slam.changelog.ext.github:GithubApplicationPlugin"
 
   [tool.poetry.plugins."slam.plugins.check"]
   changelog = "slam.ext.checks.changelog:ChangelogValidationCheckPlugin"
   general = "slam.ext.checks.general:GeneralChecksPlugin"
   poetry = "slam.ext.checks.poetry:PoetryChecksPlugin"
   release = "slam.ext.checks.release:ReleaseChecksPlugin"
-  # [tool.poetry.plugins."slam.plugins.check"]
-  # github = "slam.changelog.ext.github:GithubRemoteProvider"
 
   [tool.poetry.plugins."slam.plugins.release"]
   changelog_release = "slam.ext.release.changelog:ChangelogReleasePlugin"
