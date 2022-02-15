@@ -107,7 +107,7 @@ class VcsHost(abc.ABC):
     return None
 
   def normalize_issue(self, issue: str) -> str | None:
-    """ Sames as {@link normalize_pr_reference()} but for issues. """
+    """ Sames as {@link normalize_pr()} but for issues. """
 
   def normalize_author(self, author: str) -> str | None:
     """ Normalize an author name, for example converting an email address to a username, or None if the author
