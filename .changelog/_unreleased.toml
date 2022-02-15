@@ -3,3 +3,9 @@ id = "be9024cb-e2d2-4226-8c22-c0ba6c9b8ed0"
 type = "improvement"
 description = "`Command.help` now treats the first line differently to support docstrings where the first line is on the same line as the quotes"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "175efd0d-7b99-42f2-a6ac-9ec7d5c1ef31"
+type = "improvement"
+description = "`slam changelog update-pr` now supports updating the PR reference for changelogs of all projects"
+author = "@NiklasRosenstein"

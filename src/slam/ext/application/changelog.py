@@ -184,47 +184,58 @@ class ChangelogUpdatePrCommand(Command):
     )
   ]
 
-  def __init__(self, app: Application, manager: ChangelogManager):
+  def __init__(self, app: Application):
     super().__init__()
     self.app = app
-    self.manager = manager
+    self.managers = {project: get_changelog_manager(project) for project in app.projects}
 
   def handle(self) -> int:
     if not self._validate_arguments():
       return 1
 
-    try:
-      pr = self.manager.vcs_host.normalize_pr(self.argument("pr"))
-    except ValueError as exc:
-      self.line_error(f'error: {exc}', 'error')
-      return 1
+    changelogs = []
+    for _, manager in self.managers.items():
+      unreleased = manager.unreleased()
+      if unreleased.exists():
+        changelogs.append((unreleased, manager))
 
-    unreleased = self.manager.unreleased()
-    if not unreleased.exists():
-      self.line('no entries to update', 'info')
-      return 0
+    if not changelogs:
+        self.line('no entries to update', 'info')
+        return 0
 
     rev = self.argument("base_revision")
-    prev_contents = self._vcs.get_file_contents(unreleased.path, rev)
-    if prev_contents is None:
-      prev_entry_ids = set[str]()
-    else:
-      prev_changelog = self.manager.deser.load(io.StringIO(prev_contents.decode('utf8')), f'{rev}:{unreleased.path}')
-      prev_entry_ids = {e.id for e in prev_changelog.entries}
+    for changelog, manager in changelogs:
 
-    new_entry_ids = {e.id for e in unreleased.content.entries} - prev_entry_ids
-    if not new_entry_ids:
-      self.line('no entries to update', 'info')
-      return 0
+      try:
+        pr = manager.vcs_host.normalize_pr(self.argument("pr"))
+      except ValueError as exc:
+        self.line_error(f'error: {exc}', 'error')
+        return 1
 
-    self.line(f'Updating PR reference in {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"}', 'comment')
-    for entry in unreleased.content.entries:
-      if entry.id in new_entry_ids:
-        entry.pr = pr
-    unreleased.save(None)
+      prev_contents = self._vcs.get_file_contents(changelog.path, rev)
+      if prev_contents is None:
+        prev_entry_ids = set[str]()
+      else:
+        prev_changelog = manager.deser.load(io.StringIO(prev_contents.decode('utf8')), f'{rev}:{changelog.path}')
+        prev_entry_ids = {e.id for e in prev_changelog.entries}
+
+      new_entry_ids = {e.id for e in changelog.content.entries} - prev_entry_ids
+      if not new_entry_ids:
+        self.line('no entries to update', 'info')
+        return 0
+
+      self.line(f'Updating PR reference in {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"}', 'comment')
+      for entry in changelog.content.entries:
+        if entry.id in new_entry_ids:
+          entry.pr = pr
+      changelog.save(None)
 
     if self.option("commit"):
-      self._vcs.commit_files([unreleased.path], 'Updated PR references.', push=self._remote)
+      self._vcs.commit_files(
+        [changelog.path for changelog, _ in changelogs],
+        'Updated PR references.',
+        push=self._remote
+      )
 
     return 0
 
@@ -474,7 +485,7 @@ class ChangelogCommandPlugin(ApplicationPlugin):
 
   def activate(self, app: 'Application', config: ChangelogManager) -> None:
     app.cleo.add(ChangelogAddCommand(app, config))
-    app.cleo.add(ChangelogUpdatePrCommand(app, config))
+    app.cleo.add(ChangelogUpdatePrCommand(app))
     app.cleo.add(ChangelogFormatCommand(config))
     app.cleo.add(ChangelogConvertCommand(app, config))
 
