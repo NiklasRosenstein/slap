@@ -40,7 +40,7 @@ def detect_packages(directory: Path) -> list[Package]:
       return []
     modules = ['.'.join(common)]
 
-  return [Package(module, directory / Path(*module.split('/')), directory) for module in modules]
+  return [Package(module, directory / Path(*module.split('.')), directory) for module in modules]
 
 
 class DefaultProjectHandler(ProjectHandlerPlugin):
