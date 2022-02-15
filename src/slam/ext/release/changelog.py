@@ -15,8 +15,11 @@ class ChangelogReleasePlugin(ReleasePlugin):
     unreleased = manager.unreleased()
     new_version = manager.version(target_version)
     if unreleased.exists():
+      cwd = Path.cwd()
+      old = unreleased.path.relative_to(cwd)
+      new = new_version.path.relative_to(cwd)
       self.io.write_line(f'releasing changelog')
-      self.io.write_line(f'  <fg=cyan>{unreleased.path}</fg> → <b>{new_version.path}</b>')
+      self.io.write_line(f'  <fg=cyan>{old}</fg> → <b>{new}</b>')
       if not dry:
         unreleased.release(target_version)
       return [unreleased.path, new_version.path]
