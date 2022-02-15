@@ -1,6 +1,6 @@
 docs_dir: src
-site_name: Shut
-repo_url: https://github.com/NiklasRosenstein/shut
+site_name: Slam
+repo_url: https://github.com/NiklasRosenstein/slam
 
 theme: material
 markdown_extensions:

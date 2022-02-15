@@ -1,17 +1,17 @@
 # API Documentation
 
-@pydoc shut.application.Application
+@pydoc slam.application.Application
 
 ## Plugins
 
 @pydoc :set header_level = 3
 
-@pydoc shut.application.ApplicationPlugin :with
+@pydoc slam.application.ApplicationPlugin :with
 
-@pydoc shut.commands.check.api.CheckPlugin
+@pydoc slam.commands.check.api.CheckPlugin
 
-@pydoc shut.commands.release.api.ReleasePlugin
+@pydoc slam.commands.release.api.ReleasePlugin
 
-@pydoc shut.commands.log.api.RemoteDetectorPlugin
+@pydoc slam.commands.log.api.RemoteDetectorPlugin
 
-@pydoc shut.commands.log.api.RemoteProvider
+@pydoc slam.commands.log.api.RemoteProvider

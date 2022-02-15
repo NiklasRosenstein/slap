@@ -1,18 +1,18 @@
-# shut release
+# slam release
 
-The `shut release` command is a much improved version to the `poetry version` command in that is can bump multiple
+The `slam release` command is a much improved version to the `poetry version` command in that is can bump multiple
 references to the version number in the project. It can also be used to verify that the version number is consistent
 and matching a particular value in CI checks using the `--verify` option.
 
-Shut currently reads the configuration from `tool.poetry`, but support for [PEP 621][]
+Slam currently reads the configuration from `tool.poetry`, but support for [PEP 621][]
 metadata is planned. It tries its best to detect the package source code roots, but if the automatic detection fails or
-cannot be detected from other existing configurations, the `tool.shut.packages` and `tool.shut.source-directory`
+cannot be detected from other existing configurations, the `tool.slam.packages` and `tool.slam.source-directory`
 options can be set explicitly.
 
 The release process will also rename changelogs and insert the release date into changelogs created and managed with
-`shut log`.
+`slam log`.
 
-    $ shut release patch --tag --push
+    $ slam release patch --tag --push
     bumping 2 version references:
       pyproject.toml: 0.1.0 → 0.1.1
       src/my_package/__init__.py: 0.1.0 → 0.1.1
@@ -36,10 +36,10 @@ The release process will also rename changelogs and insert the release date into
       * [new branch]      develop -> develop
       * [new tag]         0.1.1 -> 0.1.1
 
-Additional version references can be configured using the `tool.shut.version-references` option or by installing a
-plugin that registers an entrypoint under `tool.shut.plugins.release`.
+Additional version references can be configured using the `tool.slam.version-references` option or by installing a
+plugin that registers an entrypoint under `tool.slam.plugins.release`.
 
-> __TODO__ Support releases on the remote with the `shut release --create-release` option.
+> __TODO__ Support releases on the remote with the `slam release --create-release` option.
 
 ## Configuration
 
@@ -48,7 +48,7 @@ plugin that registers an entrypoint under `tool.shut.plugins.release`.
 __Type__: `str`  
 __Default__: `"develop"`
 
-The branch on which releases are created. Unless `--no-branch-check` is passed to `shut release`, the command will
+The branch on which releases are created. Unless `--no-branch-check` is passed to `slam release`, the command will
 refuse to continue if the current branch name does not match this value.
 
 ### `release.commit-message`
@@ -73,7 +73,7 @@ __Type__: `list[VersionRefConfig]`
 __Default__: `[]`
 
 A list of version references that should be considered in addition to the version references that are automatically
-detected by Shut when updating version numbers across the project with the `shut release` command.
+detected by Slam when updating version numbers across the project with the `slam release` command.
 
 A `VersionRefConfig` contains the fields `file: str` and `pattern: str`. The `file` is considered relative to the
-project directory (which is the directory where the `shut.toml` or `pyproject.toml` configuration file resides).
+project directory (which is the directory where the `slam.toml` or `pyproject.toml` configuration file resides).

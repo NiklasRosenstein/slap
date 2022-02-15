@@ -1,16 +1,16 @@
-# shut log
+# slam log
 
-@cleo_command shut shut.commands.log.command.LogAddCommand
+@cleo_command slam slam.commands.log.command.LogAddCommand
 
-The `shut log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
-but the directory can be changed using the `tool.shut.changelog-dir` option. The CLI allows you to add new entries
+The `slam log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
+but the directory can be changed using the `tool.slam.changelog-dir` option. The CLI allows you to add new entries
 as well as print them in a pretty format in the terminal or render the changelog as Markdown.
 
 A changelog entry has a unique ID, one or more tags that categorize the type of change, one or more authors,
 a short description, maybe a link to a pull request and links to issues that are fixed by the change.
 
 ```toml
-$ shut log add -t fix,docs -m 'Fix the documentation' --fixes 231,234
+$ slam log add -t fix,docs -m 'Fix the documentation' --fixes 231,234
 # Added changelog entry to .changelog/_unreleased.toml
 id = "d0092ba"
 tags = [ "fix", "docs" ]
@@ -23,7 +23,7 @@ pr = null
 ```
 
 The `pr` value can be set manually once a PR was created, or be updated automatically for example through a GitHub
-action or other type of CI job (the `shut log inject-pr-url` command can help with that).
+action or other type of CI job (the `slam log inject-pr-url` command can help with that).
 
 ## Configuration
 

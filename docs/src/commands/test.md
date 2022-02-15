@@ -1,10 +1,10 @@
-# shut test
+# slam test
 
-Configure the commands to run with `shut test` under the `tool.shut.test` table:
+Configure the commands to run with `slam test` under the `tool.slam.test` table:
 
 ```toml
-[tool.shut.test]
-pytest = "pytest --cov=shut"
+[tool.slam.test]
+pytest = "pytest --cov=slam"
 mypy = "mypy"
 pylint = "pylint --fail-under=8.0"
 ```

@@ -1,13 +1,13 @@
-# shut check
+# slam check
 
-The `shut check` command performs sanity checks on your project.
+The `slam check` command performs sanity checks on your project.
 
 ## Configuration
 
 ### `check.plugins`
 
 __Type__: `list[str]`  
-__Default__: `["log", "poetry", "release", "shut"]`
+__Default__: `["log", "poetry", "release", "slam"]`
 
 A list of check plugins to use. Note that the Poetry plugin will only fire checks if your project appears to be using
 Poetry, so there is no harm in leaving it enabled even if you don't use it.
@@ -20,23 +20,23 @@ __Todo__: Error if a specified plugin does not exist.
 
 ### `log`
 
-The `ChangelogConsistencyCheck` checks if the changelogs managed by Shut are in order.
+The `ChangelogConsistencyCheck` checks if the changelogs managed by Slam are in order.
 
 #### Check `log:validate`
 
-Checks if all structured changelog files managed by Shut can be loaded and are valid.
+Checks if all structured changelog files managed by Slam can be loaded and are valid.
 
 ---
 
-### `shut`
+### `slam`
 
 > The `ShutChecksPlugin` provides all Python specific checks.
 
-#### Check `shut:packages`
+#### Check `slam:packages`
 
-Checks if Shut can detect at least one package.
+Checks if Slam can detect at least one package.
 
-#### Check `shut:typed`
+#### Check `slam:typed`
 
 Checks if the project is typed but does not contain a `py.typed` file or the other way round.
 This currently relies on the `$.typed` configuration and does not inspect the code for type hints.
@@ -51,7 +51,7 @@ This currently relies on the `$.typed` configuration and does not inspect the co
 
 Checks if the project readme is configured correctly or if Poetry is able to automatically
 pick up the readme file if it is not configured. This inspects te `[tool.poetry.readme]` or `[project.readme]`
-settings in `pyproject.toml` and compares it with the readme file that was automatically identified by Shut
+settings in `pyproject.toml` and compares it with the readme file that was automatically identified by Slam
 (which is a file called README, case-insensitive with one of the suffixes in the order of `.md`, `.rst`, `.txt`,
 or if that does not match, any file beginning with `README.`).
 
@@ -77,7 +77,7 @@ __TODO__ Check if the license is a valid SPDX license identifier.
 
 ### `release`
 
-> The `ReleaseChecksPlugin` performs checks to validate that `shut release` can be used properly.
+> The `ReleaseChecksPlugin` performs checks to validate that `slam release` can be used properly.
 
 #### Check `release:version`
 
@@ -86,4 +86,4 @@ Checks if the `__version__` can be detected in the source code of all detected p
 #### Check `release:remote`
 
 __TODO__ Checks if the VCS remote is configured or can be detected automatically such that the
-`shut release --create-release` option can be used.
+`slam release --create-release` option can be used.
