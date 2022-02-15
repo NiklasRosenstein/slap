@@ -94,6 +94,27 @@ class CleoApplication(BaseCleoApplication):
       add_style(io, style_name, style)
     return io
 
+  def render_error(self, error: Exception, io: IO) -> None:
+    import subprocess as sp
+
+    if isinstance(error, sp.CalledProcessError):
+      msg = 'Uncaught CalledProcessError raised for command <subj>%s</subj> (exit code: <val>%s</val>).'
+      args = (error.args[1], error.returncode)
+      stdout: str | None = error.stdout.decode() if error.stdout else None
+      stderr: str | None = error.stderr.decode() if error.stderr else None
+      if stdout:
+        msg += '\n  stdout:\n<fg=black;attr=bold>%s</fg>'
+        stdout = textwrap.indent(stdout, '    ')
+        args += (stdout,)
+      if stderr:
+        msg += '\n  stderr:\n<fg=black;attr=bold>%s</fg>'
+        stderr = textwrap.indent(stderr, '    ')
+        args += (stderr,)
+
+      logger.error(msg, *args)
+
+    return super().render_error(error, io)
+
   def _configure_io(self, io: IO) -> None:
     import logging
 
@@ -121,6 +142,9 @@ class CleoApplication(BaseCleoApplication):
     self._init_callback()
 
     return super()._configure_io(io)
+
+  def _run_command(self, command: Command, io: IO) -> int:
+    return super()._run_command(command, io)
 
 
 @dataclasses.dataclass
@@ -340,13 +364,4 @@ class Application:
   def run(self) -> None:
     """ Loads and activates application plugins and then invokes the CLI. """
 
-    import subprocess as sp
-
-    try:
-      self.cleo.run()
-    except sp.CalledProcessError as exc:
-      logger.error(
-        'Uncaught CalledProcessError of command <subj>%s</subj>. Stdout: <fg=gray>%s</fg>\nStderr: <fg=gray>%s</fg>',
-        exc.args, exc.stdout.read().decode() if exc.stdout else '', exc.stderr.read().decode() if exc.stderr else ''
-      )
-      raise
+    self.cleo.run()
