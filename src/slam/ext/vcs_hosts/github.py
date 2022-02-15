@@ -5,13 +5,11 @@ import re
 import requests
 from nr.util.git import Git
 
-from slam.application import Application, ApplicationPlugin
-from slam.changelog.manager import ChangelogValidator
-from slam.commands.log.config import RemoteDetectorPlugin, RemoteProvider
-
-
-def is_url(s: str) -> bool:
-  return s.startswith('http://') or s.startswith('https://')
+from slam.application import Application
+from slam.changelog import is_url
+from slam.plugins import VcsHostDetector, VcsHostProvider
+from slam.project import Project
+from slam.util.vcs import VcsHost
 
 
 def github_get_username_from_email(api_base_url: str, email: str) -> str:
@@ -24,7 +22,7 @@ def github_get_username_from_email(api_base_url: str, email: str) -> str:
 
 
 @dataclasses.dataclass
-class GithubChangelogValidator(ChangelogValidator):
+class GithubVcsHost(VcsHost):
 
   #: The owner and repository name separated by a slash. If the repository is hosted on GitHub enterprise, the
   #: domain of the GHE instance must precede the owner and repository name by another slash (e.g. `ghe.io/owner/repo`).
@@ -52,28 +50,28 @@ class GithubChangelogValidator(ChangelogValidator):
     parts = self.repo.split('/')
     return parts[-2], parts[-1]
 
-  def normalize_issue_reference(self, issue: str) -> str:
+  def normalize_issue(self, issue: str) -> str | None:
     issue = issue.lstrip('#')
     if issue.isnumeric():
       return f'{self._get_repo_url()}/issues/{issue}'
     elif is_url(issue):
       return issue
-    raise ValueError(f'invalid issue: {issue}')
+    return None
 
-  def normalize_pr_reference(self, pr: str) -> str:
+  def normalize_pr(self, pr: str) -> str | None:
     pr = pr.lstrip('#')
     if pr.isnumeric():
       return f'{self._get_repo_url()}/pulls/{pr}'
     elif is_url(pr):
       return pr
-    raise ValueError(f'invalid pr: {pr}')
+    return None
 
-  def normalize_author(self, author: str) -> str:
+  def normalize_author(self, author: str) -> str | None:
     # If it is an email address, try to see if we can resolve it to a GitHub username.
     # TODO (@NiklasRosenstein): Detect emails in a syntax such as "Full Name <email@address.org>" which is very common.
     if '@' in author and not author.startswith('@'):
       if author in self._author_cache:
-        return self._author_cache[author] or author
+        return self._author_cache[author]
       try:
         resolved = '@' + github_get_username_from_email(self._get_api_url(), author)
       except ValueError:
@@ -81,7 +79,7 @@ class GithubChangelogValidator(ChangelogValidator):
         return author  # Return the email address unchanged.
       self._author_cache[author] = resolved
       return resolved
-    return author
+    return None
 
   def pr_shortform(self, pr: str) -> str | None:
     return self.issue_shortform(pr)
@@ -101,13 +99,15 @@ class GithubChangelogValidator(ChangelogValidator):
     return None
 
 
-class GithubRemoteDetector(RemoteDetectorPlugin):
+class GithubVcsHostDetector(VcsHostDetector):
 
-  def detect_changelog_validator(self, app: Application) -> ChangelogValidator | None:
+  def detect_vcs_host(self, project: Project) -> VcsHost | None:
     # TODO (@NiklasRosenstein): Catch the right exception if its not a Git directory
-    git = Git(app.project_directory)
+
+    git = Git(project.directory)
     if not git.get_toplevel():
       return None
+
     remotes = git.remotes()
     for remote in remotes:
       if remote.name == 'origin' and 'github' in remote.fetch:
@@ -123,22 +123,12 @@ class GithubRemoteDetector(RemoteDetectorPlugin):
     if url.endswith('.git'):
       url = url[:-4]
 
-    return GithubChangelogValidator(url)
+    return GithubVcsHost(url)
 
 
 @dataclasses.dataclass
-class GithubRemoteProvider(RemoteProvider):
+class GithubVcsHostProvider(VcsHostProvider):
   repo: str
 
-  def get_changelog_validator(self, app: Application) -> ChangelogValidator:
-    return GithubChangelogValidator(self.repo)
-
-
-@dataclasses.dataclass
-class GithubApplicationPlugin(ApplicationPlugin):
-
-  def load_configuration(self, app: Application) -> None:
-    return None
-
-  def activate(self, app: Application, config: None) -> None:
-    app.plugins.register(RemoteDetectorPlugin, 'github', GithubRemoteDetector())
+  def get_changelog_validator(self, app: Application) -> VcsHost:
+    return GithubVcsHost(self.repo)

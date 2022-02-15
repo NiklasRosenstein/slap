@@ -46,22 +46,20 @@ classifiers = [
   pytest-coverage = "^0.0"
   pylint = "^2.12.2"
 
-  [tool.poetry.extras]
-  rtd = [ "mkdocs", "pygments", "readthedocs-custom-steps" ]
-
   [tool.poetry.scripts]
   slam = "slam.__main__:main"
 
   [tool.poetry.plugins."slam.plugins.application"]
+  changelog = "slam.ext.application.changelog:ChangelogCommandPlugin"
   check = "slam.ext.application.check:CheckCommandPlugin"
   link = "slam.ext.application.link:LinkCommandPlugin"
-  # log = "slam.commands.log.command:LogCommandPlugin"
   release = "slam.ext.application.release:ReleaseCommandPlugin"
   test = "slam.ext.application.test:TestCommandPlugin"
   # poetry = "slam.poetry.plugin:PoetryPlugin"
   # github = "slam.changelog.ext.github:GithubApplicationPlugin"
 
   [tool.poetry.plugins."slam.plugins.check"]
+  changelog = "slam.ext.checks.changelog:ChangelogValidationCheckPlugin"
   general = "slam.ext.checks.general:GeneralChecksPlugin"
   poetry = "slam.ext.checks.poetry:PoetryChecksPlugin"
   release = "slam.ext.checks.release:ReleaseChecksPlugin"
@@ -80,6 +78,12 @@ classifiers = [
   patch = "slam.ext.version_incrementing_rule:patch"
   prepatch = "slam.ext.version_incrementing_rule:prepatch"
   prerelease = "slam.ext.version_incrementing_rule:prerelease"
+
+  [tool.poetry.plugins."slam.plugins.vcs_host_detector"]
+  github = "slam.ext.vcs_hosts.github:GithubVcsHostDetector"
+
+  [tool.poetry.plugins."slam.plugins.vcs_host_provider"]
+  github = "slam.ext.vcs_hosts.github:GithubVcsHostProvider"
 
 [tool.slam]
 typed = true

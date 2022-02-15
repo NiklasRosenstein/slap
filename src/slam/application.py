@@ -27,6 +27,7 @@ if t.TYPE_CHECKING:
   from slam.util.vcs import Vcs
 
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
+DEFAULT_PLUGINS = ['changelog', 'check', 'link', 'release', 'test']
 logger = logging.getLogger(__name__)
 
 
@@ -117,10 +118,6 @@ class CleoApplication(BaseCleoApplication):
     self._init_callback()
 
     return super()._configure_io(io)
-
-
-#DEFAULT_PLUGINS = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
-DEFAULT_PLUGINS = ['check', 'link', 'release', 'test']
 
 
 @dataclasses.dataclass
@@ -228,6 +225,31 @@ class Application:
     vcs = detect_vcs(Path.cwd())
     logger.debug('Detected version control system is <subj>%s</subj>', vcs)
     return vcs
+
+  def get_main_project(self) -> Project:
+    """ Returns the main project, which is the one closest to the current working directory. """
+
+    closest: Project | None = None
+    distance: int = 99999
+    cwd = Path.cwd()
+
+    for project in self.projects:
+      path = project.directory.resolve()
+      if path == cwd:
+        closest = project
+        break
+
+      try:
+        relative = path.relative_to(cwd)
+      except ValueError:
+        continue
+
+      if len(relative.parts) < distance:
+        closest = project
+        distance = len(relative.parts)
+
+    assert closest is not None
+    return closest
 
   def load_projects(self) -> None:
     """ Loads all projects, if any additional aside from the main project need to be loaded. """

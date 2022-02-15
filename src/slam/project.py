@@ -8,7 +8,7 @@ from pathlib import Path
 
 from databind.core.annotations import alias
 
-from slam.plugins import ProjectHandlerPlugin
+from slam.plugins import ProjectHandlerPlugin, VcsHostProvider
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
@@ -37,6 +37,10 @@ class ProjectConfig:
 
   #: Whether the project source code is inteded to be typed. Defaults to `true`.
   typed: bool = True
+
+  #: Configuration for the remote VCS that is used for changelogs and creating releases. If it is not specified,
+  #: it will try to detect one from the builtin VCS remotes (see the {@link slam.ext.vcs_remotes} module).
+  remote: VcsHostProvider | None = None
 
 
 class Project:

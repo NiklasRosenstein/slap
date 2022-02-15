@@ -1,22 +1,33 @@
 
+import dataclasses
 import io
 import typing as t
 from pathlib import Path
 
-from slam.application import Application, ApplicationPlugin, Command, argument, option
-from slam.changelog.model import Changelog
-from slam.changelog.manager import ChangelogManager, DEFAULT_VALID_TYPES, ManagedChangelog
-from slam.commands.check.api import CheckPlugin
-from slam.commands.log.config import get_changelog_manager
-from slam.commands.release.api import ReleasePlugin
+from databind.core.annotations import alias
+
+from slam.application import Application, Command, argument, option
+from slam.plugins import ApplicationPlugin, VcsHostDetector
+from slam.changelog import Changelog, ChangelogManager, ManagedChangelog
+from slam.project import Project
 from slam.util.pygments import toml_highlight
-from .checks import ChangelogConsistencyCheck
-from .release_plugin import RenameChangelogOnReleasePlugin
+
+DEFAULT_VALID_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement', 'tests']
 
 
-class LogAddCommand(Command):
-  """
-  Add an entry to the unreleased changelog via the CLI.
+@dataclasses.dataclass
+class ChangelogConfig:
+  #: The directory in which changelogs are stored.
+  directory: Path = Path('.changelog')
+
+  #: The list of valid types that can be used in changelog entries. The default types are
+  #: {@link DEFAULT_CHANGELOG_TYPES}.
+  valid_types: t.Annotated[list[str] | None, alias('valid-types')] = dataclasses.field(
+      default_factory=lambda: list(DEFAULT_VALID_TYPES))
+
+
+class ChangelogAddCommand(Command):
+  """ Add an entry to the unreleased changelog via the CLI.
 
   A changelog is a TOML file, usually in the <u>.changelog/</u> directory, named with
   the version number it refers to and containing changelog entries. Changes that
@@ -50,7 +61,7 @@ class LogAddCommand(Command):
   automatically by a CI action using the <info>slam log update-pr-field</info> command.
   """
 
-  name = "log add"
+  name = "changelog add"
 
   options = [
     option(
@@ -142,16 +153,15 @@ class LogAddCommand(Command):
     return 0
 
 
-class LogPrUpdateCommand(Command):
-  """
-  Update the <u>pr</u> field of changelog entries in a commit range.
+class ChangelogUpdatePrCommand(Command):
+  """ Update the <u>pr</u> field of changelog entries in a commit range.
 
   Updates all changelog entries that were added in a given commit range. This is
   useful to run in CI for a pull request to avoid having to manually update the
   changelog entry after the PR has been created.
   """
 
-  name = "log update-pr"
+  name = "changelog update-pr"
   arguments = [
     argument(
       "base_revision",
@@ -184,7 +194,7 @@ class LogPrUpdateCommand(Command):
       return 1
 
     try:
-      pr = self.manager.validator.normalize_pr_reference(self.argument("pr"))
+      pr = self.manager.vcs_host.normalize_pr_reference(self.argument("pr"))
     except ValueError as exc:
       self.line_error(f'error: {exc}', 'error')
       return 1
@@ -239,12 +249,10 @@ class LogPrUpdateCommand(Command):
     return True
 
 
-class LogFormatComand(Command):
-  """
-  Format the changelog in the terminal or in Markdown format.
-  """
+class ChangelogFormatCommand(Command):
+  """ Format the changelog in the terminal or in Markdown format. """
 
-  name = "log format"
+  name = "changelog format"
   options = [
     option(
       "markdown", "m",
@@ -324,24 +332,23 @@ class LogFormatComand(Command):
 
   def _html_anchor(self, type: t.Literal['pr', 'issue'], ref: str) -> str:
     if type == 'pr':
-      shortform = self.manager.validator.pr_shortform(ref)
+      shortform = self.manager.vcs_host.pr_shortform(ref)
     else:
-      shortform = self.manager.validator.issue_shortform(ref)
+      shortform = self.manager.vcs_host.issue_shortform(ref)
     if shortform is None:
       shortform = 'Link'
     return f'<a href="{ref}">{shortform}</a>'
 
 
-class LogConvertCommand(Command):
-  """
-  Convert Slam's old YAML based changelogs to new style TOML changelogs.
+class ChangelogConvertCommand(Command):
+  """ Convert Slam's old YAML based changelogs to new style TOML changelogs.
 
   Sometimes the changelog entries in the old style would be suffixed with the
   author's username in the format of <code>@Name</code> or <code>(@Name)</code>, so this command will
   attempt to extract that information to figure out the author of the change.
   """
 
-  name = "log convert"
+  name = "changelog convert"
   options = [
     option(
       "author", "a",
@@ -459,15 +466,35 @@ class LogConvertCommand(Command):
     return match.group(2) if match else None, match.group(1).strip() if match else description
 
 
-class LogCommandPlugin(ApplicationPlugin):
+class ChangelogCommandPlugin(ApplicationPlugin):
 
   def load_configuration(self, app: Application) -> ChangelogManager:
-    return get_changelog_manager(app)
+    return get_changelog_manager(app.get_main_project())
+    #return {project: get_changelog_manager(project) for project in app.projects}
 
-  def activate(self, app: 'Application', manager: ChangelogManager) -> None:
-    app.plugins.register(CheckPlugin, 'log', ChangelogConsistencyCheck(manager))
-    app.plugins.register(ReleasePlugin, 'log', RenameChangelogOnReleasePlugin(manager))
-    app.cleo.add(LogAddCommand(app, manager))
-    app.cleo.add(LogPrUpdateCommand(app, manager))
-    app.cleo.add(LogFormatComand(manager))
-    app.cleo.add(LogConvertCommand(app, manager))
+  def activate(self, app: 'Application', config: dict[Project, ChangelogManager]) -> None:
+    app.cleo.add(ChangelogAddCommand(app, config))
+    app.cleo.add(ChangelogUpdatePrCommand(app, config))
+    app.cleo.add(ChangelogFormatCommand(config))
+    app.cleo.add(ChangelogConvertCommand(app, config))
+
+
+def get_changelog_manager(project: Project) -> ChangelogManager:
+    import databind.json
+    from nr.util.plugins import iter_entrypoints
+    config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
+
+    if project.config().remote:
+      vcs_host = project.config().remote.get_vcs_host(project)
+    else:
+      vcs_host = None
+      for plugin_name, plugin in iter_entrypoints(VcsHostDetector):
+        vcs_host = plugin()().detect_vcs_host(project)
+        if vcs_host:
+          break
+
+    return ChangelogManager(
+      directory=project.directory / config.directory,
+      vcs_host=vcs_host,
+      valid_types=config.valid_types,
+    )

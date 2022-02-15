@@ -2,17 +2,17 @@
 import dataclasses
 import typing as t
 
-from slam.application import Application
-from slam.changelog.manager import ChangelogManager
-from slam.commands.check.api import Check, CheckPlugin
+from slam.check import Check
+from slam.ext.application.changelog import get_changelog_manager
+from slam.plugins import CheckPlugin
+from slam.project import Project
 
 
 @dataclasses.dataclass
-class ChangelogConsistencyCheck(CheckPlugin):
+class ChangelogValidationCheckPlugin(CheckPlugin):
 
-  manager: ChangelogManager
-
-  def get_project_checks(self, app: Application) -> t.Iterable[Check]:
+  def get_project_checks(self, project: Project) -> t.Iterable[Check]:
+    self.manager = get_changelog_manager(project)
     yield self._check_changelogs()
 
   def _check_changelogs(self) -> Check:

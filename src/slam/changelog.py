@@ -1,4 +1,6 @@
 
+from __future__ import annotations
+
 import abc
 import copy
 import dataclasses
@@ -7,18 +9,42 @@ import typing as t
 import uuid
 from pathlib import Path
 
+from databind.core.annotations import alias
 from nr.util.weak import weak_property
 
-from .model import Changelog, ChangelogEntry
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
+  from slam.util.vcs import VcsHost
 
-
-DEFAULT_VALID_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement', 'tests']
 
 def is_url(s: str) -> bool:
   return s.startswith('http://') or s.startswith('https://')
+
+
+@dataclasses.dataclass
+class ChangelogEntry:
+  id: str
+  type: str
+  description: str
+  author: str | None = None
+  authors: list[str] | None = None
+  pr: str | None = None
+  issues: list[str] | None = None
+
+  def get_authors(self) -> list[str]:
+    result = []
+    if self.author is not None:
+      result.append(self.author)
+    if self.authors is not None:
+      result += self.authors
+    return result
+
+
+@dataclasses.dataclass
+class Changelog:
+  entries: list[ChangelogEntry] = dataclasses.field(default_factory=list)
+  release_date: t.Annotated[datetime.date | None, alias("release-date")] = None
 
 
 class ChangelogDeser(abc.ABC):
@@ -41,44 +67,6 @@ class TomlChangelogDeser(ChangelogDeser):
     import databind.json
     import tomli_w
     fp.write(tomli_w.dumps(t.cast(dict, databind.json.dump(changelog, Changelog))))
-
-
-class ChangelogValidator(abc.ABC):
-
-  @abc.abstractmethod
-  def normalize_pr_reference(self, pr: str) -> str:
-    """ This method is called to accept a pull request ID or URL, validate it and ensure that it is in a normalized
-    form. For example, the canonical form of a GitHub pull request ID might be to represent it as a full URL. """
-
-  @abc.abstractmethod
-  def normalize_issue_reference(self, issue: str) -> str:
-    """ Sames as {@link normalize_pr_reference()} but for issues. """
-
-  @abc.abstractmethod
-  def normalize_author(self, author: str) -> str:
-    """ Called to normalize the author name that was specified. """
-
-  def pr_shortform(self, pr: str) -> str | None:
-    return None
-
-  def issue_shortform(self, issue: str) -> str | None:
-    return None
-
-  @staticmethod
-  def null() -> 'ChangelogValidator':
-    return NullChangelogValidator()
-
-
-class NullChangelogValidator(ChangelogValidator):
-
-  def normalize_pr_reference(self, pr: str) -> str:
-    return pr
-
-  def normalize_issue_reference(self, issue: str) -> str:
-    return issue
-
-  def normalize_author(self, author: str) -> str:
-    return author
 
 
 class ManagedChangelog:
@@ -137,7 +125,7 @@ class ChangelogManager:
   directory: Path
 
   #: An instance for validation and normalization of issue and PR references.
-  validator: ChangelogValidator
+  vcs_host: VcsHost
 
   #: The name of the file that contains the unreleased changes.
   unreleased_fn: str = '_unreleased.toml'
@@ -146,7 +134,7 @@ class ChangelogManager:
   version_fn_template: str = '{version}.toml'
 
   #: A list of strings that represent the valid choices of changelog entry types.
-  valid_types: list[str] | None = dataclasses.field(default_factory=lambda: DEFAULT_VALID_TYPES[:])
+  valid_types: list[str] | None = None
 
   #: The de/serializer for changelogs.
   deser: ChangelogDeser = dataclasses.field(default_factory=TomlChangelogDeser)
@@ -191,15 +179,15 @@ class ChangelogManager:
     author is specified, it will be read from the *author* option or otherwise obtained via the #VcsRemote,
     if available. """
 
-    author = self.validator.normalize_author(author)
+    author = self.vcs_host.normalize_author(author)
 
     if self.valid_types is not None and change_type not in self.valid_types:
       raise ValueError(f'invalid change type: {change_type}')
 
     if pr is not None:
-      pr = self.validator.normalize_pr_reference(pr)
+      pr = self.vcs_host.normalize_pr(pr)
     if issues is not None:
-      issues = [self.validator.normalize_issue_reference(i) for i in issues]
+      issues = [self.vcs_host.normalize_issue(i) for i in issues]
 
     changelog_id = str(uuid.uuid4())
     return ChangelogEntry(
@@ -208,7 +196,8 @@ class ChangelogManager:
       description=description,
       author=author,
       pr=pr,
-      issues=issues or None)
+      issues=issues or None
+    )
 
   def validate_entry(self, entry: ChangelogEntry) -> None:
     if self.valid_types is not None and entry.type not in self.valid_types:
@@ -220,6 +209,8 @@ class ChangelogManager:
     if not all(entry.get_authors()):
       raise ValueError(f'empty string in author(s)')
     if entry.pr:
-      self.validator.normalize_pr_reference(entry.pr)
+      if self.vcs_host.normalize_pr(entry.pr) is None:
+        raise ValueError(f'invalid pr reference: {entry.pr}')
     for issue_url in entry.issues or []:
-      self.validator.normalize_issue_reference(issue_url)
+      if self.vcs_host.normalize_issue(issue_url) is None:
+        raise ValueError(f'invalid issue reference: {issue_url}')

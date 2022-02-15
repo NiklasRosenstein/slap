@@ -186,6 +186,7 @@ class ReleaseCommand(Command):
     plugins = []
     for plugin_name in self.config[project].plugins:
       plugin = load_entrypoint(ReleasePlugin, plugin_name)()
+      plugin.app = self.app
       plugin.io = self.io
       plugins.append(plugin)
     return plugins

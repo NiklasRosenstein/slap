@@ -4,6 +4,7 @@ from __future__ import annotations
 import abc
 import typing as t
 
+from databind.core.annotations import union
 from nr.util.generic import T
 
 if t.TYPE_CHECKING:
@@ -13,6 +14,7 @@ if t.TYPE_CHECKING:
   from slam.check import Check
   from slam.project import Package, Project
   from slam.release import VersionRef
+  from slam.util.vcs import VcsHost
 
 
 class ApplicationPlugin(t.Generic[T], abc.ABC):
@@ -76,6 +78,7 @@ class ReleasePlugin(abc.ABC):
 
   ENTRYPOINT = 'slam.plugins.release'
 
+  app: Application
   io: IO
 
   def get_version_refs(self, project: Project) -> list[VersionRef]:
@@ -91,3 +94,21 @@ class VersionIncrementingRulePlugin(abc.ABC):
   ENTRYPOINT = 'slam.plugins.version_incrementing_rule'
 
   def increment_version(self, version: Version) -> Version: ...
+
+
+@union(union.Subtypes.entrypoint('slam.plugins.vcs_host_provider'))
+class VcsHostProvider(abc.ABC):
+  """ A plugin class for providing a VCS remote for changelog and release management that can be defined in
+  the Slam configuration. """
+
+  @abc.abstractmethod
+  def get_vcs_host(self, project: Project) -> VcsHost: ...
+
+
+class VcsHostDetector(abc.ABC):
+  """ This plugin type is used to automatically detect a matching {@link VcsHost}. """
+
+  ENTRYPOINT = 'slam.plugins.vcs_host_detector'
+
+  @abc.abstractmethod
+  def detect_vcs_host(self, project: Project) -> VcsHost | None: ...

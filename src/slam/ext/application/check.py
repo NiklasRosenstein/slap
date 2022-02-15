@@ -10,7 +10,7 @@ from slam.plugins import ApplicationPlugin, CheckPlugin
 from slam.check import Check
 from slam.project import Project
 
-DEFAULT_PLUGINS = ['general', 'poetry', 'release']
+DEFAULT_PLUGINS = ['changelog', 'general', 'poetry', 'release']
 COLORS = {
   Check.Result.OK: 'green',
   Check.Result.RECOMMENDATION: 'magenta',

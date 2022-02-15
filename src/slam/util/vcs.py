@@ -97,6 +97,39 @@ class Vcs(abc.ABC):
   def detect(cls: type[T], path: Path) -> T | None: ...
 
 
+class VcsHost(abc.ABC):
+  """ Interface for performing actions on a VCS repository host provider and its particular instance. """
+
+  def normalize_pr(self, pr: str) -> str | None:
+    """ Normalize the PR reference, which may be in a short form or full form (e.g. PR ID vs URL) and return.
+    Return None if the PR is not in a normalized form and cannot be normalized. """
+
+    return None
+
+  def normalize_issue(self, issue: str) -> str | None:
+    """ Sames as {@link normalize_pr_reference()} but for issues. """
+
+  def normalize_author(self, author: str) -> str | None:
+    """ Normalize an author name, for example converting an email address to a username, or None if the author
+    does not adhere to a normal form and cannot be normalized. """
+
+    return None
+
+  def pr_shortform(self, pr: str) -> str | None:
+    """ Return the shortform of a normalized PR reference, or None if there is no shortform. """
+
+    return None
+
+  def issue_shortform(self, issue: str) -> str | None:
+    """ Return the shortform of a normalized issue reference, or None if there is no shortform. """
+
+    return None
+
+  @staticmethod
+  def null() -> 'VcsHost':
+    return VcsHost()
+
+
 class Git(Vcs):
 
   def __init__(self, directory: Path) -> None:
