@@ -27,7 +27,7 @@ classifiers = [
   "databind.core" = "^1.4.0"
   "databind.json" = "^1.4.0"
   flit = "^3.6.0"
-  "nr.util" = "^0.6.0"
+  "nr.util" = "^0.6.1"
   cleo = ">=1.0.0a4"
   poetry-core = "^1.1.0a6"
   pygments = "^2.11.2"
