@@ -219,12 +219,11 @@ class Git(Vcs):
       commit_command += ['-c', f'user.email={email}']
     if name:
       commit_command += ['-c', f'user.name={name}']
-    commit_command += ['commit', commit_message]
+    commit_command += ['commit', '-m', commit_message]
     if allow_empty:
       commit_command += ['--allow-empty']
     self._git.check_call(commit_command)
 
-    self._git.commit(commit_message, allow_empty=allow_empty)
     if tag_name is not None:
       self._git.tag(tag_name, force)
     if push is not None:
