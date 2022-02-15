@@ -181,6 +181,16 @@ class ChangelogUpdatePrCommand(Command):
     option(
       "push", "p",
       description="Push the changes, if any.",
+    ),
+    option(
+      "name",
+      description="The Git name to use when committing. Convenient to avoid manually configuring Git in CI first.",
+      flag=False,
+    ),
+    option(
+      "email",
+      description="The Git email to use when committing. Convenient to avoid manually configuring Git in CI first.",
+      flag=False,
     )
   ]
 
@@ -256,6 +266,11 @@ class ChangelogUpdatePrCommand(Command):
       self._remote = next((r for r in self._vcs.get_remotes() if r.default), None)
     else:
       self._remote = None
+
+    for opt in ('email', 'name'):
+      if self.option(opt) and not self.option("commit"):
+        self.line_error(f'error: <opt>--{opt}</opt> is not valid without <opt>--commit</opt>', 'error')
+        return False
 
     return True
 

@@ -82,10 +82,13 @@ class Vcs(abc.ABC):
     self,
     files: t.Sequence[Path],
     commit_message: str,
+    *,
     tag_name: str | None = None,
     push: Remote | None = None,
     force: bool = False,
     allow_empty: bool = False,
+    email: str | None = None,
+    name: str | None = None,
     log_line: Consumer[str] | None = None,
   ) -> None:
     """ Commit the given files into the VCS, and optionally create a tag with the given name. If a remote is specified
@@ -199,14 +202,28 @@ class Git(Vcs):
     self,
     files: t.Sequence[Path],
     commit_message: str,
+    *,
     tag_name: str | None = None,
     push: Remote | None = None,
     force: bool = False,
     allow_empty: bool = False,
+    email: str | None = None,
+    name: str | None = None,
     log_line: Consumer[str] | None = None,
   ) -> None:
     # TODO (@NiklasRosenstein): Capture stdout from Git subprocess and redirect to log_line().
     self._git.add([str(f.resolve()) for f in files])
+
+    commit_command = ['git']
+    if email:
+      commit_command += ['-c', f'user.email={email}']
+    if name:
+      commit_command += ['-c', f'user.name={name}']
+    commit_command += ['commit', commit_message]
+    if allow_empty:
+      commit_command += ['--allow-empty']
+    self._git.check_call(commit_command)
+
     self._git.commit(commit_message, allow_empty=allow_empty)
     if tag_name is not None:
       self._git.tag(tag_name, force)
