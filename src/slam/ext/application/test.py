@@ -24,7 +24,9 @@ class TestRunner:
     self.line_prefixing = line_prefixing
 
   def run(self) -> int:
+    from codecs import getreader
     import subprocess as sp
+    import sys
     from cleo.io.io import OutputType  # type: ignore[import]
     from ptyprocess import PtyProcessUnicode  # type: ignore[import]
 
@@ -36,7 +38,16 @@ class TestRunner:
     try:
       cols, rows = os.get_terminal_size()
     except OSError:
-      return sp.call(command, cwd=self.cwd)
+      sproc = sp.Popen(command, cwd=self.cwd, stdout=sp.PIPE, stderr=sp.STDOUT)
+      stdout = getreader(sys.getdefaultencoding())(sproc.stdout)
+      for line in iter(stdout.readline, ''):
+        line = line.rstrip()
+        if self.line_prefixing:
+          self.io.write(f'<fg={color}>{prefix}</fg>')
+        self.io.write(line + '\n', type=OutputType.NORMAL)
+      sproc.wait()
+      assert sproc.returncode is not None
+      return sproc.returncode
     else:
       proc = PtyProcessUnicode.spawn(command, dimensions=(rows, cols - len(prefix)), cwd=self.cwd)
       while not proc.eof():
