@@ -235,8 +235,9 @@ class ChangelogUpdatePrCommand(Command):
         continue
 
       num_updates += len(new_entry_ids)
+      path = changelog.path.relative_to(Path.cwd())
       self.line(
-        f'Updating PR reference in {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"}',
+        f'Updating {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"} in {path}',
         'comment'
       )
 
