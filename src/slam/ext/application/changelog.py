@@ -144,7 +144,7 @@ class ChangelogAddCommand(Command):
       assert vcs is not None
       commit_message = f'{change_type}: {description}'
       toplevel = vcs.get_toplevel()
-      relative = self.app.project_directory.relative_to(toplevel)
+      relative = self.app.get_main_project().directory.relative_to(toplevel)
       if relative != Path('.'):
         prefix = str(relative).replace("\\", "/").strip("/")
         commit_message = f'{prefix}/: {commit_message}'
@@ -472,7 +472,7 @@ class ChangelogCommandPlugin(ApplicationPlugin):
     return get_changelog_manager(app.get_main_project())
     #return {project: get_changelog_manager(project) for project in app.projects}
 
-  def activate(self, app: 'Application', config: dict[Project, ChangelogManager]) -> None:
+  def activate(self, app: 'Application', config: ChangelogManager) -> None:
     app.cleo.add(ChangelogAddCommand(app, config))
     app.cleo.add(ChangelogUpdatePrCommand(app, config))
     app.cleo.add(ChangelogFormatCommand(config))
@@ -482,19 +482,21 @@ class ChangelogCommandPlugin(ApplicationPlugin):
 def get_changelog_manager(project: Project) -> ChangelogManager:
     import databind.json
     from nr.util.plugins import iter_entrypoints
+    from slam.util.vcs import VcsHost
     config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
 
-    if project.config().remote:
-      vcs_host = project.config().remote.get_vcs_host(project)
+    vcs_host: VcsHost | None
+    if (provider := project.config().remote):
+      vcs_host = provider.get_vcs_host(project)
     else:
       vcs_host = None
-      for plugin_name, plugin in iter_entrypoints(VcsHostDetector):
+      for plugin_name, plugin in iter_entrypoints(VcsHostDetector):  # type: ignore[misc]
         vcs_host = plugin()().detect_vcs_host(project)
         if vcs_host:
           break
 
     return ChangelogManager(
       directory=project.directory / config.directory,
-      vcs_host=vcs_host,
+      vcs_host=vcs_host or VcsHost.null(),
       valid_types=config.valid_types,
     )

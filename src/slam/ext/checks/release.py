@@ -21,7 +21,7 @@ class ReleaseChecksPlugin(CheckPlugin):
 
   def _check_packages_have_source_code_version(self, project: Project) -> Check:
     if not project.packages():
-      return [Check('source-code-version', Check.Result.WARNING, 'No packages detected')]
+      return Check('source-code-version', Check.Result.WARNING, 'No packages detected')
 
     matcher = SourceCodeVersionReferencesPlugin()
     matcher.io = NullIO()

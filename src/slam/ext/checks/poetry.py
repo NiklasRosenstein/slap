@@ -31,7 +31,8 @@ class PoetryChecksPlugin(CheckPlugin):
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
     self.project = project
-    self.poetry = project.pyproject_toml.value_or({}).get('tool', {}).get('poetry')
+    pyproject: dict[str, t.Any] = project.pyproject_toml.value_or({})
+    self.poetry = pyproject.get('tool', {}).get('poetry')
     if self.poetry is not None:
       yield self._check_poetry_readme()
       yield self._check_urls()

@@ -130,5 +130,5 @@ class GithubVcsHostDetector(VcsHostDetector):
 class GithubVcsHostProvider(VcsHostProvider):
   repo: str
 
-  def get_changelog_validator(self, app: Application) -> VcsHost:
+  def get_vcs_host(self, project: Project) -> VcsHost:
     return GithubVcsHost(self.repo)

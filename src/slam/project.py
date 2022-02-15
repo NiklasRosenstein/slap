@@ -29,14 +29,14 @@ class Package:
 class ProjectConfig:
   #: The name of the project handler plugin. If none is specified, the built-in project handlers are tested
   #: (see the {@link slam.ext.project_handlers} module for more info on those).
-  handler: str = None
+  handler: str | None = None
 
   #: The source directory to use when relying on automatic package detection. If not set, the default project
   #: handler will search in `"src/"`` and then `"./"``.
   source_directory: t.Annotated[str | None, alias('source-directory')] = None
 
-  #: Whether the project source code is inteded to be typed. Defaults to `true`.
-  typed: bool = True
+  #: Whether the project source code is inteded to be typed.
+  typed: bool | None = None
 
   #: Configuration for the remote VCS that is used for changelogs and creating releases. If it is not specified,
   #: it will try to detect one from the builtin VCS remotes (see the {@link slam.ext.vcs_remotes} module).
@@ -124,7 +124,7 @@ class Project:
 
     config = self.config()
     if config.handler:
-      handler = load_entrypoint(ProjectHandlerPlugin, config.handler)()
+      handler = load_entrypoint(ProjectHandlerPlugin, config.handler)()  # type: ignore[misc]
       if not handler.matches_project(self):
         logger.error(
           'Project handler <obj>%s</obj> for project <subj>%s</subj> does not seem to match the project',
@@ -157,7 +157,7 @@ class Project:
       )
     return packages
 
-  def get_dist_name(self) -> str:
+  def get_dist_name(self) -> str | None:
     return self.handler().get_dist_name(self)
 
   @property

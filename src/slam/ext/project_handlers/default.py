@@ -1,7 +1,7 @@
 
 """ Implements the default package detection plugin. """
 
-from distutils.config import PyPIRCCommand
+import typing as t
 from pathlib import Path
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
@@ -53,8 +53,8 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
 
   def get_dist_name(self, project: Project) -> str | None:
     if not project.is_python_project:
-      return
-    pyproject = project.pyproject_toml.value_or({})
+      return None
+    pyproject: dict[str, t.Any] = project.pyproject_toml.value_or({})
     if (name := pyproject.get('project', {}).get('name')):
       return name
     if (name := pyproject.get('tool', {}).get('poetry', {}).get('name')):
@@ -63,8 +63,8 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
 
   def get_readme(self, project: Project) -> str | None:
     if not project.is_python_project:
-      return
-    pyproject = project.pyproject_toml.value_or({})
+      return None
+    pyproject: dict[str, t.Any] = project.pyproject_toml.value_or({})
     if (readme := pyproject.get('tool', {}).get('poetry', {}).get('readme')):
       return readme
     return None

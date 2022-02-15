@@ -7,7 +7,7 @@ from nr.util.plugins import load_entrypoint
 
 from slam.application import Application, Command, option
 from slam.plugins import ApplicationPlugin, CheckPlugin
-from slam.check import Check
+from slam.check import Check, CheckResult
 from slam.project import Project
 
 DEFAULT_PLUGINS = ['changelog', 'general', 'poetry', 'release']
@@ -48,7 +48,7 @@ class CheckCommand(Command):
 
   def handle(self) -> int:
 
-    counter: t.Mapping[Check.Result, int] = collections.defaultdict(int)
+    counter: t.MutableMapping[CheckResult, int] = collections.defaultdict(int)
     if self.app.is_monorepo:
       for check in self._run_application_checks():
         counter[check.result] += 1

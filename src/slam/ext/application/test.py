@@ -155,7 +155,7 @@ class TestCommand(Command):
     return 0 if set(results.values()) == {0} else 1
 
 
-class TestCommandPlugin(ApplicationPlugin[dict[str, str]]):
+class TestCommandPlugin(ApplicationPlugin[list[Test]]):
 
   def load_configuration(self, app: Application) -> list[Test]:
     tests = []

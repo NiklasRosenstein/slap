@@ -110,6 +110,7 @@ class CleoApplication(BaseCleoApplication):
 
     logging.basicConfig(level=level)
     formatter = TerminalColorFormatter('%(asctime)s | %(levelname)s | %(name)s | %(message)s')
+    assert formatter.styles
     formatter.styles.add_style('subj', 'blue')
     formatter.styles.add_style('obj', 'yellow')
     formatter.styles.add_style('val', 'cyan')
@@ -163,12 +164,16 @@ class Application:
   def __init__(self, name: str = 'slam', version: str = __version__) -> None:
     from nr.util.functional import Once
 
+    def _init_app():
+      self.load_projects()
+      self.load_plugins()
+
     self._projects_loaded = False
     self._plugins_loaded = False
     self.projects = []
     self.root_project = Once(self.get_root_project)
     self.config = Once(self.get_application_configuration)
-    self.cleo = CleoApplication(lambda: [self.load_projects(), self.load_plugins()], name, version)
+    self.cleo = CleoApplication(_init_app, name, version)
     self.vcs = Once(self.get_vcs)
 
   @property
@@ -188,7 +193,8 @@ class Application:
 
     from slam.project import Project
 
-    toplevel = self.vcs().get_toplevel().resolve()
+    vcs = self.vcs()
+    toplevel = vcs.get_toplevel().resolve() if vcs else None
     project: Project | None = None
 
     for path in walk_up(Path.cwd()):
@@ -322,7 +328,7 @@ class Application:
 
     for plugin_name in plugin_names:
       try:
-        plugin = load_entrypoint(ApplicationPlugin, plugin_name)()
+        plugin = load_entrypoint(ApplicationPlugin, plugin_name)()  # type: ignore[misc]
       except Exception:
         logger.exception('Could not load plugin <subj>%s</subj> due to an exception', plugin_name)
       else:

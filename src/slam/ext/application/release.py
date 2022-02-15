@@ -196,7 +196,7 @@ class ReleaseCommand(Command):
 
     max_w1 = max(len(str(ref.file)) for ref in version_refs) + 1
     max_w2 = max(len(ref.value) for ref in version_refs)
-    prev = None
+    prev: VersionRef | None = None
     for ref in sorted(version_refs, key=lambda r: r.file):
       filename = str(ref.file) + ':' if not prev or prev.file != ref.file else ''
       self.io.write(f'  <fg=cyan>{(filename).ljust(max_w1)}</fg> {ref.value.ljust(max_w2)}')
@@ -241,16 +241,18 @@ class ReleaseCommand(Command):
     if not self.is_git_repository or self.option("no-branch-check"):
       return True
 
+    config = self.config[self.app.root_project()]
+
     try:
       current_branch = self.git.get_current_branch_name()
     except NoCurrentBranchError:
       self.line_error(f'error: not currently on a Git branch', 'error')
       return False
 
-    if current_branch != self.config.branch:
+    if current_branch != config.branch:
       self.line_error(
         f'error: current branch is <b>{current_branch}</b> but must be on the '
-          f'release branch (<b>{self.config.branch}</b>)', 'error'
+          f'release branch (<b>{config.branch}</b>)', 'error'
       )
       return False
     return True
@@ -357,14 +359,16 @@ class ReleaseCommand(Command):
 
     # TODO (@NiklasRosenstein): If this step errors, revert the changes made by the command so far?
 
-    if '{version}' not in self.config.tag_format:
+    config = self.config[self.app.root_project()]
+
+    if '{version}' not in config.tag_format:
       self.line_error('<info>tool.slam.release.tag-format<info> must contain <info>{version}</info>', 'error')
       sys.exit(1)
-    tag_name = self.config.tag_format.replace('{version}', target_version)
+    tag_name = config.tag_format.replace('{version}', target_version)
     self.line(f'tagging <fg=cyan>{tag_name}</fg>')
 
     if not dry:
-      commit_message = self.config.commit_message.replace('{version}', target_version)
+      commit_message = config.commit_message.replace('{version}', target_version)
       self.git.add([str(f) for f in changed_files])
       self.git.commit(commit_message, allow_empty=True)
       self.git.tag(tag_name, force=force)
@@ -382,41 +386,6 @@ class ReleaseCommand(Command):
 
     if not dry:
       self.git.push(remote, branch, tag_name, force=force)
-
-  def _increment_version(self, version: t.Optional['Version'], rule: str) -> "Version":
-    """ Internal. Increment a version according to a rule. This is mostly copied from the Poetry `VersionCommand`. """
-
-    from poetry.core.semver.version import Version
-
-    if not version:
-      try:
-        Version.parse(rule)
-      except ValueError:
-        self.line_error('error: current version could not be automatically determined, need explicit version', 'error')
-        sys.exit(1)
-
-    if rule in {"major", "premajor"}:
-      new = version.next_major()
-      if rule == "premajor":
-        new = new.first_prerelease()
-    elif rule in {"minor", "preminor"}:
-      new = version.next_minor()
-      if rule == "preminor":
-        new = new.first_prerelease()
-    elif rule in {"patch", "prepatch"}:
-      new = version.next_patch()
-      if rule == "prepatch":
-        new = new.first_prerelease()
-    elif rule == "prerelease":
-      if version.is_unstable():
-        assert version.pre
-        new = Version(version.epoch, version.release, version.pre.next())
-      else:
-        new = version.next_patch().first_prerelease()
-    else:
-      new = Version.parse(rule)
-
-    return new
 
   def _get_version_refs(self) -> list[VersionRef]:
     """ Extracts all version references in the projects controlled by the application and returns them. """

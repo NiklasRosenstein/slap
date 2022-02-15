@@ -59,10 +59,6 @@ class LinkCommand(Command):
     super().__init__()
     self.app = app
 
-  def _save_pyproject(self, data: dict[str, t.Any]) -> None:
-    self.app.pyproject.value(data)
-    self.app.pyproject.save()
-
   def _get_source_directory(self) -> Path:
     directory = Path.cwd()
     if (src_dir := directory / 'src').is_dir():

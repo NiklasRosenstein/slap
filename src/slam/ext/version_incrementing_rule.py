@@ -1,7 +1,7 @@
 
 import typing as t
 
-from poetry.core.semver.version import Version
+from poetry.core.semver.version import Version  # type: ignore[import]
 
 from slam.plugins import VersionIncrementingRulePlugin
 
