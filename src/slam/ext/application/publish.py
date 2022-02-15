@@ -60,7 +60,7 @@ class PublishCommand(Command):
   name = "publish"
 
   options = [
-    option("repository", "r", flag=False),
+    option("repository", "r", flag=False, default='pypi'),
     option("repository-url", flag=False),
     option("sign", "s"),
     option("sign-with", flag=False),
