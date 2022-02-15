@@ -23,7 +23,7 @@ def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef':
   with open(filename) as fp:
     match = compiled_pattern.search(fp.read())
     if match:
-      return VersionRef(filename, match.start(1), match.end(1), match.group(1))
+      return VersionRef(filename, match.start(1), match.end(1), match.group(1), match.group(0))
 
   raise ValueError(f'pattern {pattern!r} does not match in file {filename!r}')
 
@@ -36,6 +36,7 @@ class VersionRef:
   start: int
   end: int
   value: str
+  content: str
 
   def __post_init__(self) -> None:
     assert isinstance(self.file, Path), self

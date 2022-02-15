@@ -12,7 +12,7 @@ class ChangelogConsistencyCheck(CheckPlugin):
 
   manager: ChangelogManager
 
-  def get_checks(self, app: Application) -> t.Iterable[Check]:
+  def get_project_checks(self, app: Application) -> t.Iterable[Check]:
     yield self._check_changelogs()
 
   def _check_changelogs(self) -> Check:

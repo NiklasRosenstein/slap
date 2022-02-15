@@ -10,6 +10,7 @@ from slam.plugins import ApplicationPlugin, CheckPlugin
 from slam.check import Check
 from slam.project import Project
 
+DEFAULT_PLUGINS = ['general', 'poetry', 'release']
 COLORS = {
   Check.Result.OK: 'green',
   Check.Result.RECOMMENDATION: 'magenta',
@@ -22,7 +23,7 @@ COLORS = {
 @dataclasses.dataclass
 class CheckConfig:
   #: A list of checks that are enabled for the project.
-  enable: list[str] = dataclasses.field(default_factory=lambda: ['general', 'poetry'])#, 'poetry', 'release'])
+  plugins: list[str] = dataclasses.field(default_factory=lambda: DEFAULT_PLUGINS[:])
 
 
 class CheckCommand(Command):
@@ -40,7 +41,7 @@ class CheckCommand(Command):
     )
   ]
 
-  def __init__(self, app: Application, config: CheckConfig):
+  def __init__(self, app: Application, config: dict[Project, CheckConfig]):
     super().__init__()
     self.app = app
     self.config = config
@@ -48,8 +49,12 @@ class CheckCommand(Command):
   def handle(self) -> int:
 
     counter: t.Mapping[Check.Result, int] = collections.defaultdict(int)
+    if self.app.is_monorepo:
+      for check in self._run_application_checks():
+        counter[check.result] += 1
     for project in self.app.projects:
-      for check in self._run_checks(project, self.app.is_monorepo):
+      if not project.is_python_project: continue
+      for check in self._run_project_checks(project):
         counter[check.result] += 1
 
     if self.option("warnings-as-errors") and counter.get(Check.WARNING, 0) > 0:
@@ -59,36 +64,14 @@ class CheckCommand(Command):
     else:
       exit_code = 0
 
-    self.line('')
     self.line(f'Summary: ' + ', '.join(f'{count} <fg={COLORS[result]};options=bold>{result.name}</fg>'
       for result, count in sorted(counter.items())) + f', exit code: {exit_code}')
 
     return exit_code
 
-  def _run_checks(self, project: Project, print_project_header: bool) -> t.Iterator[Check]:
-
-    import databind.json
-    config = databind.json.load(project.raw_config().get('check', {}), CheckConfig)
-
-    plugins: dict[str, CheckPlugin] = {}
-    for plugin_name in config.enable:
-      plugins[plugin_name] = load_entrypoint(CheckPlugin, plugin_name)()
-
-    checks = []
-    for plugin_name, plugin in sorted(plugins.items(), key=lambda t: t[0]):
-      for check in sorted(plugin.get_checks(project), key=lambda c: c.name):
-        check.name = f'{plugin_name}:{check.name}'
-        yield check
-        checks.append(check)
-
+  def _print_checks(self, checks: t.Sequence[Check]) -> None:
     max_w = max(len(c.name) for c in checks)
-
     for check in checks:
-
-      if print_project_header:
-        self.line(f'Checks for project <info>{project.id}</info>')
-        self.line('')
-        print_project_header = False
 
       if not self.option("show-skipped") and check.result == Check.SKIPPED:
         continue
@@ -103,11 +86,52 @@ class CheckCommand(Command):
         for line in check.details.splitlines():
           self.io.write_line(f'    {line}')
 
+  def _run_project_checks(self, project: Project) -> t.Iterator[Check]:
+    checks = []
+    for plugin_name in sorted(self.config[project].plugins):
+      plugin = load_entrypoint(CheckPlugin, plugin_name)()
+      for check in sorted(plugin.get_project_checks(project), key=lambda c: c.name):
+        check.name = f'{plugin_name}:{check.name}'
+        yield check
+        checks.append(check)
+      if not self.app.is_monorepo:
+        for check in sorted(plugin.get_application_checks(self.app), key=lambda c: c.name):
+          check.name = f'{plugin_name}:{check.name}'
+          yield check
+          checks.append(check)
+
+    if checks:
+      if self.app.is_monorepo:
+        self.line(f'Checks for project <info>{project.id}</info>')
+        self.line('')
+      self._print_checks(checks)
+      self.line('')
+
+  def _run_application_checks(self) -> t.Iterable[Check]:
+    plugin_names = {p for project in self.app.projects for p in self.config[project].plugins}
+    checks = []
+    for plugin_name in sorted(plugin_names):
+      plugin = load_entrypoint(CheckPlugin, plugin_name)()
+      for check in sorted(plugin.get_application_checks(self.app), key=lambda c: c.name):
+        check.name = f'{plugin_name}:{check.name}'
+        yield check
+        checks.append(check)
+
+    if checks:
+      self.line(f'Global checks:')
+      self._print_checks(checks)
+      self.line('')
+
 
 class CheckCommandPlugin(ApplicationPlugin):
 
-  def load_configuration(self, app: 'Application') -> None:
-    return None
+  def load_configuration(self, app: 'Application') -> dict[Project, CheckConfig]:
+    import databind.json
+    result = {}
+    for project in app.projects:
+      config = databind.json.load(project.raw_config().get('check', {}), CheckConfig)
+      result[project] = config
+    return result
 
-  def activate(self, app: 'Application', config: None) -> None:
-    app.cleo.add(CheckCommand(app, None))
+  def activate(self, app: 'Application', config: dict[Project, CheckConfig]) -> None:
+    app.cleo.add(CheckCommand(app, config))

@@ -29,7 +29,7 @@ def get_readme_path(project: Project) -> Path | None:
 class PoetryChecksPlugin(CheckPlugin):
   """ Check plugin to validate the Poetry configuration and compare it with Slam's expectations. """
 
-  def get_checks(self, project: Project) -> t.Iterable[Check]:
+  def get_project_checks(self, project: Project) -> t.Iterable[Check]:
     self.project = project
     self.poetry = project.pyproject_toml.value_or({}).get('tool', {}).get('poetry')
     if self.poetry is not None:

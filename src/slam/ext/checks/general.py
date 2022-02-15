@@ -10,12 +10,12 @@ class GeneralChecksPlugin(CheckPlugin):
 
   # TODO (@NiklasRosenstein): Check if VCS remote is configured?
 
-  def get_checks(self, project: Project) -> t.Iterable[Check]:
+  def get_project_checks(self, project: Project) -> t.Iterable[Check]:
     yield self._check_detect_packages(project)
     yield self._check_py_typed(project)
 
   def _check_detect_packages(self, project: Project) -> Check:
-    packages = project.get_packages()
+    packages = project.packages()
     return Check(
       'packages',
       Check.Result.OK if packages else Check.Result.ERROR,
@@ -30,7 +30,7 @@ class GeneralChecksPlugin(CheckPlugin):
 
     has_py_typed = set[str]()
     has_no_py_typed = set[str]()
-    for package in project.get_packages():
+    for package in project.packages():
       (has_py_typed if (package.path / 'py.typed').is_file() else has_no_py_typed).add(package.name)
 
     if expect_typed and has_no_py_typed:

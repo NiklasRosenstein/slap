@@ -1,26 +1,53 @@
 
+from __future__ import annotations
+
+import dataclasses
+from multiprocessing.sharedctypes import Value
 import sys
 import typing as t
 from pathlib import Path
 
-import databind.json
+from databind.core.annotations import alias
 
-from slam.application import Application, ApplicationPlugin, Command, argument, option
-from slam.commands.check.api import CheckPlugin
-from slam.commands.release.api import ReleasePlugin
-from slam.util.toml_file import TomlFile
-from .api import VersionRef
-from .builtin import SourceCodeVersionMatcherPlugin, VersionRefConfigMatcherPlugin
-from .checks import ReleaseChecksPlugin
-from .config import ReleaseConfig
+from slam.application import Application, Command, argument, option
+from slam.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRulePlugin
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
+  from slam.project import Project
+  from slam.release import VersionRef
+
+
+@dataclasses.dataclass
+class VersionRefConfig:
+  file: str
+  pattern: str
+
+
+@dataclasses.dataclass
+class ReleaseConfig:
+  #: The VCS branch on which releases are allowed. The release command will prevent you from creating a release
+  #: while on a different branch (unless `--no-branch-check` is set).
+  branch: str = 'develop'
+
+  #: The template for the commit message when a release is created and the `--tag, -t` option is used.
+  commit_message: t.Annotated[str, alias('commit-message')] = 'release {version}'
+
+  #: The template for the tag name when a release is created and the `--tag, -t` option is used.
+  tag_format: t.Annotated[str, alias('tag-format')] = '{version}'
+
+  #: A list of references to the version number that should be updated along with the version numbers
+  #: that the release command knows about by default (like the `version` in `pyproject.toml` and the
+  #: version number in the source code).
+  references: list[VersionRefConfig] = dataclasses.field(default_factory=list)
+
+  #: A list of {@link ReleasePlugin}s to use. Defaults to contain the {@link SourceCodeVersionReferencesPlugin}
+  #: and {@link ChangelogReleasePlugin}.
+  plugins: list[str] = dataclasses.field(default_factory=lambda: ['source_code_version', 'changelog_release'])
 
 
 class ReleaseCommand(Command):
-  """
-  Create a new release of your Python package.
+  """ Create a new release of your Python package.
 
   This command can perform the following operations in sequence (most of them need
   to be enabled explicitly with flags):
@@ -113,38 +140,37 @@ class ReleaseCommand(Command):
 
   # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
-  def __init__(self, config: ReleaseConfig, app: Application, pyproject: TomlFile):
+  def __init__(self, app: Application, config: dict[Project, ReleaseConfig]):
     super().__init__()
-    self.config = config
     self.app = app
-    self.pyproject = pyproject
+    self.config = config
 
   def _validate_options(self) -> int:
     """ Internal. Ensures that the combination of provided options make sense. """
 
     if self.option("dry") and self.option("validate"):
-      self.line_error('error: --dry cannot be combined with --validate', 'error')
+      self.line_error('error: <opt>--dry</opt> cannot be combined with <opt>--validate</opt>', 'error')
       return 1
     if self.option("tag") and self.option("validate"):
-      self.line_error('error: --tag cannot be combined with --validate', 'error')
+      self.line_error('error: <opt>--tag</opt> cannot be combined with <opt>--validate</opt>', 'error')
       return 1
     if self.option("push") and not self.option("tag"):
-      self.line_error('error: --push can only be combined with --tag', 'error')
+      self.line_error('error: <opt>--push</opt> can only be combined with <opt>--tag</opt>', 'error')
       return 1
     if self.option("force") and not self.option("tag"):
-      self.line_error('error: --force can only be combined with --tag and --push', 'error')
+      self.line_error('error: <opt>--force</opt> can only be combined with <opt>--tag</opt> and <opt>--push</opt>', 'error')
       return 1
     if self.option("remote") is not None and not self.option("push"):
-      self.line_error('error: --remote can only be combined with --push', 'error')
+      self.line_error('error: <opt>--remote</opt> can only be combined with <opt>--push</opt>', 'error')
       return 1
 
     self.io.input.set_option("remote", self.option("remote") or "origin")
 
     if self.option("tag") and not self.is_git_repository:
-      self.line_error('error: not in a git repository, cannot use --tag', 'error')
+      self.line_error('error: not in a git repository, cannot use <opt>--tag</opt>', 'error')
       return 1
     if self.option("push") and not self.is_git_repository:
-      self.line_error('error: not in a git repository, cannot use --push', 'error')
+      self.line_error('error: not in a git repository, cannot use <opt>--push</opt>', 'error')
       return 1
     if self.option("push") and (remote := self.option("remote")) not in {r.name for r in self.git.remotes()}:
       self.line_error(f'error: git remote "{remote}" does not exist', 'error')
@@ -152,25 +178,31 @@ class ReleaseCommand(Command):
 
     return 0
 
-  def _load_plugins(self) -> list[ReleasePlugin]:
-    """ Internal. Loads the plugins to be used in the run of `poetry release`. """
+  def _load_plugins(self, project: Project) -> list[ReleasePlugin]:
+    """ Internal. Loads the plugins for the given project. """
 
-    for path in self.config.include:
-      self.app.load_subapp(path)
+    from nr.util.plugins import load_entrypoint
 
     plugins = []
-    for app in [self.app] + self.app.subapps:
-      for plugin_name, plugin in app.plugins.group(ReleasePlugin, ReleasePlugin):
-        plugins.append(plugin)
-
+    for plugin_name in self.config[project].plugins:
+      plugin = load_entrypoint(ReleasePlugin, plugin_name)()
+      plugin.io = self.io
+      plugins.append(plugin)
     return plugins
 
-  def _show_version_refs(self, version_refs: list[VersionRef]) -> None:
+  def _show_version_refs(self, version_refs: list[VersionRef], increment_to: str | None = None) -> None:
     """ Internal. Prints the version references to the terminal. """
 
-    max_length = max(len(str(ref.file)) for ref in version_refs)
-    for ref in version_refs:
-      self.line(f'  <fg=cyan>{str(ref.file).ljust(max_length)}</fg> {ref.value}')
+    max_w1 = max(len(str(ref.file)) for ref in version_refs) + 1
+    max_w2 = max(len(ref.value) for ref in version_refs)
+    prev = None
+    for ref in sorted(version_refs, key=lambda r: r.file):
+      filename = str(ref.file) + ':' if not prev or prev.file != ref.file else ''
+      self.io.write(f'  <fg=cyan>{(filename).ljust(max_w1)}</fg> {ref.value.ljust(max_w2)}')
+      if increment_to:
+        self.io.write(f' → <b>{increment_to}</b>')
+      self.io.write_line(f' <fg=dark_gray># {ref.content}</fg>')
+      prev = ref
 
   def _validate_version_refs(self, version_refs: list[VersionRef], version: str | None) -> int:
     """ Internal. Verifies the consistency of the given version references. This is used when `--validate` is set. """
@@ -250,37 +282,50 @@ class ReleaseCommand(Command):
     return True
 
   def _get_current_version(self, version_refs: list[VersionRef]) -> 'Version':
-    from poetry.core.semver.version import Version
-    current_version = next((r.value for r in version_refs if r.file.name == 'pyproject.toml'), None)
-    if current_version is None:
-      self.line_error(f'error: could not find version in <u>pyproject.toml</u>', 'error')
-      sys.exit(1)
-    return Version.parse(current_version)
+    """ Try to identify the current version number among the version refs. This is done by selecting all versions
+    that occur in a `pyproject.toml`, and if they are all equal, they are considered the current version. If they
+    are different, a {@link ValueError} is raised. """
 
-  def _bump_version(self, version_refs: list[VersionRef], version: str, dry: bool) -> tuple[str, list[Path]]:
+    from poetry.core.semver.version import Version
+
+    current_version = {r.value for r in version_refs if r.file.name == 'pyproject.toml'}
+    if len(current_version) != 1:
+      raise ValueError('could not determine current version number')
+
+    return Version.parse(next(iter(current_version)))
+
+  def _get_new_version(self, version_refs: list[VersionRef], rule: str) -> 'Version':
+    """ Return the new version, based on *rule*. If *rule* is a version string, it is used as the new version.
+    Otherwise, it is considered a rule and the applicable rule plugin is invoked to construct the new version. """
+
+    from poetry.core.semver.version import Version
+    from nr.util.plugins import load_entrypoint, NoSuchEntrypointError
+
+    try:
+      return Version.parse(rule)
+    except ValueError:
+      try:
+        plugin = load_entrypoint(VersionIncrementingRulePlugin, rule)
+      except NoSuchEntrypointError:
+        self.line(f'error: "<b>{rule}</b> is not a valid version incrementing rule', 'error')
+        sys.exit(1)
+      return plugin().increment_version(self._get_current_version(version_refs))
+
+  def _bump_version(self, version_refs: list[VersionRef], target_version: Version, dry: bool) -> list[Path]:
     """ Internal. Replaces the version reference in all files with the specified *version*. """
 
     from nr.util import Stream
     from slam.util.text import substitute_ranges
 
-    self.line(f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"}')
+    self.line(
+      f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"} to '
+      f'<b>{target_version}</b>'
+    )
 
-    if self.app.pyproject.exists():
-      current_version = self._get_current_version(version_refs)
-    else:
-      current_version = None
-    target_version = str(self._increment_version(current_version, version))
     changed_files: list[Path] = []
 
-    for filename, refs in Stream(version_refs).groupby(lambda r: r.file, lambda it: list(it)):
-      if len(refs) == 1:
-        ref = refs[0]
-        self.line(f'  <fg=cyan>{ref.file}</fg>: {ref.value} → {target_version}')
-      else:
-        self.line(f'  <fg=cyan>{ref.file}</fg>:')
-        for ref in refs:
-          self.line(f'    {ref.value} → {target_version}')
-
+    self._show_version_refs(version_refs, target_version)
+    for filename, refs in Stream(version_refs).groupby(lambda r: r.file):
       with open(filename) as fp:
         content = fp.read()
 
@@ -294,15 +339,15 @@ class ReleaseCommand(Command):
         with open(filename, 'w') as fp:
           fp.write(content)
 
-    # Delegate to the plugins to perform any remaining changes.
-    for plugin in self.plugins:
-      try:
-        changed_files.extend(plugin.bump_to_version(target_version, dry, self.io))
-      except:
-        self.line_error(f'error with {type(plugin).__name__}.bump_version()', 'error')
-        raise
+    for project in self.app.projects:
+      for plugin in self._load_plugins(project):
+        try:
+          changed_files.extend(plugin.create_release(project, target_version, dry))
+        except:
+          self.line_error(f'error with {type(plugin).__name__}.bump_version()', 'error')
+          raise
 
-    return target_version, changed_files
+    return changed_files
 
   def _create_tag(self, target_version: str, changed_files: list[Path], dry: bool, force: bool) -> str:
     """ Internal. Used when --tag is specified to create a Git tag. """
@@ -372,6 +417,46 @@ class ReleaseCommand(Command):
 
     return new
 
+  def _get_version_refs(self) -> list[VersionRef]:
+    """ Extracts all version references in the projects controlled by the application and returns them. """
+
+    from slam.release import match_version_ref_pattern
+
+    PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
+
+    version_refs = []
+
+    # Understand the version references defined in the project configuration.
+    for project in self.app.projects:
+      references = self.config[project].references[:]
+
+      # Always consider the version number in the pyproject.toml.
+      if project.pyproject_toml.exists():
+        pyproject_ref_config = VersionRefConfig(
+          str(project.pyproject_toml.path.relative_to(project.directory)),
+          PYPROJECT_TOML_PATTERN
+        )
+        references.insert(0, pyproject_ref_config)
+
+      for config in references:
+        pattern = config.pattern.replace('{version}', r'(.*?)')
+        version_ref = match_version_ref_pattern(project.directory / config.file, pattern)
+        if version_ref is not None:
+          version_refs.append(version_ref)
+
+    # Query plugins for additional version references.
+    for project in self.app.projects:
+      for plugin in self._load_plugins(project):
+        version_refs += plugin.get_version_refs(project)
+
+    version_refs.sort(key=lambda r: r.file)
+
+    for ref in version_refs:
+      if ref.file == ref.file.absolute():
+        ref.file = ref.file.relative_to(Path.cwd())
+
+    return version_refs
+
   def handle(self) -> int:
     """ Entrypoint for the command."""
 
@@ -384,18 +469,15 @@ class ReleaseCommand(Command):
     if (err := self._validate_options()) != 0:
       return err
 
-    self.plugins = self._load_plugins()
-    version_refs = Stream(plugin.get_version_refs(self.io) for plugin in self.plugins).concat().collect()
-    version_refs.sort(key=lambda r: r.file)
-    for ref in version_refs:
-      if ref.file == ref.file.absolute():
-        ref.file = ref.file.relative_to(Path.cwd())
+    version_refs = self._get_version_refs()
 
     version = self.argument("version")
 
     if self.option("validate"):
-      if not version and self.app.pyproject.exists():
+      try:
         version = str(self._get_current_version(version_refs))
+      except ValueError:
+        version = None
       return self._validate_version_refs(version_refs, version)
 
     if version is not None:
@@ -405,7 +487,8 @@ class ReleaseCommand(Command):
         return 1
       if self.option("dry"):
         self.line('dry mode enabled, no changes will be committed to disk', 'comment')
-      target_version, changed_files = self._bump_version(version_refs, version, self.option("dry"))
+      target_version = self._get_new_version(version_refs, version)
+      changed_files = self._bump_version(version_refs, target_version, self.option("dry"))
       if self.option("tag"):
         tag_name = self._create_tag(target_version, changed_files, self.option("dry"), self.option("force"))
         if self.option("push"):
@@ -422,14 +505,14 @@ class ReleaseCommand(Command):
 
 class ReleaseCommandPlugin(ApplicationPlugin):
 
-  def load_configuration(self, app: Application) -> ReleaseConfig:
-    data = app.raw_config().get('release', {})
-    return databind.json.load(data, ReleaseConfig)
+  def load_configuration(self, app: Application) -> dict[Project, ReleaseConfig]:
+    import databind.json
 
-  def activate(self, app: Application, config: ReleaseConfig) -> None:
-    app.plugins.register(ReleasePlugin, 'builtins.SourceCodeVersionMatcherPlugin',
-      lambda: SourceCodeVersionMatcherPlugin(app.get_packages()))
-    app.plugins.register(ReleasePlugin, 'builtins.VersionRefConfigMatcherPlugin',
-      lambda: VersionRefConfigMatcherPlugin(app.pyproject.path, config.references))
-    app.plugins.register(CheckPlugin, 'release', ReleaseChecksPlugin())
-    app.cleo.add(ReleaseCommand(config, app, app.pyproject))
+    result = {}
+    for project in app.projects:
+      data = project.raw_config().get('release', {})
+      result[project] = databind.json.load(data, ReleaseConfig)
+    return result
+
+  def activate(self, app: Application, config: dict[Project, ReleaseConfig]) -> None:
+    app.cleo.add(ReleaseCommand(app, config))

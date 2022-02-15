@@ -56,7 +56,7 @@ classifiers = [
   check = "slam.ext.application.check:CheckCommandPlugin"
   link = "slam.ext.application.link:LinkCommandPlugin"
   # log = "slam.commands.log.command:LogCommandPlugin"
-  # release = "slam.commands.release.command:ReleaseCommandPlugin"
+  release = "slam.ext.application.release:ReleaseCommandPlugin"
   test = "slam.ext.application.test:TestCommandPlugin"
   # poetry = "slam.poetry.plugin:PoetryPlugin"
   # github = "slam.changelog.ext.github:GithubApplicationPlugin"
@@ -64,8 +64,22 @@ classifiers = [
   [tool.poetry.plugins."slam.plugins.check"]
   general = "slam.ext.checks.general:GeneralChecksPlugin"
   poetry = "slam.ext.checks.poetry:PoetryChecksPlugin"
+  release = "slam.ext.checks.release:ReleaseChecksPlugin"
   # [tool.poetry.plugins."slam.plugins.check"]
   # github = "slam.changelog.ext.github:GithubRemoteProvider"
+
+  [tool.poetry.plugins."slam.plugins.release"]
+  changelog_release = "slam.ext.release.changelog:ChangelogReleasePlugin"
+  source_code_version = "slam.ext.release.source_code_version:SourceCodeVersionReferencesPlugin"
+
+  [tool.poetry.plugins."slam.plugins.version_incrementing_rule"]
+  major = "slam.ext.version_incrementing_rule:major"
+  premajor = "slam.ext.version_incrementing_rule:premajor"
+  minor = "slam.ext.version_incrementing_rule:minor"
+  preminor = "slam.ext.version_incrementing_rule:preminor"
+  patch = "slam.ext.version_incrementing_rule:patch"
+  prepatch = "slam.ext.version_incrementing_rule:prepatch"
+  prerelease = "slam.ext.version_incrementing_rule:prerelease"
 
 [tool.slam]
 typed = true

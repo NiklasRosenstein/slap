@@ -65,7 +65,7 @@ class Project:
   config: Once[ProjectConfig]
 
   #: The packages detected with {@link get_packages()} as a {@link Once}.
-  packages: Once[list[Package]]
+  packages: Once[t.Sequence[Package]]
 
   def __init__(self, directory: Path, parent: Project | None = None) -> None:
     from nr.util.functional import Once
@@ -146,7 +146,7 @@ class Project:
         'Detected packages for project <subj>%s</subj> by package detector <obj>%s</obj>: <val>%s></val>',
         self, self.handler(), packages,
       )
-    else:
+    elif self.is_python_project:
       logger.warning(
         'No packages detected for project <subj>%s</subj> by any of package detectors <val>%s</val>',
         self, self.handler()
@@ -167,3 +167,7 @@ class Project:
   @id.setter
   def id(self, value: str) -> None:
     self._id = value
+
+  @property
+  def is_python_project(self) -> bool:
+    return self.pyproject_toml.exists()

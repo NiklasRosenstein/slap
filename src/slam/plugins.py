@@ -8,6 +8,7 @@ from nr.util.generic import T
 
 if t.TYPE_CHECKING:
   from pathlib import Path
+  from poetry.core.semver.version import Version
   from slam.application import Application, IO
   from slam.check import Check
   from slam.project import Package, Project
@@ -62,8 +63,11 @@ class CheckPlugin(abc.ABC):
 
   ENTRYPOINT = 'slam.plugins.check'
 
-  @abc.abstractmethod
-  def get_checks(self, project: Project) -> t.Iterable[Check]: ...
+  def get_project_checks(self, project: Project) -> t.Iterable[Check]:
+    return []
+
+  def get_application_checks(self, app: Application) -> t.Iterable[Check]:
+    return []
 
 
 class ReleasePlugin(abc.ABC):
@@ -72,8 +76,18 @@ class ReleasePlugin(abc.ABC):
 
   ENTRYPOINT = 'slam.plugins.release'
 
-  def get_version_refs(self, project: Project, io: 'IO') -> list[VersionRef]:
+  io: IO
+
+  def get_version_refs(self, project: Project) -> list[VersionRef]:
     return []
 
-  def bump_to_version(self, target_version: str, dry: bool, io: 'IO') -> t.Sequence[Path]:
+  def create_release(self, project: Project, target_version: str, dry: bool) -> t.Sequence[Path]:
     return []
+
+
+class VersionIncrementingRulePlugin(abc.ABC):
+  """ A plugin to bump a version number according to a rule. """
+
+  ENTRYPOINT = 'slam.plugins.version_incrementing_rule'
+
+  def increment_version(self, version: Version) -> Version: ...

@@ -13,12 +13,12 @@ class RenameChangelogOnReleasePlugin(ReleasePlugin):
   def __init__(self, manager: ChangelogManager) -> None:
     self.manager = manager
 
-  def bump_to_version(self, target_version: str, dry: bool, io: 'IO') -> t.Sequence[Path]:
+  def create_release(self, target_version: str, dry: bool) -> t.Sequence[Path]:
     unreleased = self.manager.unreleased()
     new_version = self.manager.version(target_version)
     if unreleased.exists():
-      io.write_line(f'releasing changelog')
-      io.write_line(f'  <fg=cyan>{unreleased.path}</fg> → <b>{new_version.path}</b>')
+      self.io.write_line(f'releasing changelog')
+      self.io.write_line(f'  <fg=cyan>{unreleased.path}</fg> → <b>{new_version.path}</b>')
       if not dry:
         unreleased.release(target_version)
     return [unreleased.path, new_version.path]

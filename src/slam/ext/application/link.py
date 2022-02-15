@@ -106,10 +106,10 @@ class LinkCommand(Command):
     num_skipped = 0
 
     for project in self.app.projects:
-      if not project.pyproject_toml.exists():
+      if not project.is_python_project:
         continue
 
-      packages = project.get_packages()
+      packages = project.packages()
       if not packages:
         continue
 

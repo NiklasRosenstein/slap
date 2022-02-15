@@ -120,7 +120,7 @@ class CleoApplication(BaseCleoApplication):
 
 
 #DEFAULT_PLUGINS = ['check', 'link', 'log', 'release', 'test', 'poetry', 'github']
-DEFAULT_PLUGINS = ['check', 'link', 'test']
+DEFAULT_PLUGINS = ['check', 'link', 'release', 'test']
 
 
 @dataclasses.dataclass
@@ -271,6 +271,9 @@ class Application:
           )
           raise ValueError(f'Project {project} is not relative to the VCS toplevel directory {toplevel!r}')
 
+    if len(set(p.id for p in self.projects)) != len(self.projects):
+      raise ValueError(f'Project IDs are not unique')
+
   def load_plugins(self) -> None:
     """ Loads all application plugins (see {@link ApplicationPlugin}) and activates them.
 
@@ -296,9 +299,13 @@ class Application:
     logger.debug('Loading application plugins <subj>%s</subj>', plugin_names)
 
     for plugin_name in plugin_names:
-      plugin = load_entrypoint(ApplicationPlugin, plugin_name)()
-      plugin_config = plugin.load_configuration(self)
-      plugin.activate(self, plugin_config)
+      try:
+        plugin = load_entrypoint(ApplicationPlugin, plugin_name)()
+      except Exception:
+        logger.exception('Could not load plugin <subj>%s</subj> due to an exception', plugin_name)
+      else:
+        plugin_config = plugin.load_configuration(self)
+        plugin.activate(self, plugin_config)
 
   def run(self) -> None:
     """ Loads and activates application plugins and then invokes the CLI. """

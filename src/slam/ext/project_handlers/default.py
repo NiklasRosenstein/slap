@@ -52,7 +52,7 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     return True
 
   def get_dist_name(self, project: Project) -> str | None:
-    if not project.pyproject_toml.exists():
+    if not project.is_python_project:
       return
     pyproject = project.pyproject_toml.value_or({})
     if (name := pyproject.get('project', {}).get('name')):
@@ -62,7 +62,7 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     return None
 
   def get_readme(self, project: Project) -> str | None:
-    if not project.pyproject_toml.exists():
+    if not project.is_python_project:
       return
     pyproject = project.pyproject_toml.value_or({})
     if (readme := pyproject.get('tool', {}).get('poetry', {}).get('readme')):
