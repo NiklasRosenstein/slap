@@ -8,17 +8,17 @@ Slam is a CLI that provides utilities for developing on Python projects. It work
 <!-- Available Commands -->
 ```
 Available commands:
-  check          Run sanity checks on your Python project.
-  help           Displays help for a command.
-  link           Symlink your Python package with the help of Flit.
-  release        Create a new release of your Python package.
-  test           Execute commands configured in [tool.slam.test].
+  check                Run sanity checks on your Python project.
+  help                 Displays help for a command.
+  link                 Symlink your Python package with the help of Flit.
+  release              Create a new release of your Python package.
+  test                 Execute commands configured in [tool.slam.test].
 
- log
-  log add        Add an entry to the unreleased changelog via the CLI.
-  log convert    Convert Shut's old YAML based changelogs to Slam's TOML changelogs.
-  log format     Format the changelog in the terminal or in Markdown format.
-  log pr update  Update the pr field of changelog entries in a commit range.
+ changelog
+  changelog add        Add an entry to the unreleased changelog via the CLI.
+  changelog convert    Convert Slam's old YAML based changelogs to new style TOML changelogs.
+  changelog format     Format the changelog in the terminal or in Markdown format.
+  changelog update-pr  Update the pr field of changelog entries in a commit range.
 ```
 <!-- /Available Commands -->
 
