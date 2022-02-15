@@ -41,10 +41,7 @@ classifiers = [
   types-requests = "^2.27.7"
   types-PyYAML = "^6.0.3"
   types-pygments = "^2.9.16"
-  pytest = "^6.2.5"
   mypy = "^0.931"
-  pytest-coverage = "^0.0"
-  pylint = "^2.12.2"
 
   [tool.poetry.scripts]
   slam = "slam.__main__:main"
@@ -90,25 +87,7 @@ typed = true
 
   [tool.slam.test]
   mypy = "mypy src --namespace-packages"
-  pylint = "pylint --fail-under=8.0 src/"
   check = "slam check"
-
-[tool.pylint.MASTER]
-disable = """
-  attribute-defined-outside-init,
-  bad-continuation,
-  invalid-name,
-  missing-class-docstring,
-  missing-function-docstring,
-  missing-module-docstring,
-  no-init,
-  no-else-continue,
-  no-else-return,
-  too-few-public-methods,
-  unnecessary-lambda
-"""
-indent-string = '  '
-max-line-length = 120
 
 [tool.mypy]
 pretty = true
