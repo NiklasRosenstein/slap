@@ -74,7 +74,7 @@ class Test(t.NamedTuple):
     return f'{self.project.id}:{self.name}'
 
 
-class TestCommand(Command):
+class TestCommandPlugin(Command, ApplicationPlugin):
   """
   Execute commands configured in <fg=green>[tool.slam.test]</fg>.
 
@@ -93,6 +93,9 @@ class TestCommand(Command):
     ...</fg>
   """
 
+  app: Application
+  tests: list[Test]
+
   name = "test"
   arguments = [
     argument("test", "One or more tests to run (runs all if none are specified)", optional=True, multiple=True),
@@ -103,21 +106,27 @@ class TestCommand(Command):
   ]
   options[0]._default = NotSet.Value  # Hack to set a default value for the flag
 
-  def __init__(self, tests: list[Test], monorepo: bool) -> None:
-    super().__init__()
-    self.tests = tests
-    self.monorepo = monorepo
+  def load_configuration(self, app: Application) -> list[Test]:
+    tests = []
+    for project in app.projects:
+      for test_name, command in project.raw_config().get('test', {}).items():
+        tests.append(Test(project, test_name, command))
+    return tests
+
+  def activate(self, app: Application, config: list[Test]) -> None:
+    self.app = app
+    app.cleo.add(self)
 
   def _select_tests(self, name: str) -> set[Test]:
     result = set()
     for test in self.tests:
       use_test = (
-        self.monorepo and (
+        self.app.is_monorepo and (
           name == test.id
           or (name.startswith(':') and test.name == name[1:])
           or (test.project.id == name)
         ) or
-        not self.monorepo and (
+        not self.app.is_monorepo and (
           name == test.name
         )
       )
@@ -169,12 +178,3 @@ class TestCommand(Command):
 
 class TestCommandPlugin(ApplicationPlugin[list[Test]]):
 
-  def load_configuration(self, app: Application) -> list[Test]:
-    tests = []
-    for project in app.projects:
-      for test_name, command in project.raw_config().get('test', {}).items():
-        tests.append(Test(project, test_name, command))
-    return tests
-
-  def activate(self, app: Application, config: list[Test]) -> None:
-    app.cleo.add(TestCommand(config, app.is_monorepo))

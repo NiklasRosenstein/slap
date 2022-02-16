@@ -8,7 +8,7 @@ from slam.application import Application, Command, option
 from slam.plugins import ApplicationPlugin
 
 
-class LinkCommand(Command):
+class LinkCommandPlugin(Command, ApplicationPlugin):
   """
   Symlink your Python package with the help of Flit.
 
@@ -40,6 +40,8 @@ class LinkCommand(Command):
   <u>[2]: https://python-poetry.org/</u>
   """
 
+  app: Application
+
   name = "link"
   help = textwrap.dedent(__doc__)
   options = [
@@ -55,9 +57,12 @@ class LinkCommand(Command):
     )
   ]
 
-  def __init__(self, app: Application):
-    super().__init__()
+  def load_configuration(self, app: Application) -> None:
+    return None
+
+  def activate(self, app: Application, config: None):
     self.app = app
+    app.cleo.add(self)
 
   def _get_source_directory(self) -> Path:
     directory = Path.cwd()
@@ -138,12 +143,3 @@ class LinkCommand(Command):
         installer.install()
 
     return 1 if num_skipped > 0 and num_projects == 1 else 0
-
-
-class LinkCommandPlugin(ApplicationPlugin):
-
-  def load_configuration(self, app: Application) -> None:
-    return None
-
-  def activate(self, app: Application, config: None):
-    app.cleo.add(LinkCommand(app))

@@ -591,23 +591,23 @@ class ChangelogCommandPlugin(ApplicationPlugin):
 
 
 def get_changelog_manager(project: Project) -> ChangelogManager:
-    import databind.json
-    from nr.util.plugins import iter_entrypoints
-    from slam.util.vcs import VcsHost
-    config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
+  import databind.json
+  from nr.util.plugins import iter_entrypoints
+  from slam.util.vcs import VcsHost
+  config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
 
-    vcs_host: VcsHost | None
-    if (provider := project.config().remote):
-      vcs_host = provider.get_vcs_host(project)
-    else:
-      vcs_host = None
-      for plugin_name, plugin in iter_entrypoints(VcsHostDetector):  # type: ignore[misc]
-        vcs_host = plugin()().detect_vcs_host(project)
-        if vcs_host:
-          break
+  vcs_host: VcsHost | None
+  if (provider := project.config().remote):
+    vcs_host = provider.get_vcs_host(project)
+  else:
+    vcs_host = None
+    for plugin_name, plugin in iter_entrypoints(VcsHostDetector):  # type: ignore[misc]
+      vcs_host = plugin()().detect_vcs_host(project)
+      if vcs_host:
+        break
 
-    return ChangelogManager(
-      directory=project.directory / config.directory,
-      vcs_host=vcs_host or VcsHost.null(),
-      valid_types=config.valid_types,
-    )
+  return ChangelogManager(
+    directory=project.directory / config.directory,
+    vcs_host=vcs_host or VcsHost.null(),
+    valid_types=config.valid_types,
+  )

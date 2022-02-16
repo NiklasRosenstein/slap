@@ -46,7 +46,7 @@ class ReleaseConfig:
   plugins: list[str] = dataclasses.field(default_factory=lambda: ['source_code_version', 'changelog_release'])
 
 
-class ReleaseCommand(Command):
+class ReleaseCommandPlugin(Command):
   """ Create a new release of your Python package.
 
   This command can perform the following operations in sequence (most of them need
@@ -121,6 +121,9 @@ class ReleaseCommand(Command):
     <u>SLAM_RELEASE_NO_PLUGINS</u>: If set, no release plugins will be loaded besides the builtin.
   """
 
+  app: Application
+  config: dict[Project, ReleaseConfig]
+
   name = "release"
   arguments = [
     argument("version", "The target version number or rule to apply to the current version.", True),
@@ -140,10 +143,18 @@ class ReleaseCommand(Command):
 
   # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
-  def __init__(self, app: Application, config: dict[Project, ReleaseConfig]):
-    super().__init__()
+  def load_configuration(self, app: Application) -> dict[Project, ReleaseConfig]:
+    import databind.json
+    result = {}
+    for project in app.projects:
+      data = project.raw_config().get('release', {})
+      result[project] = databind.json.load(data, ReleaseConfig)
+    return result
+
+  def activate(self, app: Application, config: dict[Project, ReleaseConfig]) -> None:
     self.app = app
     self.config = config
+    app.cleo.add(self)
 
   def _validate_options(self) -> int:
     """ Internal. Ensures that the combination of provided options make sense. """
@@ -475,17 +486,3 @@ class ReleaseCommand(Command):
 
     return 0
 
-
-class ReleaseCommandPlugin(ApplicationPlugin):
-
-  def load_configuration(self, app: Application) -> dict[Project, ReleaseConfig]:
-    import databind.json
-
-    result = {}
-    for project in app.projects:
-      data = project.raw_config().get('release', {})
-      result[project] = databind.json.load(data, ReleaseConfig)
-    return result
-
-  def activate(self, app: Application, config: dict[Project, ReleaseConfig]) -> None:
-    app.cleo.add(ReleaseCommand(app, config))

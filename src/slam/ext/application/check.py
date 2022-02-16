@@ -26,8 +26,11 @@ class CheckConfig:
   plugins: list[str] = dataclasses.field(default_factory=lambda: DEFAULT_PLUGINS[:])
 
 
-class CheckCommand(Command):
+class CheckCommandPlugin(Command, ApplicationPlugin):
   """ Run sanity checks on your Python project. """
+
+  app: Application
+  config: dict[Project, CheckConfig]
 
   name = "check"
   options = [
@@ -41,10 +44,18 @@ class CheckCommand(Command):
     )
   ]
 
-  def __init__(self, app: Application, config: dict[Project, CheckConfig]):
-    super().__init__()
+  def load_configuration(self, app: 'Application') -> dict[Project, CheckConfig]:
+    import databind.json
+    result = {}
+    for project in app.projects:
+      config = databind.json.load(project.raw_config().get('check', {}), CheckConfig)
+      result[project] = config
+    return result
+
+  def activate(self, app: 'Application', config: dict[Project, CheckConfig]) -> None:
     self.app = app
     self.config = config
+    app.cleo.add(self)
 
   def handle(self) -> int:
 
@@ -121,17 +132,3 @@ class CheckCommand(Command):
       self.line(f'Global checks:')
       self._print_checks(checks)
       self.line('')
-
-
-class CheckCommandPlugin(ApplicationPlugin):
-
-  def load_configuration(self, app: 'Application') -> dict[Project, CheckConfig]:
-    import databind.json
-    result = {}
-    for project in app.projects:
-      config = databind.json.load(project.raw_config().get('check', {}), CheckConfig)
-      result[project] = config
-    return result
-
-  def activate(self, app: 'Application', config: dict[Project, CheckConfig]) -> None:
-    app.cleo.add(CheckCommand(app, config))

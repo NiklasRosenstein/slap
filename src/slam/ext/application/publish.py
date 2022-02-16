@@ -49,7 +49,7 @@ class BuildBackend:
       os.chdir(old_cwd)
 
 
-class PublishCommand(Command):
+class PublishCommandPlugin(Command, ApplicationPlugin):
   """ A wrapper to publish the Python project to a repository such as PyPI.
 
   Uses the PEP 517 build system defined in the <code>pyproject.toml</code> to build
@@ -59,8 +59,9 @@ class PublishCommand(Command):
   The command-line options are almost identical to the <code>twine upload</code> command.
   """
 
-  name = "publish"
+  app: Application
 
+  name = "publish"
   options = [
     option("repository", "r", flag=False, default='pypi'),
     option("repository-url", flag=False),
@@ -79,9 +80,12 @@ class PublishCommand(Command):
     option("disable-progress-bar"),
   ]
 
-  def __init__(self, app: Application):
-    super().__init__()
+  def load_configuration(self, app: Application) -> None:
+    return None
+
+  def activate(self, app: Application, config: None) -> None:
     self.app = app
+    return app.cleo.add(self)
 
   def handle(self) -> int:
     from twine.settings import Settings
@@ -113,12 +117,3 @@ class PublishCommand(Command):
       upload(settings, [str(d) for d in distributions])
 
     return 0
-
-
-class PublishCommandPlugin(ApplicationPlugin):
-
-  def load_configuration(self, app: Application) -> None:
-    return None
-
-  def activate(self, app: Application, config: None) -> None:
-    return app.cleo.add(PublishCommand(app))
