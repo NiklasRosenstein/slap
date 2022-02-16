@@ -55,6 +55,9 @@ classifiers = [
   release = "slam.ext.application.release:ReleaseCommandPlugin"
   test = "slam.ext.application.test:TestCommandPlugin"
 
+  [tool.poetry.plugins."slam.plugins.changelog_update_automation"]
+  github-actions = "slam.ext.changelog_update_automation.github_actions:GithubActionsChangelogUpdateAutomationPlugin"
+
   [tool.poetry.plugins."slam.plugins.check"]
   changelog = "slam.ext.checks.changelog:ChangelogValidationCheckPlugin"
   general = "slam.ext.checks.general:GeneralChecksPlugin"

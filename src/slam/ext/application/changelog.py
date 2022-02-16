@@ -1,4 +1,5 @@
 
+from asyncio.log import logger
 import dataclasses
 import io
 import typing as t
@@ -7,7 +8,7 @@ from pathlib import Path
 from databind.core.annotations import alias
 
 from slam.application import Application, Command, argument, option
-from slam.plugins import ApplicationPlugin, VcsHostDetector
+from slam.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin, VcsHostDetector
 from slam.changelog import Changelog, ChangelogManager, ManagedChangelog
 from slam.project import Project
 from slam.util.pygments import toml_highlight
@@ -165,12 +166,14 @@ class ChangelogUpdatePrCommand(Command):
   arguments = [
     argument(
       "base_revision",
-      description="The revision ID to look back to to make out which changelog entries have been added since."
+      description="The revision ID to look back to to make out which changelog entries have been added since.",
+      optional=True,
     ),
     argument(
       "pr",
       description="The reference to the PR that should be inserted into all entries added between the specified "
         "revision and the current version of the unreleased changelog.",
+      optional=True,
     )
   ]
   options = [
@@ -193,10 +196,14 @@ class ChangelogUpdatePrCommand(Command):
       flag=False,
     ),
     option(
-      "token",
-      description="The token when pushing to an HTTPS remote (useful in CI; only with <opt>--push, -p</opt>). "
-        "Note that this option will be ignored if the <code>origin</code> remote is not an HTTPS remote.",
+      "use",
+      description="Use the specified plugin to publish the updated changelogs. Use this in supported CI environments "
+        "instead of manually configuring the command-line settings.",
       flag=False,
+    ),
+    option(
+      "list", "l",
+      description="List the available plugins you can pass to the <opt>--use</opt> option.",
     )
   ]
 
@@ -206,8 +213,26 @@ class ChangelogUpdatePrCommand(Command):
     self.managers = {project: get_changelog_manager(project) for project in app.projects}
 
   def handle(self) -> int:
+    from nr.util.plugins import iter_entrypoints, load_entrypoint
+
     if not self._validate_arguments():
       return 1
+
+    if self.option("list"):
+      for ep in iter_entrypoints(ChangelogUpdateAutomationPlugin):
+        self.line(f'  • {ep}')
+      return 0
+
+    automation_plugin: ChangelogUpdateAutomationPlugin | None = None
+    if plugin_name := self.option("use"):
+      logger.info('Loading changelog update automation plugin <subj>%s</subj>', plugin_name)
+      automation_plugin = load_entrypoint(ChangelogUpdateAutomationPlugin, plugin_name)()
+      automation_plugin.io = self.io
+      automation_plugin.initialize()
+      base_revision: str = automation_plugin.get_base_ref()
+    else:
+      base_revision = self.argument("base_revision")
+    assert base_revision
 
     changelogs = []
     for _, manager in self.managers.items():
@@ -219,9 +244,12 @@ class ChangelogUpdatePrCommand(Command):
         self.line('no entries to update', 'info')
         return 0
 
-    rev = self.argument("base_revision")
     num_updates = 0
     for changelog, manager in changelogs:
+
+      if not (pr := self.argument("pr")):
+        assert automation_plugin
+        pr = automation_plugin.get_pr()
 
       try:
         pr = manager.vcs_host.normalize_pr(self.argument("pr"))
@@ -229,11 +257,11 @@ class ChangelogUpdatePrCommand(Command):
         self.line_error(f'error: {exc}', 'error')
         return 1
 
-      prev_contents = self._vcs.get_file_contents(changelog.path, rev)
+      prev_contents = self._vcs.get_file_contents(changelog.path, base_revision)
       if prev_contents is None:
         prev_entry_ids = set[str]()
       else:
-        prev_changelog = manager.deser.load(io.StringIO(prev_contents.decode('utf8')), f'{rev}:{changelog.path}')
+        prev_changelog = manager.deser.load(io.StringIO(prev_contents.decode('utf8')), f'{base_revision}:{changelog.path}')
         prev_entry_ids = {e.id for e in prev_changelog.entries}
 
       new_entry_ids = {e.id for e in changelog.content.entries} - prev_entry_ids
@@ -256,22 +284,39 @@ class ChangelogUpdatePrCommand(Command):
       self.line('no entries to update', 'info')
       return 0
 
-    if self.option("commit"):
-      if self._remote and (token := self.option("token")):
-        # TODO (@NiklasRosenstein): A bit hacky, but that's how we can inject the token into the remote URL.
-        self._remote.name = self._remote.url.replace('https://', f'https://{token}@')
+    changed_files = [changelog.path for changelog, _ in changelogs]
 
+    if self.option("commit"):
+      assert not self.automation_plugin
       self._vcs.commit_files(
-        [changelog.path for changelog, _ in changelogs],
+        changed_files,
         f'Updated {num_updates} PR reference{"" if num_updates == 0 else "s"}.',
         push=self._remote,
         name=self.option("name"),
         email=self.option("email"),
       )
 
+    if automation_plugin:
+      automation_plugin.publish_changes(changed_files)
+
     return 0
 
   def _validate_arguments(self) -> bool:
+    if self.option("list"):
+      if used_option := next((o.name for o in self.options if o.name != "list" and self.option(o.name)), None):
+        self.line_error(f'error: <opt>--{used_option}</opt> cannot be used with <opt>--list</opt>', 'error')
+        return False
+
+    if self.option("use"):
+      if used_option := next((o.name for o in self.options if o.name != "use" and self.option(o.name)), None):
+        self.line_error(f'error: <opt>--{used_option}</opt> cannot be used with <opt>--use</opt>', 'error')
+        return False
+    else:
+      for arg in ("base_revision", "pr"):
+        if not self.argument(arg):
+          self.line_error(f'error: missing argument <opt>{arg}</opt>', 'error')
+          return False
+
     if self.option("push") and not self.option("commit"):
       self.line_error(
         f'error: <opt>--push, -p</opt> can only be used in combination with <opt>--commit, -c</opt>',
@@ -292,19 +337,6 @@ class ChangelogUpdatePrCommand(Command):
     for opt in ('email', 'name'):
       if self.option(opt) and not self.option("commit"):
         self.line_error(f'error: <opt>--{opt}</opt> is not valid without <opt>--commit, -c</opt>', 'error')
-        return False
-
-    if self.option("token"):
-      if not self.option("push"):
-        self.line_error(f'error: <opt>--token</opt> can only be used with <opt>--commit, -c</opt>', 'error')
-        return False
-      assert self._remote
-      if not self._remote.url.startswith('https://'):
-        self.line_error(
-          f'error: <opt>--token</opt> is specified, but remote "{self._remote.name}" does not point to '
-            f'an HTTPS url (<code>{self._remote.url}</code>).',
-          'error'
-        )
         return False
 
     return True

@@ -112,3 +112,23 @@ class VcsHostDetector(abc.ABC):
 
   @abc.abstractmethod
   def detect_vcs_host(self, project: Project) -> VcsHost | None: ...
+
+
+class ChangelogUpdateAutomationPlugin(abc.ABC):
+  """ A plugin used by the `slam changelog update-pr` plugin to automate the publishing of updated changelog files. """
+
+  ENTRYPOINT = 'slam.plugins.changelog_update_automation'
+
+  io: IO
+
+  @abc.abstractmethod
+  def initialize(self) -> None: ...
+
+  @abc.abstractmethod
+  def get_base_ref(self) -> str: ...
+
+  @abc.abstractmethod
+  def get_pr(self) -> str: ...
+
+  @abc.abstractmethod
+  def publish_changes(self, changed_files: list[Path]) -> None: ...
