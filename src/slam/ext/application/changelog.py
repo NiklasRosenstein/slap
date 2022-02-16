@@ -13,7 +13,7 @@ from slam.changelog import Changelog, ChangelogManager, ManagedChangelog
 from slam.project import Project
 from slam.util.pygments import toml_highlight
 
-DEFAULT_VALID_TYPES = ['breaking change', 'docs', 'feature', 'fix', 'hygiene', 'improvement', 'tests']
+DEFAULT_VALID_TYPES = ['breaking change', 'deprecation', 'docs', 'feature', 'fix', 'hygiene', 'improvement', 'tests']
 
 
 @dataclasses.dataclass
