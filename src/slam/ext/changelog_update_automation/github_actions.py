@@ -63,5 +63,5 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
     user_email = os.environ.get('GIT_USER_EMAIL', 'no-reply@github.com')
     commit_message = os.environ.get('GIT_COMMIT_MESSAGE', 'Update changelog PR references')
     sp.check_call(['git', 'add'] + [str(f) for f in changed_files])
-    sp.check_call(['git', 'commit', '-c' 'user.name', user_name, '-c', 'user.email', user_email, '-m', commit_message])
+    sp.check_call(['git', '-c', 'user.name=' + user_name, '-c', 'user.email=' + user_email, 'commit', '-m', commit_message])
     sp.check_call(['git', 'push', 'origin', os.environ['GITHUB_HEAD_REF']])
