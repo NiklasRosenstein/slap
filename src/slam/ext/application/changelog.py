@@ -268,16 +268,10 @@ class ChangelogUpdatePrCommand(Command):
       if not new_entry_ids:
         continue
 
-      num_updates += len(new_entry_ids)
-      path = changelog.path.relative_to(Path.cwd())
-      self.line(
-        f'Updating {len(new_entry_ids)} {"entry" if len(new_entry_ids) == 1 else "entries"} in {path}',
-        'comment'
-      )
-
       for entry in changelog.content.entries:
-        if entry.id in new_entry_ids:
+        if entry.id in new_entry_ids and entry.pr != pr:
           entry.pr = pr
+          num_updates += 1
       changelog.save(None)
 
     if not num_updates:
