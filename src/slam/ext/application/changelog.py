@@ -178,6 +178,10 @@ class ChangelogUpdatePrCommand(Command):
   ]
   options = [
     option(
+      "dry", "d",
+      description="Do not actually make changes on disk.",
+    ),
+    option(
       "commit", "c",
       description="Commit the changes, if any.",
     ),
@@ -264,18 +268,27 @@ class ChangelogUpdatePrCommand(Command):
         prev_changelog = manager.deser.load(io.StringIO(prev_contents.decode('utf8')), f'{base_revision}:{changelog.path}')
         prev_entry_ids = {e.id for e in prev_changelog.entries}
 
-      new_entry_ids = {e.id for e in changelog.content.entries} - prev_entry_ids
+      new_entry_ids = {e.id for e in changelog.content.entries if e.pr != pr} - prev_entry_ids
       if not new_entry_ids:
         continue
 
+      num_updates += len(new_entry_ids)
+      self.line(
+        f'update <info>{changelog.path.relative_to(Path.cwd())}</info> '
+        f'({len(new_entry_ids)} reference{"s" if len(new_entry_ids) != 1 else ""})')
+
       for entry in changelog.content.entries:
-        if entry.id in new_entry_ids and entry.pr != pr:
+        if entry.id in new_entry_ids:
           entry.pr = pr
-          num_updates += 1
-      changelog.save(None)
+
+      if not self.option("dry"):
+        changelog.save(None)
 
     if not num_updates:
       self.line('no entries to update', 'info')
+      return 0
+
+    if self.option("dry"):
       return 0
 
     changed_files = [changelog.path for changelog, _ in changelogs]
