@@ -1,8 +1,10 @@
 
 import os
 import importlib
-from pathlib import Path
+import typing as t
 import tempfile
+from pathlib import Path
+
 from slam.application import Application, Command, option
 from slam.plugins import ApplicationPlugin
 
@@ -23,7 +25,7 @@ class BuildBackend:
     self.name = name
     self.project_directory = project_directory.resolve()
     self.build_directory = build_directory.resolve()
-    self._module = importlib.import_module(name)
+    self._module = t.cast(t.Any, importlib.import_module(name))
 
   def __repr__(self) -> str:
     return f'BuildBackend("{self.name}")'
@@ -109,6 +111,8 @@ class PublishCommand(Command):
       kwargs['repository_name'] = kwargs.pop('repository')
       settings = Settings(**kwargs)
       upload(settings, [str(d) for d in distributions])
+
+    return 0
 
 
 class PublishCommandPlugin(ApplicationPlugin):

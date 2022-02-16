@@ -230,7 +230,7 @@ class ChangelogUpdatePrCommand(Command):
     automation_plugin: ChangelogUpdateAutomationPlugin | None = None
     if plugin_name := self.option("use"):
       logger.info('Loading changelog update automation plugin <subj>%s</subj>', plugin_name)
-      automation_plugin = load_entrypoint(ChangelogUpdateAutomationPlugin, plugin_name)()
+      automation_plugin = load_entrypoint(ChangelogUpdateAutomationPlugin, plugin_name)()  # type: ignore[misc]
       automation_plugin.io = self.io
       automation_plugin.initialize()
       base_revision: str = automation_plugin.get_base_ref()

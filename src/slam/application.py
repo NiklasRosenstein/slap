@@ -99,7 +99,7 @@ class CleoApplication(BaseCleoApplication):
 
     if isinstance(error, sp.CalledProcessError):
       msg = 'Uncaught CalledProcessError raised for command <subj>%s</subj> (exit code: <val>%s</val>).'
-      args = (error.args[1], error.returncode)
+      args: tuple[t.Any, ...] = (error.args[1], error.returncode)
       stdout: str | None = error.stdout.decode() if error.stdout else None
       stderr: str | None = error.stderr.decode() if error.stderr else None
       if stdout:

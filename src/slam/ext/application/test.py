@@ -39,6 +39,7 @@ class TestRunner:
       cols, rows = os.get_terminal_size()
     except OSError:
       sproc = sp.Popen(command, cwd=self.cwd, stdout=sp.PIPE, stderr=sp.STDOUT)
+      assert sproc.stdout
       stdout = getreader(sys.getdefaultencoding())(sproc.stdout)
       for line in iter(stdout.readline, ''):
         line = line.rstrip()
