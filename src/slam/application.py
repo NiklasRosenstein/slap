@@ -288,6 +288,21 @@ class Application:
     assert closest is not None
     return closest
 
+  def get_projects_in_topological_order(self) -> t.Sequence[Project]:
+    """ Return the projects in topological order based on their interdependencies. """
+
+    from nr.util.digraph import DiGraph
+    from nr.util.digraph.algorithm.topological_sort import topological_sort
+
+    graph: DiGraph[Project, None, None] = DiGraph()
+    for project in self.projects:
+      graph.add_node(project, None)
+      for dep in project.get_interdependencies(self.projects):
+        graph.add_node(dep, None)
+        graph.add_edge(dep, project, None)
+
+    return list(topological_sort(graph))
+
   def load_projects(self) -> None:
     """ Loads all projects, if any additional aside from the main project need to be loaded. """
 

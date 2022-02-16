@@ -46,9 +46,8 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     dependencies = []
 
     # TODO: venv check
-    # TODO: check for dependencies between projects to ensure right install order
 
-    for project in self.app.projects:
+    for project in self.app.get_projects_in_topological_order():
       if not self.option("no-root") and not self.option("link"):
         dependencies.append(str(project.directory.resolve()))
 

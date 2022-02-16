@@ -147,7 +147,6 @@ class Project:
         )
       return handler
     else:
-      # TODO (@NiklasRosenstein): Add Poetry package detector here before default package detector.
       from slam.ext.project_handlers.default import DefaultProjectHandler
       handlers = [DefaultProjectHandler()]
       for handler in handlers:

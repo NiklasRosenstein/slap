@@ -101,12 +101,10 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
 
     # logging.basicConfig(level=logging.INFO, format='%(message)s')
 
-    # TODO (@NiklasRosenstein): Ensure that dependencies are installed?
-
     num_projects = 0
     num_skipped = 0
 
-    for project in self.app.projects:
+    for project in self.app.get_projects_in_topological_order():
       if not project.is_python_project:
         continue
 

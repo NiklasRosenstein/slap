@@ -39,7 +39,7 @@ class GithubVcsHost(VcsHost):
       return f'https://github.com'
 
   def _get_api_url(self) -> str:
-    # TODO (@NiklasRosenstein): Can we rely on GHE having a api. subdomain?
+    # TODO (@NiklasRosenstein): Can we rely on GHE having an `api.` subdomain?
     return self._get_base_url().replace('https://', 'https://api.').rstrip('/')
 
   def _get_repo_url(self) -> str:

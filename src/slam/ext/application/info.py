@@ -18,7 +18,7 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
-    for project in self.app.projects:
+    for project in self.app.get_projects_in_topological_order():
       if not project.is_python_project: continue
       packages = ", ".join(f"<opt>{p.name} ({p.root.relative_to(project.directory)})</opt>" for p in project.packages())
       self.line(f'Project <s>"{project.directory.relative_to(Path.cwd())}" (id: <opt>{project.id}</opt>)</s>')
