@@ -120,7 +120,11 @@ class CleoApplication(BaseCleoApplication):
 
     from nr.util.logging.formatters.terminal_colors import TerminalColorFormatter
 
-    if io.input.has_parameter_option("-vvv") or io.input.has_parameter_option("-vv"):
+    fmt = '<fg=bright black>%(message)s</fg>'
+    if io.input.has_parameter_option("-vvv"):
+      fmt = '<fg=bright black>%(asctime)s | %(levelname)s | %(name)s | %(message)s</fg>'
+      level = logging.DEBUG
+    elif io.input.has_parameter_option("-vv"):
       level = logging.DEBUG
     elif io.input.has_parameter_option("-v"):
       level = logging.INFO
@@ -132,7 +136,7 @@ class CleoApplication(BaseCleoApplication):
       level = logging.WARNING
 
     logging.basicConfig(level=level)
-    formatter = TerminalColorFormatter('%(asctime)s | %(levelname)s | %(name)s | %(message)s')
+    formatter = TerminalColorFormatter(fmt)
     assert formatter.styles
     formatter.styles.add_style('subj', 'blue')
     formatter.styles.add_style('obj', 'yellow')
