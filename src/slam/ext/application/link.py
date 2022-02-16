@@ -1,4 +1,5 @@
 
+import os
 import shutil
 import textwrap
 import typing as t
@@ -6,6 +7,7 @@ from pathlib  import Path
 
 from slam.application import Application, Command, option
 from slam.plugins import ApplicationPlugin
+from .install import venv_check, venv_check_option
 
 
 class LinkCommandPlugin(Command, ApplicationPlugin):
@@ -46,15 +48,16 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
   help = textwrap.dedent(__doc__)
   options = [
     option(
-      "python",
+      "python", "p",
       description="The Python executable to link the package to.",
       flag=False,
-      default="python",
+      default=os.getenv('PYTHON', 'python'),
     ),
     option(
       "dump-pyproject",
       description="Dump the updated pyproject.toml and do not actually do the linking.",
-    )
+    ),
+    venv_check_option
   ]
 
   def load_configuration(self, app: Application) -> None:
@@ -98,6 +101,9 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
     from nr.util.fs import atomic_swap
 
     from slam.util.pygments import toml_highlight
+
+    if not venv_check(self, 'refusing to link'):
+      return 1
 
     # logging.basicConfig(level=logging.INFO, format='%(message)s')
 
