@@ -219,8 +219,8 @@ class ChangelogUpdatePrCommand(Command):
       return 1
 
     if self.option("list"):
-      for ep in iter_entrypoints(ChangelogUpdateAutomationPlugin):
-        self.line(f'  • {ep}')
+      for ep in iter_entrypoints(ChangelogUpdateAutomationPlugin.ENTRYPOINT ):
+        self.line(f'  • {ep.name}')
       return 0
 
     automation_plugin: ChangelogUpdateAutomationPlugin | None = None
@@ -301,10 +301,11 @@ class ChangelogUpdatePrCommand(Command):
         self.line_error(f'error: <opt>--{used_option}</opt> cannot be used with <opt>--list</opt>', 'error')
         return False
 
-    if self.option("use"):
+    elif self.option("use"):
       if used_option := next((o.name for o in self.options if o.name != "use" and self.option(o.name)), None):
         self.line_error(f'error: <opt>--{used_option}</opt> cannot be used with <opt>--use</opt>', 'error')
         return False
+
     else:
       for arg in ("base_revision", "pr"):
         if not self.argument(arg):
