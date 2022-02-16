@@ -46,8 +46,8 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
   """
 
   def initialize(self) -> None:
-    sp.check_call(['git', 'fetch'], stdout=sp.PIPE)
-    sp.check_call(['git', 'checkout', os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE)
+    sp.check_call(['git', 'fetch'], stdout=sp.PIPE, stderr=sp.STDOUT)
+    sp.check_call(['git', 'checkout', os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE, stderr=sp.STDOUT)
 
   def get_base_ref(self) -> str:
     return 'origin/' + os.environ['GITHUB_BASE_REF']
@@ -65,6 +65,6 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
     commit_message = os.environ.get('GIT_COMMIT_MESSAGE', 'Update changelog PR references')
     if os.getenv('GIT_SHOW_DIFF'):
       sp.check_call(['git', 'diff'])
-    sp.check_call(['git', 'add'] + [str(f) for f in changed_files], stdout=sp.PIPE)
-    sp.check_call(['git', '-c', 'user.name=' + user_name, '-c', 'user.email=' + user_email, 'commit', '-m', commit_message], stdout=sp.PIPE)
-    sp.check_call(['git', 'push', 'origin', os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE)
+    sp.check_call(['git', 'add'] + [str(f) for f in changed_files], stdout=sp.PIPE, stderr=sp.STDOUT)
+    sp.check_call(['git', '-c', 'user.name=' + user_name, '-c', 'user.email=' + user_email, 'commit', '-m', commit_message], stdout=sp.PIPE, stderr=sp.STDOUT)
+    sp.check_call(['git', 'push', 'origin', os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE, stderr=sp.STDOUT)

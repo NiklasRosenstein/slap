@@ -137,7 +137,8 @@ class CleoApplication(BaseCleoApplication):
     formatter.styles.add_style('subj', 'blue')
     formatter.styles.add_style('obj', 'yellow')
     formatter.styles.add_style('val', 'cyan')
-    formatter.install()
+    formatter.install('tty')
+    formatter.install('notty')  # Hack for now to enable it also in CI
 
     self._init_callback()
 
