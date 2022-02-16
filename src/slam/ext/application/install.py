@@ -69,7 +69,10 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       if not self.option("no-dev"):
         dependencies += project.dependencies().dev
 
-    sp.call([self.option("python"), "-m", "pip", "install"] + dependencies)
+    if (res := sp.call([self.option("python"), "-m", "pip", "install"] + dependencies)) != 0:
+      return res
 
     if self.option("link"):
       self.call("link")
+
+    return 0
