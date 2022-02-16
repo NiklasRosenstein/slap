@@ -252,7 +252,7 @@ class ChangelogUpdatePrCommand(Command):
         pr = automation_plugin.get_pr()
 
       try:
-        pr = manager.vcs_host.normalize_pr(self.argument("pr"))
+        pr = manager.vcs_host.normalize_pr(pr)
       except ValueError as exc:
         self.line_error(f'error: {exc}', 'error')
         return 1
