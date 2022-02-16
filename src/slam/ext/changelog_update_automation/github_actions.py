@@ -42,6 +42,7 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
   * `GIT_USER_NAME` (defaults to `GitHub Actions`)
   * `GIT_USER_EMAIL` (defaults to `no-reply@github.com`)
   * `GIT_COMMIT_MESSAGE` (defaults to `Update changelog PR references`)
+  * `GIT_SHOW_DIFF` (if set, runs "git diff" before publishing changes)
   """
 
   def initialize(self) -> None:
@@ -62,6 +63,8 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
     user_name = os.environ.get('GIT_USER_NAME', 'GitHub Actions')
     user_email = os.environ.get('GIT_USER_EMAIL', 'no-reply@github.com')
     commit_message = os.environ.get('GIT_COMMIT_MESSAGE', 'Update changelog PR references')
+    if os.getenv('GIT_SHOW_DIFF'):
+      sp.check_call(['git', 'diff'])
     sp.check_call(['git', 'add'] + [str(f) for f in changed_files])
     sp.check_call(['git', '-c', 'user.name=' + user_name, '-c', 'user.email=' + user_email, 'commit', '-m', commit_message])
     sp.check_call(['git', 'push', 'origin', os.environ['GITHUB_HEAD_REF']])
