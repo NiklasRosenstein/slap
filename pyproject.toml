@@ -51,6 +51,7 @@ classifiers = [
   changelog = "slam.ext.application.changelog:ChangelogCommandPlugin"
   check = "slam.ext.application.check:CheckCommandPlugin"
   info = "slam.ext.application.info:InfoCommandPlugin"
+  install = "slam.ext.application.install:InstallCommandPlugin"
   link = "slam.ext.application.link:LinkCommandPlugin"
   publish = "slam.ext.application.publish:PublishCommandPlugin"
   release = "slam.ext.application.release:ReleaseCommandPlugin"
