@@ -443,14 +443,14 @@ class ReleaseCommand(Command):
       return err
 
     version_refs = self._get_version_refs()
-
     version = self.argument("version")
 
     if self.option("validate"):
-      try:
-        version = str(self._get_current_version(version_refs))
-      except ValueError:
-        version = None
+      if version is None:
+        try:
+          version = str(self._get_current_version(version_refs))
+        except ValueError:
+          pass
       return self._validate_version_refs(version_refs, version)
 
     if version is not None:
