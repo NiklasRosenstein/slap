@@ -174,7 +174,3 @@ class TestCommandPlugin(Command, ApplicationPlugin):
         self.line(f'  <fg={color}>•</fg> {test_name} (exit code: {exit_code})')
 
     return 0 if set(results.values()) == {0} else 1
-
-
-class TestCommandPlugin(ApplicationPlugin[list[Test]]):
-
