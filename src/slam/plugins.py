@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
   from slam.application import Application, IO
   from slam.check import Check
-  from slam.project import Package, Project
+  from slam.project import Dependencies, Package, Project
   from slam.release import VersionRef
   from slam.util.vcs import VcsHost
 
@@ -56,6 +56,10 @@ class ProjectHandlerPlugin(abc.ABC):
   @abc.abstractmethod
   def get_packages(self, project: Project) -> list[Package]:
     """ Return a list of packages for the project. """
+
+  @abc.abstractmethod
+  def get_dependencies(self, project: Project) -> Dependencies:
+    """ Return the dependencies of the project. """
 
 
 class CheckPlugin(abc.ABC):

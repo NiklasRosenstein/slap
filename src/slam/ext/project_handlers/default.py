@@ -1,6 +1,7 @@
 
 """ Implements the default package detection plugin. """
 
+import logging
 import typing as t
 from pathlib import Path
 
@@ -8,9 +9,10 @@ from nr.util.algorithm.longest_common_substring import longest_common_substring
 from setuptools import find_namespace_packages
 
 from slam.plugins import ProjectHandlerPlugin
-from slam.project import Package, Project
+from slam.project import Dependencies, Package, Project
 
 IGNORED_MODULES = ['test', 'tests', 'docs']
+logger = logging.getLogger(__name__)
 
 
 def detect_packages(directory: Path) -> list[Package]:
@@ -43,18 +45,37 @@ def detect_packages(directory: Path) -> list[Package]:
   return [Package(module, directory / Path(*module.split('.')), directory) for module in modules]
 
 
+def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> list[str]:
+  from poetry.core.packages.dependency import Dependency
+
+  if isinstance(dependencies, list):
+    return dependencies
+  elif isinstance(dependencies, dict):
+    result = []
+    for key, version in dependencies.items():
+      if key == 'python': continue
+      result.append(Dependency(key, version).to_pep_508())
+    return result
+  else:
+    raise TypeError(type(dependencies))
+
+
 class DefaultProjectHandler(ProjectHandlerPlugin):
 
   def __repr__(self) -> str:
     return type(self).__name__
 
+  def _get_pyproject(self, project: Project) -> dict[str, t.Any] | None:
+    if not project.is_python_project:
+      return None
+    return project.pyproject_toml.value_or({})
+
   def matches_project(self, project: Project) -> bool:
     return True
 
   def get_dist_name(self, project: Project) -> str | None:
-    if not project.is_python_project:
+    if (pyproject := self._get_pyproject(project)) is None:
       return None
-    pyproject: dict[str, t.Any] = project.pyproject_toml.value_or({})
     if (name := pyproject.get('project', {}).get('name')):
       return name
     if (name := pyproject.get('tool', {}).get('poetry', {}).get('name')):
@@ -62,9 +83,8 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     return None
 
   def get_readme(self, project: Project) -> str | None:
-    if not project.is_python_project:
+    if (pyproject := self._get_pyproject(project)) is None:
       return None
-    pyproject: dict[str, t.Any] = project.pyproject_toml.value_or({})
     if (readme := pyproject.get('tool', {}).get('poetry', {}).get('readme')):
       return readme
     return None
@@ -79,3 +99,38 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
         if packages:
           return packages
     return []
+
+  def get_dependencies(self, project: Project) -> Dependencies:
+    if (pyproject := self._get_pyproject(project)) is None:
+      return Dependencies([], [], {})
+
+    poetry: dict[str, t.Any] | None = pyproject.get('tool', {}).get('poetry')
+    flit: dict[str, t.Any] | None = pyproject.get('tool', {}).get('flit')
+    project_conf: dict[str, t.Any] | None = pyproject.get('project')
+
+    if project_conf:
+      logger.info('Reading <val>[project]</val> dependencies for project <subj>%s</subj>', project)
+      optional = project_conf.get('optional-dependencies', {})
+      return Dependencies(
+        project_conf.get('dependencies', []),
+        optional.pop('dev', []),
+        optional,
+      )
+    elif poetry:
+      logger.info('Reading <val>[tool.poetry]</val> dependencies for project <subj>%s</subj>', project)
+      return Dependencies(
+        convert_poetry_dependencies(poetry.get('dependencies', [])),
+        convert_poetry_dependencies(poetry.get('dev-dependencies', [])),
+        {k: convert_poetry_dependencies(v) for k, v in poetry.get('extras', {}).items()},
+      )
+    elif flit:
+      logger.info('Reading <val>[tool.flit]</val> dependencies for project <subj>%s</subj>', project)
+      optional = flit.get('requires-extra', {}).get('dev', [])
+      return Dependencies(
+        flit.get('requires', []),
+        optional.pop('dev', []),
+        optional,
+      )
+    else:
+      logger.info('Unable to identify dependencies source for project <subj>%s</subj>', project)
+      return Dependencies([], [], {})

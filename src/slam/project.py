@@ -19,6 +19,13 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
+class Dependencies:
+  run: list[str]
+  dev: list[str]
+  extra: dict[str, list[str]]
+
+
+@dataclasses.dataclass
 class Package:
   name: str   #: The name of the package. Contains periods in case of a namespace package.
   path: Path  #: The path to the package directory. This points to the namespace package if applicable.
@@ -71,6 +78,12 @@ class Project:
   #: The packages detected with {@link get_packages()} as a {@link Once}.
   packages: Once[t.Sequence[Package]]
 
+  #: The packages detected readme as a {@link Once}.
+  readme: Once[str | None]
+
+  #: The packages dependencies as a {@link Once}.
+  dependencies: Once[Dependencies]
+
   def __init__(self, directory: Path, parent: Project | None = None) -> None:
     from nr.util.functional import Once
 
@@ -85,6 +98,8 @@ class Project:
     self.handler = Once(self.get_project_handler)
     self.config = Once(self.get_project_configuration)
     self.packages = Once(self.get_packages)
+    self.readme = Once(self.get_readme)
+    self.dependencies = Once(self.get_dependencies)
 
   def __repr__(self) -> str:
     return f'Project(id="{self.id}", directory="{self.directory}")'
@@ -159,6 +174,12 @@ class Project:
 
   def get_dist_name(self) -> str | None:
     return self.handler().get_dist_name(self)
+
+  def get_readme(self) -> str | None:
+    return self.handler().get_readme(self)
+
+  def get_dependencies(self) -> Dependencies:
+    return self.handler().get_dependencies(self)
 
   @property
   def id(self) -> str:
