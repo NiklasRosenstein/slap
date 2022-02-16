@@ -106,15 +106,14 @@ class TestCommandPlugin(Command, ApplicationPlugin):
   ]
   options[0]._default = NotSet.Value  # Hack to set a default value for the flag
 
-  def load_configuration(self, app: Application) -> list[Test]:
-    tests = []
+  def load_configuration(self, app: Application) -> None:
+    self.app = app
+    self.tests = []
     for project in app.projects:
       for test_name, command in project.raw_config().get('test', {}).items():
-        tests.append(Test(project, test_name, command))
-    return tests
+        self.tests.append(Test(project, test_name, command))
 
-  def activate(self, app: Application, config: list[Test]) -> None:
-    self.app = app
+  def activate(self, app: Application, config: None) -> None:
     app.cleo.add(self)
 
   def _select_tests(self, name: str) -> set[Test]:
