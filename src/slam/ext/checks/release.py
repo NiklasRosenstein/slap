@@ -6,7 +6,7 @@ from cleo.io.null_io import NullIO  # type: ignore[import]
 from slam.application import Application
 from slam.check import Check
 from slam.ext.release.source_code_version import SourceCodeVersionReferencesPlugin
-from slam.ext.application.release import ReleaseCommand, ReleaseCommandPlugin
+from slam.ext.application.release import ReleaseCommandPlugin
 from slam.plugins import CheckPlugin
 from slam.project import Project
 
@@ -42,8 +42,9 @@ class ReleaseChecksPlugin(CheckPlugin):
     )
 
   def _check_version_number_consistency(self, app: Application) -> Check:
-    config = ReleaseCommandPlugin().load_configuration(app)
-    releaser = ReleaseCommand(app, config)
+    releaser = ReleaseCommandPlugin()
+    releaser.load_configuration(app)
+
     version_refs = releaser._get_version_refs()
     cardinality = len(set(r.value for r in version_refs))
 

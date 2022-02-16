@@ -46,7 +46,7 @@ class ReleaseConfig:
   plugins: list[str] = dataclasses.field(default_factory=lambda: ['source_code_version', 'changelog_release'])
 
 
-class ReleaseCommandPlugin(Command):
+class ReleaseCommandPlugin(Command, ApplicationPlugin):
   """ Create a new release of your Python package.
 
   This command can perform the following operations in sequence (most of them need
@@ -149,11 +149,11 @@ class ReleaseCommandPlugin(Command):
     for project in app.projects:
       data = project.raw_config().get('release', {})
       result[project] = databind.json.load(data, ReleaseConfig)
+    self.app = app
+    self.config = result
     return result
 
   def activate(self, app: Application, config: dict[Project, ReleaseConfig]) -> None:
-    self.app = app
-    self.config = config
     app.cleo.add(self)
 
   def _validate_options(self) -> int:
