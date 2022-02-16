@@ -49,7 +49,7 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
     sp.check_call(['git', 'checkout', os.environ['GITHUB_HEAD_REF']])
 
   def get_base_ref(self) -> str:
-    return os.environ['GITHUB_BASE_REF']
+    return 'origin/' + os.environ['GITHUB_BASE_REF']
 
   def get_pr(self) -> str:
     ref = os.environ['GITHUB_REF']
