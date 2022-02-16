@@ -27,6 +27,11 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
       self.line(f'  readme: <opt>{project.handler().get_readme(project)}</opt>')
       self.line(f'  handler: <opt>{project.handler()}</opt>')
 
+      inter_deps = project.get_interdependencies(self.app.projects)
+      if inter_deps:
+        projects = ", ".join(f"<opt>{p.get_dist_name()}</opt>" for p in inter_deps)
+        self.line(f'  depends on: {projects}')
+
       deps = project.dependencies()
       self.line(f'  dependencies:')
       self._print_deps('run', deps.run)
@@ -35,9 +40,9 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
         self._print_deps(f'extra.{key}', value)
 
   def _print_deps(self, prefix: str, deps: list[str]) -> None:
-      if deps:
-        self.line(f'    {prefix}:')
-        for dep in sorted(deps, key=lambda s: s.lower()):
-          self.line(f'      - <opt>{dep}</opt>')
-      else:
-        self.line(f'    {prefix}: <i>none</i>')
+    if deps:
+      self.line(f'    {prefix}:')
+      for dep in sorted(deps, key=lambda s: s.lower()):
+        self.line(f'      - <opt>{dep}</opt>')
+    else:
+      self.line(f'    {prefix}: <i>none</i>')

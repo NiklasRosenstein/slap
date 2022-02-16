@@ -181,6 +181,25 @@ class Project:
   def get_dependencies(self) -> Dependencies:
     return self.handler().get_dependencies(self)
 
+  def get_interdependencies(self, projects: t.Sequence[Project]) -> list[Project]:
+    """ Returns the dependencies of this project in the list of other projects. The returned dictionary maps
+    to the project and the dependency constraint. This will only take run dependencies into account. """
+
+    import re
+
+    dependency_names = set()
+    for dep in self.dependencies().run:
+      match = re.match(r'[\w\d\_\-\.]+\b', dep)
+      if not match: continue
+      dependency_names.add(match.group(0))
+
+    result = []
+    for project in projects:
+      if project.get_dist_name() in dependency_names:
+        result.append(project)
+
+    return result
+
   @property
   def id(self) -> str:
     if not self.parent:
