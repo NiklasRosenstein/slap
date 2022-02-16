@@ -39,8 +39,8 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
 
   Additional environment variables to control the plugin:
 
-  * `GIT_USER_NAME` (defaults to `GitHub Actions`)
-  * `GIT_USER_EMAIL` (defaults to `no-reply@github.com`)
+  * `GIT_USER_NAME` (defaults to `GitHub Action`)
+  * `GIT_USER_EMAIL` (defaults to `github-action@users.noreply.github.com`)
   * `GIT_COMMIT_MESSAGE` (defaults to `Update changelog PR references`)
   * `GIT_SHOW_DIFF` (if set, runs "git diff" before publishing changes)
   """
@@ -60,8 +60,8 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
     return match.group(1)
 
   def publish_changes(self, changed_files: list[Path]) -> None:
-    user_name = os.environ.get('GIT_USER_NAME', 'GitHub Actions')
-    user_email = os.environ.get('GIT_USER_EMAIL', 'no-reply@github.com')
+    user_name = os.environ.get('GIT_USER_NAME', 'GitHub Action')
+    user_email = os.environ.get('GIT_USER_EMAIL', 'github-action@users.noreply.github.com')
     commit_message = os.environ.get('GIT_COMMIT_MESSAGE', 'Update changelog PR references')
     if os.getenv('GIT_SHOW_DIFF'):
       sp.check_call(['git', 'diff'])
