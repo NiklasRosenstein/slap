@@ -46,7 +46,7 @@ def detect_packages(directory: Path) -> list[Package]:
 
 
 def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> list[str]:
-  from poetry.core.packages.dependency import Dependency
+  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 
   if isinstance(dependencies, list):
     return dependencies

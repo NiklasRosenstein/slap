@@ -288,7 +288,7 @@ class Application:
     assert closest is not None
     return closest
 
-  def get_projects_in_topological_order(self) -> t.Sequence[Project]:
+  def get_projects_in_topological_order(self) -> list[Project]:
     """ Return the projects in topological order based on their interdependencies. """
 
     from nr.util.digraph import DiGraph

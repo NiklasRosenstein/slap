@@ -39,6 +39,8 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
       for key, value in deps.extra.items():
         self._print_deps(f'extra.{key}', value)
 
+    return 0
+
   def _print_deps(self, prefix: str, deps: list[str]) -> None:
     if deps:
       self.line(f'    {prefix}:')

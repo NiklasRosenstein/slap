@@ -82,6 +82,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
 
     dependencies = []
     for project in projects + project_dependencies:
+      if not project.is_python_project: continue
       if not self.option("no-root") and not self.option("link"):
         dependencies.append(str(project.directory.resolve()))
       dependencies += project.dependencies().run
