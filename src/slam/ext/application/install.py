@@ -1,5 +1,7 @@
 
+import logging
 import os
+import shlex
 from pathlib import Path
 import subprocess as sp
 
@@ -8,6 +10,7 @@ from slam.plugins import ApplicationPlugin
 from slam.project import Project
 from slam.util.python import Environment
 
+logger = logging.getLogger(__name__)
 venv_check_option = option(
   "--no-venv-check",
   description="Do not check if the target Python environment is a virtual environment.",
@@ -85,7 +88,8 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       if not project.is_python_project: continue
       if not self.option("no-root") and not self.option("link"):
         dependencies.append(str(project.directory.resolve()))
-      dependencies += project.dependencies().run
+      else:
+        dependencies += project.dependencies().run
     for project in projects:
       if not self.option("no-dev"):
         dependencies += project.dependencies().dev
@@ -93,6 +97,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     pip_command = [self.option("python"), "-m", "pip", "install"] + dependencies
     if self.option("quiet"):
       pip_command += ['-q']
+    logger.info('Installing with Pip using command <subj>$ %s</subj>', ' '.join(map(shlex.quote, pip_command)))
     if (res := sp.call(pip_command)) != 0:
       return res
 
