@@ -30,12 +30,26 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
       - <fg=cyan>plugins</fg> (aka. "entrypoints")
       - <fg=cyan>scripts</fg>
 
+  2. <u>Flit [0]</u>
+
+    <i>Since the <opt>link</opt> command relies on Flit, no subset of configuration neeeds to be
+    explicitly supported.</i>
+
   <b>Example usage:</b>
 
     <fg=yellow>$</fg> slam link
     <fg=dark_gray>Discovered modules in /projects/my_package/src: my_package
     Extras to install for deps 'all': {{'.none'}}
     Symlinking src/my_package -> .venv/lib/python3.10/site-packages/my_package</fg>
+
+  <b>Important notes:</b>
+
+    This command will <b>symlink</b> your package into your Python environment; this is
+    much unlike a Pip editable install which instead points to your code via a
+    <code>.pth</code> file. If you install something into your environment that requires an
+    older version of the package you symlinked, Pip may write into those symlinked
+    files and effectively change your codebase, which could lead to potential loss
+    of changes.
 
   <u>[0]: https://flit.readthedocs.io/en/latest/</u>
   <u>[1]: https://www.python.org/dev/peps/pep-0517/</u>
