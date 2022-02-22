@@ -5,23 +5,6 @@ Slam is a CLI that provides utilities for developing on Python projects. It work
 
   [Poetry]: https://python-poetry.org/
 
-<!-- Available Commands -->
-```
-Available commands:
-  check                Run sanity checks on your Python project.
-  help                 Displays help for a command.
-  link                 Symlink your Python package with the help of Flit.
-  release              Create a new release of your Python package.
-  test                 Execute commands configured in [tool.slam.test].
-
- changelog
-  changelog add        Add an entry to the unreleased changelog via the CLI.
-  changelog convert    Convert Slam's old YAML based changelogs to new style TOML changelogs.
-  changelog format     Format the changelog in the terminal or in Markdown format.
-  changelog update-pr  Update the pr field of changelog entries in a commit range.
-```
-<!-- /Available Commands -->
-
 ### Installation
 
 It is recommended to install Slam via Pipx, but you can also install it with Pip directly.
