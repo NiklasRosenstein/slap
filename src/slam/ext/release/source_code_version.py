@@ -22,7 +22,7 @@ class SourceCodeVersionReferencesPlugin(ReleasePlugin):
   """
 
   VERSION_REGEX = r'^__version__\s*=\s*[\'"]([^\'"]+)[\'"]'
-  FILENAMES = ['__init__.py', '__about__.py', '_version.py']
+  FILENAMES = ['__init__.py', '__about__.py', '_version.py', '.py']
 
   def get_version_refs(self, project: Project) -> list[VersionRef]:
     packages = project.packages()
@@ -32,8 +32,7 @@ class SourceCodeVersionReferencesPlugin(ReleasePlugin):
     results = []
     packages_without_version = []
     for package in packages:
-      for filename in self.FILENAMES:
-        path = package.path / filename
+      for path in [package.path] if package.path.is_file() else [package.path / f for f in self.FILENAMES]:
         if path.exists():
           version_ref = match_version_ref_pattern(path, self.VERSION_REGEX)
           if version_ref:

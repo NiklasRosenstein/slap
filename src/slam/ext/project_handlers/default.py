@@ -6,7 +6,7 @@ import typing as t
 from pathlib import Path
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
-from setuptools import find_namespace_packages
+from setuptools import find_namespace_packages, find_packages
 
 from slam.plugins import ProjectHandlerPlugin
 from slam.project import Dependencies, Package, Project
@@ -18,15 +18,29 @@ logger = logging.getLogger(__name__)
 def detect_packages(directory: Path) -> list[Package]:
   """ Detects the Python packages in *directory*, making an effort to identify namespace packages correctly. """
 
+  if not directory.is_dir():
+    return []
+
   assert isinstance(directory, Path)
-  modules = find_namespace_packages(str(directory))
+  modules = list(set(find_namespace_packages(str(directory)) + find_packages(str(directory))))
+
+  # Also support toplevel modules.
+  for path in directory.iterdir():
+    if path.is_file() and path.suffix == '.py' and path.stem not in modules:
+      modules.append(path.stem)
+
   if not modules:
     return []
 
-  if len(modules) > 1:
-    def _filter(module: str) -> bool:
-      return (directory / module.replace('.', '/') / '__init__.py').is_file()
-    modules = list(filter(_filter, modules))
+  paths = {}
+  for module in modules:
+    tlm_file = (directory / (module + '.py'))
+    pkg_file = directory / Path(*module.split('.'),  '__init__.py')
+    use_file = tlm_file if tlm_file.is_file() else pkg_file.parent if pkg_file.is_file() else None
+    if use_file is not None:
+      paths[module] = use_file
+
+  modules = [m for m in modules if m in paths]
 
   if len(modules) > 1:
     modules = [
@@ -42,7 +56,7 @@ def detect_packages(directory: Path) -> list[Package]:
       return []
     modules = ['.'.join(common)]
 
-  return [Package(module, directory / Path(*module.split('.')), directory) for module in modules]
+  return [Package(module, paths[module], directory) for module in modules]
 
 
 def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> list[str]:
