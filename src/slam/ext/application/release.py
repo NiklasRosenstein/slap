@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import dataclasses
-from multiprocessing.sharedctypes import Value
 import sys
 import typing as t
 from pathlib import Path
@@ -425,6 +424,12 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
       for config in references:
         pattern = config.pattern.replace('{version}', r'(.*?)')
         version_ref = match_version_ref_pattern(project.directory / config.file, pattern)
+        if version_ref and version_ref.value == '':
+          self.line_error(
+            f'warning: custom reference <b>{config}</b> matches an empty string.\n  make sure you have at least one '
+            f'character after the <b>{{version}}</b> construct (ex. <b>version: {{version}}$</b>)',
+            'warning'
+          )
         if version_ref is not None:
           version_refs.append(version_ref)
 
