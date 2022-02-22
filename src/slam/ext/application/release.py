@@ -329,7 +329,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     """ Internal. Replaces the version reference in all files with the specified *version*. """
 
     from nr.util import Stream
-    from slam.util.text import substitute_ranges
+    from nr.util.text import substitute_ranges
 
     self.line(
       f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"} to '
