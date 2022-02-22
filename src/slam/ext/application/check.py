@@ -1,6 +1,7 @@
 
 import collections
 import dataclasses
+import logging
 import typing as t
 
 from nr.util.plugins import load_entrypoint
@@ -10,6 +11,7 @@ from slam.plugins import ApplicationPlugin, CheckPlugin
 from slam.check import Check, CheckResult
 from slam.project import Project
 
+logger = logging.getLogger(__name__)
 DEFAULT_PLUGINS = ['changelog', 'general', 'poetry', 'release']
 COLORS = {
   Check.Result.OK: 'green',
@@ -101,13 +103,28 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
     checks = []
     for plugin_name in sorted(self.config[project].plugins):
       plugin = load_entrypoint(CheckPlugin, plugin_name)()
-      for check in sorted(plugin.get_project_checks(project), key=lambda c: c.name):
-        check.name = f'{plugin_name}:{check.name}'
+      try:
+        for check in sorted(plugin.get_project_checks(project), key=lambda c: c.name):
+          check.name = f'{plugin_name}:{check.name}'
+          yield check
+          checks.append(check)
+      except Exception as exc:
+        logger.exception(
+          'Uncaught exception in project <subj>%s</subj> application checks for plugin <val>%s</val>',
+          project, plugin_name
+        )
+        check = Check(f'{plugin_name}', CheckResult.ERROR, str(exc))
         yield check
         checks.append(check)
       if not self.app.is_monorepo:
-        for check in sorted(plugin.get_application_checks(self.app), key=lambda c: c.name):
-          check.name = f'{plugin_name}:{check.name}'
+        try:
+          for check in sorted(plugin.get_application_checks(self.app), key=lambda c: c.name):
+            check.name = f'{plugin_name}:{check.name}'
+            yield check
+            checks.append(check)
+        except Exception as exc:
+          logger.exception('Uncaught exception in application checks for plugin <val>%s</val>', plugin_name)
+          check = Check(f'{plugin_name}', CheckResult.ERROR, str(exc))
           yield check
           checks.append(check)
 
