@@ -32,7 +32,7 @@ classifiers = [
   poetry-core = "^1.1.0a6"
   ptyprocess = "^0.7.0"
   pygments = "^2.11.2"
-  PyYAML = "^6.0"
+  PyYAML = ">=4.0"
   requests = "^2.27.1"
   tomli = "^2.0.0"
   twine = "^3.7.0"
@@ -43,6 +43,11 @@ classifiers = [
   types-PyYAML = "^6.0.3"
   types-pygments = "^2.9.16"
   mypy = "^0.931"
+
+  # Todo: Move into an extras section
+  mkdocs = "*"
+  mkdocs-material = "*"
+  novella = "^0.1.1"
 
   [tool.poetry.scripts]
   slam = "slam.__main__:main"
