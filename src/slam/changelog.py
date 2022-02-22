@@ -157,6 +157,8 @@ class ChangelogManager:
     return ManagedChangelog(self, self.directory / self.version_fn_template.format(version=version), version)
 
   def all(self) -> list[ManagedChangelog]:
+    if not self.directory.exists():
+      return []
     changelogs = []
     for path in self.directory.iterdir():
       if path.suffix == '.toml' and path.name != self.unreleased_fn:
