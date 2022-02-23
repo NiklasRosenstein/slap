@@ -44,10 +44,8 @@ classifiers = [
   types-pygments = "^2.9.16"
   mypy = "^0.931"
 
-  # Todo: Move into an extras section
-  mkdocs = "*"
-  mkdocs-material = "*"
-  novella = "^0.1.1"
+  [tool.poetry.extras]
+  docs = ["mkdocs", "mkdocs-material", "novella ^0.1.1"]
 
   [tool.poetry.scripts]
   slam = "slam.__main__:main"

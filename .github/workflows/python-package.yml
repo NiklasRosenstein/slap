@@ -34,11 +34,9 @@ jobs:
       uses: actions/setup-python@v2
       with: { python-version: "3.10" }
     - name: Install dependencies
-      run: python -m pip install slam-cli==1.0.0a15 && python -m venv .venv && source .venv/bin/activate && slam install
-    - name: Run tests
-      run: source .venv/bin/activate && slam test
+      run: python -m pip install pipx -q && pipx install . && slam install --only-extras docs --no-venv-check
     - name: Build documentation
-      run: source .venv/bin/activate && cd docs && novella
+      run: cd docs && novella
     - uses: actions/upload-artifact@v2
       with:
         name: docs
