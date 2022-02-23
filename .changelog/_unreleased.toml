@@ -3,3 +3,9 @@ id = "86cb742b-9867-4903-bbcd-4574d42482ba"
 type = "improvement"
 description = "use more concrete branch name for checkout in `github-actions` plugin to work around issues if the branch name is the same as a top level folder in the repository"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "35582ab9-11d1-456b-99d7-e7e9b5bf0376"
+type = "fix"
+description = "fix `github-actions` tendency to swallow command output which could have been of use in case of an error"
+author = "@NiklasRosenstein"

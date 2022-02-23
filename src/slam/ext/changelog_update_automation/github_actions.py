@@ -9,7 +9,7 @@ from slam.plugins import ChangelogUpdateAutomationPlugin
 
 
 class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlugin):
-  f""" A plugin for use in GitHub Actions via `slam changelog update-pr --use github-actions` which will do all steps
+  """ A plugin for use in GitHub Actions via `slam changelog update-pr --use github-actions` which will do all steps
   to push the updated changelogs back to a pull request branch. It should be used only in an action that is run as
   part of a GitHub pull request.
 
@@ -27,7 +27,7 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
       uses: actions/setup-python@v2
       with: {{ python-version: '3.10' }}
     - name: Install Slam
-      run: pip install slam-cli=={__version__}
+      run: pip install slam-cli==1.0.2
     - name: Update PR references in changelogs
       run: slam changelog update-pr --use github-actions
   ```
@@ -36,6 +36,7 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
 
   * `GITHUB_HEAD_REF`
   * `GITHUB_BASE_REF`
+  * `GITHUB_REF` (the github PR number formatted as `refs/pull/{id}`)
 
   Additional environment variables to control the plugin:
 
@@ -46,8 +47,9 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
   """
 
   def initialize(self) -> None:
-    sp.check_call(['git', 'fetch'], stdout=sp.PIPE, stderr=sp.STDOUT)
-    sp.check_call(['git', 'checkout', 'origin/' + os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE, stderr=sp.STDOUT)
+    sp.check_output(['git', 'fetch'], stderr=sp.PIPE)
+    sp.check_output(['git', 'checkout', 'origin/' + os.environ['GITHUB_HEAD_REF']], stderr=sp.PIPE)
+    sp.check_output(['git', 'checkout', '-b', os.environ['GITHUB_HEAD_REF']])
 
   def get_base_ref(self) -> str:
     return 'origin/' + os.environ['GITHUB_BASE_REF']
@@ -64,7 +66,7 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
     user_email = os.environ.get('GIT_USER_EMAIL', 'github-action@users.noreply.github.com')
     commit_message = os.environ.get('GIT_COMMIT_MESSAGE', 'Update changelog PR references')
     if os.getenv('GIT_SHOW_DIFF'):
-      sp.check_call(['git', 'diff'])
-    sp.check_call(['git', 'add'] + [str(f) for f in changed_files], stdout=sp.PIPE, stderr=sp.STDOUT)
-    sp.check_call(['git', '-c', 'user.name=' + user_name, '-c', 'user.email=' + user_email, 'commit', '-m', commit_message], stdout=sp.PIPE, stderr=sp.STDOUT)
-    sp.check_call(['git', 'push', 'origin', os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE, stderr=sp.STDOUT)
+      sp.check_output(['git', 'diff'], stderr=sp.PIPE)
+    sp.check_output(['git', 'add'] + [str(f) for f in changed_files], stderr=sp.PIPE)
+    sp.check_output(['git', '-c', 'user.name=' + user_name, '-c', 'user.email=' + user_email, 'commit', '-m', commit_message], stderr=sp.PIPE)
+    sp.check_output(['git', 'push', 'origin', os.environ['GITHUB_HEAD_REF']], stderr=sp.PIPE)
