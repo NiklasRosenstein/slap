@@ -588,10 +588,10 @@ class ChangelogConvertCommand(BaseChangelogCommand):
 
 class ChangelogCommandPlugin(ApplicationPlugin):
 
-  def load_configuration(self, app: Application) -> ChangelogManager | None:
+  def load_configuration(self, app: Application) -> ChangelogManager:
     return get_changelog_manager(app.get_main_project())
 
-  def activate(self, app: 'Application', config: ChangelogManager | None) -> None:
+  def activate(self, app: 'Application', config: ChangelogManager) -> None:
     app.cleo.add(ChangelogAddCommand(app, config))
     app.cleo.add(ChangelogUpdatePrCommand(app))
     app.cleo.add(ChangelogFormatCommand(app, config))
