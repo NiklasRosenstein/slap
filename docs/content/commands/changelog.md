@@ -28,9 +28,20 @@ action or other type of CI job (the `slam log inject-pr-url` command can help wi
 __Example for GitHub Actions__
 
 ```yml
-- name: Update PR numbers
-  if: github.event_name == 'pull_request'
-  run: git fetch && slam changelog update-pr ${{github.base_ref}} ${{github.event.number}} --commit --push
+  update-pr-numbers:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with: { python-version: "3.10" }
+    - name: Install Slam
+      run: pip install slam-cli==1.0.0
+    - name: Update PR references in changelogs
+      run: slam -vv changelog update-pr --use github-actions
 ```
 
 Note that you still have to configure Git such that it has an author email and name to create the commit with.
