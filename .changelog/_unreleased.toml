@@ -1,0 +1,5 @@
+[[entries]]
+id = "b5c1c656-970c-4897-9498-81c8e9badf39"
+type = "improvement"
+description = "hide output from `git checkout -b` in `github-actions` plugin"
+author = "@NiklasRosenstein"
