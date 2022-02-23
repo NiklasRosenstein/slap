@@ -295,17 +295,19 @@ class ChangelogUpdatePrCommand(Command):
         prev_entry_ids = {e.id for e in prev_changelog.entries}
 
       new_entry_ids = {e.id for e in changelog.content.entries if e.pr != pr} - prev_entry_ids
-      if not new_entry_ids:
+      entries_to_update = [
+        e for e in changelog.content.entries
+        if e.id in new_entry_ids and (not e.pr or self.option("overwrite"))
+      ]
+      if not entries_to_update:
         continue
 
-      num_updates += len(new_entry_ids)
       self.line(
         f'update <info>{changelog.path.relative_to(Path.cwd())}</info> '
-        f'({len(new_entry_ids)} reference{"s" if len(new_entry_ids) != 1 else ""})')
+        f'({len(entries_to_update)} reference{"s" if len(new_entry_ids) != 1 else ""})')
 
-      for entry in changelog.content.entries:
-        if entry.id in new_entry_ids and (not entry.pr or self.option("overwrite")):
-          entry.pr = pr
+      for entry in entries_to_update:
+        entry.pr = pr
 
       if not self.option("dry"):
         changelog.save(None)
