@@ -1,0 +1,5 @@
+[[entries]]
+id = "04e3d176-72a1-42db-806c-4e357320eca0"
+type = "feature"
+description = "add `ChangelogManager.readonly` which prevents you from saving a changelog to disk"
+author = "@NiklasRosenstein"

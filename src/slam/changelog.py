@@ -141,11 +141,16 @@ class ChangelogManager:
   #: The de/serializer for changelogs.
   deser: ChangelogDeser = dataclasses.field(default_factory=TomlChangelogDeser)
 
+  #: If enabled, write operations to the changelog directory are disabled.
+  readonly: bool = False
+
   def _load(self, file: Path) -> Changelog:
     with file.open('r') as fp:
       return self.deser.load(fp, str(file))
 
   def _save(self, changelog: Changelog, file: Path) -> None:
+    if self.readonly:
+      raise RuntimeError(f'"{self.directory}" is readonly')
     file.parent.mkdir(parents=True, exist_ok=True)
     with file.open('w') as fp:
       self.deser.save(changelog, fp, str(file))
