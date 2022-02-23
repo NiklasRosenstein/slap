@@ -3,3 +3,9 @@ id = "b5c1c656-970c-4897-9498-81c8e9badf39"
 type = "improvement"
 description = "hide output from `git checkout -b` in `github-actions` plugin"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "8096986f-570a-4406-ac05-edc4ddab97e2"
+type = "fix"
+description = "fix shortform detection for GitHub pull request URLs"
+author = "@NiklasRosenstein"

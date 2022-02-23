@@ -85,7 +85,7 @@ class GithubVcsHost(VcsHost):
     return self.issue_shortform(pr)
 
   def issue_shortform(self, issue: str) -> str | None:
-    match = re.search(r'https?://([\w\-\.]+)/(?:|.+/)([\w\-\.\_]+)/([\w\-\.\_]+)/(?:pulls|issues)/(\d+)', issue)
+    match = re.search(r'https?://([\w\-\.]+)/(?:|.+/)([\w\-\.\_]+)/([\w\-\.\_]+)/(?:pulls?|issues)/(\d+)', issue)
     if match:
       domain, owner, repo, issue_id = match.groups()
       if domain == 'github.com' and self.repo == (owner + '/' + repo):
