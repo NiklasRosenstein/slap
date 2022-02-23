@@ -2,6 +2,7 @@
 """ Implements the default package detection plugin. """
 
 import logging
+import re
 import typing as t
 from pathlib import Path
 
@@ -63,7 +64,14 @@ def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> lis
   from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 
   if isinstance(dependencies, list):
-    return dependencies
+    result = []
+    for dep in dependencies:
+      match = re.match(r'\s*[\w\d\-\_]+', dep)
+      if match:
+        result.append(Dependency(match.group(0), dep[match.end():]).to_pep_508())
+      else:
+        result.append(dep)
+    return result
   elif isinstance(dependencies, dict):
     result = []
     for key, version in dependencies.items():
