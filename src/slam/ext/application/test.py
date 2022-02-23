@@ -109,7 +109,9 @@ class TestCommandPlugin(Command, ApplicationPlugin):
   def load_configuration(self, app: Application) -> None:
     self.app = app
     self.tests = []
-    for project in app.projects:
+
+    projects = app.projects if app.get_main_project() == app.root_project() else [app.get_main_project()]
+    for project in projects:
       for test_name, command in project.raw_config().get('test', {}).items():
         self.tests.append(Test(project, test_name, command))
 
