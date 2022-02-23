@@ -51,6 +51,16 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       "no-root",
       description="Do not install the package itself, but only its dependencies.",
     ),
+    option(
+      "extras",
+      description="A comma-separated list of extras to install. Note that <s>\"dev\"</s> is a valid extras.",
+      flag=False,
+    ),
+    option(
+      "only-extras",
+      description="Install only the specified extras. Note that <s>\"dev\"</s> is a valid extras.",
+      flag=False,
+    ),
     venv_check_option,
     option(
       "python", "p",
@@ -68,6 +78,11 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
+    for a, b in [("only-extras", "extras"), ("no-root", "link"), ("only-extras", "link")]:
+      if self.option(a) and self.option(b):
+        self.line_error(f'error: conflicting options <opt>--{a}</opt> and <opt>--{b}</opt>', 'error')
+        return 1
+
     if not venv_check(self):
       return 1
 
@@ -83,16 +98,28 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       projects = self.app.get_projects_in_topological_order()
       project_dependencies = []
 
+    extras = {x.strip() for x in (self.option("extras") or self.option("only-extras") or '').split(',') if x.strip()}
+    found_extras = {'dev'}
+
     dependencies = []
     for project in projects + project_dependencies:
       if not project.is_python_project: continue
-      if not self.option("no-root") and not self.option("link"):
+      if not self.option("no-root") and not self.option("link") and not self.option("only-extras"):
         dependencies.append(str(project.directory.resolve()))
-      else:
+      elif not self.option("only-extras"):
         dependencies += project.dependencies().run
     for project in projects:
-      if not self.option("no-dev"):
+      if (not self.option("no-dev") and not self.option("only-extras")) or 'dev' in extras:
         dependencies += project.dependencies().dev
+      for extra in extras - {'dev'}:
+        project_extras = project.dependencies().extra.get(extra)
+        if project_extras is not None:
+          found_extras.add(extra)
+          dependencies += project_extras
+
+    if missing_extras := extras - found_extras:
+      self.line_error(f'error: the follow extras do not exist: <fg=yellow>{missing_extras}</fg>', 'error')
+      return 1
 
     pip_command = [self.option("python"), "-m", "pip", "install"] + dependencies
     if self.option("quiet"):

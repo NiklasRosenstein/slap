@@ -3,3 +3,9 @@ id = "5e929f72-e807-4206-ace5-353a7b1809ef"
 type = "improvement"
 description = "parse semver in `[tool.poetry.extras]`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "6f543b15-1731-458b-b7e5-6a41ce013f3b"
+type = "feature"
+description = "add `--extras` and `--only-extras` options to `slam install`"
+author = "@NiklasRosenstein"
