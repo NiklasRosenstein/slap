@@ -204,6 +204,10 @@ class ChangelogUpdatePrCommand(Command):
       description="Do not actually make changes on disk.",
     ),
     option(
+      "overwrite",
+      description="Update PR references even if an entry's reference is already set but different.",
+    ),
+    option(
       "commit", "c",
       description="Commit the changes, if any.",
     ),
@@ -300,7 +304,7 @@ class ChangelogUpdatePrCommand(Command):
         f'({len(new_entry_ids)} reference{"s" if len(new_entry_ids) != 1 else ""})')
 
       for entry in changelog.content.entries:
-        if entry.id in new_entry_ids:
+        if entry.id in new_entry_ids and (not entry.pr or self.option("overwrite")):
           entry.pr = pr
 
       if not self.option("dry"):
