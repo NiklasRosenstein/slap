@@ -47,7 +47,7 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
 
   def initialize(self) -> None:
     sp.check_call(['git', 'fetch'], stdout=sp.PIPE, stderr=sp.STDOUT)
-    sp.check_call(['git', 'checkout', os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE, stderr=sp.STDOUT)
+    sp.check_call(['git', 'checkout', 'origin/' + os.environ['GITHUB_HEAD_REF']], stdout=sp.PIPE, stderr=sp.STDOUT)
 
   def get_base_ref(self) -> str:
     return 'origin/' + os.environ['GITHUB_BASE_REF']
