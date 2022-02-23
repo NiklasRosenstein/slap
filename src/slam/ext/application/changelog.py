@@ -271,8 +271,8 @@ class ChangelogUpdatePrCommand(Command):
         changelogs.append((unreleased, manager))
 
     if not changelogs:
-        self.line('no entries to update', 'info')
-        return 0
+      self.line('no entries to update', 'info')
+      return 0
 
     num_updates = 0
     for changelog, manager in changelogs:
@@ -306,6 +306,7 @@ class ChangelogUpdatePrCommand(Command):
         f'update <info>{changelog.path.relative_to(Path.cwd())}</info> '
         f'({len(entries_to_update)} reference{"s" if len(new_entry_ids) != 1 else ""})')
 
+      num_updates += len(entries_to_update)
       for entry in entries_to_update:
         entry.pr = pr
 

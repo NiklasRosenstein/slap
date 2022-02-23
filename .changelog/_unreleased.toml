@@ -3,3 +3,9 @@ id = "fabc0159-3014-4bf5-9325-e24cc2c581f3"
 type = "fix"
 description = "`slam test` now only runs subproject tests instead of all tests in a monorepo if the main project (the one from the cwd) is not the same as the root project"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "4743bfcf-c2dc-4f5e-9dda-aab1b0326a6b"
+type = "fix"
+description = "`slam changelog update-pr` always counted 0 entries to update and thus never committed the changes"
+author = "@NiklasRosenstein"
