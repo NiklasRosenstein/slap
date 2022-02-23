@@ -1,0 +1,2124 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.1">
+    
+    
+      
+        <title>Changelog - Slam</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.e8d9bf0c.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Slam" class="md-header__button md-logo" aria-label="Slam" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Slam
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/NiklasRosenstein/slam/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Slam" class="md-nav__button md-logo" aria-label="Slam" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Slam
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/NiklasRosenstein/slam/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Welcome to the Slam documentation!
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        API Documentation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Changelog
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Changelog
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#101-2022-02-23" class="md-nav__link">
+    1.0.1 (2022-02-23)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a6-2022-02-15" class="md-nav__link">
+    1.0.0a6 (2022-02-15)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a5-2022-02-15" class="md-nav__link">
+    1.0.0a5 (2022-02-15)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a3-2022-02-13" class="md-nav__link">
+    1.0.0a3 (2022-02-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a2-2022-02-13" class="md-nav__link">
+    1.0.0a2 (2022-02-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a1-2022-02-13" class="md-nav__link">
+    1.0.0a1 (2022-02-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0211-2021-11-21" class="md-nav__link">
+    0.21.1 (2021-11-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0210-2021-09-18" class="md-nav__link">
+    0.21.0 (2021-09-18)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0200-2021-09-16" class="md-nav__link">
+    0.20.0 (2021-09-16)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0190-2021-09-15" class="md-nav__link">
+    0.19.0 (2021-09-15)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0182-2021-09-04" class="md-nav__link">
+    0.18.2 (2021-09-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0181-2021-08-27" class="md-nav__link">
+    0.18.1 (2021-08-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0180-2021-08-26" class="md-nav__link">
+    0.18.0 (2021-08-26)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0174-2021-08-20" class="md-nav__link">
+    0.17.4 (2021-08-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0173-2021-08-20" class="md-nav__link">
+    0.17.3 (2021-08-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0172-2021-08-14" class="md-nav__link">
+    0.17.2 (2021-08-14)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0171-2021-08-13" class="md-nav__link">
+    0.17.1 (2021-08-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0170-2021-08-13" class="md-nav__link">
+    0.17.0 (2021-08-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0161-2021-08-12" class="md-nav__link">
+    0.16.1 (2021-08-12)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0160-2021-08-10" class="md-nav__link">
+    0.16.0 (2021-08-10)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0151-2021-08-09" class="md-nav__link">
+    0.15.1 (2021-08-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0150-2021-08-09" class="md-nav__link">
+    0.15.0 (2021-08-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0143-2021-08-08" class="md-nav__link">
+    0.14.3 (2021-08-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0142-2021-08-03" class="md-nav__link">
+    0.14.2 (2021-08-03)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0141-2021-07-23" class="md-nav__link">
+    0.14.1 (2021-07-23)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140-2021-07-22" class="md-nav__link">
+    0.14.0 (2021-07-22)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0133-2021-06-20" class="md-nav__link">
+    0.13.3 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0132-2021-06-20" class="md-nav__link">
+    0.13.2 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131-2021-06-20" class="md-nav__link">
+    0.13.1 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130-2021-06-20" class="md-nav__link">
+    0.13.0 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120-2021-06-08" class="md-nav__link">
+    0.12.0 (2021-06-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0114-2021-02-01" class="md-nav__link">
+    0.11.4 (2021-02-01)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0113-2021-01-29" class="md-nav__link">
+    0.11.3 (2021-01-29)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0112-2020-12-19" class="md-nav__link">
+    0.11.2 (2020-12-19)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0111-2020-12-04" class="md-nav__link">
+    0.11.1 (2020-12-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0110-2020-12-03" class="md-nav__link">
+    0.11.0 (2020-12-03)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0103-2020-11-27" class="md-nav__link">
+    0.10.3 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0102-2020-11-27" class="md-nav__link">
+    0.10.2 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0101-2020-11-27" class="md-nav__link">
+    0.10.1 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0100-2020-11-27" class="md-nav__link">
+    0.10.0 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090-2020-11-20" class="md-nav__link">
+    0.9.0 (2020-11-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080-2020-09-09" class="md-nav__link">
+    0.8.0 (2020-09-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#073-2020-09-09" class="md-nav__link">
+    0.7.3 (2020-09-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#072-2020-09-08" class="md-nav__link">
+    0.7.2 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#071-2020-09-08" class="md-nav__link">
+    0.7.1 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070-2020-09-08" class="md-nav__link">
+    0.7.0 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060-2020-09-08" class="md-nav__link">
+    0.6.0 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#055-2020-09-05" class="md-nav__link">
+    0.5.5 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#054-2020-09-05" class="md-nav__link">
+    0.5.4 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#053-2020-09-05" class="md-nav__link">
+    0.5.3 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#052-2020-09-05" class="md-nav__link">
+    0.5.2 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051-2020-09-05" class="md-nav__link">
+    0.5.1 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050-2020-09-05" class="md-nav__link">
+    0.5.0 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040-2020-09-04" class="md-nav__link">
+    0.4.0 (2020-09-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030-2020-08-29" class="md-nav__link">
+    0.3.0 (2020-08-29)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020-2020-08-29" class="md-nav__link">
+    0.2.0 (2020-08-29)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugins/" class="md-nav__link">
+        Plugins
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          Commands
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Commands
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/changelog/" class="md-nav__link">
+        slam changelog
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/check/" class="md-nav__link">
+        slam check
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/link/" class="md-nav__link">
+        slam link
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/release/" class="md-nav__link">
+        slam release
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/test/" class="md-nav__link">
+        slam test
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          Guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/publishing/" class="md-nav__link">
+        Publishing
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Remotes
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Remotes" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Remotes
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../remotes/github/" class="md-nav__link">
+        GitHub
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#101-2022-02-23" class="md-nav__link">
+    1.0.1 (2022-02-23)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a6-2022-02-15" class="md-nav__link">
+    1.0.0a6 (2022-02-15)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a5-2022-02-15" class="md-nav__link">
+    1.0.0a5 (2022-02-15)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a3-2022-02-13" class="md-nav__link">
+    1.0.0a3 (2022-02-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a2-2022-02-13" class="md-nav__link">
+    1.0.0a2 (2022-02-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100a1-2022-02-13" class="md-nav__link">
+    1.0.0a1 (2022-02-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0211-2021-11-21" class="md-nav__link">
+    0.21.1 (2021-11-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0210-2021-09-18" class="md-nav__link">
+    0.21.0 (2021-09-18)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0200-2021-09-16" class="md-nav__link">
+    0.20.0 (2021-09-16)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0190-2021-09-15" class="md-nav__link">
+    0.19.0 (2021-09-15)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0182-2021-09-04" class="md-nav__link">
+    0.18.2 (2021-09-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0181-2021-08-27" class="md-nav__link">
+    0.18.1 (2021-08-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0180-2021-08-26" class="md-nav__link">
+    0.18.0 (2021-08-26)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0174-2021-08-20" class="md-nav__link">
+    0.17.4 (2021-08-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0173-2021-08-20" class="md-nav__link">
+    0.17.3 (2021-08-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0172-2021-08-14" class="md-nav__link">
+    0.17.2 (2021-08-14)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0171-2021-08-13" class="md-nav__link">
+    0.17.1 (2021-08-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0170-2021-08-13" class="md-nav__link">
+    0.17.0 (2021-08-13)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0161-2021-08-12" class="md-nav__link">
+    0.16.1 (2021-08-12)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0160-2021-08-10" class="md-nav__link">
+    0.16.0 (2021-08-10)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0151-2021-08-09" class="md-nav__link">
+    0.15.1 (2021-08-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0150-2021-08-09" class="md-nav__link">
+    0.15.0 (2021-08-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0143-2021-08-08" class="md-nav__link">
+    0.14.3 (2021-08-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0142-2021-08-03" class="md-nav__link">
+    0.14.2 (2021-08-03)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0141-2021-07-23" class="md-nav__link">
+    0.14.1 (2021-07-23)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140-2021-07-22" class="md-nav__link">
+    0.14.0 (2021-07-22)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0133-2021-06-20" class="md-nav__link">
+    0.13.3 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0132-2021-06-20" class="md-nav__link">
+    0.13.2 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131-2021-06-20" class="md-nav__link">
+    0.13.1 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130-2021-06-20" class="md-nav__link">
+    0.13.0 (2021-06-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120-2021-06-08" class="md-nav__link">
+    0.12.0 (2021-06-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0114-2021-02-01" class="md-nav__link">
+    0.11.4 (2021-02-01)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0113-2021-01-29" class="md-nav__link">
+    0.11.3 (2021-01-29)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0112-2020-12-19" class="md-nav__link">
+    0.11.2 (2020-12-19)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0111-2020-12-04" class="md-nav__link">
+    0.11.1 (2020-12-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0110-2020-12-03" class="md-nav__link">
+    0.11.0 (2020-12-03)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0103-2020-11-27" class="md-nav__link">
+    0.10.3 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0102-2020-11-27" class="md-nav__link">
+    0.10.2 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0101-2020-11-27" class="md-nav__link">
+    0.10.1 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0100-2020-11-27" class="md-nav__link">
+    0.10.0 (2020-11-27)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090-2020-11-20" class="md-nav__link">
+    0.9.0 (2020-11-20)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080-2020-09-09" class="md-nav__link">
+    0.8.0 (2020-09-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#073-2020-09-09" class="md-nav__link">
+    0.7.3 (2020-09-09)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#072-2020-09-08" class="md-nav__link">
+    0.7.2 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#071-2020-09-08" class="md-nav__link">
+    0.7.1 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070-2020-09-08" class="md-nav__link">
+    0.7.0 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060-2020-09-08" class="md-nav__link">
+    0.6.0 (2020-09-08)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#055-2020-09-05" class="md-nav__link">
+    0.5.5 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#054-2020-09-05" class="md-nav__link">
+    0.5.4 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#053-2020-09-05" class="md-nav__link">
+    0.5.3 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#052-2020-09-05" class="md-nav__link">
+    0.5.2 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051-2020-09-05" class="md-nav__link">
+    0.5.1 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050-2020-09-05" class="md-nav__link">
+    0.5.0 (2020-09-05)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040-2020-09-04" class="md-nav__link">
+    0.4.0 (2020-09-04)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030-2020-08-29" class="md-nav__link">
+    0.3.0 (2020-08-29)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020-2020-08-29" class="md-nav__link">
+    0.2.0 (2020-08-29)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/NiklasRosenstein/slam/blob/docs/docs/content/changelog.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+
+<h1 id="changelog">Changelog</h1>
+<h2 id="unreleased">Unreleased</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+parse semver in `[tool.poetry.extras]`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `--extras` and `--only-extras` options to `slam install`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="101-2022-02-23">1.0.1 (2022-02-23)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix the URL generated for pull request IDs when passed to the `slam changelog add` command for Github hosted repositories</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="100a6-2022-02-15">1.0.0a6 (2022-02-15)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+`Command.help` now treats the first line differently to support docstrings where the first line is on the same line as the quotes</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+`slam changelog update-pr` now supports updating the PR reference for changelogs of all projects</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="100a5-2022-02-15">1.0.0a5 (2022-02-15)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+test runner without TTY now does the correct line prefixing</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="100a3-2022-02-13">1.0.0a3 (2022-02-13)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix entrypoint for `slam` script</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="100a2-2022-02-13">1.0.0a2 (2022-02-13)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+reduce code duplicity in `shut.commands.link` and `shut.util.python_package`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+fix `shut log command --author,-a` option being a flag</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+allow `pyproject.toml` to not exist when using `shut release` command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+fix pattern replacing `{version}` string in release references</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+Add `Application.load_subapp()` and `Application.subapps`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+`shut release` now has an `include` configuration key that can be used to include the version refs of sub projects, for example in a mono repository where a root `shut.toml` is used to manage the same version number across all components</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+add support for `SLAM_DIR` environment variable</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="100a1-2022-02-13">1.0.0a1 (2022-02-13)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Breaking change</td><td>
+
+Fully reimplment Shut, rename it to Slam</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0211-2021-11-21">0.21.1 (2021-11-21)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+using `VirtualFiles.get_modified_files()` no longer creates non-existent directories</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+catch malformed ref error when trying to determine main branch name and use `develop` as default (see #40)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+`$package.render-requirements-txt` is now handled correctly</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0210-2021-09-18">0.21.0 (2021-09-18)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `$.scripts` in `package.yml` and `shut pkg run` command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0200-2021-09-16">0.20.0 (2021-09-16)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `shut init` command group with initial `shut init mkdocs` command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `documentation` job in GitHub Actions template</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+ignore GitHub Actions template when checking package config in GitHub Actions (this is mainly used when using an unreleased version of shut to generate the action template or when needing to do quick modifications to the action config without triggering the shut checks in CI).</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0190-2021-09-15">0.19.0 (2021-09-15)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+Changelog entry `fixes` is now optional</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+switch to Mako as a template engine from Jinja2</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `$.templates` to `AbstractProjectModel` and the `github-actions` template</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+`shut pkg new` now adds the `github-template` to the generated `package.yml`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+remove template rendering capability of `pylint` test driver, instead add `pylintrc` template plugin</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0182-2021-09-04">0.18.2 (2021-09-04)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+min `click` version must be `7.1` for `no_args_is_help` option, also allow `8.x`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0181-2021-08-27">0.18.1 (2021-08-27)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix added in `0.18.0` for #33 is actually incorrect, the `command` variable was needed when using the `_tempcopy()` feature. now it is fixed for good</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/33">NiklasRosenstein/shut#33</a></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0180-2021-08-26">0.18.0 (2021-08-26)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `pylint` test driver</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+the fix from `0.17.4` actually made the install cache not work at all and just always install test requirements, now shut knows per driver selection whether dependencies have been installed before or not</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+test drivers are now loaded via the `shut.test_drivers` entrypoint, allowing plugins to be registered from external packages</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+internal: add `AbstractProjectModel.get_auxiliary_renderers()`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+`pylint` now comes with `.pylintrc` templates (only `shut` for now) and can also render templates from HTTP(S) URLs</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+Shut now recognizes lowercase readme/license files</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/31">NiklasRosenstein/shut#31</a></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+render `command` variable into `setup.py` only if package `$.install.hooks` is used</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/33">NiklasRosenstein/shut#33</a></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0174-2021-08-20">0.17.4 (2021-08-20)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix missing test-requirements installation with `shut mono|pkg test --isolate` if the comand was run previously</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0173-2021-08-20">0.17.3 (2021-08-20)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+`shut mono|pkg test --isolate` no longer installs the main package in develop mode</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0172-2021-08-14">0.17.2 (2021-08-14)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+`shut mono|pkg update --verify-tag ""` does not show an error when it should</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+`shut mono|pkg update --verify-tag` now accepts strings prefixed with `refs/tags/` and strips that prefix (useful for GitHub Actions to use the `$GITHUB_REF` variable)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+`shut pkg update --dry` option not respected</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0171-2021-08-13">0.17.1 (2021-08-13)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+dd `shut mono|pkg test -q,--quiet` option to quietly install test requirements with Pip, changed default to not do silent installs</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0170-2021-08-13">0.17.0 (2021-08-13)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `shut pkg test --install/--no-install` which will default to `--install` if the current Python installation (determined by the `PYTHON` variable or falling back to just the `python` command) is a virtual env</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add support for a `mypy` test driver</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+api: add `Package.get_source_directory()`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `$.test-drivers` field in package model and deprecate `$.test-driver` for it.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `shut mono test --install/--no-install` option (parallel to the existing option for `shut pkg test`), without the flag test requirements are only installed if Shut did not install the same requirements into the same environment before</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+make sure `$.test-requirements` are installed when running `shut mono|pkg test` in addition to the test-driver requirements. Update some output formatting of `shut mono|pkg test`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+lines in `MANIFEST.in` outside the shut-specific block are not kept on `shut pkg update` (fixed in `VirtualFiles.write_all()`)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+package `$.author` data can now be de-serialized from a mapping again (as used to be possible before migrating to `databind.core^1.x`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+fix printing of `Failed test details:` when there were no failures but at least one skipped test case</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+`pytest` driver now supports a `$.parallelism` option which automatically pulls in `pytest-xdist` as a test requirement</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+`shut mono|pkg bump --tag|--push|--dry` options now have short versions `-t|-p|-d` respectively</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0161-2021-08-12">0.16.1 (2021-08-12)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+pass `filename` to databind deserializer when loading monorepo/package configuration files</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+Cannot run "pip install" without develop mode on package that inherits monorepo license</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/22">NiklasRosenstein/shut#22</a></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0160-2021-08-10">0.16.0 (2021-08-10)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix missing import for `typing.Dict` in `pytest` driver module, which could in some Python versions result in a `NameError`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+add `extra_requires[test]` in generated `setup.py`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+fix `setup.py` rendering for inherit license files</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/21">NiklasRosenstein/shut#21</a></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+`_tempcopy()` function in `setup.py` now fails if the file cannot be copied from the source file</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0151-2021-08-09">0.15.1 (2021-08-09)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add BSD2, BSD3, BSD4 and Apache2 license templates</td><td></td><td></td><td>@ndjeong</td></tr>
+</table>
+
+<h2 id="0150-2021-08-09">0.15.0 (2021-08-09)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `shut mono|pkg status --json --include-config` options</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0143-2021-08-08">0.14.3 (2021-08-08)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix `VendoredRequirement._normpath()` which corrupted absolute paths on Windows (e.g. `C:/path/to` would be converted to `./C:\path\to` when it should just be `C:\path\to`). This caused `shut pkg install` on Windows to fail.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+`No module named setuptools` error when using `shut pkg install` in venv on Windows</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/16">NiklasRosenstein/shut#16</a></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+fix additional CR in generated `LICENSE.txt` on Windows when installing Shut from source</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/17">NiklasRosenstein/shut#17</a></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+`py.typed` file is rendered into `MANIFEST.in` with backslashes</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0142-2021-08-03">0.14.2 (2021-08-03)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+update how install hooks are rendered into `setup.py`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0141-2021-07-23">0.14.1 (2021-07-23)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+`TypeError` when using --extra and --dev/--test</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0140-2021-07-22">0.14.0 (2021-07-22)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `--dev/--no-dev` and `--test/--no-test` options to `shut mono install` and `shut pkg install`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0133-2021-06-20">0.13.3 (2021-06-20)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+exclude python requirements when rendering `requirements.txt`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0132-2021-06-20">0.13.2 (2021-06-20)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix format of requirements in requirements.txt</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0131-2021-06-20">0.13.1 (2021-06-20)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+also install `PackageModel.test_requirements` on `shut pkg install`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0130-2021-06-20">0.13.0 (2021-06-20)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `PackageModel.dev_requirements` which will be installed with `shut pkg install`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `PackageModel.render_requirements_txt` which will be rendered with `shut pkg update`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0120-2021-06-08">0.12.0 (2021-06-08)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+allow running Shut via `python -m shut`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+fix call to `run_install()` in `shut mono install`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0114-2021-02-01">0.11.4 (2021-02-01)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+`shut pkg install` now correctly installs transitive package interdependencies in the right order</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0113-2021-01-29">0.11.3 (2021-01-29)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix error rendering `setup.py` if the license file did not exist</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `get-version` command to `shut mono` and `shut pkg`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+`shut pkg requirements add` now adds the InstallConfiguration pip args</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0112-2020-12-19">0.11.2 (2020-12-19)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix license_file relative path generation in setuptools renderer, now correctly inherits the license file from the monorepo</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0111-2020-12-04">0.11.1 (2020-12-04)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+fix error in `setuptools` renderer if no license is configured in the package</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0110-2020-12-03">0.11.0 (2020-12-03)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+add `$.package-data` field to `package.yml`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+add missing package data that needs to be packaged with `shut`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0103-2020-11-27">0.10.3 (2020-11-27)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+referencing a LICENSE or README outside the package directory now does not fail on install if the source file does not exist, but it will print a warning</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0102-2020-11-27">0.10.2 (2020-11-27)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+add `PackageModel.license_file` and fix license rendering into MANIFEST.in and setup.py</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0101-2020-11-27">0.10.1 (2020-11-27)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+remove debug print in "package-url" check</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="0100-2020-11-27">0.10.0 (2020-11-27)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+packages now inherit the monorepos license if it is unset (using PackageModel.get_license())</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+If a package inherits the monoreop license, the LICENSE file will not be replicated in the package directory but instead be copied from the monorepo (using `_tempcopy()` in `setup.py`)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+`shut {mono,pkg} update` commands now produce a LICENSE.txt file if a license template exists for the specified license (currently only `MIT`)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+packages now inherit the monorepo `author` and `url`, and `version` if `release.single_version == True`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add "shut pkg format" command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+package `author` and `url` are now inherited from the monorepo</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="090-2020-11-20">0.9.0 (2020-11-20)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+cli: Fix `shut mono bump` not updating requirements in package `setup.py` if packages have inter dependencies</td><td></td><td><a href="https://github.com/NiklasRosenstein/shut/issues/7">NiklasRosenstein/shut#7</a></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+shut.model.package: Add `$.install.index-url` and `$.install.extra-index-urls` fields</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: `shut pkg install` now supports `$.install.index-url` and `$.install.extra-index-urls`, added a `--pipx` option</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+checks: Add check for namespace files</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+fix order of dependencies in the same mono repository when using `shut pkg install`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="080-2020-09-09">0.8.0 (2020-09-09)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+cli: Add `shut ... test --keep-test-env` option</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+shut.test.base: Add `TestStatus.SKIPPED` enumeration value</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+shut.test.pytest: Support skipped tests instead of failing ungracefully</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: Support skipped tests `shut ... test` output</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="073-2020-09-09">0.7.3 (2020-09-09)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+cli: Fix `AttributeError` when running `shut mono bump --snapshot`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="072-2020-09-08">0.7.2 (2020-09-08)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+cli: Fix `shut pkg install` command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="071-2020-09-08">0.7.1 (2020-09-08)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+shore.models.monorepo: Add `Monorepo.get_inter_dependencies_graph()`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+cli: `shut mono install` now uses topological order to retrieve package requirements</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="070-2020-09-08">0.7.0 (2020-09-08)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+cli: Removed `-a,--all` flag from `shut mono update`, the command now always behaves like that flag is set</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: Add `shut mono update` flags `--verify` and `--verify-tag`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+shut.renderers.setuptools: Fix rendering of `extras_require`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: Add `shut mono install` command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="060-2020-09-08">0.6.0 (2020-09-08)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+shut.changelog: Add `breaking_change` Changelog type</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: `shut ... bump` command without version argument or bump mode option will determine the bump mode from the unreleased changelog</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shore.model: `dump()` method now uses `nr.fs.atomic_file` to ensure the original file contents are not modified if the dump operation fails</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shore.model.requirements: Add `BaseRequirement` and `VendoredRequirement` classes, require databind.core and databind.json ^0.4.0 for the `@datamodel(serialize_as)` feature</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+shut.model.package: `Package.requirements` and related properties are now of type `BaseRequirement`, allowing the use of `VendoredRequirement`s</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+cli: `shut pkg build` and `shut pkg publish` will now error if the package uses vendored requirements</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: `shut pkg requirements add` now supports adding vendored requirements using the `-v,--vendor` option</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.model.package: Use new `RequirementsList` class instead of `List[BaseRequirement]`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+shut.model.requirements: `Requirement` now supports package extras</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: Add `--verify` option to `shut pkg update`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+shut.checkers.package: Add `up to date` check for packages</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: `shut pkg install` now supports installing vendored requirements</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+shut.renderers.setuptools: Fix error when package author was not set</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.checkers: Change Checkers interface (remove `project` argument)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: `shut pkg bump` now prevents bumping if managed files are outdated</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+cli: `shut pkg bump` now prevents bumping if package version is managed by a monorepo single-version (as was previously already expected to happen)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+cli: `shut mono bump` now includes the packages in the mono repo if `$.release.single-version` is enabled</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.checkers.monorepo: remove `bad-package-directory` check again, having a package name differ from the directory name is a valid use case</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: Add `shut mono publish` command which delegates to `shut pkg publish`.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.publishers.warehouse: The `WarehouseProvider` now uses the new `PackageModel.get_publish_conf()` instead of `PackageModel.publish` directly, allowing packages to inherit the publish configuration of the mono repository</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="055-2020-09-05">0.5.5 (2020-09-05)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+shut.test.pytest: set altname for `PytestDriver.report_file` to `report-file`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+cli: `shut mono test` now prints a summary of the status for every tested package</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="054-2020-09-05">0.5.4 (2020-09-05)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+shut.test.pytest: `PytestDriver.args` option now defaults to `["-vv"]`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: Add `shut mono test --only` option</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="053-2020-09-05">0.5.3 (2020-09-05)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+cli: Support `VIRTUALENV` and `PIP` environment variables in `shut pkg test` and `shut mono test`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="052-2020-09-05">0.5.2 (2020-09-05)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Feature</td><td>
+
+cli: add `--checks/--no-checks` toggle to `shut pkg` and `shut mono` commands</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+shut.test.pytest: Fix parsing of Pytest JSON record for test functions from a `unittest.TestCase` subclass</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="051-2020-09-05">0.5.1 (2020-09-05)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+cli: fix running "shut pkg install" from inside "shut pkg test --isolate" call</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="050-2020-09-05">0.5.0 (2020-09-05)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+shut.model.package: Remove `PackageData` class, merge it's members into `PackageModel` (this does not change the interface of `PackageModel`), Removed `PackageModel.data` property</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Tests</td><td>
+
+fix unit tests</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shore.checkers.package: `package-author` check is now an error level check</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+cli: `shut mono bump` and `shut pkg bump` no longer run checks, the command group already does it</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Fix</td><td>
+
+shut.renderers.setuptools: fix rendering of `python_requires` option in `setup.py` if package is universal (i.e. the `python` requirement uses an OR (|) which we cannot currently translate to setuptools correctly)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: add `shut pkg test` command which and `PackageModel.test_driver` configuration, the `shore.test` sub-package implements test drivers (currently just `pytest`)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: add `shut mono test` command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="040-2020-09-04">0.4.0 (2020-09-04)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+cli: Updated temrinal output of `shut ... checks`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.model.package: Add `PackageError` exception class</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.checkers.monorepo: Add `bad-package-directory` check to Monorepo checker</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+cli: `shut pkg checks` now inherits checks from the Monorepo if the check result targets the package directly (e.g. the `bad-package-directory` check)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.checkers.core: Add `CheckResult.subject` member (default: `None`)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+cli: `shut pkg` and `shut mono` commands will now print failed checks to stderr before executing the requested subcommand.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.checkers.monorepo: include error message in `invalid-package` check result</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.checkers.generic: `unknown-config-options` check no longer shows if it passes</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.checkers.generic: rename `unknown-config` check to `unknown-config-options`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+cli: no longer set `PYTHONWARNINGS` environment variable</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+shut.model.monorepo: add `Monorepo.get_inter_dependencies_for()` method</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+cli: add `shut pkg install` command</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="030-2020-08-29">0.3.0 (2020-08-29)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+update Changelog typing for databind</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+update paths printed in `shut ... bump` when changelog is released</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="020-2020-08-29">0.2.0 (2020-08-29)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Docs</td><td>
+
+fix README example</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../api/" class="md-footer__link md-footer__link--prev" aria-label="Previous: API Documentation" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              API Documentation
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../configuration/" class="md-footer__link md-footer__link--next" aria-label="Next: Configuration" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Configuration
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.8aa65030.min.js"></script>
+      
+    
+  </body>
+</html>
