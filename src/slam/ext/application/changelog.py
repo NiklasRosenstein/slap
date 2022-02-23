@@ -28,6 +28,11 @@ DEFAULT_VALID_TYPES = [
 
 @dataclasses.dataclass
 class ChangelogConfig:
+  #: Whether the changelog feature is enabled. This acts locally for the current project and not globally.
+  #: Particularly useful for monorepos that have multiple subprojects each with their changelog directories
+  #: to prevent accidentally creating changelogs in the root directory.
+  enabled: bool = True
+
   #: The directory in which changelogs are stored.
   directory: Path = Path('.changelog')
 
@@ -37,7 +42,15 @@ class ChangelogConfig:
       default_factory=lambda: list(DEFAULT_VALID_TYPES))
 
 
-class ChangelogAddCommand(Command):
+class BaseChangelogCommand(Command):
+
+  def __init__(self, app: Application, manager: ChangelogManager) -> None:
+    super().__init__()
+    self.app = app
+    self.manager = manager
+
+
+class ChangelogAddCommand(BaseChangelogCommand):
   """ Add an entry to the unreleased changelog via the CLI.
 
   A changelog is a TOML file, usually in the <u>.changelog/</u> directory, named with
@@ -114,13 +127,12 @@ class ChangelogAddCommand(Command):
     ),
   ]
 
-  def __init__(self, app: Application, manager: ChangelogManager) -> None:
-    super().__init__()
-    self.app = app
-    self.manager = manager
-
   def handle(self) -> int:
     import databind.json
+
+    if self.manager.readonly:
+      self.line_error(f'error: cannot add changelog because it the feature is disabled in the config', 'error')
+      return 1
 
     vcs = self.app.get_vcs()
     change_type: str | None = self.option("type")
@@ -360,7 +372,7 @@ class ChangelogUpdatePrCommand(Command):
     return True
 
 
-class ChangelogFormatCommand(Command):
+class ChangelogFormatCommand(BaseChangelogCommand):
   """ Format the changelog in the terminal or in Markdown format. """
 
   name = "changelog format"
@@ -377,10 +389,6 @@ class ChangelogFormatCommand(Command):
   arguments = [
     argument("version", "The changelog version to format.", optional=True),
   ]
-
-  def __init__(self, manager: ChangelogManager):
-    super().__init__()
-    self.manager = manager
 
   def handle(self) -> int:
     if not self._validate_arguments():
@@ -451,7 +459,7 @@ class ChangelogFormatCommand(Command):
     return f'<a href="{ref}">{shortform}</a>'
 
 
-class ChangelogConvertCommand(Command):
+class ChangelogConvertCommand(BaseChangelogCommand):
   """ Convert Slam's old YAML based changelogs to new style TOML changelogs.
 
   Sometimes the changelog entries in the old style would be suffixed with the
@@ -489,11 +497,6 @@ class ChangelogConvertCommand(Command):
     'breaking_change': 'breaking change',
     'refactor': 'hygiene',
   }
-
-  def __init__(self, app: Application, manager: ChangelogManager) -> None:
-    super().__init__()
-    self.app = app
-    self.manager = manager
 
   def handle(self) -> int:
     import yaml
@@ -579,14 +582,13 @@ class ChangelogConvertCommand(Command):
 
 class ChangelogCommandPlugin(ApplicationPlugin):
 
-  def load_configuration(self, app: Application) -> ChangelogManager:
+  def load_configuration(self, app: Application) -> ChangelogManager | None:
     return get_changelog_manager(app.get_main_project())
-    #return {project: get_changelog_manager(project) for project in app.projects}
 
-  def activate(self, app: 'Application', config: ChangelogManager) -> None:
+  def activate(self, app: 'Application', config: ChangelogManager | None) -> None:
     app.cleo.add(ChangelogAddCommand(app, config))
     app.cleo.add(ChangelogUpdatePrCommand(app))
-    app.cleo.add(ChangelogFormatCommand(config))
+    app.cleo.add(ChangelogFormatCommand(app, config))
     app.cleo.add(ChangelogConvertCommand(app, config))
 
 
@@ -610,4 +612,5 @@ def get_changelog_manager(project: Project) -> ChangelogManager:
     directory=project.directory / config.directory,
     vcs_host=vcs_host or VcsHost.null(),
     valid_types=config.valid_types,
+    readonly=not config.enabled,
   )

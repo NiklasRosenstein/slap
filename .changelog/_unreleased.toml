@@ -3,3 +3,9 @@ id = "04e3d176-72a1-42db-806c-4e357320eca0"
 type = "feature"
 description = "add `ChangelogManager.readonly` which prevents you from saving a changelog to disk"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "77db75a0-0fa8-4ca4-a9f9-a0fe534d63a3"
+type = "feature"
+description = "add `[tool.shut.changelog].enabled` option which can be used to turn off the ability to add changelogs to the current project via the CLI"
+author = "@NiklasRosenstein"
