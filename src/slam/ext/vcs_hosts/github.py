@@ -61,7 +61,7 @@ class GithubVcsHost(VcsHost):
   def normalize_pr(self, pr: str) -> str | None:
     pr = pr.lstrip('#')
     if pr.isnumeric():
-      return f'{self._get_repo_url()}/pulls/{pr}'
+      return f'{self._get_repo_url()}/pull/{pr}'
     elif is_url(pr):
       return pr
     return None

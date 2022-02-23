@@ -1,0 +1,5 @@
+[[entries]]
+id = "bd0f7737-d797-4cca-bc1d-0e4ee53aa418"
+type = "fix"
+description = "fix the URL generated for pull request IDs when passed to the `slam changelog add` command for Github hosted repositories"
+author = "@NiklasRosenstein"
