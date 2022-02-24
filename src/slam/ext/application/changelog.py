@@ -525,7 +525,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
           self._convert_changelog(author, filename)
         except yaml.error.YAMLError as exc:
           has_failures = True
-          self.line_error(f'warn: cannot parse "{filename}"', 'warning')
+          self.line_error(f'warn: cannot parse "{filename}": {exc}', 'warning')
           continue
         except Exception as exc:
           has_failures = True
@@ -570,7 +570,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
       dest = self.manager.version(source.stem)
 
     changelog = dest.content if dest.exists() else Changelog()
-    changelog.release_date = datetime.datetime.strptime(data['release_date'], '%Y-%m-%d').date()
+    changelog.release_date = datetime.datetime.strptime(data['release_date'], '%Y-%m-%d').date() if data.get('release_date') else None
     changelog.entries = entries
 
     if self.option("dry"):

@@ -1,0 +1,5 @@
+[[entries]]
+id = "a184b816-3f48-4bb5-a737-a133332ecc3f"
+type = "fix"
+description = "`slam changelog convert-pr` command now provides YAML error details if the file cannot be parsed and allows the `release_date` to not be set (to convert `_unreleased.yml`)"
+author = "@NiklasRosenstein"
