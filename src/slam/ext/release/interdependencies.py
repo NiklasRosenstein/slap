@@ -51,6 +51,12 @@ class InterdependenciesReleasePlugin(ReleasePlugin):
 
           for expr in expressions:
             for match in re.finditer(expr, line):
-              refs.append(VersionRef(pyproject_file, match.start('version'), match.end('version'), match.group('version'), line.rstrip()))
+              refs.append(VersionRef(
+                file=pyproject_file,
+                start=fp.tell() -len(line) + match.start('version'),
+                end=fp.tell() -len(line) + match.end('version'),
+                value=match.group('version'),
+                content=line.rstrip(),
+              ))
 
     return refs
