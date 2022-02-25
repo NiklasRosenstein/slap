@@ -501,6 +501,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
 
   CHANGELOG_TYPE_MAPPING_TABLE = {
     'change': 'improvement',
+    'break': 'breaking change',
     'breaking_change': 'breaking change',
     'refactor': 'hygiene',
   }
