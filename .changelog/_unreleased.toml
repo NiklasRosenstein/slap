@@ -1,0 +1,5 @@
+[[entries]]
+id = "b139657e-488f-49ac-a58b-3101738044f6"
+type = "fix"
+description = "`slam install` now skips projects that dont expose Python packages"
+author = "@NiklasRosenstein"
