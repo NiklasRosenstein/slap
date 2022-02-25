@@ -3,3 +3,9 @@ id = "a184b816-3f48-4bb5-a737-a133332ecc3f"
 type = "fix"
 description = "`slam changelog convert-pr` command now provides YAML error details if the file cannot be parsed and allows the `release_date` to not be set (to convert `_unreleased.yml`)"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a8395763-e329-4eae-816f-15007a73a802"
+type = "fix"
+description = "`Project.get_packages()` no longer delegates to the `ProjectHandler` if the project is not a Python project (does not have a `pyproject.toml`) to avoid weird namespace packages to be detected unintentionally"
+author = "@NiklasRosenstein"

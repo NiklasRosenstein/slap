@@ -158,6 +158,8 @@ class Project:
     """ Returns the packages that can be detected for this project. How the packages are detected depends on the
     {@link ProjectConfig.packages} option. """
 
+    if not self.is_python_project:
+      return []
     packages = self.handler().get_packages(self)
     if packages:
       logger.debug(
