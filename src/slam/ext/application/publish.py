@@ -36,6 +36,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
     option("client-cert", flag=False),
     #option("verbose"),
     option("disable-progress-bar"),
+    option("dry", "d"),
   ]
 
   def load_configuration(self, app: Application) -> None:
@@ -52,7 +53,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
     distributions: list[Path] = []
 
     with tempfile.TemporaryDirectory() as tmpdir:
-      for project in self.app.projects:
+      for project in self.app.get_projects_in_topological_order():
         if not project.is_python_project: continue
 
         self.line(f'Build <info>{project.get_dist_name()}</info>')
@@ -69,9 +70,10 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
         distributions += [sdist, wheel]
 
-      kwargs = {option.name.replace('-', '_'): self.option(option.name) for option in self.options}
-      kwargs['repository_name'] = kwargs.pop('repository')
-      settings = Settings(**kwargs)
-      upload(settings, [str(d) for d in distributions])
+      if not self.option("dry"):
+        kwargs = {option.name.replace('-', '_'): self.option(option.name) for option in self.options}
+        kwargs['repository_name'] = kwargs.pop('repository')
+        settings = Settings(**kwargs)
+        upload(settings, [str(d) for d in distributions])
 
     return 0

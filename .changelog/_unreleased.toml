@@ -3,3 +3,9 @@ id = "96463501-1ca4-4e5e-a51f-ad149bb818bd"
 type = "fix"
 description = "support old `break` change type and convert it to `breaking change`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f8cae048-5519-4daf-b68f-e43546ccb9ea"
+type = "feature"
+description = "add `slam publish --dry,-d` option"
+author = "@NiklasRosenstein"
