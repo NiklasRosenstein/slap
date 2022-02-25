@@ -301,7 +301,7 @@ class Application:
         graph.add_node(dep, None)
         graph.add_edge(dep, project, None)
 
-    return list(topological_sort(graph))
+    return list(topological_sort(graph, sorting_key=lambda p: p.id))
 
   def load_projects(self) -> None:
     """ Loads all projects, if any additional aside from the main project need to be loaded. """

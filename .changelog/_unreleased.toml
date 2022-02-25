@@ -1,0 +1,5 @@
+[[entries]]
+id = "b4fcc652-2f8a-4419-a879-b693711da1dc"
+type = "fix"
+description = "fix consistent sorting of packages ordered topologically by interdependencies"
+author = "@NiklasRosenstein"
