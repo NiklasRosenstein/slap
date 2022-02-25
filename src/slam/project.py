@@ -76,7 +76,7 @@ class Project:
   config: Once[ProjectConfig]
 
   #: The packages detected with {@link get_packages()} as a {@link Once}.
-  packages: Once[t.Sequence[Package]]
+  packages: Once[t.Sequence[Package] | None]
 
   #: The packages detected readme as a {@link Once}.
   readme: Once[str | None]
@@ -154,7 +154,7 @@ class Project:
           return handler
       raise RuntimeError(f'no fallback package handler found for project <subj>%s</subj>', self)
 
-  def get_packages(self) -> list[Package]:
+  def get_packages(self) -> list[Package] | None:
     """ Returns the packages that can be detected for this project. How the packages are detected depends on the
     {@link ProjectConfig.packages} option. """
 
@@ -166,7 +166,7 @@ class Project:
         'Detected packages for project <subj>%s</subj> by package detector <obj>%s</obj>: <val>%s></val>',
         self, self.handler(), packages,
       )
-    elif self.is_python_project:
+    elif self.is_python_project and packages is not None:
       logger.warning(
         'No packages detected for project <subj>%s</subj> by any of package detectors <val>%s</val>',
         self, self.handler()

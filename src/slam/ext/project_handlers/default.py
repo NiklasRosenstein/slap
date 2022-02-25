@@ -12,7 +12,7 @@ from setuptools import find_namespace_packages, find_packages
 from slam.plugins import ProjectHandlerPlugin
 from slam.project import Dependencies, Package, Project
 
-IGNORED_MODULES = ['test', 'tests', 'docs']
+IGNORED_MODULES = ['test', 'tests', 'docs', 'build']
 logger = logging.getLogger(__name__)
 
 
@@ -43,12 +43,11 @@ def detect_packages(directory: Path) -> list[Package]:
 
   modules = [m for m in modules if m in paths]
 
-  if len(modules) > 1:
-    modules = [
-      m for m in modules
-      if m not in IGNORED_MODULES and
-        ('.' not in m or m.split('.')[0] not in IGNORED_MODULES)
-    ]
+  modules = [
+    m for m in modules
+    if m not in IGNORED_MODULES and
+      ('.' not in m or m.split('.')[0] not in IGNORED_MODULES)
+  ]
 
   if len(modules) > 1:
     # If we stil have multiple modules, we try to find the longest common path.
@@ -111,7 +110,21 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
       return readme
     return None
 
-  def get_packages(self, project: Project) -> list[Package]:
+  def get_packages(self, project: Project) -> list[Package] | None:
+    if (pyproject := self._get_pyproject(project)) is not None:
+      packages = pyproject.get('tool', {}).get('poetry', {}).get('packages')
+      if packages is not None:
+        if not packages:
+          return None  # Indicate explicitly that the project does not expose packages
+        return [
+          Package(
+            name=p['include'].replace('/', '.'),
+            path=project.directory / p.get('from', '') / p['include'],
+            root=project.directory / p.get('from', ''),
+          )
+          for p in packages
+        ]
+
     source_dir = project.config().source_directory
     if source_dir:
       return detect_packages(project.directory / source_dir)

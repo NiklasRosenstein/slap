@@ -18,8 +18,8 @@ class GeneralChecksPlugin(CheckPlugin):
     packages = project.packages()
     return Check(
       'packages',
-      Check.Result.OK if packages else Check.Result.ERROR,
-      'Detected ' + ", ".join(f'<b>{p.root}/{p.name}</b>' for p in packages)
+      Check.Result.SKIPPED if packages is None else Check.Result.OK if packages else Check.Result.ERROR,
+      'Detected ' + ", ".join(f'<b>{p.root}/{p.name}</b>' for p in packages) if packages else None
     )
 
   def _check_py_typed(self, project: Project) -> Check:
@@ -30,7 +30,7 @@ class GeneralChecksPlugin(CheckPlugin):
 
     has_py_typed = set[str]()
     has_no_py_typed = set[str]()
-    for package in project.packages():
+    for package in project.packages() or []:
       (has_py_typed if (package.path / 'py.typed').is_file() else has_no_py_typed).add(package.name)
 
     if expect_typed and has_no_py_typed:

@@ -54,8 +54,9 @@ class ProjectHandlerPlugin(abc.ABC):
     """ Return the readme file configured for the project. """
 
   @abc.abstractmethod
-  def get_packages(self, project: Project) -> list[Package]:
-    """ Return a list of packages for the project. """
+  def get_packages(self, project: Project) -> list[Package] | None:
+    """ Return a list of packages for the project. Return `None` to indicate that the project is expected to
+    not contain any packages. """
 
   @abc.abstractmethod
   def get_dependencies(self, project: Project) -> Dependencies:

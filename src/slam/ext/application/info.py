@@ -20,7 +20,12 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
   def handle(self) -> int:
     for project in self.app.get_projects_in_topological_order():
       if not project.is_python_project: continue
-      packages = ", ".join(f"<opt>{p.name} ({p.root.relative_to(project.directory)})</opt>" for p in project.packages())
+      packages_list = project.packages()
+      packages = (
+        '<i>none</i>'
+        if packages_list is None
+        else '[]' if len(packages_list or []) == 0
+        else ", ".join(f"<opt>{p.name} ({p.root.relative_to(project.directory)})</opt>" for p in packages_list))
       self.line(f'Project <s>"{project.directory.relative_to(Path.cwd())}" (id: <opt>{project.id}</opt>)</s>')
       self.line(f'  dist-name: <opt>{project.get_dist_name()}</opt>')
       self.line(f'  packages: {packages}')

@@ -26,10 +26,10 @@ class ReleaseChecksPlugin(CheckPlugin):
     matcher = SourceCodeVersionReferencesPlugin()
     matcher.io = NullIO()
     version_refs = matcher.get_version_refs(project)
-    packages_without_version = {p.name for p in project.packages()}
+    packages_without_version = {p.name for p in project.packages() or []}
 
     for ref in version_refs:
-      for package in project.packages():
+      for package in project.packages() or []:
         if ref.file.is_relative_to(package.path):
           packages_without_version.discard(package.name)
 
@@ -38,7 +38,7 @@ class ReleaseChecksPlugin(CheckPlugin):
       Check.ERROR if packages_without_version else Check.OK,
       (f'The following packages have no <b>__version__</b>: <b>{", ".join(packages_without_version)}</b>')
         if packages_without_version else
-        f'Found <b>__version__</b> in <b>{", ".join(x.name for x in project.packages())}</b>'
+        f'Found <b>__version__</b> in <b>{", ".join(x.name for x in project.packages() or [])}</b>'
     )
 
   def _check_version_number_consistency(self, app: Application) -> Check:
