@@ -71,6 +71,7 @@ classifiers = [
 
   [tool.poetry.plugins."slam.plugins.release"]
   changelog_release = "slam.ext.release.changelog:ChangelogReleasePlugin"
+  interdependencies = "slam.ext.release.interdependencies:InterdependenciesReleasePlugin"
   source_code_version = "slam.ext.release.source_code_version:SourceCodeVersionReferencesPlugin"
 
   [tool.poetry.plugins."slam.plugins.version_incrementing_rule"]

@@ -3,3 +3,9 @@ id = "14b78ab4-7513-4091-afcb-46a35f5b017a"
 type = "improvement"
 description = "add `Project.application` member"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "768793ed-3c58-4012-bf1c-86c3822f1597"
+type = "feature"
+description = "add release plugin to automatically bump interdependencies between projects in a monorepository (can be disabled by setting `tool.slam.release.interdependencies = false`)"
+author = "@NiklasRosenstein"

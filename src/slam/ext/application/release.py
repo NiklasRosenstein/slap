@@ -4,9 +4,10 @@ from __future__ import annotations
 import dataclasses
 import sys
 import typing as t
+import typing_extensions as te
 from pathlib import Path
 
-from databind.core.annotations import alias
+from databind.core.annotations import alias, fieldinfo
 
 from slam.application import Application, Command, argument, option
 from slam.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRulePlugin
@@ -42,7 +43,10 @@ class ReleaseConfig:
 
   #: A list of {@link ReleasePlugin}s to use. Defaults to contain the {@link SourceCodeVersionReferencesPlugin}
   #: and {@link ChangelogReleasePlugin}.
-  plugins: list[str] = dataclasses.field(default_factory=lambda: ['source_code_version', 'changelog_release'])
+  plugins: list[str] = dataclasses.field(default_factory=lambda: ['changelog_release', 'interdependencies', 'source_code_version'])
+
+  # Extra settings for other things, for example by plugins.
+  extra: te.Annotated[dict[str, t.Any], fieldinfo(flat=True)] = dataclasses.field(default_factory=dict)
 
 
 class ReleaseCommandPlugin(Command, ApplicationPlugin):
