@@ -1,0 +1,5 @@
+[[entries]]
+id = "14b78ab4-7513-4091-afcb-46a35f5b017a"
+type = "improvement"
+description = "add `Project.application` member"
+author = "@NiklasRosenstein"

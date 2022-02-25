@@ -229,14 +229,14 @@ class Application:
     project: Project | None = None
 
     for path in walk_up(Path.cwd()):
-      temp_project = Project(path)
+      temp_project = Project(self, path)
       if temp_project.pyproject_toml.exists() or temp_project.slam_toml.exists():
         project = temp_project
       if path == toplevel:
         break
 
     if not project:
-      project = Project(Path.cwd())
+      project = Project(self, Path.cwd())
 
     logger.info('Root project is <subj>%s</subj>', project)
     return project
@@ -322,13 +322,13 @@ class Application:
         # Find immediate subdirectories with a `pyproject.toml` and consider them included.
         for path in root.directory.iterdir():
           if not path.is_dir(): continue
-          project = Project(path, root)
+          project = Project(self, path, root)
           if project.pyproject_toml.exists():
             self.projects.append(project)
 
     else:
       for path in (root.directory / p for p in config.include):
-        self.projects.append(Project(path))
+        self.projects.append(Project(self, path))
 
     if self.projects != [root]:
       logger.debug('Loaded projects <subj>%s</subj>', self.projects)

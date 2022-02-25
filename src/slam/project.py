@@ -12,6 +12,7 @@ from slam.plugins import ProjectHandlerPlugin, VcsHostProvider
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
+  from slam.application import Application
   from slam.util.toml_file import TomlFile
 
 
@@ -55,6 +56,9 @@ class Project:
   repository or source code project contains multiple individual Python projects. Every project has its own
   configuration, either loaded from `slam.toml` or `pyproject.toml`. """
 
+  #: Reference to the Slam application object.
+  application: Application
+
   #: The directory of the project. This is the directory where the `slam.toml` or `pyproject.toml` configuration
   #: would usually reside in, but the existence of neither is absolutely required.
   directory: Path
@@ -84,11 +88,12 @@ class Project:
   #: The packages dependencies as a {@link Once}.
   dependencies: Once[Dependencies]
 
-  def __init__(self, directory: Path, parent: Project | None = None) -> None:
+  def __init__(self, application: Application, directory: Path, parent: Project | None = None) -> None:
     from nr.util.functional import Once
 
     from slam.util.toml_file import TomlFile
 
+    self.application = application
     self.directory = directory
     self.parent = parent
     self.pyproject_toml = TomlFile(directory / 'pyproject.toml')
