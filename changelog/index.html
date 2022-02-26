@@ -265,6 +265,20 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#110-2022-02-26" class="md-nav__link">
+    1.1.0 (2022-02-26)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#1010-2022-02-25" class="md-nav__link">
     1.0.10 (2022-02-25)
   </a>
@@ -984,6 +998,20 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#110-2022-02-26" class="md-nav__link">
+    1.1.0 (2022-02-26)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#1010-2022-02-25" class="md-nav__link">
     1.0.10 (2022-02-25)
   </a>
@@ -1450,13 +1478,33 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/(HEAD detached at 1.0.10)/docs/content/changelog.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/content/changelog.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="unreleased">Unreleased</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Fix</td><td>
+
+support old `break` change type and convert it to `breaking change`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add `slam publish --dry,-d` option</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
+<h2 id="110-2022-02-26">1.1.0 (2022-02-26)</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+add `Project.application` member</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Feature</td><td>
+
+add release plugin to automatically bump interdependencies between projects in a monorepository (can be disabled by setting `tool.slam.release.interdependencies = false`)</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
 <h2 id="1010-2022-02-25">1.0.10 (2022-02-25)</h2>
 <table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
   <tr><td>Fix</td><td>
