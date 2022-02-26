@@ -23,12 +23,11 @@ classifiers = [
 
   [tool.poetry.dependencies]
   python = "^3.10"
-  "databind.core" = "^1.4.0"
-  "databind.json" = "^1.4.0"
-  "nr.util" = "^0.7.6"
   beautifulsoup4 = "^4.10.0"
   cleo = ">=1.0.0a4"
+  "databind" = "^1.5.1"
   flit = "^3.6.0"
+  "nr.util" = ">=0.7.6,<1.0.0"
   poetry-core = "^1.1.0a6"
   ptyprocess = "^0.7.0"
   pygments = "^2.11.2"
