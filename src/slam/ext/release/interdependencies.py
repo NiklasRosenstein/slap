@@ -1,5 +1,6 @@
 
 import re
+import typing as t
 
 from slam.plugins import ReleasePlugin
 from slam.project import Project
@@ -23,9 +24,9 @@ class InterdependenciesReleasePlugin(ReleasePlugin):
     if not enabled:
       return []
 
-    other_projects = [
-      p.get_dist_name() for p in project.application.projects
-      if p.is_python_project and p is not project
+    other_projects: list[str] = [
+      t.cast(str, p.get_dist_name()) for p in project.application.projects
+      if p.is_python_project and p is not project and p.get_dist_name()
     ]
 
     refs = []
