@@ -1132,29 +1132,30 @@
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L173">[view_source]</a></p>
 <p>The application object is the main hub for command-line interactions. It is responsible for managing the project
-that is the main subject of the command-line invokation (or multiple of such), provide the {@link cleo} command-line
-application that {@link ApplicationPlugin}s can register commands to, etc.</p>
+that is the main subject of the command-line invokation (or multiple of such), provide the <a href="#pydoc:slam.application.Application.cleo">cleo</a> command-line
+application that <a href="#pydoc:slam.plugins.ApplicationPlugin">ApplicationPlugins</a> can register commands to, etc.</p>
 <p><a id="slam.application.Application.projects"></a></p>
 <p><a id="pydoc:slam.application.Application.projects"></a></p>
 <h4 id="projects">projects</h4>
 <p>A list of projects that are loaded into the application for taking into account by commands.
-Multiple projects may be loaded by the application if the first project that is loaded has a {@link ApplicationConfig.include} configuration.</p>
+Multiple projects may be loaded by the application if the first project that is loaded has a
+{@link pydoc:slam.application.ApplicationConfig.include} configuration.</p>
 <p><a id="slam.application.Application.root_project"></a></p>
 <p><a id="pydoc:slam.application.Application.root_project"></a></p>
 <h4 id="root_project">root_project</h4>
-<p>The root project identified by {@link get_root_project()}.</p>
+<p>The root project identified by <a href="#pydoc:slam.application.Application.get_root_project">get_root_project()</a>.</p>
 <p><a id="slam.application.Application.config"></a></p>
 <p><a id="pydoc:slam.application.Application.config"></a></p>
 <h4 id="config">config</h4>
-<p>The application configuration loaded once via {@link get_application_configuration()}.</p>
+<p>The application configuration loaded once via <a href="#pydoc:slam.application.Application.get_application_configuration">get_application_configuration()</a>.</p>
 <p><a id="slam.application.Application.cleo"></a></p>
 <p><a id="pydoc:slam.application.Application.cleo"></a></p>
 <h4 id="cleo">cleo</h4>
-<p>The cleo application to which new commands can be registered via {@link ApplicationPlugin}s.</p>
+<p>The cleo application to which new commands can be registered via <a href="#pydoc:slam.plugins.ApplicationPlugin">ApplicationPlugins</a>.</p>
 <p><a id="slam.application.Application.vcs"></a></p>
 <p><a id="pydoc:slam.application.Application.vcs"></a></p>
 <h4 id="vcs">vcs</h4>
-<p>The version control system that is being used as a {@link Once}.</p>
+<p>The version control system that is being used as a <code>Once</code>.</p>
 <p><a id="slam.application.Application.get_root_project"></a></p>
 <p><a id="pydoc:slam.application.Application.get_root_project"></a></p>
 <h4 id="get_root_project">get_root_project</h4>
@@ -1205,7 +1206,7 @@ the current directory or in any of the parent directories, the current directory
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_plugins</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L351">[view_source]</a></p>
-<p>Loads all application plugins (see {@link ApplicationPlugin}) and activates them.</p>
+<p>Loads all application plugins (see <a href="#pydoc:slam.plugins.ApplicationPlugin">ApplicationPlugin</a>) and activates them.</p>
 <p>By default, all plugins available in the <code>slam.application.ApplicationPlugin</code> entry point group are loaded. This
 behaviour can be modified by setting either the <code>[tool.slam.plugins.disable]</code> or <code>[tool.slam.plugins.enable]</code>
 configuration option (without the <code>tool.slam</code> prefix in case of a <code>slam.toml</code> configuration file). The default
@@ -1234,7 +1235,7 @@ option.</p>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L26">[view_source]</a></p>
 <p>Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Slam
-configuration, which is either loaded from <code>pyproject.toml</code> or <code>slam.toml</code>. Use {@attr Application.raw_config}
+configuration, which is either loaded from <code>pyproject.toml</code> or <code>slam.toml</code>. Use <code>Application.raw_config</code>
 to access the Slam configuration.</p>
 <p><a id="slam.plugins.ApplicationPlugin.activate"></a></p>
 <p><a id="pydoc:slam.plugins.ApplicationPlugin.activate"></a></p>
@@ -1243,8 +1244,8 @@ to access the Slam configuration.</p>
 <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L32">[view_source]</a></p>
-<p>Activate the plugin. Register a {@link Command} to {@attr Application.cleo} or another type of plugin to
-the {@attr Application.plugins} registry.</p>
+<p>Activate the plugin. Register a <code>Command</code> to <a href="#pydoc:slam.application.Application.cleo">Application.cleo</a> or another type of plugin to
+the <code>Application.plugins</code> registry.</p>
 <p><a id="slam.plugins.ProjectHandlerPlugin"></a></p>
 <p><a id="pydoc:slam.plugins.ProjectHandlerPlugin"></a></p>
 <h2 id="class-projecthandlerplugin">Class ProjectHandlerPlugin</h2>
@@ -1334,7 +1335,7 @@ the Slam configuration.</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VcsHostDetector</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L113">[view_source]</a></p>
-<p>This plugin type is used to automatically detect a matching {@link VcsHost}.</p>
+<p>This plugin type is used to automatically detect a matching {@link pydoc:slam.util.vcs.VcsHost}.</p>
 <p><a id="slam.plugins.ChangelogUpdateAutomationPlugin"></a></p>
 <p><a id="pydoc:slam.plugins.ChangelogUpdateAutomationPlugin"></a></p>
 <h2 id="class-changelogupdateautomationplugin">Class ChangelogUpdateAutomationPlugin</h2>
