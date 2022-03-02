@@ -30,6 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Checkout branch if PR
+      if: github.event_name == 'pull_request'
+      run: git checkout -b $GITHUB_HEAD_REF
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with: { python-version: "3.10" }
