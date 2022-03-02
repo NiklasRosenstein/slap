@@ -1,4 +1,4 @@
-# slam link
+# Link
 
 This is particularly interesting when managing the package with [Poetry][] as it does not currently support editable
 installs (as of Poetry 1.2.0a2 on 2022-01-14). This is a little helper command that will temporarily reorganize the

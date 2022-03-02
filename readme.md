@@ -13,7 +13,3 @@ It is recommended to install Slam via Pipx, but you can also install it with Pip
 
 > __Note__: Currently, Slam relies on an alpha version of `poetry-core` (`^1.1.0a6`). If you install it into
 > the same environment as Poetry itself, you may also need to use an alpha version of Poetry (e.g. `1.2.0a2`).
-
----
-
-<p align="center">Copyright &copy; 2022 Niklas Rosenstein</p>

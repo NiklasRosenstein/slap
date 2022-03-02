@@ -1,4 +1,4 @@
-# slam release
+# Release
 
 The `slam release` command updates references to the version number in `pyproject.toml` and your source code, updates
 the unreleased changelog if you make use of Slam's structured changelogs, as well as updating any other versions

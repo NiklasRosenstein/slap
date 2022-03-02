@@ -1,0 +1,21 @@
+nav:
+  - index.md
+  - usage-examples.md
+  - configuration.md
+  - Features:
+    - commands/changelog.md
+    - commands/check.md
+    - commands/info.md
+    - commands/install.md
+    - commands/link.md
+    - commands/release.md
+    - commands/test.md
+  - Guides:
+    - guides/automatic-changelog-pull-request-urls.md
+    - guides/publishing.md
+  - API:
+    - api/documentation.md
+    - api/plugins.md
+    - api/remotes/github.md
+  - Other:
+    - changelog.md

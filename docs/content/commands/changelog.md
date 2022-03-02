@@ -1,4 +1,4 @@
-# slam changelog
+# Changelog
 
 The `slam log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
 but the directory can be changed using the `tool.slam.changelog-dir` option. The CLI allows you to add new entries

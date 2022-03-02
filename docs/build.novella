@@ -1,3 +1,7 @@
-template "mkdocs" {
+template "mkdocs"
+
+action "mkdocs-update-config" {
   site_name = "Slam"
+  update '$.theme.features' add: ['navigation.sections']
+  update '$.theme.palette' add: {'scheme': 'slate', 'primary': 'blue', 'accent': 'teal'}
 }

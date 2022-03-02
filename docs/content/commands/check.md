@@ -1,4 +1,4 @@
-# slam check
+# Check
 
 The `slam check` command performs sanity checks on your project.
 

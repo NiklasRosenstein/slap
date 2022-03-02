@@ -36,7 +36,7 @@ jobs:
     - name: Install dependencies
       run: python -m pip install pipx -q && pipx install . && slam install --only-extras docs --no-venv-check
     - name: Build documentation
-      run: cd docs && novella
+      run: cd docs && novella --base-url slam/
     - uses: actions/upload-artifact@v2
       with:
         name: docs

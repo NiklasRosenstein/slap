@@ -1,4 +1,4 @@
-# slam test
+# Test
 
 Configure the commands to run with `slam test` under the `tool.slam.test` table:
 
