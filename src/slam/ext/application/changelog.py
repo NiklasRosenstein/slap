@@ -134,7 +134,7 @@ class ChangelogAddCommand(BaseChangelogCommand):
       self.line_error(f'error: cannot add changelog because it the feature is disabled in the config', 'error')
       return 1
 
-    vcs = self.app.get_vcs()
+    vcs = self.app.repository.vcs()
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
     author: str | None = self.option("author") or (vcs.get_author().email if vcs else None)
@@ -167,7 +167,7 @@ class ChangelogAddCommand(BaseChangelogCommand):
       assert vcs is not None
       commit_message = f'{change_type}: {description}'
       toplevel = vcs.get_toplevel()
-      relative = self.app.get_main_project().directory.relative_to(toplevel)
+      relative = self.app._get_main_project().directory.relative_to(toplevel)
       if relative != Path('.'):
         prefix = str(relative).replace("\\", "/").strip("/")
         commit_message = f'{prefix}/: {commit_message}'
@@ -240,7 +240,7 @@ class ChangelogUpdatePrCommand(Command):
   def __init__(self, app: Application):
     super().__init__()
     self.app = app
-    self.managers = {project: get_changelog_manager(project) for project in app.projects}
+    self.managers = {project: get_changelog_manager(project) for project in app.repository.projects()}
 
   def handle(self) -> int:
     from nr.util.plugins import iter_entrypoints, load_entrypoint
@@ -360,7 +360,7 @@ class ChangelogUpdatePrCommand(Command):
         'error')
       return False
 
-    vcs = self.app.get_vcs()
+    vcs = self.app.repository.vcs()
     if not vcs:
       self.line_error('error: VCS is not configured or could not be detected', 'error')
       return False
@@ -509,7 +509,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
   def handle(self) -> int:
     import yaml
 
-    vcs = self.app.get_vcs()
+    vcs = self.app.repository.vcs()
     author = self.option("author") or (vcs.get_author().email if vcs else None)
 
     if not author:
@@ -591,7 +591,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
 class ChangelogCommandPlugin(ApplicationPlugin):
 
   def load_configuration(self, app: Application) -> ChangelogManager:
-    return get_changelog_manager(app.get_main_project())
+    return get_changelog_manager(app._get_main_project())
 
   def activate(self, app: 'Application', config: ChangelogManager) -> None:
     app.cleo.add(ChangelogAddCommand(app, config))
@@ -602,23 +602,12 @@ class ChangelogCommandPlugin(ApplicationPlugin):
 
 def get_changelog_manager(project: Project) -> ChangelogManager:
   import databind.json
-  from nr.util.plugins import iter_entrypoints
   from slam.util.vcs import VcsHost
   config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
 
-  vcs_host: VcsHost | None
-  if (provider := project.config().remote):
-    vcs_host = provider.get_vcs_host(project)
-  else:
-    vcs_host = None
-    for plugin_name, plugin in iter_entrypoints(VcsHostDetector):  # type: ignore[misc]
-      vcs_host = plugin()().detect_vcs_host(project)
-      if vcs_host:
-        break
-
   return ChangelogManager(
     directory=project.directory / config.directory,
-    vcs_host=vcs_host or VcsHost.null(),
+    vcs_host=project.repository.vcs_remote() or VcsHost.null(),
     valid_types=config.valid_types,
     readonly=not config.enabled,
   )

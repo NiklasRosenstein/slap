@@ -10,6 +10,7 @@ from pathlib import Path
 from databind.core.annotations import alias, fieldinfo
 
 from slam.application import Application, Command, argument, option
+from slam.configuration import Configuration
 from slam.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRulePlugin
 
 if t.TYPE_CHECKING:
@@ -115,7 +116,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     for repositories that have a <u>github.com</u> "origin" remote. Otherwise, it can be
     configured like this:
 
-      <fg=green>[tool.slam.remote]</fg>
+      <fg=green>[tool.slam.]</fg>
       <fg=dark_gray>type</fg> = <fg=yellow>"github"</fg>
       <fg=dark_gray>repo</fg> = <fg=yellow>"my-github-enterprise.com/owner/repo"</fg>
 
@@ -125,7 +126,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
   """
 
   app: Application
-  config: dict[Project, ReleaseConfig]
+  config: dict[Configuration, ReleaseConfig]
 
   name = "release"
   arguments = [
@@ -146,10 +147,10 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
   # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
-  def load_configuration(self, app: Application) -> dict[Project, ReleaseConfig]:
+  def load_configuration(self, app: Application) -> dict[Configuration, ReleaseConfig]:
     import databind.json
     result = {}
-    for project in app.projects:
+    for project in t.cast(list[Configuration], [app.repository] + app.repository.projects()):  # type: ignore[operator]
       data = project.raw_config().get('release', {})
       result[project] = databind.json.load(data, ReleaseConfig)
     self.app = app
@@ -255,7 +256,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     if not self.is_git_repository or self.option("no-branch-check"):
       return True
 
-    config = self.config[self.app.root_project()]
+    config = self.config[self.app.repository]
 
     try:
       current_branch = self.git.get_current_branch_name()
@@ -357,7 +358,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         with open(filename, 'w') as fp:
           fp.write(content)
 
-    for project in self.app.projects:
+    for project in self.app.repository.projects():
       for plugin in self._load_plugins(project):
         try:
           changed_files.extend(plugin.create_release(project, str(target_version), dry))
@@ -374,7 +375,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
     # TODO (@NiklasRosenstein): If this step errors, revert the changes made by the command so far?
 
-    config = self.config[self.app.root_project()]
+    config = self.config[self.app.repository]
 
     if '{version}' not in config.tag_format:
       self.line_error('<info>tool.slam.release.tag-format<info> must contain <info>{version}</info>', 'error')
@@ -414,7 +415,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     version_refs = []
 
     # Understand the version references defined in the project configuration.
-    for project in self.app.projects:
+    for project in self.app.repository.projects():
       references = self.config[project].references[:]
 
       # Always consider the version number in the pyproject.toml.
@@ -438,7 +439,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
           version_refs.append(version_ref)
 
     # Query plugins for additional version references.
-    for project in self.app.projects:
+    for project in self.app.repository.projects():
       for plugin in self._load_plugins(project):
         version_refs += plugin.get_version_refs(project)
 

@@ -10,6 +10,7 @@ import textwrap
 import typing as t
 from pathlib import Path
 
+import deprecated
 from cleo.application import Application as BaseCleoApplication  # type: ignore[import]
 from cleo.commands.command import Command as _BaseCommand  # type: ignore[import]
 from cleo.helpers import argument, option  # type: ignore[import]
@@ -22,8 +23,8 @@ from slam import __version__
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
-
   from slam.project import Project
+  from slam.repository import Repository
   from slam.util.vcs import Vcs
 
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
@@ -154,12 +155,6 @@ class CleoApplication(BaseCleoApplication):
 
 @dataclasses.dataclass
 class ApplicationConfig:
-  #: A list of paths pointing to projects to include in the application invokation. This is useful if multuple
-  #: projects should be usable with the Slam CLI in unison. Note that if this option is not set and either no
-  #: configuration file exists in the CWD or the `slam.toml` is used, all immediate subdirectories that contain
-  #: a `pyproject.toml` will be considered included projects.
-  include: list[str] | None = None
-
   #: A list of plugins to disable from the #DEFAULT_PLUGINS.
   disable: list[str] = dataclasses.field(default_factory=list)
 
@@ -175,10 +170,7 @@ class Application:
   that is the main subject of the command-line invokation (or multiple of such), provide the #cleo command-line
   application that #ApplicationPlugin#s can register commands to, etc. """
 
-  #: A list of projects that are loaded into the application for taking into account by commands.
-  #: Multiple projects may be loaded by the application if the first project that is loaded has a
-  #: #ApplicationConfig.include configuration.
-  projects: list[Project]
+  repository: Repository
 
   #: The root project identified by #get_root_project().
   root_project: Once[Project]
@@ -192,85 +184,35 @@ class Application:
   #: The version control system that is being used as a #Once.
   vcs: Once[Vcs | None]
 
-  def __init__(self, name: str = 'slam', version: str = __version__) -> None:
+  def __init__(self, directory: Path | None = None, name: str = 'slam', version: str = __version__) -> None:
     from nr.util.functional import Once
-
-    def _init_app():
-      self.load_projects()
-      self.load_plugins()
-
-    self._projects_loaded = False
+    from slam.repository import Repository
+    self.repository = Repository(directory or Path.cwd())
     self._plugins_loaded = False
-    self.projects = []
-    self.root_project = Once(self.get_root_project)
-    self.config = Once(self.get_application_configuration)
-    self.cleo = CleoApplication(_init_app, name, version)
-    self.vcs = Once(self.get_vcs)
+    self.config = Once(self._get_application_configuration)
+    self.cleo = CleoApplication(lambda: self.load_plugins(), name, version)
+    self.main_project = Once(self._get_main_project)
 
-  @property
-  def directory(self) -> Path:
-    return self.root_project().directory
-
-  @property
-  def is_monorepo(self) -> bool:
-    return len(self.projects) > 1
-
-  def get_root_project(self) -> Project:
-    """ Searches for the root project, by going up the directory tree until the VCS toplevel is reached, taking the
-    highest directory that has a `slam.toml` or `pyproject.toml` configuration file. Note that if there is none in
-    the current directory or in any of the parent directories, the current directory will be used nonetheless. """
-
-    from nr.util.fs import walk_up
-
-    from slam.project import Project
-
-    vcs = self.vcs()
-    toplevel = vcs.get_toplevel().resolve() if vcs else None
-    project: Project | None = None
-
-    for path in walk_up(Path.cwd()):
-      temp_project = Project(self, path)
-      if temp_project.pyproject_toml.exists() or temp_project.slam_toml.exists():
-        project = temp_project
-      if path == toplevel:
-        break
-
-    if not project:
-      project = Project(self, Path.cwd())
-
-    logger.info('Root project is <subj>%s</subj>', project)
-    return project
-
-  def get_application_configuration(self) -> ApplicationConfig:
+  def _get_application_configuration(self) -> ApplicationConfig:
     """ Loads the application-level configuration. """
 
     import databind.json
     from databind.core.annotations import enable_unknowns
 
     return databind.json.load(
-      self.root_project().raw_config().get('application', {}),
+      self.repository.raw_config().get('application', {}),
       ApplicationConfig,
       options=[enable_unknowns()]
     )
 
-  def get_vcs(self) -> Vcs | None:
-    """ Detect the version control system in use in the application. """
-
-    from slam.util.vcs import detect_vcs
-
-    assert self._projects_loaded
-    vcs = detect_vcs(Path.cwd())
-    logger.debug('Detected version control system is <subj>%s</subj>', vcs)
-    return vcs
-
-  def get_main_project(self) -> Project:
+  def _get_main_project(self) -> Project:
     """ Returns the main project, which is the one closest to the current working directory. """
 
     closest: Project | None = None
     distance: int = 99999
     cwd = Path.cwd()
 
-    for project in self.projects:
+    for project in self.repository.projects():
       path = project.directory.resolve()
       if path == cwd:
         closest = project
@@ -288,66 +230,6 @@ class Application:
     assert closest is not None
     return closest
 
-  def get_projects_in_topological_order(self) -> list[Project]:
-    """ Return the projects in topological order based on their interdependencies. """
-
-    from nr.util.digraph import DiGraph
-    from nr.util.digraph.algorithm.topological_sort import topological_sort
-
-    graph: DiGraph[Project, None, None] = DiGraph()
-    for project in self.projects:
-      graph.add_node(project, None)
-      for dep in project.get_interdependencies(self.projects):
-        graph.add_node(dep, None)
-        graph.add_edge(dep, project, None)
-
-    return list(topological_sort(graph, sorting_key=lambda p: p.id))
-
-  def load_projects(self) -> None:
-    """ Loads all projects, if any additional aside from the main project need to be loaded. """
-
-    from nr.util.fs import is_relative_to
-
-    from slam.project import Project
-
-    assert not self._projects_loaded
-    self._projects_loaded = True
-
-    root = self.root_project()
-    self.projects.append(root)
-
-    config = self.config()
-    if config.include is None:
-      if root.slam_toml.exists() or not root.pyproject_toml.exists():
-        # Find immediate subdirectories with a `pyproject.toml` and consider them included.
-        for path in root.directory.iterdir():
-          if not path.is_dir(): continue
-          project = Project(self, path, root)
-          if project.pyproject_toml.exists():
-            self.projects.append(project)
-
-    else:
-      for path in (root.directory / p for p in config.include):
-        self.projects.append(Project(self, path))
-
-    if self.projects != [root]:
-      logger.debug('Loaded projects <subj>%s</subj>', self.projects)
-
-    # Ensure that all loaded projects are inside the VCS toplevel directory.
-    vcs = self.vcs()
-    if vcs:
-      toplevel = vcs.get_toplevel()
-      for project in self.projects:
-        if not is_relative_to(project.directory, toplevel):
-          logger.error(
-            'Project <subj>%s</subj> is not relative to the VCS toplevel directory <val>%s</val>',
-            self, toplevel
-          )
-          raise ValueError(f'Project {project} is not relative to the VCS toplevel directory {toplevel!r}')
-
-    if len(set(p.id for p in self.projects)) != len(self.projects):
-      raise ValueError(f'Project IDs are not unique')
-
   def load_plugins(self) -> None:
     """ Loads all application plugins (see #ApplicationPlugin) and activates them.
 
@@ -358,7 +240,6 @@ class Application:
     option. """
 
     from nr.util.plugins import load_entrypoint
-
     from slam.plugins import ApplicationPlugin
 
     assert not self._plugins_loaded

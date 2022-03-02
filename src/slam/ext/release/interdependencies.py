@@ -20,13 +20,13 @@ class InterdependenciesReleasePlugin(ReleasePlugin):
     if not pyproject_file.exists():
       return []
 
-    enabled = project.application.root_project().raw_config().get('release', {}).get('interdependencies', True)
+    enabled = project.repository.raw_config().get('release', {}).get('interdependencies', True)
     if not enabled:
       return []
 
     other_projects: list[str] = [
-      t.cast(str, p.get_dist_name()) for p in project.application.projects
-      if p.is_python_project and p is not project and p.get_dist_name()
+      t.cast(str, p.dist_name()) for p in project.repository.projects()
+      if p.is_python_project and p is not project and p.dist_name()
     ]
 
     refs = []

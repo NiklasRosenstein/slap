@@ -82,11 +82,11 @@ classifiers = [
   prepatch = "slam.ext.version_incrementing_rule:prepatch"
   prerelease = "slam.ext.version_incrementing_rule:prerelease"
 
-  [tool.poetry.plugins."slam.plugins.vcs_host_detector"]
-  github = "slam.ext.vcs_hosts.github:GithubVcsHostDetector"
+  [tool.poetry.plugins."slam.plugins.project"]
+  default = "slam.ext.project_handlers.default:DefaultProjectHandler"
 
-  [tool.poetry.plugins."slam.plugins.vcs_host_provider"]
-  github = "slam.ext.vcs_hosts.github:GithubVcsHostProvider"
+  [tool.poetry.plugins."slam.plugins.repository"]
+  default = "slam.ext.repository_handlers.default:DefaultRepositoryHandler"
 
 [tool.slam]
 typed = true

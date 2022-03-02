@@ -49,7 +49,7 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
   def load_configuration(self, app: 'Application') -> dict[Project, CheckConfig]:
     import databind.json
     result = {}
-    for project in app.projects:
+    for project in app.repository.projects():
       config = databind.json.load(project.raw_config().get('check', {}), CheckConfig)
       result[project] = config
     return result
@@ -62,10 +62,10 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
   def handle(self) -> int:
 
     counter: t.MutableMapping[CheckResult, int] = collections.defaultdict(int)
-    if self.app.is_monorepo:
+    if self.app.repository.is_monorepo:
       for check in self._run_application_checks():
         counter[check.result] += 1
-    for project in self.app.projects:
+    for project in self.app.repository.projects():
       if not project.is_python_project: continue
       for check in self._run_project_checks(project):
         counter[check.result] += 1
@@ -116,7 +116,7 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
         check = Check(f'{plugin_name}', CheckResult.ERROR, str(exc))
         yield check
         checks.append(check)
-      if not self.app.is_monorepo:
+      if not self.app.repository.is_monorepo:
         try:
           for check in sorted(plugin.get_application_checks(self.app), key=lambda c: c.name):
             check.name = f'{plugin_name}:{check.name}'
@@ -129,14 +129,14 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
           checks.append(check)
 
     if checks:
-      if self.app.is_monorepo:
+      if self.app.repository.is_monorepo:
         self.line(f'Checks for project <info>{project.id}</info>')
         self.line('')
       self._print_checks(checks)
       self.line('')
 
   def _run_application_checks(self) -> t.Iterable[Check]:
-    plugin_names = {p for project in self.app.projects for p in self.config[project].plugins}
+    plugin_names = {p for project in self.app.repository.projects() for p in self.config[project].plugins}
     checks = []
     for plugin_name in sorted(plugin_names):
       plugin = load_entrypoint(CheckPlugin, plugin_name)()

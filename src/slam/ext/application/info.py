@@ -18,7 +18,7 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
-    for project in self.app.get_projects_in_topological_order():
+    for project in self.app.repository.projects():
       if not project.is_python_project: continue
       packages_list = project.packages()
       packages = (
@@ -27,14 +27,14 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
         else '[]' if len(packages_list or []) == 0
         else ", ".join(f"<opt>{p.name} ({p.root.relative_to(project.directory)})</opt>" for p in packages_list))
       self.line(f'Project <s>"{project.directory.relative_to(Path.cwd())}" (id: <opt>{project.id}</opt>)</s>')
-      self.line(f'  dist-name: <opt>{project.get_dist_name()}</opt>')
+      self.line(f'  dist-name: <opt>{project.dist_name()}</opt>')
       self.line(f'  packages: {packages}')
       self.line(f'  readme: <opt>{project.handler().get_readme(project)}</opt>')
       self.line(f'  handler: <opt>{project.handler()}</opt>')
 
-      inter_deps = project.get_interdependencies(self.app.projects)
+      inter_deps = project.get_interdependencies(self.app.repository.projects())
       if inter_deps:
-        projects = ", ".join(f"<opt>{p.get_dist_name()}</opt>" for p in inter_deps)
+        projects = ", ".join(f"<opt>{p.dist_name()}</opt>" for p in inter_deps)
         self.line(f'  depends on: {projects}')
 
       deps = project.dependencies()

@@ -109,9 +109,7 @@ class TestCommandPlugin(Command, ApplicationPlugin):
   def load_configuration(self, app: Application) -> None:
     self.app = app
     self.tests = []
-
-    projects = app.projects if app.get_main_project() == app.root_project() else [app.get_main_project()]
-    for project in projects:
+    for project in app.repository.projects():
       for test_name, command in project.raw_config().get('test', {}).items():
         self.tests.append(Test(project, test_name, command))
 
@@ -122,12 +120,12 @@ class TestCommandPlugin(Command, ApplicationPlugin):
     result = set()
     for test in self.tests:
       use_test = (
-        self.app.is_monorepo and (
+        self.app.repository.is_monorepo and (
           name == test.id
           or (name.startswith(':') and test.name == name[1:])
           or (test.project.id == name)
         ) or
-        not self.app.is_monorepo and (
+        not self.app.repository.is_monorepo and (
           name == test.name
         )
       )

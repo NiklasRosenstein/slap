@@ -12,6 +12,9 @@ A project with a `slam.toml` configuration file (or with no configuration file) 
 project for two or more sub-projects. This configuration represents a mono-repository where multiple projects
 are stored and versioned together.
 
+Slam understands most details about a project through a {@pylink slam.plugins.ProjectHandlerPlugin}. It comes
+with a default implementation that supports Poetry and Flit Python projects.
+
 ## Repository
 
 A repository is a directory that contains one or more projects. For singular projects, the repository directory
@@ -47,3 +50,6 @@ project (i.e. if it has a `pyproject.toml` instead of a `slam.toml`) it will be 
         tests/
       shut.toml
     ```
+
+Slam understands most details about a repository through a {@pylink slam.plugins.RepositoryHandlerPlugin}. It
+comes with a default implementation that supports Git repositories and GitHub.

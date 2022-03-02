@@ -1,0 +1,5 @@
+[[entries]]
+id = "e9114573-01d9-41d3-b701-39a18c057559"
+type = "refactor"
+description = "add `Repository` and `RepositoryHandlerPlugin` which gets to decide which projects are loaded, remove most of the related members from the `Application` class"
+author = "@NiklasRosenstein"

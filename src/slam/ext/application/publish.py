@@ -53,10 +53,10 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
     distributions: list[Path] = []
 
     with tempfile.TemporaryDirectory() as tmpdir:
-      for project in self.app.get_projects_in_topological_order():
+      for project in self.app.repository.projects():
         if not project.is_python_project: continue
 
-        self.line(f'Build <info>{project.get_dist_name()}</info>')
+        self.line(f'Build <info>{project.dist_name()}</info>')
         backend = Pep517BuildBackend(
           project.pyproject_toml.value()['build-system']['build-backend'],
           project.directory,

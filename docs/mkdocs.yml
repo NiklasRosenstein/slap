@@ -17,6 +17,5 @@ nav:
   - API:
     - api/plugins.md
     - api/documentation.md
-    - api/remotes/github.md
   - Other:
     - changelog.md

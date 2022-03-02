@@ -124,7 +124,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
     num_projects = 0
     num_skipped = 0
 
-    for project in self.app.get_projects_in_topological_order():
+    for project in self.app.repository.projects():
       if not project.is_python_project:
         continue
 
@@ -139,7 +139,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
         continue
 
       config = project.pyproject_toml.value()
-      dist_name = project.get_dist_name() or project.directory.resolve().name
+      dist_name = project.dist_name() or project.directory.resolve().name
       if not self._setup_flit_config(packages[0].name, dist_name, config):
         return 1
 

@@ -8,12 +8,12 @@ from pathlib import Path
 
 from databind.core.annotations import alias
 
-from slam.plugins import ProjectHandlerPlugin, VcsHostProvider
+from slam.configuration import Configuration
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
-  from slam.application import Application
-  from slam.util.toml_file import TomlFile
+  from slam.repository import Repository
+  from slam.plugins import ProjectHandlerPlugin
 
 
 logger = logging.getLogger(__name__)
@@ -46,35 +46,14 @@ class ProjectConfig:
   #: Whether the project source code is inteded to be typed.
   typed: bool | None = None
 
-  #: Configuration for the remote VCS that is used for changelogs and creating releases. If it is not specified,
-  #: it will try to detect one from the builtin VCS remotes (see the #slam.ext.vcs_remotes module).
-  remote: VcsHostProvider | None = None
 
-
-class Project:
+class Project(Configuration):
   """ Represents one Python project. Slam can work with multiple projects at the same time, for example if the same
   repository or source code project contains multiple individual Python projects. Every project has its own
   configuration, either loaded from `slam.toml` or `pyproject.toml`. """
 
   #: Reference to the Slam application object.
-  application: Application
-
-  #: The directory of the project. This is the directory where the `slam.toml` or `pyproject.toml` configuration
-  #: would usually reside in, but the existence of neither is absolutely required.
-  directory: Path
-
-  #: Points to the `pyproject.toml` file in the project and can be used to conveniently check for its existence
-  #: or to access its contents.
-  pyproject_toml: TomlFile
-
-  #: Points to the `slam.toml` file in the project and can be used to conveniently check for its existence
-  #: or to access its contents.
-  slam_toml: TomlFile
-
-  #: Use this to access the Slam configuration, automatically loaded from either `slam.toml` or the `tool.slam`
-  #: section in `pyproject.toml`. The attribute is a #Once instance, thus it needs to be called to retrieve
-  #: the contents. This is the same as #get_raw_configuration(), but is more efficient.
-  raw_config: Once[dict[str, t.Any]]
+  repository: Repository
 
   #: The parsed configuration, accessible as a #Once.
   config: Once[ProjectConfig]
@@ -88,78 +67,41 @@ class Project:
   #: The packages dependencies as a #Once.
   dependencies: Once[Dependencies]
 
-  def __init__(self, application: Application, directory: Path, parent: Project | None = None) -> None:
+  def __init__(self, repository: Repository, directory: Path) -> None:
+    super().__init__(directory)
     from nr.util.functional import Once
-
     from slam.util.toml_file import TomlFile
 
-    self.application = application
-    self.directory = directory
-    self.parent = parent
-    self.pyproject_toml = TomlFile(directory / 'pyproject.toml')
-    self.slam_toml = TomlFile(directory / 'slam.toml')
+    self.repository = repository
     self.usercfg = TomlFile(Path('~/.config/slam/config.toml').expanduser())
-    self.raw_config = Once(self.get_raw_configuration)
-    self.handler = Once(self.get_project_handler)
-    self.config = Once(self.get_project_configuration)
-    self.packages = Once(self.get_packages)
-    self.readme = Once(self.get_readme)
-    self.dependencies = Once(self.get_dependencies)
+    self.handler = Once(self._get_project_handler)
+    self.config = Once(self._get_project_configuration)
+    self.packages = Once(self._get_packages)
+    self.readme = Once(self._get_readme)
+    self.dependencies = Once(self._get_dependencies)
+    self.dist_name = Once(self._get_dist_name)
 
-  def __repr__(self) -> str:
-    return f'Project(id="{self.id}", directory="{self.directory}")'
-
-  def get_raw_configuration(self) -> dict[str, t.Any]:
-    """ Loads the raw configuration data for Slam from either the `slam.toml` configuration file or `pyproject.toml`
-    under the `[slam.tool]` section. If neither of the files exist or the section in the pyproject does not exist,
-    an empty dictionary will be returned. """
-
-    if self.slam_toml.exists():
-      logger.debug(
-        'Reading configuration for project <subj>%s</subj> from <val>%s</val>',
-        self, self.slam_toml.path
-      )
-      return self.slam_toml.value()
-    if self.pyproject_toml.exists():
-      logger.debug(
-        'Reading configuration for project <subj>%s</subj> from <val>%s</val>',
-        self, self.pyproject_toml.path
-      )
-      return self.pyproject_toml.value().get('tool', {}).get('slam', {})
-    return {}
-
-  def get_project_configuration(self) -> ProjectConfig:
+  def _get_project_configuration(self) -> ProjectConfig:
     """ Loads the project-level configuration. """
 
     import databind.json
     from databind.core.annotations import enable_unknowns
     return databind.json.load(self.raw_config(), ProjectConfig, options=[enable_unknowns()])
 
-  def get_project_handler(self) -> ProjectHandlerPlugin:
-    """ Loads the project handler for this project. """
+  def _get_project_handler(self) -> ProjectHandlerPlugin:
+    """ Returns the handler for this project. """
 
     from nr.util.plugins import load_entrypoint
-
     from slam.plugins import ProjectHandlerPlugin
 
-    config = self.config()
-    if config.handler:
-      handler = load_entrypoint(ProjectHandlerPlugin, config.handler)()  # type: ignore[misc]
-      if not handler.matches_project(self):
-        logger.error(
-          'Project handler <obj>%s</obj> for project <subj>%s</subj> does not seem to match the project',
-          config.handler, self
-        )
-      return handler
-    else:
-      from slam.ext.project_handlers.default import DefaultProjectHandler
-      handlers = [DefaultProjectHandler()]
-      for handler in handlers:
-        if handler.matches_project(self):
-          return handler
-      raise RuntimeError(f'no fallback package handler found for project <subj>%s</subj>', self)
+    handler_name = self.config().handler or 'default'
+    assert isinstance(handler_name, str), repr(handler_name)
 
-  def get_packages(self) -> list[Package] | None:
+    handler = load_entrypoint(ProjectHandlerPlugin, handler_name)()  # type: ignore[misc]
+    assert handler.matches_project(self), (self, handler)
+    return handler
+
+  def _get_packages(self) -> list[Package] | None:
     """ Returns the packages that can be detected for this project. How the packages are detected depends on the
     #ProjectConfig.packages option. """
 
@@ -178,13 +120,13 @@ class Project:
       )
     return packages
 
-  def get_dist_name(self) -> str | None:
+  def _get_dist_name(self) -> str | None:
     return self.handler().get_dist_name(self)
 
-  def get_readme(self) -> str | None:
+  def _get_readme(self) -> str | None:
     return self.handler().get_readme(self)
 
-  def get_dependencies(self) -> Dependencies:
+  def _get_dependencies(self) -> Dependencies:
     return self.handler().get_dependencies(self)
 
   def get_interdependencies(self, projects: t.Sequence[Project]) -> list[Project]:
@@ -201,18 +143,14 @@ class Project:
 
     result = []
     for project in projects:
-      if project.get_dist_name() in dependency_names:
+      if project.dist_name() in dependency_names:
         result.append(project)
 
     return result
 
   @property
   def id(self) -> str:
-    if not self.parent:
-      return '$'
-    if self.handler and (name := self.handler().get_dist_name(self)):
-      return name
-    return self.directory.resolve().name
+    return self.dist_name() or self.directory.resolve().name
 
   @id.setter
   def id(self, value: str) -> None:

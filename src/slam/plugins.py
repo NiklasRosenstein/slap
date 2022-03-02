@@ -14,7 +14,8 @@ if t.TYPE_CHECKING:
   from slam.check import Check
   from slam.project import Dependencies, Package, Project
   from slam.release import VersionRef
-  from slam.util.vcs import VcsHost
+  from slam.repository import Repository
+  from slam.util.vcs import Vcs, VcsHost
 
 
 class ApplicationPlugin(t.Generic[T], abc.ABC):
@@ -32,6 +33,28 @@ class ApplicationPlugin(t.Generic[T], abc.ABC):
   def activate(self, app: Application, config: T) -> None:
     """ Activate the plugin. Register a #Command to #Application.cleo or another type of plugin to
     the #Application.plugins registry. """
+
+
+class RepositoryHandlerPlugin(abc.ABC):
+  """ A plugin to provide data and operations on a repository level. """
+
+  ENTRYPOINT = 'slam.plugins.repository'
+
+  @abc.abstractmethod
+  def matches_repository(self, repository: Repository) -> bool:
+    """ Return `True` if the handler is able to provide data for the given project. """
+
+  @abc.abstractmethod
+  def get_vcs(self, repository: Repository) -> Vcs | None:
+    """ Return the version control system that the repository is managed with. """
+
+  @abc.abstractmethod
+  def get_vcs_remote(self, repository: Repository) -> VcsHost | None:
+    """ Return the interface for interacting with the VCS hosting service. """
+
+  @abc.abstractmethod
+  def get_projects(self, repository: Repository) -> list[Project]:
+    """ Return the projects of this repository. """
 
 
 class ProjectHandlerPlugin(abc.ABC):

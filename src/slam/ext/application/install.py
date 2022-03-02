@@ -88,14 +88,14 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
 
     if only_project := self.option("only"):
       project_path = Path(only_project).resolve()
-      projects = [p for p in self.app.projects if p.directory.resolve() == project_path]
+      projects = [p for p in self.app.repository.projects() if p.directory.resolve() == project_path]
       if not projects:
         self.line_error(f'error: "{only_project}" does not point to a project', 'error')
         return 1
       assert len(projects) == 1, projects
       project_dependencies = self._get_project_dependencies(projects[0])
     else:
-      projects = self.app.get_projects_in_topological_order()
+      projects = self.app.repository.projects()
       project_dependencies = []
 
     extras = {x.strip() for x in (self.option("extras") or self.option("only-extras") or '').split(',') if x.strip()}
@@ -134,7 +134,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     return 0
 
   def _get_project_dependencies(self, project: Project) -> list[Project]:
-    dependencies = project.get_interdependencies(self.app.projects)
+    dependencies = project.get_interdependencies(self.app.repository.projects())
     for dep in dependencies[:]:
       dependencies = self._get_project_dependencies(dep) + dependencies
     return dependencies
