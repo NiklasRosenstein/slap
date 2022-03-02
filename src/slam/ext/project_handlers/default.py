@@ -66,7 +66,7 @@ def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> lis
     result = []
     for dep in dependencies:
       match = re.match(r'\s*[\w\d\-\_]+', dep)
-      if match:
+      if match and not dep.startswith('git+'):
         result.append(Dependency(match.group(0), dep[match.end():]).to_pep_508())
       else:
         result.append(dep)

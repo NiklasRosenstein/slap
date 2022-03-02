@@ -1,0 +1,5 @@
+[[entries]]
+id = "224ba10d-b075-43f1-97e3-316c9e79fb55"
+type = "fix"
+description = "`git+https://...` requirements are now understood and no longer converted into a dependency caled just \"git\""
+author = "@NiklasRosenstein"
