@@ -1118,7 +1118,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/content/api/documentation.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/(HEAD detached at 1.1.2)/docs/content/api/documentation.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -1130,7 +1130,7 @@
 <h2 id="class-application">Class Application</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Application</span><span class="p">()</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L173">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L173)</p>
 <p>The application object is the main hub for command-line interactions. It is responsible for managing the project
 that is the main subject of the command-line invokation (or multiple of such), provide the {@link cleo} command-line
 application that {@link ApplicationPlugin}s can register commands to, etc.</p>
@@ -1160,7 +1160,7 @@ Multiple projects may be loaded by the application if the first project that is 
 <h4 id="get_root_project">get_root_project</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_root_project</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Project</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L218">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L218)</p>
 <p>Searches for the root project, by going up the directory tree until the VCS toplevel is reached, taking the
 highest directory that has a <code>slam.toml</code> or <code>pyproject.toml</code> configuration file. Note that if there is none in
 the current directory or in any of the parent directories, the current directory will be used nonetheless.</p>
@@ -1169,42 +1169,42 @@ the current directory or in any of the parent directories, the current directory
 <h4 id="get_application_configuration">get_application_configuration</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_application_configuration</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ApplicationConfig</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L244">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L244)</p>
 <p>Loads the application-level configuration.</p>
 <p><a id="slam.application.Application.get_vcs"></a></p>
 <p><a id="pydoc:slam.application.Application.get_vcs"></a></p>
 <h4 id="get_vcs">get_vcs</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_vcs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Vcs</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L256">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L256)</p>
 <p>Detect the version control system in use in the application.</p>
 <p><a id="slam.application.Application.get_main_project"></a></p>
 <p><a id="pydoc:slam.application.Application.get_main_project"></a></p>
 <h4 id="get_main_project">get_main_project</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_main_project</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Project</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L266">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L266)</p>
 <p>Returns the main project, which is the one closest to the current working directory.</p>
 <p><a id="slam.application.Application.get_projects_in_topological_order"></a></p>
 <p><a id="pydoc:slam.application.Application.get_projects_in_topological_order"></a></p>
 <h4 id="get_projects_in_topological_order">get_projects_in_topological_order</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_projects_in_topological_order</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Project</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L291">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L291)</p>
 <p>Return the projects in topological order based on their interdependencies.</p>
 <p><a id="slam.application.Application.load_projects"></a></p>
 <p><a id="pydoc:slam.application.Application.load_projects"></a></p>
 <h4 id="load_projects">load_projects</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_projects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L306">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L306)</p>
 <p>Loads all projects, if any additional aside from the main project need to be loaded.</p>
 <p><a id="slam.application.Application.load_plugins"></a></p>
 <p><a id="pydoc:slam.application.Application.load_plugins"></a></p>
 <h4 id="load_plugins">load_plugins</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_plugins</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L351">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L351)</p>
 <p>Loads all application plugins (see {@link ApplicationPlugin}) and activates them.</p>
 <p>By default, all plugins available in the <code>slam.application.ApplicationPlugin</code> entry point group are loaded. This
 behaviour can be modified by setting either the <code>[tool.slam.plugins.disable]</code> or <code>[tool.slam.plugins.enable]</code>
@@ -1216,7 +1216,7 @@ option.</p>
 <h4 id="run">run</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/application.py#L384">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/application.py#L384)</p>
 <p>Loads and activates application plugins and then invokes the CLI.</p>
 <hr />
 <p><a id="slam.plugins.ApplicationPlugin"></a></p>
@@ -1224,7 +1224,7 @@ option.</p>
 <h2 id="class-applicationplugin">Class ApplicationPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ApplicationPlugin</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L20">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L20)</p>
 <p>A plugin that is activated on application load, usually used to register additional CLI commands.</p>
 <p><a id="slam.plugins.ApplicationPlugin.load_configuration"></a></p>
 <p><a id="pydoc:slam.plugins.ApplicationPlugin.load_configuration"></a></p>
@@ -1232,7 +1232,7 @@ option.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">load_configuration</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L26">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L26)</p>
 <p>Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Slam
 configuration, which is either loaded from <code>pyproject.toml</code> or <code>slam.toml</code>. Use {@attr Application.raw_config}
 to access the Slam configuration.</p>
@@ -1242,7 +1242,7 @@ to access the Slam configuration.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L32">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L32)</p>
 <p>Activate the plugin. Register a {@link Command} to {@attr Application.cleo} or another type of plugin to
 the {@attr Application.plugins} registry.</p>
 <p><a id="slam.plugins.ProjectHandlerPlugin"></a></p>
@@ -1250,7 +1250,7 @@ the {@attr Application.plugins} registry.</p>
 <h2 id="class-projecthandlerplugin">Class ProjectHandlerPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProjectHandlerPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L37">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L37)</p>
 <p>A plugin that implements the core functionality of a project. Project handlers are intermediate layers between
 the Slam tooling and the actual project configuration, allowing different types of configurations to be adapted and
 used with Slam.</p>
@@ -1260,7 +1260,7 @@ used with Slam.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">matches_project</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L45">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L45)</p>
 <p>Return <code>True</code> if the handler is able to provide data for the given project.</p>
 <p><a id="slam.plugins.ProjectHandlerPlugin.get_dist_name"></a></p>
 <p><a id="pydoc:slam.plugins.ProjectHandlerPlugin.get_dist_name"></a></p>
@@ -1268,7 +1268,7 @@ used with Slam.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_dist_name</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L49">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L49)</p>
 <p>Return the distribution name for the project.</p>
 <p><a id="slam.plugins.ProjectHandlerPlugin.get_readme"></a></p>
 <p><a id="pydoc:slam.plugins.ProjectHandlerPlugin.get_readme"></a></p>
@@ -1276,7 +1276,7 @@ used with Slam.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_readme</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L53">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L53)</p>
 <p>Return the readme file configured for the project.</p>
 <p><a id="slam.plugins.ProjectHandlerPlugin.get_packages"></a></p>
 <p><a id="pydoc:slam.plugins.ProjectHandlerPlugin.get_packages"></a></p>
@@ -1284,7 +1284,7 @@ used with Slam.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_packages</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Package</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L57">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L57)</p>
 <p>Return a list of packages for the project. Return <code>None</code> to indicate that the project is expected to
 not contain any packages.</p>
 <p><a id="slam.plugins.ProjectHandlerPlugin.get_dependencies"></a></p>
@@ -1293,14 +1293,14 @@ not contain any packages.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_dependencies</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dependencies</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L62">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L62)</p>
 <p>Return the dependencies of the project.</p>
 <p><a id="slam.plugins.CheckPlugin"></a></p>
 <p><a id="pydoc:slam.plugins.CheckPlugin"></a></p>
 <h2 id="class-checkplugin">Class CheckPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">CheckPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L66">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L66)</p>
 <p>This plugin type can be implemented to add custom checks to the <code>shut check</code> command. Note that checks will
 be grouped and their names prefixed with the plugin name, so that name does not need to be included in the name
 of the returned checks.</p>
@@ -1309,7 +1309,7 @@ of the returned checks.</p>
 <h2 id="class-releaseplugin">Class ReleasePlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReleasePlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L80">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L80)</p>
 <p>This plugin can provide additional version references that need to be updated when a release is created or
 perform custom actions when <code>shut release</code> is used.</p>
 <p><a id="slam.plugins.VersionIncrementingRulePlugin"></a></p>
@@ -1317,7 +1317,7 @@ perform custom actions when <code>shut release</code> is used.</p>
 <h2 id="class-versionincrementingruleplugin">Class VersionIncrementingRulePlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VersionIncrementingRulePlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L96">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L96)</p>
 <p>A plugin to bump a version number according to a rule.</p>
 <p><a id="slam.plugins.VcsHostProvider"></a></p>
 <p><a id="pydoc:slam.plugins.VcsHostProvider"></a></p>
@@ -1325,7 +1325,7 @@ perform custom actions when <code>shut release</code> is used.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@union</span><span class="p">(</span><span class="n">union</span><span class="o">.</span><span class="n">Subtypes</span><span class="o">.</span><span class="n">entrypoint</span><span class="p">(</span><span class="s1">&#39;slam.plugins.vcs_host_provider&#39;</span><span class="p">))</span>
 <span class="k">class</span> <span class="nc">VcsHostProvider</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L105">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L105)</p>
 <p>A plugin class for providing a VCS remote for changelog and release management that can be defined in
 the Slam configuration.</p>
 <p><a id="slam.plugins.VcsHostDetector"></a></p>
@@ -1333,14 +1333,14 @@ the Slam configuration.</p>
 <h2 id="class-vcshostdetector">Class VcsHostDetector</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VcsHostDetector</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L113">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L113)</p>
 <p>This plugin type is used to automatically detect a matching {@link VcsHost}.</p>
 <p><a id="slam.plugins.ChangelogUpdateAutomationPlugin"></a></p>
 <p><a id="pydoc:slam.plugins.ChangelogUpdateAutomationPlugin"></a></p>
 <h2 id="class-changelogupdateautomationplugin">Class ChangelogUpdateAutomationPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ChangelogUpdateAutomationPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/../src/slam/plugins.py#L122">[view_source]</a></p>
+<p>[[view_source]](https://github.com/NiklasRosenstein/slam/blob/(HEAD/docs/../src/slam/plugins.py#L122)</p>
 <p>A plugin used by the <code>slam changelog update-pr</code> plugin to automate the publishing of updated changelog files.</p>
 
               
