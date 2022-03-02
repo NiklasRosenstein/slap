@@ -11,7 +11,7 @@ from slam.configuration import Configuration
 if t.TYPE_CHECKING:
   from slam.plugins import RepositoryHandlerPlugin
   from slam.project import Project
-  from slam.util.vcs import Vcs, VcsHost
+  from slam.util.vcs import Vcs, VcsRemote
 
 
 class Repository(Configuration):
@@ -64,5 +64,5 @@ class Repository(Configuration):
   def _get_vcs(self) -> Vcs | None:
     return self._handler().get_vcs(self)
 
-  def _get_vcs_remote(self) -> VcsHost | None:
+  def _get_vcs_remote(self) -> VcsRemote | None:
     return self._handler().get_vcs_remote(self)

@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
   from slam.project import Dependencies, Package, Project
   from slam.release import VersionRef
   from slam.repository import Repository
-  from slam.util.vcs import Vcs, VcsHost
+  from slam.util.vcs import Vcs, VcsRemote
 
 
 class ApplicationPlugin(t.Generic[T], abc.ABC):
@@ -49,7 +49,7 @@ class RepositoryHandlerPlugin(abc.ABC):
     """ Return the version control system that the repository is managed with. """
 
   @abc.abstractmethod
-  def get_vcs_remote(self, repository: Repository) -> VcsHost | None:
+  def get_vcs_remote(self, repository: Repository) -> VcsRemote | None:
     """ Return the interface for interacting with the VCS hosting service. """
 
   @abc.abstractmethod
@@ -140,16 +140,16 @@ class VcsHostProvider(abc.ABC):
   the Slam configuration. """
 
   @abc.abstractmethod
-  def get_vcs_host(self, project: Project) -> VcsHost: ...
+  def get_vcs_host(self, project: Project) -> VcsRemote: ...
 
 
 class VcsHostDetector(abc.ABC):
-  """ This plugin type is used to automatically detect a matching #VcsHost. """
+  """ This plugin type is used to automatically detect a matching #VcsRemote. """
 
   ENTRYPOINT = 'slam.plugins.vcs_host_detector'
 
   @abc.abstractmethod
-  def detect_vcs_host(self, project: Project) -> VcsHost | None: ...
+  def detect_vcs_host(self, project: Project) -> VcsRemote | None: ...
 
 
 class ChangelogUpdateAutomationPlugin(abc.ABC):

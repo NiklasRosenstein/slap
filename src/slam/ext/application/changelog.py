@@ -282,7 +282,7 @@ class ChangelogUpdatePrCommand(Command):
         pr = automation_plugin.get_pr()
 
       try:
-        pr = manager.vcs_host.normalize_pr(pr)
+        pr = manager.vcs_remote.normalize_pr(pr)
       except ValueError as exc:
         self.line_error(f'error: {exc}', 'error')
         return 1
@@ -458,9 +458,9 @@ class ChangelogFormatCommand(BaseChangelogCommand):
 
   def _html_anchor(self, type: t.Literal['pr', 'issue'], ref: str) -> str:
     if type == 'pr':
-      shortform = self.manager.vcs_host.pr_shortform(ref)
+      shortform = self.manager.vcs_remote.pr_shortform(ref)
     else:
-      shortform = self.manager.vcs_host.issue_shortform(ref)
+      shortform = self.manager.vcs_remote.issue_shortform(ref)
     if shortform is None:
       shortform = 'Link'
     return f'<a href="{ref}">{shortform}</a>'
@@ -602,12 +602,12 @@ class ChangelogCommandPlugin(ApplicationPlugin):
 
 def get_changelog_manager(project: Project) -> ChangelogManager:
   import databind.json
-  from slam.util.vcs import VcsHost
+  from slam.util.vcs import VcsRemote
   config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
 
   return ChangelogManager(
     directory=project.directory / config.directory,
-    vcs_host=project.repository.vcs_remote() or VcsHost.null(),
+    vcs_remote=project.repository.vcs_remote() or VcsRemote.null(),
     valid_types=config.valid_types,
     readonly=not config.enabled,
   )

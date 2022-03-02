@@ -103,7 +103,7 @@ class Vcs(abc.ABC):
   def detect(cls: type[T], path: Path) -> T | None: ...
 
 
-class VcsHost(abc.ABC):
+class VcsRemote(abc.ABC):
   """ Interface for performing actions on a VCS repository host provider and its particular instance. """
 
   def normalize_pr(self, pr: str) -> str | None:
@@ -132,8 +132,8 @@ class VcsHost(abc.ABC):
     return None
 
   @staticmethod
-  def null() -> 'VcsHost':
-    return VcsHost()
+  def null() -> 'VcsRemote':
+    return VcsRemote()
 
 
 class Git(Vcs):
@@ -254,7 +254,7 @@ class Git(Vcs):
 
 
 @dataclasses.dataclass
-class GithubVcsHost(VcsHost):
+class GithubVcsRemote(VcsRemote):
 
   #: The owner and repository name separated by a slash. If the repository is hosted on GitHub enterprise, the
   #: domain of the GHE instance must precede the owner and repository name by another slash (e.g. `ghe.io/owner/repo`).
@@ -305,7 +305,7 @@ class GithubVcsHost(VcsHost):
       if author in self._author_cache:
         return self._author_cache[author]
       try:
-        resolved = '@' + GithubVcsHost.github_get_username_from_email(self._get_api_url(), author)
+        resolved = '@' + GithubVcsRemote.github_get_username_from_email(self._get_api_url(), author)
       except ValueError:
         self._author_cache[author] = None
         return author  # Return the email address unchanged.
@@ -331,7 +331,7 @@ class GithubVcsHost(VcsHost):
     return None
 
   @staticmethod
-  def detect(path: Path) -> VcsHost | None:
+  def detect(path: Path) -> VcsRemote | None:
     git = _Git(path)
     if not git.get_toplevel():
       return None
@@ -351,7 +351,7 @@ class GithubVcsHost(VcsHost):
     if url.endswith('.git'):
       url = url[:-4]
 
-    return GithubVcsHost(url)
+    return GithubVcsRemote(url)
 
   @staticmethod
   def github_get_username_from_email(api_base_url: str, email: str) -> str:
@@ -370,8 +370,8 @@ def detect_vcs(path: Path) -> Vcs | None:
   return None
 
 
-def detect_vcs_host(path: Path) -> VcsHost | None:
-  for cls in [GithubVcsHost]:
+def detect_vcs_host(path: Path) -> VcsRemote | None:
+  for cls in [GithubVcsRemote]:
     if (vcs := cls.detect(path)):
       return vcs
   return None

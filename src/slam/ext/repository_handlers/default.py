@@ -3,7 +3,7 @@ import dataclasses
 from slam.plugins import RepositoryHandlerPlugin
 from slam.project import Project
 from slam.repository import Repository
-from slam.util.vcs import Vcs, VcsHost, detect_vcs, detect_vcs_host
+from slam.util.vcs import Vcs, VcsRemote, detect_vcs, detect_vcs_host
 
 
 @dataclasses.dataclass
@@ -24,7 +24,7 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
   def get_vcs(self, repository: Repository) -> Vcs | None:
     return detect_vcs(repository.directory)
 
-  def get_vcs_remote(self, repository: Repository) -> VcsHost | None:
+  def get_vcs_remote(self, repository: Repository) -> VcsRemote | None:
     return detect_vcs_host(repository.directory)
 
   def get_projects(self, repository: Repository) -> list[Project]:
