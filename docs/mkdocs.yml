@@ -2,6 +2,7 @@ nav:
   - index.md
   - usage-examples.md
   - configuration.md
+  - glossary.md
   - Features:
     - commands/changelog.md
     - commands/check.md

@@ -78,8 +78,9 @@ class CheckPlugin(abc.ABC):
 
 
 class ReleasePlugin(abc.ABC):
-  """ This plugin can provide additional version references that need to be updated when a release is created or
-  perform custom actions when `shut release` is used. """
+  """ This plugin type provides additional references to the project's version number allowing `slam release` to
+  update these references to a new version number.
+  """
 
   ENTRYPOINT = 'slam.plugins.release'
 
@@ -87,14 +88,23 @@ class ReleasePlugin(abc.ABC):
   io: IO
 
   def get_version_refs(self, project: Project) -> list[VersionRef]:
+    """ Return a list of occurrences of the project version. """
+
     return []
 
   def create_release(self, project: Project, target_version: str, dry: bool) -> t.Sequence[Path]:
+    """ Gives the plugin a chance to perform an arbitrary action after all version references have been bumped,
+    being informed of the target version. If *dry* is `True`, the plugin should only act as if it was performing
+    its usual actions but not commit the changes to disk. It should return the list of files that it modifies
+    or would have modified. """
+
     return []
 
 
 class VersionIncrementingRulePlugin(abc.ABC):
-  """ A plugin to bump a version number according to a rule. """
+  """ This plugin type can be implemented to provide rules accepted by the `slam release <rule>` command to "bump" an
+  existing version number to another. The builtin rules implemented in #slam.ext.version_incrementing_rules.
+  """
 
   ENTRYPOINT = 'slam.plugins.version_incrementing_rule'
 
@@ -120,7 +130,11 @@ class VcsHostDetector(abc.ABC):
 
 
 class ChangelogUpdateAutomationPlugin(abc.ABC):
-  """ A plugin used by the `slam changelog update-pr` plugin to automate the publishing of updated changelog files. """
+  """ This plugin type can be used with the `slam changelog update-pr -use <plugin_name>` option. It provides all the
+  details derivable from the environment (e.g. environment variables available from CI builds) that can be used to
+  detect which changelog entries have been added in a pull request, the pull request URL and the means to publish
+  the changes back to the original repository.
+  """
 
   ENTRYPOINT = 'slam.plugins.changelog_update_automation'
 
