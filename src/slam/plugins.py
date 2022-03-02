@@ -25,13 +25,13 @@ class ApplicationPlugin(t.Generic[T], abc.ABC):
   @abc.abstractmethod
   def load_configuration(self, app: Application) -> T:
     """ Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Slam
-    configuration, which is either loaded from `pyproject.toml` or `slam.toml`. Use {@attr Application.raw_config}
+    configuration, which is either loaded from `pyproject.toml` or `slam.toml`. Use #Application.raw_config
     to access the Slam configuration. """
 
   @abc.abstractmethod
   def activate(self, app: Application, config: T) -> None:
-    """ Activate the plugin. Register a {@link Command} to {@attr Application.cleo} or another type of plugin to
-    the {@attr Application.plugins} registry. """
+    """ Activate the plugin. Register a #Command to #Application.cleo or another type of plugin to
+    the #Application.plugins registry. """
 
 
 class ProjectHandlerPlugin(abc.ABC):
@@ -111,7 +111,7 @@ class VcsHostProvider(abc.ABC):
 
 
 class VcsHostDetector(abc.ABC):
-  """ This plugin type is used to automatically detect a matching {@link VcsHost}. """
+  """ This plugin type is used to automatically detect a matching #VcsHost. """
 
   ENTRYPOINT = 'slam.plugins.vcs_host_detector'
 

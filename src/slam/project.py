@@ -36,7 +36,7 @@ class Package:
 @dataclasses.dataclass
 class ProjectConfig:
   #: The name of the project handler plugin. If none is specified, the built-in project handlers are tested
-  #: (see the {@link slam.ext.project_handlers} module for more info on those).
+  #: (see the #slam.ext.project_handlers module for more info on those).
   handler: str | None = None
 
   #: The source directory to use when relying on automatic package detection. If not set, the default project
@@ -47,7 +47,7 @@ class ProjectConfig:
   typed: bool | None = None
 
   #: Configuration for the remote VCS that is used for changelogs and creating releases. If it is not specified,
-  #: it will try to detect one from the builtin VCS remotes (see the {@link slam.ext.vcs_remotes} module).
+  #: it will try to detect one from the builtin VCS remotes (see the #slam.ext.vcs_remotes module).
   remote: VcsHostProvider | None = None
 
 
@@ -72,20 +72,20 @@ class Project:
   slam_toml: TomlFile
 
   #: Use this to access the Slam configuration, automatically loaded from either `slam.toml` or the `tool.slam`
-  #: section in `pyproject.toml`. The attribute is a {@link Once} instance, thus it needs to be called to retrieve
-  #: the contents. This is the same as {@link get_raw_configuration()}, but is more efficient.
+  #: section in `pyproject.toml`. The attribute is a #Once instance, thus it needs to be called to retrieve
+  #: the contents. This is the same as #get_raw_configuration(), but is more efficient.
   raw_config: Once[dict[str, t.Any]]
 
-  #: The parsed configuration, accessible as a {@link Once}.
+  #: The parsed configuration, accessible as a #Once.
   config: Once[ProjectConfig]
 
-  #: The packages detected with {@link get_packages()} as a {@link Once}.
+  #: The packages detected with #get_packages() as a #Once.
   packages: Once[t.Sequence[Package] | None]
 
-  #: The packages detected readme as a {@link Once}.
+  #: The packages detected readme as a #Once.
   readme: Once[str | None]
 
-  #: The packages dependencies as a {@link Once}.
+  #: The packages dependencies as a #Once.
   dependencies: Once[Dependencies]
 
   def __init__(self, application: Application, directory: Path, parent: Project | None = None) -> None:
@@ -161,7 +161,7 @@ class Project:
 
   def get_packages(self) -> list[Package] | None:
     """ Returns the packages that can be detected for this project. How the packages are detected depends on the
-    {@link ProjectConfig.packages} option. """
+    #ProjectConfig.packages option. """
 
     if not self.is_python_project:
       return []

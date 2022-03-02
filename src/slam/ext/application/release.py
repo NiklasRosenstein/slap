@@ -41,8 +41,8 @@ class ReleaseConfig:
   #: version number in the source code).
   references: list[VersionRefConfig] = dataclasses.field(default_factory=list)
 
-  #: A list of {@link ReleasePlugin}s to use. Defaults to contain the {@link SourceCodeVersionReferencesPlugin}
-  #: and {@link ChangelogReleasePlugin}.
+  #: A list of #ReleasePlugins to use. Defaults to contain the #SourceCodeVersionReferencesPlugin
+  #: and #ChangelogReleasePlugin.
   plugins: list[str] = dataclasses.field(default_factory=lambda: ['changelog_release', 'interdependencies', 'source_code_version'])
 
   # Extra settings for other things, for example by plugins.
@@ -301,7 +301,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
   def _get_current_version(self, version_refs: list[VersionRef]) -> 'Version':
     """ Try to identify the current version number among the version refs. This is done by selecting all versions
     that occur in a `pyproject.toml`, and if they are all equal, they are considered the current version. If they
-    are different, a {@link ValueError} is raised. """
+    are different, a #ValueError is raised. """
 
     from poetry.core.semver.version import Version
 

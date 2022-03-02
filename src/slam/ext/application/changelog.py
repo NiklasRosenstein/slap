@@ -37,7 +37,7 @@ class ChangelogConfig:
   directory: Path = Path('.changelog')
 
   #: The list of valid types that can be used in changelog entries. The default types are
-  #: {@link DEFAULT_CHANGELOG_TYPES}.
+  #: #DEFAULT_CHANGELOG_TYPES.
   valid_types: t.Annotated[list[str] | None, alias('valid-types')] = dataclasses.field(
       default_factory=lambda: list(DEFAULT_VALID_TYPES))
 

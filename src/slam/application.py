@@ -160,10 +160,10 @@ class ApplicationConfig:
   #: a `pyproject.toml` will be considered included projects.
   include: list[str] | None = None
 
-  #: A list of plugins to disable from the {@link DEFAULT_PLUGINS}.
+  #: A list of plugins to disable from the #DEFAULT_PLUGINS.
   disable: list[str] = dataclasses.field(default_factory=list)
 
-  #: A list of plugins to enable in addition to the {@link DEFAULT_PLUGINS}.
+  #: A list of plugins to enable in addition to the #DEFAULT_PLUGINS.
   enable: list[str] = dataclasses.field(default_factory=list)
 
   #: A list of plugins to enable only, causing the default plugins to not be loaded.
@@ -172,24 +172,24 @@ class ApplicationConfig:
 
 class Application:
   """ The application object is the main hub for command-line interactions. It is responsible for managing the project
-  that is the main subject of the command-line invokation (or multiple of such), provide the {@link cleo} command-line
-  application that {@link ApplicationPlugin}s can register commands to, etc. """
+  that is the main subject of the command-line invokation (or multiple of such), provide the #cleo command-line
+  application that #ApplicationPlugin#s can register commands to, etc. """
 
   #: A list of projects that are loaded into the application for taking into account by commands.
-  #: Multiple projects may be loaded by the application if the first project that is loaded has a {@link
-  #: ApplicationConfig.include} configuration.
+  #: Multiple projects may be loaded by the application if the first project that is loaded has a
+  #: #ApplicationConfig.include configuration.
   projects: list[Project]
 
-  #: The root project identified by {@link get_root_project()}.
+  #: The root project identified by #get_root_project().
   root_project: Once[Project]
 
-  #: The application configuration loaded once via {@link get_application_configuration()}.
+  #: The application configuration loaded once via #get_application_configuration().
   config: Once[ApplicationConfig]
 
-  #: The cleo application to which new commands can be registered via {@link ApplicationPlugin}s.
+  #: The cleo application to which new commands can be registered via #ApplicationPlugin#s.
   cleo: CleoApplication
 
-  #: The version control system that is being used as a {@link Once}.
+  #: The version control system that is being used as a #Once.
   vcs: Once[Vcs | None]
 
   def __init__(self, name: str = 'slam', version: str = __version__) -> None:
@@ -349,7 +349,7 @@ class Application:
       raise ValueError(f'Project IDs are not unique')
 
   def load_plugins(self) -> None:
-    """ Loads all application plugins (see {@link ApplicationPlugin}) and activates them.
+    """ Loads all application plugins (see #ApplicationPlugin) and activates them.
 
     By default, all plugins available in the `slam.application.ApplicationPlugin` entry point group are loaded. This
     behaviour can be modified by setting either the `[tool.slam.plugins.disable]` or `[tool.slam.plugins.enable]`

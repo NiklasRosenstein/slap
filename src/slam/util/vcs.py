@@ -53,7 +53,7 @@ class Vcs(abc.ABC):
   @abc.abstractmethod
   def get_remotes(self) -> t.Sequence[Remote]:
     """ Return a sequence of the known remote copies that the local version can be synced with. At least one of the
-    returned remotes should be marked as the default remote via {@link Remote.default}. """
+    returned remotes should be marked as the default remote via #Remote.default. """
 
   @abc.abstractmethod
   def get_current_branch(self) -> str | None:
@@ -110,7 +110,7 @@ class VcsHost(abc.ABC):
     return None
 
   def normalize_issue(self, issue: str) -> str | None:
-    """ Sames as {@link normalize_pr()} but for issues. """
+    """ Sames as #normalize_pr() but for issues. """
 
   def normalize_author(self, author: str) -> str | None:
     """ Normalize an author name, for example converting an email address to a username, or None if the author
