@@ -575,8 +575,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/documentation/" class="md-nav__link">
-        API Documentation
+      <a href="../api/plugins/" class="md-nav__link">
+        Plugins
       </a>
     </li>
   
@@ -589,8 +589,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/plugins/" class="md-nav__link">
-        Plugins
+      <a href="../api/documentation/" class="md-nav__link">
+        API Documentation
       </a>
     </li>
   
@@ -754,7 +754,7 @@
 <p>Slam provides a variety of features to increase productivity for Python developers. It supports dealing with
 multiple Python projects managed from a monorepository, in which case most operations are homogenously applied
 across all projects.</p>
-<p>All features are implemented as {@pylink slam.plugins.ApplicationPlugin} and most features provide additional
+<p>All features are implemented as <a href="/slam/api/documentation#pydoc:slam.plugins.ApplicationPlugin">Class ApplicationPlugin</a> and most features provide additional
 interfaces to plug into their functionality (such as additional plugins for the <code>slam check</code> and <code>slam release</code>
 command).</p>
 <h2 id="inspect-slams-understanding-of-your-project">Inspect Slam's understanding of your project</h2>
@@ -785,6 +785,7 @@ command).</p>
       - types-PyYAML (&gt;=6.0.3,&lt;7.0.0)
       - types-requests (&gt;=2.27.7,&lt;3.0.0)
     extra.docs:
+      - git+https://github.com/NiklasRosenstein/pydoc-markdown
       - mkdocs
       - mkdocs-material
       - novella (&gt;=0.1.11,&lt;0.2.0)
@@ -811,7 +812,7 @@ want to deliberately install into a global Python environment, pass the <code>--
 </blockquote>
 <h2 id="check-your-project-configuration">Check your project configuration</h2>
 <p>The <code>slam check</code> command provides some feedback on the sanity of your project configuration.</p>
-<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 67 changelogs are valid.
+<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 68 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slam/slam/src/slam
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -844,19 +845,19 @@ it to the <code>origin</code> remote. It can also be used to validate if all ver
 further configuration, the command will find the version in your <code>pyproject.toml</code> as well as the version numbers of
 dependencies to projects in the same monorepository (if applicable) and the <code>__version__</code> in your source code.</p>
 <div class="highlight"><span class="filename">$ slam release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.1.1 # version = &quot;1.1.1&quot;
-  src/slam/__init__.py: 1.1.1 # __version__ = &#39;1.1.1&#39;
+  pyproject.toml:       1.1.2 # version = &quot;1.1.2&quot;
+  src/slam/__init__.py: 1.1.2 # __version__ = &#39;1.1.2&#39;
 </code></pre></div>
 <p>To create a new release, pass the version number of a version bump rule instead.</p>
 <div class="highlight"><span class="filename">$ slam release --tag --push patch --dry</span><pre><span></span><code>dry mode enabled, no changes will be committed to disk
-bumping 2 version references to 1.1.2
-  pyproject.toml:       1.1.1 → 1.1.2 # version = &quot;1.1.1&quot;
-  src/slam/__init__.py: 1.1.1 → 1.1.2 # __version__ = &#39;1.1.1&#39;
+bumping 2 version references to 1.1.3
+  pyproject.toml:       1.1.2 → 1.1.3 # version = &quot;1.1.2&quot;
+  src/slam/__init__.py: 1.1.2 → 1.1.3 # __version__ = &#39;1.1.2&#39;
 
 
-tagging 1.1.2
+tagging 1.1.3
 
-pushing develop, 1.1.2 to origin
+pushing develop, 1.1.3 to origin
 </code></pre></div>
 <blockquote>
 <p><a href="../commands/release/">More details</a></p>
