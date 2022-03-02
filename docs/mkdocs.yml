@@ -14,8 +14,8 @@ nav:
     - guides/automatic-changelog-pull-request-urls.md
     - guides/publishing.md
   - API:
-    - api/documentation.md
     - api/plugins.md
+    - api/documentation.md
     - api/remotes/github.md
   - Other:
     - changelog.md

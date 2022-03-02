@@ -44,7 +44,7 @@ classifiers = [
   mypy = "^0.931"
 
   [tool.poetry.extras]
-  docs = ["mkdocs", "mkdocs-material", "novella ^0.1.11"]
+  docs = ["mkdocs", "mkdocs-material", "novella ^0.1.11", "git+https://github.com/NiklasRosenstein/pydoc-markdown"]
 
   [tool.poetry.scripts]
   slam = "slam.__main__:main"

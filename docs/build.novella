@@ -5,3 +5,7 @@ action "mkdocs-update-config" {
   update '$.theme.features' add: ['navigation.sections']
   update '$.theme.palette' add: {'scheme': 'slate', 'primary': 'blue', 'accent': 'teal'}
 }
+
+action "preprocess-markdown" {
+  use "pydoc"
+}
