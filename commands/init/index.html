@@ -742,27 +742,85 @@
 <p>The <code>slam init</code> command is a small helper to bootstrap Python project files.</p>
 <h2 id="templates">Templates</h2>
 <h3 id="poetry">Poetry</h3>
-<div class="highlight"><span class="filename">$ slam init -t poetry --name my-package</span><pre><span></span><code>    $ slam init -t poetry --name my-package -f --dry  # exited with return code 1
-    [90mUncaught CalledProcessError raised for command [34m[&#39;git&#39;, &#39;config&#39;, &#39;user.name&#39;][0m (exit code: [36m1[0m).[0m
-
-      CalledProcessError
-
-      Command &#39;[&#39;git&#39;, &#39;config&#39;, &#39;user.name&#39;]&#39; returned non-zero exit status 1.
-
-      at /opt/hostedtoolcache/Python/3.10.2/x64/lib/python3.10/subprocess.py:524 in run
-           520│             # We don&#39;t call process.wait() as .__exit__ does that for us.
-           521│             raise
-           522│         retcode = process.poll()
-           523│         if check and retcode:
-        →  524│             raise CalledProcessError(retcode, process.args,
-           525│                                      output=stdout, stderr=stderr)
-           526│     return CompletedProcess(process.args, retcode, stdout, stderr)
-           527│ 
-           528│ 
+<div class="highlight"><span class="filename">$ slam init -t poetry --name my-package</span><pre><span></span><code>write pyproject.toml
+write readme.md
+write .gitignore
+write src/my_package/__init__.py
+write src/my_package/py.typed
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>$ slam init -t poetry --name my-package --as-markdown -q  # exited with return code 1
-[90mUncaught CalledProcessError raised for command [34m[&#39;git&#39;, &#39;config&#39;, &#39;user.name&#39;][0m (exit code: [36m1[0m).[0m
+<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">pyproject.toml</label><label for="__tabbed_1_2">readme.md</label><label for="__tabbed_1_3">.gitignore</label><label for="__tabbed_1_4">src/my_package/<strong>init</strong>.py</label><label for="__tabbed_1_5">src/my_package/py.typed</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
+<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;poetry-core&quot;</span><span class="p">]</span><span class="w"></span>
+<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;poetry.core.masonry.api&quot;</span><span class="w"></span>
+
+<span class="k">[tool.poetry]</span><span class="w"></span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;my-package&quot;</span><span class="w"></span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0.1.0&quot;</span><span class="w"></span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"></span>
+<span class="n">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;Unknown &lt;me@unknown.org&gt;&quot;</span><span class="p">]</span><span class="w"></span>
+<span class="n">license</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;MIT&quot;</span><span class="w"></span>
+<span class="n">readme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;readme.md&quot;</span><span class="w"></span>
+<span class="n">packages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="n">include</span><span class="o">=</span><span class="s">&quot;my_package&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">from</span><span class="o">=</span><span class="s">&quot;src&quot;</span><span class="w"> </span><span class="p">}]</span><span class="w"></span>
+<span class="n">classifiers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span><span class="w"></span>
+<span class="n">keywords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span><span class="w"></span>
+
+<span class="k">[tool.poetry.urls]</span><span class="w"></span>
+<span class="c1"># &quot;Bug Tracker&quot; = &quot;&quot;</span><span class="w"></span>
+<span class="c1"># Documentation = &quot;&quot;</span><span class="w"></span>
+<span class="c1"># Homepage = &quot;&quot;</span><span class="w"></span>
+<span class="c1"># Repository = &quot;&quot;</span><span class="w"></span>
+
+<span class="k">[tool.poetry.dependencies]</span><span class="w"></span>
+<span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;^3.7&quot;</span><span class="w"></span>
+
+<span class="k">[tool.poetry.dev-dependencies]</span><span class="w"></span>
+<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;*&quot;</span><span class="w"></span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;*&quot;</span><span class="w"></span>
+
+<span class="k">[tool.slam]</span><span class="w"></span>
+<span class="n">typed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+
+<span class="k">[tool.slam.test]</span><span class="w"></span>
+<span class="n">check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;slam check&quot;</span><span class="w"></span>
+<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy src/ --namespace-packages&quot;</span><span class="w"></span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest test/&quot;</span><span class="w"></span>
+
+<span class="k">[tool.mypy]</span><span class="w"></span>
+<span class="n">pretty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="n">warn_redundant_casts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="n">warn_unused_ignores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="n">warn_no_return</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="n">warn_unreachable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="n">show_error_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="n">show_error_codes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 </code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gh"># my-package</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>/.vscode
+/dist
+/build
+.venv/
+*.egg-info/
+__pycache__/
+poetry.lock
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+</div>
+</div>
+</div>
 
               
             </article>
