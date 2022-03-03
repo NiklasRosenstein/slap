@@ -22,4 +22,4 @@ runs:
         else
           VERSION="==$VERSION"
         fi
-        pip install pipx -q && pipx install 'slam-cli$VERSION'
+        pip install pipx -q && pipx install "slam-cli$VERSION"
