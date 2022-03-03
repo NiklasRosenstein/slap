@@ -832,7 +832,7 @@ want to deliberately install into a global Python environment, pass the <code>--
 </blockquote>
 <h2 id="check-your-project-configuration">Check your project configuration</h2>
 <p>The <code>slam check</code> command provides some feedback on the sanity of your project configuration.</p>
-<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 69 changelogs are valid.
+<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 70 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slam/slam/src/slam
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -874,6 +874,8 @@ bumping 2 version references to 1.2.1
   pyproject.toml:       1.2.0 → 1.2.1 # version = &quot;1.2.0&quot;
   src/slam/__init__.py: 1.2.0 → 1.2.1 # __version__ = &#39;1.2.0&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.2.1.toml
 
 tagging 1.2.1
 

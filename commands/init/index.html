@@ -742,14 +742,14 @@
 <p>The <code>slam init</code> command is a small helper to bootstrap Python project files.</p>
 <h2 id="templates">Templates</h2>
 <h3 id="poetry">Poetry</h3>
-<div class="highlight"><span class="filename">$ slam init -t poetry --name my-package</span><pre><span></span><code>write pyproject.toml
-write LICENSE
-write readme.md
-write .gitignore
-write src/my_package/__init__.py
-write src/my_package/py.typed
+<div class="highlight"><span class="filename">$ slam init -t poetry --name my-package</span><pre><span></span><code>write my-package/pyproject.toml
+write my-package/LICENSE
+write my-package/readme.md
+write my-package/.gitignore
+write my-package/src/my_package/__init__.py
+write my-package/src/my_package/py.typed
 </code></pre></div>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:6"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><input id="__tabbed_1_6" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">pyproject.toml</label><label for="__tabbed_1_2">LICENSE</label><label for="__tabbed_1_3">readme.md</label><label for="__tabbed_1_4">.gitignore</label><label for="__tabbed_1_5">src/my_package/<strong>init</strong>.py</label><label for="__tabbed_1_6">src/my_package/py.typed</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:6"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><input id="__tabbed_1_6" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">my-package/pyproject.toml</label><label for="__tabbed_1_2">my-package/LICENSE</label><label for="__tabbed_1_3">my-package/readme.md</label><label for="__tabbed_1_4">my-package/.gitignore</label><label for="__tabbed_1_5">my-package/src/my_package/<strong>init</strong>.py</label><label for="__tabbed_1_6">my-package/src/my_package/py.typed</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
