@@ -153,8 +153,8 @@ class InitCommandPlugin(ApplicationPlugin, Command):
     }
     for filename, content in TEMPLATES[template].items():
       if filename == 'LICENSE':
-        content = get_license_metadata(self.option("license"))
-        content = wrap_license_text(content.license_text)
+        content = get_license_metadata(self.option("license")).license_text
+        content = wrap_license_text(content)
         content = 'Copyright (c) {year} {author_name}\n\n'.format(**scope) + content
         content = f'The {self.option("license")} License\n\n' + content
       else:
