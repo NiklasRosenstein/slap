@@ -3,3 +3,9 @@ id = "cb9ff9fc-b96b-4996-9a02-ff9f1ca004ca"
 type = "feature"
 description = "add `slam changelog <directory>` argument, defaults to the same as `--name`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "8e765aad-d150-4baa-b942-80161afbdcc3"
+type = "improvement"
+description = "`slam init` now understands dots as namespace packages"
+author = "@NiklasRosenstein"

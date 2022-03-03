@@ -22,7 +22,7 @@ TEMPLATES = {
       authors = ["{author_name} <{author_email}>"]
       license = "{license}"
       readme = "readme.md"
-      packages = [{{ include="{package}", from="src" }}]
+      packages = [{{ include = "{path}", from = "src" }}]
       classifiers = []
       keywords = []
 
@@ -71,11 +71,11 @@ TEMPLATES = {
       __pycache__/
       poetry.lock
     ''',
-    'src/{package}/__init__.py': '''
+    'src/{path}/__init__.py': '''
 
       __version__ = '0.1.0'
     ''',
-    'src/{package}/py.typed': '',
+    'src/{path}/py.typed': '',
   }
 }
 
@@ -150,10 +150,11 @@ class InitCommandPlugin(ApplicationPlugin, Command):
 
     vcs = self.app.repository.vcs()
     author = vcs.get_author() if vcs else None
-    directory = Path(self.argument("directory") or self.option("name"))
+    directory = Path(self.argument("directory") or self.option("name").replace('.', '-'))
 
     scope = {
-      'name': self.option("name"),
+      'name': self.option("name").replace('.', '-'),
+      'path': self.option("name").replace('.', '/').replace('-', '_'),
       'package': self.option("name").replace('.', '_').replace('-', '_'),
       'license': self.option("license"),
       'year': datetime.date.today().year,
