@@ -79,6 +79,8 @@ class GithubRepositoryHost(RepositoryHost):
       if shortform.isnumeric():
         id = shortform
         shortform = '#' + id
+      else:
+        id = shortform
     else:
       raise ValueError(f'bad issue/pull request reference for GitHub: {issue_reference!r}')
     return Issue(id, url, shortform)
