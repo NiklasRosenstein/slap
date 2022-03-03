@@ -13,4 +13,5 @@ runs:
       with: { version: "${{ inputs.version }}" }
 
     - name: Update changelogs
+      shell: bash
       run: slam -vv changelog update-pr --use github-actions
