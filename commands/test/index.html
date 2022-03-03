@@ -669,9 +669,9 @@
 <h1 id="test">Test</h1>
 <p>Configure the commands to run with <code>slam test</code> under the <code>tool.slam.test</code> table:</p>
 <div class="highlight"><pre><span></span><code><span class="k">[tool.slam.test]</span><span class="w"></span>
-<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest --cov=slam&quot;</span><span class="w"></span>
-<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy&quot;</span><span class="w"></span>
-<span class="n">pylint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pylint --fail-under=8.0&quot;</span><span class="w"></span>
+<span class="n">check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;slam check&quot;</span><span class="w"></span>
+<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy src/&quot;</span><span class="w"></span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest test/&quot;</span><span class="w"></span>
 </code></pre></div>
 
               

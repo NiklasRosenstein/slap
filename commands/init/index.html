@@ -743,12 +743,13 @@
 <h2 id="templates">Templates</h2>
 <h3 id="poetry">Poetry</h3>
 <div class="highlight"><span class="filename">$ slam init -t poetry --name my-package</span><pre><span></span><code>write pyproject.toml
+write LICENSE
 write readme.md
 write .gitignore
 write src/my_package/__init__.py
 write src/my_package/py.typed
 </code></pre></div>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">pyproject.toml</label><label for="__tabbed_1_2">readme.md</label><label for="__tabbed_1_3">.gitignore</label><label for="__tabbed_1_4">src/my_package/<strong>init</strong>.py</label><label for="__tabbed_1_5">src/my_package/py.typed</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:6"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><input id="__tabbed_1_6" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">pyproject.toml</label><label for="__tabbed_1_2">LICENSE</label><label for="__tabbed_1_3">readme.md</label><label for="__tabbed_1_4">.gitignore</label><label for="__tabbed_1_5">src/my_package/<strong>init</strong>.py</label><label for="__tabbed_1_6">src/my_package/py.typed</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
@@ -784,17 +785,41 @@ write src/my_package/py.typed
 
 <span class="k">[tool.slam.test]</span><span class="w"></span>
 <span class="n">check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;slam check&quot;</span><span class="w"></span>
-<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy src/ --namespace-packages&quot;</span><span class="w"></span>
+<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy src/&quot;</span><span class="w"></span>
 <span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest test/&quot;</span><span class="w"></span>
 
 <span class="k">[tool.mypy]</span><span class="w"></span>
 <span class="n">pretty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="n">namespace_packages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">warn_redundant_casts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">warn_unused_ignores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">warn_no_return</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">warn_unreachable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">show_error_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">show_error_codes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>The MIT License
+
+Copyright (c) 2022 Unknown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+this software and associated documentation files (the &quot;Software&quot;), to deal in
+Software without restriction, including without limitation the rights to use,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the
+and to permit persons to whom the Software is furnished to do so, subject to
+following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+USE OR OTHER DEALINGS IN THE SOFTWARE.
 </code></pre></div>
 </div>
 <div class="tabbed-block">
