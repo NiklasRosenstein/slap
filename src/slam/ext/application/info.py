@@ -18,6 +18,11 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
+    self.line('Repository')
+    self.line(f'  vcs: <opt>{self.app.repository.vcs()}</opt>')
+    self.line(f'  host: <opt>{self.app.repository.host()}</opt>')
+    self.line(f'  projects: <opt>{[p.id for p in self.app.repository.projects()]}</opt>')
+
     for project in self.app.repository.projects():
       if not project.is_python_project: continue
       packages_list = project.packages()

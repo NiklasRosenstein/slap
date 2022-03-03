@@ -8,9 +8,10 @@ from pathlib import Path
 from databind.core.annotations import alias
 
 from slam.application import Application, Command, argument, option
-from slam.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin, VcsHostDetector
+from slam.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
 from slam.changelog import Changelog, ChangelogManager, ManagedChangelog
 from slam.project import Project
+from slam.repository import Issue, PullRequest
 from slam.util.pygments import toml_highlight
 
 DEFAULT_VALID_TYPES = [
@@ -135,9 +136,13 @@ class ChangelogAddCommand(BaseChangelogCommand):
       return 1
 
     vcs = self.app.repository.vcs()
+    remote = self.app.repository.host()
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
-    author: str | None = self.option("author") or (vcs.get_author().email if vcs else None)
+    author: str | None = self.option("author") or (
+      remote.get_username(self.app.repository) if remote else
+      vcs.get_author().email if vcs else
+      None)
     pr: str | None = self.option("pr")
     issues: list[str] | None = self.option("issue")
 
@@ -264,7 +269,7 @@ class ChangelogUpdatePrCommand(Command):
       base_revision = self.argument("base_revision")
     assert base_revision
 
-    changelogs = []
+    changelogs: list[tuple[ManagedChangelog, ChangelogManager]] = []
     for _, manager in self.managers.items():
       unreleased = manager.unreleased()
       if unreleased.exists():
@@ -274,18 +279,20 @@ class ChangelogUpdatePrCommand(Command):
       self.line('no entries to update', 'info')
       return 0
 
-    num_updates = 0
-    for changelog, manager in changelogs:
+    if not (pr := self.argument("pr")):
+      assert automation_plugin
+      pr = automation_plugin.get_pr()
 
-      if not (pr := self.argument("pr")):
-        assert automation_plugin
-        pr = automation_plugin.get_pr()
-
+    host = self.app.repository.host()
+    if host:
       try:
-        pr = manager.vcs_remote.normalize_pr(pr)
+        pr = host.get_pull_request_by_reference(pr).url
       except ValueError as exc:
         self.line_error(f'error: {exc}', 'error')
         return 1
+
+    num_updates = 0
+    for changelog, manager in changelogs:
 
       prev_contents = self._vcs.get_file_contents(changelog.path, base_revision)
       if prev_contents is None:
@@ -457,13 +464,19 @@ class ChangelogFormatCommand(BaseChangelogCommand):
     print('</table>')
 
   def _html_anchor(self, type: t.Literal['pr', 'issue'], ref: str) -> str:
-    if type == 'pr':
-      shortform = self.manager.vcs_remote.pr_shortform(ref)
-    else:
-      shortform = self.manager.vcs_remote.issue_shortform(ref)
-    if shortform is None:
-      shortform = 'Link'
-    return f'<a href="{ref}">{shortform}</a>'
+    if self.manager.repository_host:
+      try:
+        if type == 'pr':
+          item: Issue | PullRequest = self.manager.repository_host.get_pull_request_by_reference(ref)
+        else:
+          item = self.manager.repository_host.get_issue_by_reference(ref)
+      except ValueError as exc:
+        self.line_error(f'warning: {exc}', 'error')
+        url = ref
+        text = 'Link'
+      else:
+        url, text = item.url, item.id
+    return f'<a href="{url}">{text}</a>'
 
 
 class ChangelogConvertCommand(BaseChangelogCommand):
@@ -602,12 +615,11 @@ class ChangelogCommandPlugin(ApplicationPlugin):
 
 def get_changelog_manager(project: Project) -> ChangelogManager:
   import databind.json
-  from slam.util.vcs import VcsRemote
   config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
 
   return ChangelogManager(
     directory=project.directory / config.directory,
-    vcs_remote=project.repository.vcs_remote() or VcsRemote.null(),
+    repository_host=project.repository.host(),
     valid_types=config.valid_types,
     readonly=not config.enabled,
   )

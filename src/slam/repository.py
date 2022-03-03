@@ -1,9 +1,12 @@
 
 from __future__ import annotations
 
+import abc
+import dataclasses
 import typing as t
 from pathlib import Path
 
+from databind.core.annotations import union
 from nr.util.functional import Once
 
 from slam.configuration import Configuration
@@ -11,11 +14,57 @@ from slam.configuration import Configuration
 if t.TYPE_CHECKING:
   from slam.plugins import RepositoryHandlerPlugin
   from slam.project import Project
-  from slam.util.vcs import Vcs, VcsRemote
+  from slam.util.vcs import Vcs
+
+
+@dataclasses.dataclass
+class Issue:
+  """ Represents an issue. """
+
+  id: str
+  url: str
+  shortform: str
+
+
+@dataclasses.dataclass
+class PullRequest:
+  """ Represents a pull request. """
+
+  id: str
+  url: str
+  shortform: str
+
+
+@union(union.Subtypes.entrypoint('slam.plugins.repository_host'))
+class RepositoryHost(abc.ABC):
+  """ Interface for repository hosting services to resolve issue and pull request references, comment on issues
+  and create releases. """
+
+  ENTRYPOINT = 'slam.plugins.repository_host'
+
+  @abc.abstractmethod
+  def get_username(self, repository: Repository) -> str | None: ...
+
+  @abc.abstractmethod
+  def get_issue_by_reference(self, issue_reference: str) -> Issue: ...
+
+  @abc.abstractmethod
+  def get_pull_request_by_reference(self, pr_reference: str) -> PullRequest: ...
+
+  @abc.abstractmethod
+  def comment_on_issue(self, issue_reference: str, message: str) -> None: ...
+
+  @abc.abstractmethod
+  def create_release(self, version: str, description: str, attachments: list[Path]) -> None: ...
+
+  @staticmethod
+  @abc.abstractmethod
+  def detect_repository_host(repository: Repository) -> RepositoryHost | None: ...
 
 
 class Repository(Configuration):
-  """ A repository represents a directory that contains one or more projects. """
+  """ A repository represents a directory that contains one or more projects. A repository represents one or more
+  projects in one logical unit, usually tracked by a single version control repository. The class  """
 
   handler: Once[RepositoryHandlerPlugin]
 
@@ -24,7 +73,7 @@ class Repository(Configuration):
     self._handler = Once(self._get_repository_handler)
     self.projects = Once(self._get_projects)
     self.vcs = Once(self._get_vcs)
-    self.vcs_remote = Once(self._get_vcs_remote)
+    self.host = Once(self._get_repository_host)
 
   @property
   def is_monorepo(self) -> bool:
@@ -64,5 +113,5 @@ class Repository(Configuration):
   def _get_vcs(self) -> Vcs | None:
     return self._handler().get_vcs(self)
 
-  def _get_vcs_remote(self) -> VcsRemote | None:
-    return self._handler().get_vcs_remote(self)
+  def _get_repository_host(self) -> RepositoryHost | None:
+    return self._handler().get_repository_host(self)

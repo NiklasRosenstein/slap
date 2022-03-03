@@ -88,6 +88,9 @@ classifiers = [
   [tool.poetry.plugins."slam.plugins.repository"]
   default = "slam.ext.repository_handlers.default:DefaultRepositoryHandler"
 
+  [tool.poetry.plugins."slam.plugins.repository_host"]
+  github = "slam.ext.repository_hosts.github:GithubRepositoryHost"
+
 [tool.slam]
 typed = true
 

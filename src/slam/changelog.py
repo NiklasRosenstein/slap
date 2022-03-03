@@ -15,7 +15,7 @@ from nr.util.weak import weak_property
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
-  from slam.util.vcs import VcsRemote
+  from slam.repository import RepositoryHost
 
 
 def is_url(s: str) -> bool:
@@ -127,7 +127,7 @@ class ChangelogManager:
   directory: Path
 
   #: An instance for validation and normalization of issue and PR references.
-  vcs_remote: VcsRemote
+  repository_host: RepositoryHost | None
 
   #: The name of the file that contains the unreleased changes.
   unreleased_fn: str = '_unreleased.toml'
@@ -185,18 +185,16 @@ class ChangelogManager:
     """ Creates a new #ChangelogEntry and validates it. If the parameters of the changelog are invalid, a
     #InvalidChangelogEntryException is raised. A random unique ID is generated for the changelog. The *pr*
     and *issues* parameters may be issue IDs if a #remote is configured that supports the conversion. If no
-    author is specified, it will be read from the *author* option or otherwise obtained via the #VcsRemote,
+    author is specified, it will be read from the *author* option or otherwise obtained via the #RepositoryHost,
     if available. """
-
-    author = self.vcs_remote.normalize_author(author) or author
 
     if self.valid_types is not None and change_type not in self.valid_types:
       raise ValueError(f'invalid change type: {change_type}')
 
-    if pr is not None:
-      pr = self.vcs_remote.normalize_pr(pr) or pr
-    if issues is not None:
-      issues = [self.vcs_remote.normalize_issue(i) or i for i in issues]
+    if pr is not None and self.repository_host:
+      pr = self.repository_host.get_pull_request_by_reference(pr).url
+    if issues is not None and self.repository_host:
+      issues = [self.repository_host.get_issue_by_reference(i).url or i for i in issues]
 
     changelog_id = str(uuid.uuid4())
     return ChangelogEntry(
@@ -217,9 +215,8 @@ class ChangelogManager:
       raise ValueError(f'entry has no "author" or "authors"')
     if not all(entry.get_authors()):
       raise ValueError(f'empty string in author(s)')
-    if entry.pr:
-      if self.vcs_remote.normalize_pr(entry.pr) is None:
-        raise ValueError(f'invalid pr reference: {entry.pr}')
-    for issue_url in entry.issues or []:
-      if self.vcs_remote.normalize_issue(issue_url) is None:
-        raise ValueError(f'invalid issue reference: {issue_url}')
+    if self.repository_host:
+      if entry.pr:
+        entry.pr = self.repository_host.get_pull_request_by_reference(entry.pr).url
+      if entry.issues:
+        entry.issues = [self.repository_host.get_issue_by_reference(issue).url for issue in entry.issues]

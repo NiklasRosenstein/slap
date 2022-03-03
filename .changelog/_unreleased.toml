@@ -3,3 +3,9 @@ id = "e9114573-01d9-41d3-b701-39a18c057559"
 type = "refactor"
 description = "add `Repository` and `RepositoryHandlerPlugin` which gets to decide which projects are loaded, remove most of the related members from the `Application` class"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "895eae85-f569-43a8-bc94-34b4462e3dd1"
+type = "improvement"
+description = "morph `VcsHost` into `RepositoryHost` class"
+author = "NiklasRosenstein"
