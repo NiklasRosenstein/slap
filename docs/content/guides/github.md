@@ -11,7 +11,9 @@ some built-in utities to make integration with GitHub easier.
 
 ### Install Slam
 
-The `NiklasRosenstein/slam@github-action/install/v1` action installs Slam for you. It does this by setting up
+  [0]: https://github.com/NiklasRosenstein/slam/tree/github-action/install/v1
+
+The [`NiklasRosenstein/slam@github-action/install/v1`][0] action installs Slam for you. It does this by setting up
 Python 3.10 and installing Slam via Pipx.
 
 !!! note
@@ -38,9 +40,11 @@ jobs:
 
 ### Update Changelogs
 
+  [1]: https://github.com/NiklasRosenstein/slam/tree/github-action/changelog-update/v1
+
 The `slam changelog update-pr` command updates the PR references of changelogs added between two Git revisions. In
 addition, by passing `--use github-actions`, there is almost no need for any additional configuration inside of a
-GitHub action run for a Pull Request event. The `NiklasRosenstein/slam@github-action/changelog-update/v1` action
+GitHub action run for a Pull Request event. The [`NiklasRosenstein/slam@github-action/changelog-update/v1`][1] action
 makes automatically updated changelogs a breeze:
 
 ```yaml title=".github/workflows/python.yml"
