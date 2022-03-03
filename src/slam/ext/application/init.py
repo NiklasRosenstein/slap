@@ -56,6 +56,7 @@ TEMPLATES = {
       show_error_context = true
       show_error_codes = true
     ''',
+    'LICENSE': '',
     'readme.md': '''
       # {name}
 
@@ -74,7 +75,6 @@ TEMPLATES = {
       __version__ = '0.1.0'
     ''',
     'src/{package}/py.typed': '',
-    'LICENSE': '',
   }
 }
 
