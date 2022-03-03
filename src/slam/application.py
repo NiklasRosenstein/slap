@@ -167,7 +167,7 @@ class Application:
 
   repository: Repository
 
-  main_project: Once[Project]
+  main_project: Once[Project | None]
 
   #: The application configuration loaded once via #get_application_configuration().
   config: Once[ApplicationConfig]

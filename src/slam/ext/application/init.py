@@ -163,3 +163,5 @@ class InitCommandPlugin(ApplicationPlugin, Command):
         print(textwrap.indent(content, '    '))
         print(f'    ```\n')
       self.line(f'write <info>{filename}</info>')
+
+    return 0
