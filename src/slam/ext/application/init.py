@@ -1,10 +1,12 @@
 
-from pathlib import Path
+import datetime
 import textwrap
-from urllib import request
+from pathlib import Path
+
 from slam import __version__
 from slam.application import Application, Command, option
 from slam.plugins import ApplicationPlugin
+from slam.util.external.licenses import get_license_metadata, wrap_license_text
 
 TEMPLATES = {
   'poetry': {
@@ -72,6 +74,7 @@ TEMPLATES = {
       __version__ = '0.1.0'
     ''',
     'src/{package}/py.typed': '',
+    'LICENSE': '',
   }
 }
 
@@ -143,14 +146,21 @@ class InitCommandPlugin(ApplicationPlugin, Command):
       'name': self.option("name"),
       'package': self.option("name").replace('.', '_').replace('-', '_'),
       'license': self.option("license"),
+      'year': datetime.date.today().year,
       'author_name': author.name if author and author.name else 'Unknown',
       'author_email': author.email if author and author.email else 'me@unknown.org',
     }
     for filename, content in TEMPLATES[template].items():
-      filename = filename.format(**scope)
-      content = textwrap.dedent(content.format(**scope)).strip()
-      if content:
-        content += '\n'
+      if filename == 'LICENSE':
+        content = get_license_metadata(self.option("license"))
+        content = wrap_license_text(content.license_text)
+        content = 'Copyright (c) {year} {author_name}\n\n'.format(**scope) + content
+        content = f'The {self.option("license")} License\n\n' + content
+      else:
+        filename = filename.format(**scope)
+        content = textwrap.dedent(content.format(**scope)).strip()
+        if content:
+          content += '\n'
       if Path(filename).exists() and not self.option("overwrite"):
         self.line(f'skip <info>{filename}</info> (already exists)')
         continue
