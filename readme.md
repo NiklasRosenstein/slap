@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
+      - uses: actions/checkout@v2
       - uses: NiklasRosenstein/slam@github-action/changelog-update/v1
         with:
           version: '1.1.2'
