@@ -1,0 +1,16 @@
+name: 'Update Slam changelogs'
+description: 'Updates the Slam changelogs to inject the pull request reference.'
+inputs:
+  version:
+    description: The Slam version
+    required: true
+    default: '*'
+runs:
+  using: "composite"
+  steps:
+
+    - uses: NiklasRosenstein/slam@github-action/install/v1
+      with: { version: "${{ inputs.version }}" }
+
+    - name: Update changelogs
+      run: slam -vv changelog update-pr --use github-actions
