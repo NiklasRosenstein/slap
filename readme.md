@@ -7,6 +7,7 @@ This action updates Slam changelogs from a Pull Request to insert the URL of the
 ```yaml
 jobs:
   changelog-update:
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
       - uses: NiklasRosenstein/slam@github-action/changelog-update/v1
