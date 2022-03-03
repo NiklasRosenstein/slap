@@ -145,8 +145,14 @@ class Git(Vcs):
       return None
 
   def get_author(self) -> Author:
-    name = self._git.get_config('user.name')
-    email = self._git.get_config('user.email')
+    import subprocess as sp
+    try:
+      name = self._git.get_config('user.name')
+      email = self._git.get_config('user.email')
+    except sp.CalledProcessError as exc:
+      if exc.returncode != 1:
+        raise
+      return Author(None, None)
     return Author(name, email)
 
   def get_all_files(self) -> t.Sequence[Path]:
