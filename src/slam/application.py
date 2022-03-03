@@ -167,17 +167,13 @@ class Application:
 
   repository: Repository
 
-  #: The root project identified by #get_root_project().
-  root_project: Once[Project]
+  main_project: Once[Project]
 
   #: The application configuration loaded once via #get_application_configuration().
   config: Once[ApplicationConfig]
 
   #: The cleo application to which new commands can be registered via #ApplicationPlugin#s.
   cleo: CleoApplication
-
-  #: The version control system that is being used as a #Once.
-  vcs: Once[Vcs | None]
 
   def __init__(self, directory: Path | None = None, name: str = 'slam', version: str = __version__) -> None:
     from nr.util.functional import Once

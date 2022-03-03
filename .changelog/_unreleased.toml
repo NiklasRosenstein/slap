@@ -27,3 +27,9 @@ id = "165a458d-fec8-44c7-ac44-6ad63e44d743"
 type = "improvement"
 description = "All application plugins are now loaded by default (no explicit list of plugins to load), but the `tool.slam.application.disable` config persists to disable the activation of a particular set of plugins"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "6a36eba2-468e-4aca-8a3a-17be5246bc10"
+type = "feature"
+description = "add `slam init` command"
+author = "@NiklasRosenstein"
