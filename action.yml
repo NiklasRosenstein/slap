@@ -1,5 +1,5 @@
-name: 'Setup Slam'
-description: 'Sets up the Slam command-line utility.'
+name: 'Install Slam'
+description: 'Install Slam into your Action environment using Python 3.10 and Pipx.'
 inputs:
   version:
     description: The Slam version

@@ -9,7 +9,7 @@ using Python 3.10 and Pipx.
 jobs:
   build:
     steps:
-      - uses: NiklasRosenstein/slam@github-action/v1
+      - uses: NiklasRosenstein/slam@github-action/install/v1
         with:
           version: '1.1.2'
 ```
