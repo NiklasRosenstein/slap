@@ -24,7 +24,7 @@ jobs:
     - name: Install with poetry
       run: pip install . && slam install --no-venv-check
     - name: Test
-      run: slam test
+      run: slam info && slam test
 
   docs:
     runs-on: ubuntu-latest
