@@ -13,7 +13,7 @@ nav:
     - commands/release.md
     - commands/test.md
   - Guides:
-    - guides/automatic-changelog-pull-request-urls.md
+    - guides/github.md
     - guides/publishing.md
   - API:
     - api/plugins.md
