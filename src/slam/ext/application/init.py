@@ -44,11 +44,12 @@ TEMPLATES = {
 
       [tool.slam.test]
       check = "slam check"
-      mypy = "mypy src/ --namespace-packages"
+      mypy = "mypy src/"
       pytest = "pytest test/"
 
       [tool.mypy]
       pretty = true
+      namespace_packages = true
       warn_redundant_casts = true
       warn_unused_ignores = true
       warn_no_return = true
