@@ -502,11 +502,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#github-action" class="md-nav__link">
-    GitHub Action
+  <a href="#github-actions" class="md-nav__link">
+    GitHub Actions
   </a>
   
-    <nav class="md-nav" aria-label="GitHub Action">
+    <nav class="md-nav" aria-label="GitHub Actions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -708,11 +708,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#github-action" class="md-nav__link">
-    GitHub Action
+  <a href="#github-actions" class="md-nav__link">
+    GitHub Actions
   </a>
   
-    <nav class="md-nav" aria-label="GitHub Action">
+    <nav class="md-nav" aria-label="GitHub Actions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -755,9 +755,9 @@
 <h1 id="using-slam-in-github-repositories">Using Slam in GitHub repositories</h1>
 <p>Most of Slam's functionality is independent of the repository hosting service that you use. However, Slam comes with
 some built-in utities to make integration with GitHub easier.</p>
-<h2 id="github-action">GitHub Action</h2>
+<h2 id="github-actions">GitHub Actions</h2>
 <h3 id="install-slam">Install Slam</h3>
-<p>The <code>NiklasRosenstein/slam@github-action/install/v1</code> action installs Slam for you. It does this by setting up
+<p>The <a href="https://github.com/NiklasRosenstein/slam/tree/github-action/install/v1"><code>NiklasRosenstein/slam@github-action/install/v1</code></a> action installs Slam for you. It does this by setting up
 Python 3.10 and installing Slam via Pipx.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -781,7 +781,7 @@ pick an exact version for your configuration to avoid surprises.</p>
 <h3 id="update-changelogs">Update Changelogs</h3>
 <p>The <code>slam changelog update-pr</code> command updates the PR references of changelogs added between two Git revisions. In
 addition, by passing <code>--use github-actions</code>, there is almost no need for any additional configuration inside of a
-GitHub action run for a Pull Request event. The <code>NiklasRosenstein/slam@github-action/changelog-update/v1</code> action
+GitHub action run for a Pull Request event. The <a href="https://github.com/NiklasRosenstein/slam/tree/github-action/changelog-update/v1"><code>NiklasRosenstein/slam@github-action/changelog-update/v1</code></a> action
 makes automatically updated changelogs a breeze:</p>
 <div class="highlight"><span class="filename">.github/workflows/python.yml</span><pre><span></span><code><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">pull_request</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"></span>
 <span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
