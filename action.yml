@@ -15,4 +15,11 @@ runs:
 
     - name: Install Slam
       shell: bash
-      run: pip install pipx -q && pipx install 'slam-cli==${{ inputs.version }}'
+      run: |
+        VERSION='${{ inputs.version }}'
+        if [ "$VERSION" == '*' ]; then
+          VERSION=''
+        else
+          VERSION="==$VERSION"
+        fi
+        pip install pipx -q && pipx install 'slam-cli$VERSION'
