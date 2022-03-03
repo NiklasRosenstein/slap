@@ -7,7 +7,7 @@ title: GitHub
 Most of Slam's functionality is independent of the repository hosting service that you use. However, Slam comes with
 some built-in utities to make integration with GitHub easier.
 
-## GitHub Action
+## GitHub Actions
 
 ### Install Slam
 
