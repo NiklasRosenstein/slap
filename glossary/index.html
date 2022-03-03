@@ -338,6 +338,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_5">
@@ -388,6 +390,20 @@
     <li class="md-nav__item">
       <a href="../commands/info/" class="md-nav__link">
         Info
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/init/" class="md-nav__link">
+        Init
       </a>
     </li>
   
@@ -548,8 +564,6 @@
         
           
         
-          
-        
       
       
         <label class="md-nav__link" for="__nav_7">
@@ -586,20 +600,6 @@
     <li class="md-nav__item">
       <a href="../api/documentation/" class="md-nav__link">
         API Documentation
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/remotes/github/" class="md-nav__link">
-        GitHub
       </a>
     </li>
   
@@ -734,6 +734,8 @@ that can be installed, built or published to PyPI or another repository.</p>
 <p>A project with a <code>slam.toml</code> configuration file (or with no configuration file) is usually used as the parent
 project for two or more sub-projects. This configuration represents a mono-repository where multiple projects
 are stored and versioned together.</p>
+<p>Slam understands most details about a project through a <a href="/slam/api/documentation#pydoc:slam.plugins.ProjectHandlerPlugin">Class ProjectHandlerPlugin</a>. It comes
+with a default implementation that supports Poetry and Flit Python projects.</p>
 <h2 id="repository">Repository</h2>
 <p>A repository is a directory that contains one or more projects. For singular projects, the repository directory
 is the same as the project directory. For a mono-repository configuration, any directory that contains multiple
@@ -767,6 +769,8 @@ project (i.e. if it has a <code>pyproject.toml</code> instead of a <code>slam.to
 </div>
 </div>
 </div>
+<p>Slam understands most details about a repository through a <a href="/slam/api/documentation#pydoc:slam.plugins.RepositoryHandlerPlugin">Class RepositoryHandlerPlugin</a>. It
+comes with a default implementation that supports Git repositories and GitHub.</p>
 
               
             </article>

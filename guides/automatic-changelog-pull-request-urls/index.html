@@ -290,6 +290,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_5">
@@ -340,6 +342,20 @@
     <li class="md-nav__item">
       <a href="../../commands/info/" class="md-nav__link">
         Info
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../commands/init/" class="md-nav__link">
+        Init
       </a>
     </li>
   
@@ -543,8 +559,6 @@
         
           
         
-          
-        
       
       
         <label class="md-nav__link" for="__nav_7">
@@ -581,20 +595,6 @@
     <li class="md-nav__item">
       <a href="../../api/documentation/" class="md-nav__link">
         API Documentation
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../api/remotes/github/" class="md-nav__link">
-        GitHub
       </a>
     </li>
   
@@ -728,7 +728,7 @@ entries that have been added by that particular PR.</p>
 <span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v2</span><span class="w"></span>
 <span class="w">    </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> python-version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.10&quot;</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"></span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install Slam</span><span class="w"></span>
-<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r slam-cli==</span><span class="w"></span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r slam-cli==1.1.2</span><span class="w"></span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Update PR references in changelogs</span><span class="w"></span>
 <span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slam -vv changelog update-pr --use github-actions</span><span class="w"></span>
 </code></pre></div>
