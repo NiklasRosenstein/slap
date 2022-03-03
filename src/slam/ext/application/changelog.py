@@ -2,6 +2,7 @@
 from asyncio.log import logger
 import dataclasses
 import io
+import re
 import typing as t
 from pathlib import Path
 
@@ -446,7 +447,9 @@ class ChangelogFormatCommand(BaseChangelogCommand):
         return
 
     for entry in changelog.content.entries:
-      self.line(f'  <fg=cyan;options=italic>{entry.type}</fg> — {entry.description} (<fg=yellow>{entry.author}</fg>)')
+      description = entry.description
+      description = re.sub(r'(?!<\\)`([^`]+)`', r'<fg=dark_gray>\1</fg>', description)
+      self.line(f'  <fg=cyan;options=italic>{entry.type}</fg> — {description} (<fg=yellow>{entry.author}</fg>)')
 
   def _render_markdown(self, changelog: ManagedChangelog) -> None:
     if changelog.version:

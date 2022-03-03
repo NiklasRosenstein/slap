@@ -15,3 +15,9 @@ id = "93d5a5e9-b9a3-4e7c-ae63-689e4a534876"
 type = "fix"
 description = "fix possible `AssertionError` in `Application._get_main_project()` that can occur if Slam is invoked in a directory that does not contain a `pyproject.toml` nor `slam.toml` file."
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "336311d4-26f3-406f-91bd-4e764a90738e"
+type = "improvement"
+description = "`slam changelog format` in the Terminal now colorizes inline code (indicated by backticks)"
+author = "@NiklasRosenstein"
