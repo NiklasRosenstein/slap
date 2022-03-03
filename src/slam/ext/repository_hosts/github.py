@@ -64,7 +64,8 @@ class GithubRepositoryHost(RepositoryHost):
     vcs = repository.vcs()
     assert vcs
     email = vcs.get_author().email
-    return github_get_username_from_email(self._get_api_url(), email) or email
+    username = github_get_username_from_email(self._get_api_url(), email)
+    return ('@' + username) if username else email
 
   def get_issue_by_reference(self, issue_reference: str) -> Issue:
     issue_reference = issue_reference.lstrip('#')

@@ -9,3 +9,9 @@ id = "895eae85-f569-43a8-bc94-34b4462e3dd1"
 type = "improvement"
 description = "morph `VcsHost` into `RepositoryHost` class"
 author = "NiklasRosenstein"
+
+[[entries]]
+id = "93d5a5e9-b9a3-4e7c-ae63-689e4a534876"
+type = "fix"
+description = "fix possible `AssertionError` in `Application._get_main_project()` that can occur if Slam is invoked in a directory that does not contain a `pyproject.toml` nor `slam.toml` file."
+author = "@NiklasRosenstein"

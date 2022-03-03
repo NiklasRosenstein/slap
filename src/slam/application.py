@@ -205,7 +205,7 @@ class Application:
       options=[enable_unknowns()]
     )
 
-  def _get_main_project(self) -> Project:
+  def _get_main_project(self) -> Project | None:
     """ Returns the main project, which is the one closest to the current working directory. """
 
     closest: Project | None = None
@@ -227,7 +227,6 @@ class Application:
         closest = project
         distance = len(relative.parts)
 
-    assert closest is not None
     return closest
 
   def load_plugins(self) -> None:

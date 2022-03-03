@@ -12,7 +12,7 @@ from slam.project import Project
 class ChangelogValidationCheckPlugin(CheckPlugin):
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
-    self.manager = get_changelog_manager(project)
+    self.manager = get_changelog_manager(project.repository, project)
     yield self._check_changelogs()
 
   def _check_changelogs(self) -> Check:

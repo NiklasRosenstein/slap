@@ -8,10 +8,11 @@ from pathlib import Path
 from databind.core.annotations import alias
 
 from slam.application import Application, Command, argument, option
+from slam.configuration import Configuration
 from slam.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
 from slam.changelog import Changelog, ChangelogManager, ManagedChangelog
 from slam.project import Project
-from slam.repository import Issue, PullRequest
+from slam.repository import Issue, PullRequest, Repository
 from slam.util.pygments import toml_highlight
 
 DEFAULT_VALID_TYPES = [
@@ -32,7 +33,9 @@ class ChangelogConfig:
   #: Whether the changelog feature is enabled. This acts locally for the current project and not globally.
   #: Particularly useful for monorepos that have multiple subprojects each with their changelog directories
   #: to prevent accidentally creating changelogs in the root directory.
-  enabled: bool = True
+  #:
+  #: When not set, it will be considered `True` if the current project is a Python project.
+  enabled: bool | None = None
 
   #: The directory in which changelogs are stored.
   directory: Path = Path('.changelog')
@@ -132,7 +135,7 @@ class ChangelogAddCommand(BaseChangelogCommand):
     import databind.json
 
     if self.manager.readonly:
-      self.line_error(f'error: cannot add changelog because it the feature is disabled in the config', 'error')
+      self.line_error(f'error: cannot add changelog because the feature must be enabled in the config', 'error')
       return 1
 
     vcs = self.app.repository.vcs()
@@ -171,8 +174,8 @@ class ChangelogAddCommand(BaseChangelogCommand):
     if self.option("commit"):
       assert vcs is not None
       commit_message = f'{change_type}: {description}'
-      toplevel = vcs.get_toplevel()
-      relative = self.app._get_main_project().directory.relative_to(toplevel)
+      main_project = self.app.main_project()
+      relative = main_project.directory.relative_to(self.app.repository.directory) if main_project else Path('.')
       if relative != Path('.'):
         prefix = str(relative).replace("\\", "/").strip("/")
         commit_message = f'{prefix}/: {commit_message}'
@@ -245,7 +248,7 @@ class ChangelogUpdatePrCommand(Command):
   def __init__(self, app: Application):
     super().__init__()
     self.app = app
-    self.managers = {project: get_changelog_manager(project) for project in app.repository.projects()}
+    self.managers = {project: get_changelog_manager(app.repository, project) for project in app.repository.projects()}
 
   def handle(self) -> int:
     from nr.util.plugins import iter_entrypoints, load_entrypoint
@@ -604,7 +607,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
 class ChangelogCommandPlugin(ApplicationPlugin):
 
   def load_configuration(self, app: Application) -> ChangelogManager:
-    return get_changelog_manager(app._get_main_project())
+    return get_changelog_manager(app.repository, app.main_project())
 
   def activate(self, app: 'Application', config: ChangelogManager) -> None:
     app.cleo.add(ChangelogAddCommand(app, config))
@@ -613,13 +616,15 @@ class ChangelogCommandPlugin(ApplicationPlugin):
     app.cleo.add(ChangelogConvertCommand(app, config))
 
 
-def get_changelog_manager(project: Project) -> ChangelogManager:
+def get_changelog_manager(repository: Repository, project: Project | None) -> ChangelogManager:
   import databind.json
-  config = databind.json.load(project.raw_config().get('changelog', {}), ChangelogConfig)
+  config = databind.json.load((project or repository).raw_config().get('changelog', {}), ChangelogConfig)
+  if config.enabled is None and project:
+    config.enabled = project.is_python_project
 
   return ChangelogManager(
-    directory=project.directory / config.directory,
-    repository_host=project.repository.host(),
+    directory=(project or repository).directory / config.directory,
+    repository_host=repository.host(),
     valid_types=config.valid_types,
     readonly=not config.enabled,
   )
