@@ -21,3 +21,9 @@ id = "336311d4-26f3-406f-91bd-4e764a90738e"
 type = "improvement"
 description = "`slam changelog format` in the Terminal now colorizes inline code (indicated by backticks)"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "165a458d-fec8-44c7-ac44-6ad63e44d743"
+type = "improvement"
+description = "All application plugins are now loaded by default (no explicit list of plugins to load), but the `tool.slam.application.disable` config persists to disable the activation of a particular set of plugins"
+author = "@NiklasRosenstein"

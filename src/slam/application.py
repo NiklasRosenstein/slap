@@ -10,7 +10,6 @@ import textwrap
 import typing as t
 from pathlib import Path
 
-import deprecated
 from cleo.application import Application as BaseCleoApplication  # type: ignore[import]
 from cleo.commands.command import Command as _BaseCommand  # type: ignore[import]
 from cleo.helpers import argument, option  # type: ignore[import]
@@ -28,7 +27,6 @@ if t.TYPE_CHECKING:
   from slam.util.vcs import Vcs
 
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
-DEFAULT_PLUGINS = ['changelog', 'check', 'info', 'install', 'link', 'publish', 'release', 'test']
 logger = logging.getLogger(__name__)
 
 
@@ -155,11 +153,8 @@ class CleoApplication(BaseCleoApplication):
 
 @dataclasses.dataclass
 class ApplicationConfig:
-  #: A list of plugins to disable from the #DEFAULT_PLUGINS.
+  #: A list of application plugins to _not_ activate.
   disable: list[str] = dataclasses.field(default_factory=list)
-
-  #: A list of plugins to enable in addition to the #DEFAULT_PLUGINS.
-  enable: list[str] = dataclasses.field(default_factory=list)
 
   #: A list of plugins to enable only, causing the default plugins to not be loaded.
   enable_only: t.Annotated[list[str] | None, alias('enable-only')] = None
@@ -238,23 +233,21 @@ class Application:
     plugins delivered immediately with Slam are enabled by default unless disabled explicitly with the `disable`
     option. """
 
-    from nr.util.plugins import load_entrypoint
+    from nr.util.plugins import iter_entrypoints
     from slam.plugins import ApplicationPlugin
 
     assert not self._plugins_loaded
     self._plugins_loaded = True
 
     config = self.config()
+    disable = config.disable or []
 
-    if config.enable_only is not None:
-      plugin_names = set(config.enable_only)
-    else:
-      plugin_names = set(DEFAULT_PLUGINS) - set(config.disable) | set(config.enable)
-    logger.debug('Loading application plugins <subj>%s</subj>', plugin_names)
+    logger.debug('Loading application plugins')
 
-    for plugin_name in plugin_names:
+    for plugin_name, loader in iter_entrypoints(ApplicationPlugin):  # type: ignore[misc]
+      if plugin_name in disable: continue
       try:
-        plugin = load_entrypoint(ApplicationPlugin, plugin_name)()  # type: ignore[misc]
+        plugin = loader()()
       except Exception:
         logger.exception('Could not load plugin <subj>%s</subj> due to an exception', plugin_name)
       else:
