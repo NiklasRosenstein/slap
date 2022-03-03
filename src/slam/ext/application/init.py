@@ -4,7 +4,7 @@ import textwrap
 from pathlib import Path
 
 from slam import __version__
-from slam.application import Application, Command, option
+from slam.application import Application, Command, argument, option
 from slam.plugins import ApplicationPlugin
 from slam.util.external.licenses import get_license_metadata, wrap_license_text
 
@@ -91,6 +91,14 @@ class InitCommandPlugin(ApplicationPlugin, Command):
   app: Application
 
   name = "init"
+  arguments = [
+    argument(
+      "directory",
+      description="The directory in which to create the generated files. If not specified, a new directory with "
+        "the name specified via the <opt>--name</opt> option is created.",
+      optional=True,
+    )
+  ]
   options = [
     option(
       "--name",
@@ -142,6 +150,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
 
     vcs = self.app.repository.vcs()
     author = vcs.get_author() if vcs else None
+    directory = Path(self.argument("directory") or self.option("name"))
 
     scope = {
       'name': self.option("name"),
@@ -162,17 +171,24 @@ class InitCommandPlugin(ApplicationPlugin, Command):
         content = textwrap.dedent(content.format(**scope)).strip()
         if content:
           content += '\n'
-      if Path(filename).exists() and not self.option("overwrite"):
-        self.line(f'skip <info>{filename}</info> (already exists)')
-        continue
-      Path(filename).parent.mkdir(parents=True, exist_ok=True)
-      if not self.option("dry") and not self.option("as-markdown"):
-        Path(filename).write_text(content)
-      elif self.option("as-markdown"):
-        print(f'=== "{filename}"\n')
-        print(f'    ```{Path(filename).suffix[1:]}')
+
+      path = directory / filename
+
+      if self.option("as-markdown"):
+        print(f'=== "{path}"\n')
+        print(f'    ```{path.suffix[1:]}')
         print(textwrap.indent(content, '    '))
         print(f'    ```\n')
-      self.line(f'write <info>{filename}</info>')
+        continue
+
+      if path.exists() and not self.option("overwrite"):
+        self.line(f'skip <info>{path}</info> (already exists)')
+        continue
+
+      if not self.option("dry") and not self.option("as-markdown"):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content)
+
+      self.line(f'write <info>{path}</info>')
 
     return 0
