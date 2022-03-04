@@ -9,3 +9,9 @@ id = "8e765aad-d150-4baa-b942-80161afbdcc3"
 type = "improvement"
 description = "`slam init` now understands dots as namespace packages"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "b7dad5e7-e1d9-4977-aa0f-08156cf0fbf8"
+type = "improvement"
+description = "`slam init` package name written into `pyproject.toml` keeps dots"
+author = "@NiklasRosenstein"

@@ -153,7 +153,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
     directory = Path(self.argument("directory") or self.option("name").replace('.', '-'))
 
     scope = {
-      'name': self.option("name").replace('.', '-'),
+      'name': self.option("name"),
       'path': self.option("name").replace('.', '/').replace('-', '_'),
       'package': self.option("name").replace('.', '_').replace('-', '_'),
       'license': self.option("license"),

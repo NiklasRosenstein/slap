@@ -6,8 +6,8 @@ The `slam init` command is a small helper to bootstrap Python project files.
 
 ### Poetry
 
-``` title="$ slam init -t poetry --name my-package"
-@shell slam init -t poetry --name my-package -f --dry
+``` title="$ slam init -t poetry --name my.pkg"
+@shell slam init -t poetry --name my.pkg -f --dry
 ```
 
-@shell slam init -t poetry --name my-package --as-markdown -q
+@shell slam init -t poetry --name my.pkg --as-markdown -q
