@@ -45,7 +45,7 @@ TEMPLATES = {
       [tool.slam.test]
       check = "slam check"
       mypy = "mypy src/"
-      pytest = "pytest test/"
+      pytest = "pytest test/ -vv"
 
       [tool.mypy]
       pretty = true

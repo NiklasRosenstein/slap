@@ -21,3 +21,9 @@ id = "06af48b7-a6c2-48af-957b-3078cd489720"
 type = "feature"
 description = "add `slam run` command"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "04c3396e-981b-4059-b000-00188c658cf2"
+type = "improvement"
+description = "added `-vv` flag to Pytest command rendered in `pyproject.toml` by `slam init -t poetry` "
+author = "@NiklasRosenstein"
