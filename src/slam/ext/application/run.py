@@ -16,7 +16,10 @@ class RunCommandPlugin(Command, ApplicationPlugin):
   ]
 
   def load_configuration(self, app: Application) -> dict[str, str]:
-    return app.main_project().raw_config().get('run', {})
+    project = app.main_project()
+    if project:
+      return project.raw_config().get('run', {})
+    return {}
 
   def activate(self, app: Application, config: dict[str, str]) -> None:
     self.app = app

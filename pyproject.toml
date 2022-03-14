@@ -100,6 +100,9 @@ typed = true
   mypy = "mypy src --namespace-packages"
   check = "slam check"
 
+  [tool.slam.run]
+  "docs:dev" = "cd docs && novella --serve"
+
 [tool.mypy]
 pretty = true
 warn_redundant_casts = true
