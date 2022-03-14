@@ -58,6 +58,7 @@ classifiers = [
   link = "slam.ext.application.link:LinkCommandPlugin"
   publish = "slam.ext.application.publish:PublishCommandPlugin"
   release = "slam.ext.application.release:ReleaseCommandPlugin"
+  run = "slam.ext.application.run:RunCommandPlugin"
   test = "slam.ext.application.test:TestCommandPlugin"
 
   [tool.poetry.plugins."slam.plugins.changelog_update_automation"]

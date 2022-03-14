@@ -76,7 +76,7 @@ class Test(t.NamedTuple):
 
 class TestCommandPlugin(Command, ApplicationPlugin):
   """
-  Execute commands configured in <fg=green>[tool.slam.test]</fg>.
+  Execute commands configured in <code>[tool.slam.test]</code>.
 
   <b>Example configuration:</b>
 

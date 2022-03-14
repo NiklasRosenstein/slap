@@ -15,3 +15,9 @@ id = "b7dad5e7-e1d9-4977-aa0f-08156cf0fbf8"
 type = "improvement"
 description = "`slam init` package name written into `pyproject.toml` keeps dots"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "06af48b7-a6c2-48af-957b-3078cd489720"
+type = "feature"
+description = "add `slam run` command"
+author = "@NiklasRosenstein"

@@ -1,7 +1,7 @@
 
-from asyncio.log import logger
 import dataclasses
 import io
+import logging
 import re
 import typing as t
 from pathlib import Path
@@ -9,13 +9,13 @@ from pathlib import Path
 from databind.core.annotations import alias
 
 from slam.application import Application, Command, argument, option
-from slam.configuration import Configuration
 from slam.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
 from slam.changelog import Changelog, ChangelogManager, ManagedChangelog
 from slam.project import Project
 from slam.repository import Issue, PullRequest, Repository
 from slam.util.pygments import toml_highlight
 
+logger = logging.getLogger(__name__)
 DEFAULT_VALID_TYPES = [
   'breaking change',
   'deprecation',
@@ -186,7 +186,7 @@ class ChangelogAddCommand(BaseChangelogCommand):
 
 
 class ChangelogUpdatePrCommand(Command):
-  """ Update the <u>pr</u> field of changelog entries in a commit range.
+  """ Update the <code>pr</code> field of changelog entries in a commit range.
 
   Updates all changelog entries that were added in a given commit range. This is
   useful to run in CI for a pull request to avoid having to manually update the
