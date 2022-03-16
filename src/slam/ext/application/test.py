@@ -1,13 +1,16 @@
 
+import logging
 import os
-from pathlib import Path
 import typing as t
+from pathlib import Path
 
 from nr.util.singleton import NotSet
 
 from slam.application import Application, Command, IO, argument, option
 from slam.plugins import ApplicationPlugin
 from slam.project import Project
+
+logger = logging.getLogger(__name__)
 
 
 class TestRunner:
@@ -34,6 +37,8 @@ class TestRunner:
     TestRunner._prev_color = color
     command = ['bash', '-c', self.config]
     prefix = f'{self.name}| '
+
+    logger.info('Running command <subj>%s</subj> in <val>%s</val>', command, self.cwd)
 
     try:
       cols, rows = os.get_terminal_size()
@@ -101,8 +106,15 @@ class TestCommandPlugin(Command, ApplicationPlugin):
     argument("test", "One or more tests to run (runs all if none are specified)", optional=True, multiple=True),
   ]
   options = [
-    option("no-line-prefix", "s", "Do not prefix output from the test commands with the test name (default if "
-      "a single argument for <info>test</info> is specified)."),
+    option(
+      "no-line-prefix", "s",
+      description="Do not prefix output from the test commands with the test name (default if a single argument "
+        "for <info>test</info> is specified).",
+    ),
+    option(
+      "list", "l",
+      description="List all available tests",
+    ),
   ]
   options[0]._default = NotSet.Value  # Hack to set a default value for the flag
 
@@ -136,6 +148,14 @@ class TestCommandPlugin(Command, ApplicationPlugin):
     return result
 
   def handle(self) -> int:
+    if self.option("list"):
+      if self.argument("test"):
+        self.line_error('error: incompatible arguments (<opt>test</opt> and <opt>-l,--list</opt>)', 'error')
+        return 1
+      for test in self.tests:
+        print(test.id)
+      return 0
+
     if not self.tests:
       self.line_error('error: no tests configured', 'error')
       return 1

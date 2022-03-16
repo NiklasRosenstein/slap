@@ -1,0 +1,11 @@
+[[entries]]
+id = "4d25d208-2f53-46ee-a99d-27d71e731b2c"
+type = "improvement"
+description = "`test` command no info-logs the command being run"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "00410e5a-28d2-422f-bc93-d4c0695907a4"
+type = "feature"
+description = "add `slam test -l,--list` option"
+author = "@NiklasRosenstein"
