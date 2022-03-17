@@ -763,12 +763,10 @@ write my-pkg/LICENSE
 write my-pkg/readme.md
 write my-pkg/.gitignore
 write my-pkg/src/my/pkg/__init__.py
+write my-pkg/test/test.py
 write my-pkg/src/my/pkg/py.typed
 </code></pre></div>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:6"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><input id="__tabbed_1_6" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">my-pkg/pyproject.toml</label><label for="__tabbed_1_2">my-pkg/LICENSE</label><label for="__tabbed_1_3">my-pkg/readme.md</label><label for="__tabbed_1_4">my-pkg/.gitignore</label><label for="__tabbed_1_5">my-pkg/src/my/pkg/<strong>init</strong>.py</label><label for="__tabbed_1_6">my-pkg/src/my/pkg/py.typed</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
+<div class="highlight"><span class="filename">my-pkg/pyproject.toml</span><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
 <span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;poetry-core&quot;</span><span class="p">]</span><span class="w"></span>
 <span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;poetry.core.masonry.api&quot;</span><span class="w"></span>
 
@@ -801,7 +799,7 @@ write my-pkg/src/my/pkg/py.typed
 
 <span class="k">[tool.slam.test]</span><span class="w"></span>
 <span class="n">check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;slam check&quot;</span><span class="w"></span>
-<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy src/&quot;</span><span class="w"></span>
+<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;MYPYPATH=src mypy src/ --namespace-packages --explicit-package-bases&quot;</span><span class="w"></span>
 <span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest test/ -vv&quot;</span><span class="w"></span>
 
 <span class="k">[tool.mypy]</span><span class="w"></span>
@@ -814,9 +812,7 @@ write my-pkg/src/my/pkg/py.typed
 <span class="n">show_error_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">show_error_codes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>The MIT License
+<div class="highlight"><span class="filename">my-pkg/LICENSE</span><pre><span></span><code>The MIT License
 
 Copyright (c) 2022 Unknown
 
@@ -835,15 +831,11 @@ INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
 BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
-USE OR OTHER DEALINGS IN THE SOFTWARE.
+USE OR OTHER DEALINGS IN THE SOFTWARE.     
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="gh"># my.pkg</span>
+<div class="highlight"><span class="filename">my-pkg/readme.md</span><pre><span></span><code><span class="gh"># my.pkg</span>
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>/.vscode
+<div class="highlight"><span class="filename">my-pkg/.gitignore</span><pre><span></span><code>/.vscode
 /dist
 /build
 .venv/
@@ -851,17 +843,13 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 __pycache__/
 poetry.lock
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span>
+<div class="highlight"><span class="filename">my-pkg/src/my/pkg/__init__.py</span><pre><span></span><code><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span>
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>
+<div class="highlight"><span class="filename">my-pkg/test/test.py</span><pre><span></span><code><span class="k">def</span> <span class="nf">test_import_all</span><span class="p">():</span>
+  <span class="n">exec</span><span class="p">(</span><span class="s1">&#39;from my.pkg import *&#39;</span><span class="p">)</span>
 </code></pre></div>
-</div>
-</div>
-</div>
+<div class="highlight"><span class="filename">my-pkg/src/my/pkg/py.typed</span><pre><span></span><code>
+</code></pre></div>
 
               
             </article>
