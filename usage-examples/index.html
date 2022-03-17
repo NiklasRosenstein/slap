@@ -776,7 +776,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/None/docs/content/usage-examples.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/content/usage-examples.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -848,7 +848,7 @@ want to deliberately install into a global Python environment, pass the <code>--
 </blockquote>
 <h2 id="check-your-project-configuration">Check your project configuration</h2>
 <p>The <code>slam check</code> command provides some feedback on the sanity of your project configuration.</p>
-<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 70 changelogs are valid.
+<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 71 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slam/slam/src/slam
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -885,29 +885,17 @@ dependencies to projects in the same monorepository (if applicable) and the <cod
   src/slam/__init__.py: 1.2.1 # __version__ = &#39;1.2.1&#39;
 </code></pre></div>
 <p>To create a new release, pass the version number of a version bump rule instead.</p>
-<div class="highlight"><span class="filename">$ slam release --tag --push patch --dry</span><pre><span></span><code>    $ cd .. &amp;&amp; slam release --dry --tag --push patch --no-branch-check --no-worktree-check  # exited with return code 1
-    dry mode enabled, no changes will be committed to disk
-    bumping 2 version references to 1.2.2
-      pyproject.toml:       1.2.1 → 1.2.2 # version = &quot;1.2.1&quot;
-      src/slam/__init__.py: 1.2.1 → 1.2.2 # __version__ = &#39;1.2.1&#39;
+<div class="highlight"><span class="filename">$ slam release --tag --push patch --dry</span><pre><span></span><code>dry mode enabled, no changes will be committed to disk
+bumping 2 version references to 1.2.2
+  pyproject.toml:       1.2.1 → 1.2.2 # version = &quot;1.2.1&quot;
+  src/slam/__init__.py: 1.2.1 → 1.2.2 # __version__ = &#39;1.2.1&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.2.2.toml
 
-    tagging 1.2.2
+tagging 1.2.2
 
-      NoCurrentBranchError
-
-      /home/runner/work/slam/slam
-
-      at /opt/pipx/venvs/slam-cli/lib/python3.10/site-packages/nr/util/git/__init__.py:136 in get_current_branch_name
-          132│     for branch in self.get_branches():
-          133│       if branch.current:
-          134│         return branch.name
-          135│ 
-        → 136│     raise NoCurrentBranchError(self.path)
-          137│ 
-          138│   def get_remote_refs(self, remote: str) -&gt; t.List[RefWithSha]:
-          139│     result = []
-          140│     command = [&#39;git&#39;, &#39;ls-remote&#39;, &#39;--heads&#39;, &#39;origin&#39;]
+pushing develop, 1.2.2 to origin
 </code></pre></div>
 <blockquote>
 <p><a href="../commands/release/">More details</a></p>
@@ -982,7 +970,7 @@ dependencies to projects in the same monorepository (if applicable) and the <cod
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
     
     
       <script src="../assets/javascripts/bundle.467223ff.min.js"></script>
