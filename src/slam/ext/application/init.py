@@ -44,7 +44,7 @@ TEMPLATES = {
 
       [tool.slam.test]
       check = "slam check"
-      mypy = "mypy src/"
+      mypy = "MYPYPATH=src mypy src/ --namespace-packages --explicit-package-bases"
       pytest = "pytest test/ -vv"
 
       [tool.mypy]
@@ -74,6 +74,10 @@ TEMPLATES = {
     'src/{path}/__init__.py': '''
 
       __version__ = '0.1.0'
+    ''',
+    'test/test.py': '''
+      def test_import_all():
+        exec('from {dotted_name} import *')
     ''',
     'src/{path}/py.typed': '',
   }
@@ -154,6 +158,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
 
     scope = {
       'name': self.option("name"),
+      'dotted_name': self.option("name").replace('-', '_'),
       'path': self.option("name").replace('.', '/').replace('-', '_'),
       'package': self.option("name").replace('.', '_').replace('-', '_'),
       'license': self.option("license"),
@@ -176,10 +181,9 @@ class InitCommandPlugin(ApplicationPlugin, Command):
       path = directory / filename
 
       if self.option("as-markdown"):
-        print(f'=== "{path}"\n')
-        print(f'    ```{path.suffix[1:]}')
-        print(textwrap.indent(content, '    '))
-        print(f'    ```\n')
+        print(f'```{path.suffix[1:]} title="{path}"')
+        print(content, '    ')
+        print(f'```\n\n')
         continue
 
       if path.exists() and not self.option("overwrite"):

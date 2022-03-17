@@ -9,3 +9,9 @@ id = "00410e5a-28d2-422f-bc93-d4c0695907a4"
 type = "feature"
 description = "add `slam test -l,--list` option"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "4d2ff9b3-dbde-42d1-8e4d-5902e01cf35e"
+type = "improvement"
+description = "`slam init -t poetry` now creates a test file"
+author = "@NiklasRosenstein"
