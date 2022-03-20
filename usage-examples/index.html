@@ -848,7 +848,7 @@ want to deliberately install into a global Python environment, pass the <code>--
 </blockquote>
 <h2 id="check-your-project-configuration">Check your project configuration</h2>
 <p>The <code>slam check</code> command provides some feedback on the sanity of your project configuration.</p>
-<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 71 changelogs are valid.
+<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 72 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slam/slam/src/slam
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -881,19 +881,19 @@ it to the <code>origin</code> remote. It can also be used to validate if all ver
 further configuration, the command will find the version in your <code>pyproject.toml</code> as well as the version numbers of
 dependencies to projects in the same monorepository (if applicable) and the <code>__version__</code> in your source code.</p>
 <div class="highlight"><span class="filename">$ slam release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.2.2 # version = &quot;1.2.2&quot;
-  src/slam/__init__.py: 1.2.2 # __version__ = &#39;1.2.2&#39;
+  pyproject.toml:       1.2.3 # version = &quot;1.2.3&quot;
+  src/slam/__init__.py: 1.2.3 # __version__ = &#39;1.2.3&#39;
 </code></pre></div>
 <p>To create a new release, pass the version number of a version bump rule instead.</p>
 <div class="highlight"><span class="filename">$ slam release --tag --push patch --dry</span><pre><span></span><code>dry mode enabled, no changes will be committed to disk
-bumping 2 version references to 1.2.3
-  pyproject.toml:       1.2.2 → 1.2.3 # version = &quot;1.2.2&quot;
-  src/slam/__init__.py: 1.2.2 → 1.2.3 # __version__ = &#39;1.2.2&#39;
+bumping 2 version references to 1.2.4
+  pyproject.toml:       1.2.3 → 1.2.4 # version = &quot;1.2.3&quot;
+  src/slam/__init__.py: 1.2.3 → 1.2.4 # __version__ = &#39;1.2.3&#39;
 
 
-tagging 1.2.3
+tagging 1.2.4
 
-pushing develop, 1.2.3 to origin
+pushing develop, 1.2.4 to origin
 </code></pre></div>
 <blockquote>
 <p><a href="../commands/release/">More details</a></p>
