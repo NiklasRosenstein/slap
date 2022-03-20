@@ -763,7 +763,7 @@ write my-pkg/LICENSE
 write my-pkg/readme.md
 write my-pkg/.gitignore
 write my-pkg/src/my/pkg/__init__.py
-write my-pkg/test/test.py
+write my-pkg/test/test_import.py
 write my-pkg/src/my/pkg/py.typed
 </code></pre></div>
 <div class="highlight"><span class="filename">my-pkg/pyproject.toml</span><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
@@ -845,7 +845,7 @@ poetry.lock
 </code></pre></div>
 <div class="highlight"><span class="filename">my-pkg/src/my/pkg/__init__.py</span><pre><span></span><code><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/test/test.py</span><pre><span></span><code><span class="k">def</span> <span class="nf">test_import_all</span><span class="p">():</span>
+<div class="highlight"><span class="filename">my-pkg/test/test_import.py</span><pre><span></span><code><span class="k">def</span> <span class="nf">test_import</span><span class="p">():</span>
   <span class="n">exec</span><span class="p">(</span><span class="s1">&#39;from my.pkg import *&#39;</span><span class="p">)</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">my-pkg/src/my/pkg/py.typed</span><pre><span></span><code>
