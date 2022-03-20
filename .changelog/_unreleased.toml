@@ -21,3 +21,9 @@ id = "7c61697e-dc56-40ba-886c-26b544774fae"
 type = "fix"
 description = "Fix `slam init` to create a `test/test_import.py` instead of `test/test.py`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "9ded719d-4ae4-41b1-82f9-f0640e1c13b0"
+type = "fix"
+description = "Fix `slam install` command to forward to the `--no-venv-check` option to the `slam link` command"
+author = "@NiklasRosenstein"

@@ -129,7 +129,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       return res
 
     if self.option("link"):
-      self.call("link")
+      self.call("link", ["--no-venv-check"] if self.option("--no-venv-check") else [])
 
     return 0
 
