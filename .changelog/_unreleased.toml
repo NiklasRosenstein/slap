@@ -27,3 +27,9 @@ id = "9ded719d-4ae4-41b1-82f9-f0640e1c13b0"
 type = "fix"
 description = "Fix `slam install` command to forward to the `--no-venv-check` option to the `slam link` command"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "2260124e-ce9f-46a2-9401-4fbf5fe198d0"
+type = "fix"
+description = "Fix `slam changelog convert` to use the proper default author"
+author = "@NiklasRosenstein"

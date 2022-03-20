@@ -29,6 +29,15 @@ DEFAULT_VALID_TYPES = [
 ]
 
 
+def get_default_author(app: Application) -> str | None:
+  vcs = app.repository.vcs()
+  remote = app.repository.host()
+  return (
+    remote.get_username(app.repository) if remote else
+    vcs.get_author().email if vcs else
+    None)
+
+
 @dataclasses.dataclass
 class ChangelogConfig:
   #: Whether the changelog feature is enabled. This acts locally for the current project and not globally.
@@ -140,13 +149,9 @@ class ChangelogAddCommand(BaseChangelogCommand):
       return 1
 
     vcs = self.app.repository.vcs()
-    remote = self.app.repository.host()
     change_type: str | None = self.option("type")
     description: str | None = self.option("description")
-    author: str | None = self.option("author") or (
-      remote.get_username(self.app.repository) if remote else
-      vcs.get_author().email if vcs else
-      None)
+    author: str | None = self.option("author") or get_default_author(self.app)
     pr: str | None = self.option("pr")
     issues: list[str] | None = self.option("issue")
 
@@ -529,7 +534,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
     import yaml
 
     vcs = self.app.repository.vcs()
-    author = self.option("author") or (vcs.get_author().email if vcs else None)
+    author = self.option("author") or get_default_author(self.app)
 
     if not author:
       self.line_error('error: missing <opt>--author,-a</opt>', 'error')
