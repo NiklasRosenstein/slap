@@ -15,3 +15,9 @@ id = "4d2ff9b3-dbde-42d1-8e4d-5902e01cf35e"
 type = "improvement"
 description = "`slam init -t poetry` now creates a test file"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "7c61697e-dc56-40ba-886c-26b544774fae"
+type = "fix"
+description = "Fix `slam init` to create a `test/test_import.py` instead of `test/test.py`"
+author = "@NiklasRosenstein"

@@ -75,8 +75,8 @@ TEMPLATES = {
 
       __version__ = '0.1.0'
     ''',
-    'test/test.py': '''
-      def test_import_all():
+    'test/test_import.py': '''
+      def test_import():
         exec('from {dotted_name} import *')
     ''',
     'src/{path}/py.typed': '',
