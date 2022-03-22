@@ -27,7 +27,7 @@ classifiers = [
   cleo = ">=1.0.0a4"
   "databind" = "^1.5.1"
   flit = "^3.6.0"
-  "nr.util" = ">=0.7.6,<1.0.0"
+  "nr.util" = ">=0.8.4,<1.0.0"
   poetry-core = "^1.1.0a6"
   ptyprocess = "^0.7.0"
   pygments = "^2.11.2"
