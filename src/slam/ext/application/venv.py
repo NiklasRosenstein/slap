@@ -137,6 +137,9 @@ class VenvCommand(Command):
       if self.option("delete") and self.option(opt):
         self.line_error('error: <opt>-d,--delete</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
         return False
+    if not any(self.option(opt) for opt in ('activate', 'create', 'delete', 'init-code', 'list')):
+      self.line_error('error: no options supplied', 'error')
+      return False
     return True
 
   def _get_python_bin(self) -> str:
