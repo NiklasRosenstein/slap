@@ -13,6 +13,7 @@ nav:
     - commands/release.md
     - commands/run.md
     - commands/test.md
+    - commands/venv.md
   - Guides:
     - guides/github.md
     - guides/publishing.md

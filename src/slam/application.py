@@ -256,7 +256,7 @@ class Application:
     try:
       self.repository.load()
     except NotASlamRepository as exc:
-      io.write_error_line(f'<error>error: this does not appear to be a directorty in which you want to use Slam</error>')
+      io.write_error_line(f'<error>error: this does not appear to be a directory in which you want to use Slam</error>')
       sys.exit(1)
 
     self.load_plugins()
