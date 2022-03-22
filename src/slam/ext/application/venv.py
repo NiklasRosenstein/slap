@@ -10,7 +10,25 @@ from slam.application import Application, Command, argument, option
 from slam.plugins import ApplicationPlugin
 
 GLOBAL_BIN_DIRECTORY = Path('~/.local/bin').expanduser()
-GLOBAL_VENVS_DIRECTORY = Path('~/.local/venvs').expanduser()
+GLOBAL_VENVS_DIRECTORY = Path('~/.local/venvs').expanduser()\
+
+INIT_SCRIPTS = {
+  'bash': '''
+  function slam() {
+    local ORIGINAL=$(which slam)
+    if ! [ $? = 0 ]; then
+      >&2 echo "error: command 'slam' does not exist"
+      return 127
+    fi
+    if [ "$1" == "venv" ] && [[ "$2" =~ -[gc]*a[gc]* ]]; then
+      eval "$("$ORIGINAL" "$@" --called-from-shadow-func)"
+    else
+      "$ORIGINAL" "$@"
+    fi
+    return $?
+  }
+  ''',
+}
 
 
 class Venv:
@@ -109,7 +127,8 @@ class VenvCommand(Command):
     option(
       "init-code", "i",
       description="Print the code snippet that can be placed in your shells init scripts to shadow this command "
-        "in order to properly make use of the <opt>-a,--activate</opt> option.",
+        "in order to properly make use of the <opt>-a,--activate</opt> option. Currently supported shells are: "
+        + ", ".join(INIT_SCRIPTS),
       flag=False,
     ),
     option(
@@ -160,8 +179,9 @@ class VenvCommand(Command):
       self.line(f'• {venv.name.ljust(maxw)}  <code>{venv.get_python_version().splitlines()[0]}</code>')
 
   def _get_init_code(self, shell: str) -> str:
-    if shell in ('bash', 'sh'):
-      raise NotImplementedError
+    import textwrap
+    if shell in INIT_SCRIPTS:
+      print(textwrap.dedent(INIT_SCRIPTS[shell]))
     else:
       self.line_error(f'error: init code for shell <s>{shell}</s> is not supported', 'error')
       return 1
