@@ -218,7 +218,7 @@ class Git(Vcs):
     }[mode]
 
 
-def get_git_author(path: Path | None = None) -> None:
+def get_git_author(path: Path | None = None) -> Author:
   import subprocess as sp
   git = _Git(path)
   global_ = git.get_toplevel() is not None
