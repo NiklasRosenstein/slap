@@ -12,22 +12,26 @@ from slam.plugins import ApplicationPlugin
 GLOBAL_BIN_DIRECTORY = Path('~/.local/bin').expanduser()
 GLOBAL_VENVS_DIRECTORY = Path('~/.local/venvs').expanduser()\
 
-INIT_SCRIPTS = {
+SHADOW_INIT_SCRIPTS = {
   'bash': '''
-  function slam() {
-    local ORIGINAL=$(which slam)
-    if ! [ $? = 0 ]; then
-      >&2 echo "error: command 'slam' does not exist"
-      return 127
-    fi
-    if [ "$1" == "venv" ] && [[ "$2" =~ -[gc]*a[gc]* ]]; then
-      eval "$("$ORIGINAL" "$@" --called-from-shadow-func)"
-    else
-      "$ORIGINAL" "$@"
-    fi
-    return $?
-  }
+    function slam() {
+      local ORIGINAL=$(which slam)
+      if ! [ $? = 0 ]; then
+        >&2 echo "error: command 'slam' does not exist"
+        return 127
+      fi
+      if [ "$1" == "venv" ] && [[ "$2" =~ -[gc]*a[gc]* ]]; then
+        eval "$(SLAM_SHADOW=true "$ORIGINAL" "$@")"
+      else
+        "$ORIGINAL" "$@"
+      fi
+      return $?
+    }
   ''',
+}
+
+USER_INIT_SCRIPTS = {
+  'bash': 'which slam >/dev/null && eval "$(SLAM_SHADOW=true slam venv -i bash)"',
 }
 
 
@@ -128,7 +132,7 @@ class VenvCommand(Command):
       "init-code", "i",
       description="Print the code snippet that can be placed in your shells init scripts to shadow this command "
         "in order to properly make use of the <opt>-a,--activate</opt> option. Currently supported shells are: "
-        + ", ".join(INIT_SCRIPTS),
+        + ", ".join(USER_INIT_SCRIPTS),
       flag=False,
     ),
     option(
@@ -137,17 +141,16 @@ class VenvCommand(Command):
         "it defaults to <code>python</code> + the environment name if the environment name looks like a version "
         "number (contains numbers and dots). Otehrwise, it defaults to <code>python3</code>.",
       flag=False,
-    ),
-    option(
-      "called-from-shadow-func",
-      description="Passed by the shell shadow function to inform the command that it was not invoked directly.",
     )
   ]
 
   def _validate_args(self) -> bool:
     for opt in ('activate', 'create', 'delete'):
       if self.option("init-code") and self.option(opt):
-        self.line_error('error: <opt>-i,--init-code</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
+        self.line_error(f'error: <opt>-i,--init-code</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
+        return False
+      if self.option("list") and self.option(opt):
+        self.line_error(f'error: <opt>-l,--list</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
         return False
       if self.option(opt) and not self.argument("name"):
         self.line_error('error: missing <opt>name</opt> argument', 'error')
@@ -178,10 +181,14 @@ class VenvCommand(Command):
     for venv in venvs:
       self.line(f'• {venv.name.ljust(maxw)}  <code>{venv.get_python_version().splitlines()[0]}</code>')
 
+  def _is_called_from_shadow(self) -> bool:
+    return os.getenv('SLAM_SHADOW') == 'true'
+
   def _get_init_code(self, shell: str) -> int:
     import textwrap
-    if shell in INIT_SCRIPTS:
-      print(textwrap.dedent(INIT_SCRIPTS[shell]))
+    source = SHADOW_INIT_SCRIPTS if self._is_called_from_shadow() else USER_INIT_SCRIPTS
+    if shell in source:
+      print(textwrap.dedent(source[shell]))
       return 0
     else:
       self.line_error(f'error: init code for shell <s>{shell}</s> is not supported', 'error')
@@ -217,7 +224,7 @@ class VenvCommand(Command):
         return 1
       # TODO (@NiklasRosenstein): Adjust output based on the shell that this is called from?
       # TODO (@NiklasRosenstein): This also needs to be a different path on Windows.
-      if not self.option("called-from-shadow-func"):
+      if not self._is_called_from_shadow():
         self.line_error('warning: the <opt>-a,--activate</opt> option only works when shadowed by a shell function', 'warning')
       print(f'source "{venv.get_bin("activate")}"')
 
