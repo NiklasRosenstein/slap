@@ -164,8 +164,6 @@ class Application:
   that is the main subject of the command-line invokation (or multiple of such), provide the #cleo command-line
   application that #ApplicationPlugin#s can register commands to, etc. """
 
-  repository: Repository
-
   main_project: Once[Project | None]
 
   #: The application configuration loaded once via #get_application_configuration().
@@ -176,12 +174,24 @@ class Application:
 
   def __init__(self, directory: Path | None = None, name: str = 'slam', version: str = __version__) -> None:
     from nr.util.functional import Once
-    from slam.repository import Repository
-    self.repository = Repository(directory or Path.cwd())
+    self._directory = directory or Path.cwd()
+    self._repository: t.Optional[Repository] = None
     self._plugins_loaded = False
     self.config = Once(self._get_application_configuration)
     self.cleo = CleoApplication(self._cleo_init, name, version)
     self.main_project = Once(self._get_main_project)
+
+  @property
+  def repository(self) -> Repository:
+    """ Return the Slam repository that is the subject of the current application. There may be command plugins
+    that do not require the repository to function, so this property creates the repository lazily. """
+
+    from slam.repository import Repository
+
+    if self._repository is None:
+      self._repository = Repository(self._directory)
+
+    return self._repository
 
   def _get_application_configuration(self) -> ApplicationConfig:
     """ Loads the application-level configuration. """
@@ -250,15 +260,6 @@ class Application:
         plugin.activate(self, plugin_config)
 
   def _cleo_init(self, io: IO) -> None:
-    import sys
-    from slam.repository import NotASlamRepository
-
-    try:
-      self.repository.load()
-    except NotASlamRepository as exc:
-      io.write_error_line(f'<error>error: this does not appear to be a directory in which you want to use Slam</error>')
-      sys.exit(1)
-
     self.load_plugins()
 
   def run(self) -> None:

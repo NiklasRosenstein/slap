@@ -178,10 +178,11 @@ class VenvCommand(Command):
     for venv in venvs:
       self.line(f'• {venv.name.ljust(maxw)}  <code>{venv.get_python_version().splitlines()[0]}</code>')
 
-  def _get_init_code(self, shell: str) -> str:
+  def _get_init_code(self, shell: str) -> int:
     import textwrap
     if shell in INIT_SCRIPTS:
       print(textwrap.dedent(INIT_SCRIPTS[shell]))
+      return 0
     else:
       self.line_error(f'error: init code for shell <s>{shell}</s> is not supported', 'error')
       return 1
@@ -192,8 +193,7 @@ class VenvCommand(Command):
 
     shell = self.option("init-code")
     if shell:
-      self._get_init_code(shell)
-      return 0
+      return self._get_init_code(shell)
 
     manager = VenvManager(GLOBAL_VENVS_DIRECTORY if self.option("global") else Path(".venvs"))
 
@@ -227,6 +227,8 @@ class VenvCommand(Command):
         return 1
       venv.delete()
       self.line_error(f'deleted environment <s>"{venv.name}"</s>', 'info')
+
+    return 0
 
 
 class VenvLinkCommand(Command):
@@ -271,6 +273,8 @@ class VenvLinkCommand(Command):
       target.unlink()
     target.symlink_to(program)
     self.line(f'symlinked <s>"{target}"</s> to <s>"{program}"</s>', 'info')
+
+    return 0
 
 
 class VenvPlugin(ApplicationPlugin):

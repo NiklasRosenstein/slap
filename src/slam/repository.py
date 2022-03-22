@@ -81,29 +81,19 @@ class Repository(Configuration):
       return True
     return False
 
-  def load(self) -> None:
-    """ Loads the repository handler internally. This method is supposed to be called for catching the potential
-    #NotASlamRepository exception if the repository is incompatible.
-
-    Raises:
-      NotASlamRepository: If the #directory does not appear to be manageable by the Slam default handler.
-        This will not be raised if the repository handler was overwritten in the config and doesn't match.
-    """
-
-    self._handler.get()
-
-  def _get_repository_handler(self) -> RepositoryHandlerPlugin:
+  def _get_repository_handler(self) -> RepositoryHandlerPlugin | None:
     """ Returns the handler for this repository. """
 
     from nr.util.plugins import load_entrypoint
     from slam.plugins import RepositoryHandlerPlugin
     from slam.ext.repository_handlers.default import DefaultRepositoryHandler
 
+    handler: RepositoryHandlerPlugin
     handler_name = self.raw_config().get('repository', {}).get('handler')
     if handler_name is None:
       handler = DefaultRepositoryHandler()
       if not handler.matches_repository(self):
-        raise NotASlamRepository(self.directory)
+        return None
     else:
       assert isinstance(handler_name, str), repr(handler_name)
       handler = load_entrypoint(RepositoryHandlerPlugin, handler_name)()  # type: ignore[misc]
@@ -116,7 +106,11 @@ class Repository(Configuration):
     from nr.util.digraph import DiGraph
     from nr.util.digraph.algorithm.topological_sort import topological_sort
 
-    projects = sorted(self._handler().get_projects(self), key=lambda p: p.id)
+    handler = self._handler()
+    if not handler:
+      return []
+
+    projects = sorted(handler.get_projects(self), key=lambda p: p.id)
     graph: DiGraph[Project, None, None] = DiGraph()
     for project in projects:
       graph.add_node(project, None)
@@ -127,16 +121,9 @@ class Repository(Configuration):
     return list(topological_sort(graph, sorting_key=lambda p: p.id))
 
   def _get_vcs(self) -> Vcs | None:
-    return self._handler().get_vcs(self)
+    from nr.util.optional import Optional
+    return Optional(self._handler()).map(lambda h: h.get_vcs(self)).or_else(None)
 
   def _get_repository_host(self) -> RepositoryHost | None:
-    return self._handler().get_repository_host(self)
-
-
-class NotASlamRepository(Exception):
-  """ This exception is raised when the default #RepositoryHandlerPlugin is loaded but the #Repository cannot be
-  handled by it. This is for example if the directory does not appear to be a directory that should be managed using
-  Slam at all."""
-
-  def __init__(self, directory: Path) -> None:
-    self.directory = directory
+    from nr.util.optional import Optional
+    return Optional(self._handler()).map(lambda h: h.get_repository_host(self)).or_else(None)
