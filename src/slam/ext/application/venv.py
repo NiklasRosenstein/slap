@@ -1,12 +1,64 @@
 
+import os
 import shutil
 import string
 import subprocess as sp
+import typing as t
 from pathlib import Path
-from urllib import request
 
 from slam.application import Application, Command, argument, option
 from slam.plugins import ApplicationPlugin
+
+
+class Venv:
+
+  def __init__(self, directory: Path) -> None:
+    self.directory = directory
+
+  @property
+  def name(self) -> str:
+    return self.directory.name
+
+  def exists(self) -> bool:
+    return self.directory.exists()
+
+  def create(self, python_bin: str) -> None:
+    self.directory.parent.mkdir(parents=True, exist_ok=True)
+    sp.check_call([python_bin, '-m', 'venv', self.directory])
+
+  def delete(self) -> None:
+    shutil.rmtree(self.directory)
+
+  def get_bin_directory(self) -> Path:
+    if os.name == 'nt':
+      return self.directory / 'Scripts'
+    else:
+      return self.directory / 'bin'
+
+  def get_bin(self, program: str) -> Path:
+    path = self.get_bin_directory() / program
+    if os.name == 'nt':
+      path = path.with_name(path.name + '.exe')
+    return path
+
+  def get_python_version(self) -> str:
+    return sp.check_output([self.get_bin('python'), '-c', 'import sys; print(sys.version)']).decode().strip()
+
+
+class VenvManager:
+
+  def __init__(self, directory: Path | None = None) -> None:
+    self.directory = directory or Path('.venvs')
+
+  def ls(self) -> t.Iterable[Venv]:
+    if not self.directory.exists():
+      return
+    for path in self.directory.iterdir():
+      yield Venv(path)
+
+  def get(self, venv_name: str) -> Venv:
+    return Venv(self.directory / venv_name)
+
 
 
 class VenvCommand(Command):
@@ -97,18 +149,15 @@ class VenvCommand(Command):
     else:
       return Path('.venvs')
 
-  def _get_python_version(self, path: Path) -> None:
-    return sp.check_output([path / 'bin' / 'python', '-c', 'import sys; print(" ".join(map(str.strip, sys.version.splitlines())))']).decode().strip()
-
-  def _list_environments(self) -> None:
-    base_path = self._get_base_path()
-    paths = tuple(base_path.iterdir()) if base_path.exists() else ()
-    if not paths:
-      self.line_error(f'no environments in <s>"{base_path}"</s>', 'info')
+  def _list_environments(self, manager: VenvManager) -> None:
+    venvs = list(manager.ls())
+    if not venvs:
+      self.line_error(f'no environments in <s>"{manager.directory}"</s>', 'info')
       return
-    self.line(f'{len(paths)} environment{"s" if len(paths) != 1 else ""} in <s>"{base_path}"</s>', 'info')
-    for path in paths:
-      self.line(f'• {path.name}\t\t<code>{self._get_python_version(path)}</code>')
+    self.line(f'{len(venvs)} environment{"s" if len(venvs) != 1 else ""} in <s>"{manager.directory}"</s>', 'info')
+    maxw = max(len(venv.name) for venv in venvs)
+    for venv in venvs:
+      self.line(f'• {venv.name.ljust(maxw)}  <code>{venv.get_python_version().splitlines()[0]}</code>')
 
   def _get_init_code(self, shell: str) -> str:
     if shell in ('bash', 'sh'):
@@ -126,42 +175,54 @@ class VenvCommand(Command):
       self._get_init_code(shell)
       return 0
 
+    manager = VenvManager(self._get_base_path())
+
     if self.option("list"):
-      self._list_environments()
+      self._list_environments(manager)
       return 0
 
     python = self._get_python_bin()
-    env_path = self._get_base_path() / self.argument("name")
+    venv = manager.get(self.argument("name"))
 
     if self.option("create"):
-      if env_path.exists():
-        self.line_error(f'error: environment <s>"{env_path}"</s> already exists', 'error')
+      if venv.exists():
+        self.line_error(f'error: environment <s>"{venv.name}"</s> already exists', 'error')
         return 1
-      env_path.parent.mkdir(parents=True, exist_ok=True)
-      sp.check_call([python, '-m', 'venv', env_path])
+      self.line_error(f'creating environment <s>"{venv.name}"</s> (using <code>{python}</code>)', 'info')
+      venv.create(python)
 
     if self.option("activate"):
-      if not env_path.exists():
-        self.line_error(f'error: environment <s>"{env_path}"</s> does not exist', 'error')
+      if not venv.exists():
+        self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         return 1
       # TODO (@NiklasRosenstein): Adjust output based on the shell that this is called from?
       # TODO (@NiklasRosenstein): This also needs to be a different path on Windows.
       if not self.option("called-from-shadow-func"):
         self.line_error('warning: the <opt>-a,--activate</opt> option only works when shadowed by a shell function', 'warning')
-      print(f'source "{env_path}/bin/activate"')
+      print(f'source "{venv.get_bin("activate")}"')
 
     if self.option("delete"):
-      if not env_path.exists():
-        self.line_error(f'error: environment <s>"{env_path}"</s> does not exist', 'error')
+      if not venv.exists():
+        self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         return 1
-      shutil.rmtree(env_path)
+      venv.delete()
+      self.line_error(f'deleted environment <s>"{venv.name}"</s>', 'info')
 
 
 class VenvLinkCommand(Command):
   """ Link executables from a global virtual environment. """
 
   name = "venv link"
-
+  arguments = [
+    argument(
+      "name",
+      description="The global environment name.",
+    ),
+    argument(
+      "program",
+      description="The name of the program to link.",
+    ),
+  ]
 
   def handle(self) -> int:
     print('venv link')
