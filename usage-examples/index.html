@@ -363,6 +363,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_5">
@@ -497,6 +499,20 @@
     <li class="md-nav__item">
       <a href="../commands/test/" class="md-nav__link">
         Test
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/venv/" class="md-nav__link">
+        Venv
       </a>
     </li>
   
@@ -776,7 +792,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/None/docs/content/usage-examples.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/content/usage-examples.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -791,7 +807,7 @@ interfaces to plug into their functionality (such as additional plugins for the 
 command).</p>
 <h2 id="inspect-slams-understanding-of-your-project">Inspect Slam's understanding of your project</h2>
 <p>Using the <code>slam info</code> command, you can get an overview of the project details that Slam understands of your project.</p>
-<div class="highlight"><span class="filename">$ slam info</span><pre><span></span><code>Repository
+<div class="highlight"><span class="filename">$ slam info</span><pre><span></span><code>Repository &quot;/home/runner/work/slam/slam&quot;
   vcs: Git(&quot;/home/runner/work/slam/slam&quot;)
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slam&#39;)
   projects: [&#39;slam-cli&#39;]
@@ -848,7 +864,7 @@ want to deliberately install into a global Python environment, pass the <code>--
 </blockquote>
 <h2 id="check-your-project-configuration">Check your project configuration</h2>
 <p>The <code>slam check</code> command provides some feedback on the sanity of your project configuration.</p>
-<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 72 changelogs are valid.
+<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 73 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slam/slam/src/slam
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -885,29 +901,17 @@ dependencies to projects in the same monorepository (if applicable) and the <cod
   src/slam/__init__.py: 1.2.3 # __version__ = &#39;1.2.3&#39;
 </code></pre></div>
 <p>To create a new release, pass the version number of a version bump rule instead.</p>
-<div class="highlight"><span class="filename">$ slam release --tag --push patch --dry</span><pre><span></span><code>    $ cd .. &amp;&amp; slam release --dry --tag --push patch --no-branch-check --no-worktree-check  # exited with return code 1
-    dry mode enabled, no changes will be committed to disk
-    bumping 2 version references to 1.2.4
-      pyproject.toml:       1.2.3 → 1.2.4 # version = &quot;1.2.3&quot;
-      src/slam/__init__.py: 1.2.3 → 1.2.4 # __version__ = &#39;1.2.3&#39;
+<div class="highlight"><span class="filename">$ slam release --tag --push patch --dry</span><pre><span></span><code>dry mode enabled, no changes will be committed to disk
+bumping 2 version references to 1.2.4
+  pyproject.toml:       1.2.3 → 1.2.4 # version = &quot;1.2.3&quot;
+  src/slam/__init__.py: 1.2.3 → 1.2.4 # __version__ = &#39;1.2.3&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.2.4.toml
 
-    tagging 1.2.4
+tagging 1.2.4
 
-      NoCurrentBranchError
-
-      /home/runner/work/slam/slam
-
-      at /opt/pipx/venvs/slam-cli/lib/python3.10/site-packages/nr/util/git/__init__.py:136 in get_current_branch_name
-          132│     for branch in self.get_branches():
-          133│       if branch.current:
-          134│         return branch.name
-          135│ 
-        → 136│     raise NoCurrentBranchError(self.path)
-          137│ 
-          138│   def get_remote_refs(self, remote: str) -&gt; t.List[RefWithSha]:
-          139│     result = []
-          140│     command = [&#39;git&#39;, &#39;ls-remote&#39;, &#39;--heads&#39;, &#39;origin&#39;]
+pushing develop, 1.2.4 to origin
 </code></pre></div>
 <blockquote>
 <p><a href="../commands/release/">More details</a></p>

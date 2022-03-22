@@ -13,7 +13,7 @@
     
     
       
-        <title>Info - Slam</title>
+        <title>Venv - Slam</title>
       
     
     
@@ -62,6 +62,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#venv" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -91,7 +96,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Info
+              Venv
             
           </span>
         </div>
@@ -339,19 +344,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../info/" class="md-nav__link">
         Info
       </a>
-      
     </li>
   
 
@@ -445,11 +442,72 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../venv/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Venv
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Venv
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#synopsis" class="md-nav__link">
+    Synopsis
+  </a>
+  
+    <nav class="md-nav" aria-label="Synopsis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#venv_1" class="md-nav__link">
+    venv
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#venv-link" class="md-nav__link">
+    venv link
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -662,20 +720,133 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#synopsis" class="md-nav__link">
+    Synopsis
+  </a>
+  
+    <nav class="md-nav" aria-label="Synopsis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#venv_1" class="md-nav__link">
+    venv
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#venv-link" class="md-nav__link">
+    venv link
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/content/commands/info.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/develop/docs/content/commands/venv.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
-  <h1>Info</h1>
+<h1 id="venv">Venv</h1>
+<p>The <code>slam venv</code> command is a utility for managing virtual environments created using the standard library <code>venv</code>
+module in the current directory or globally (in <code>~/.local/venvs</code>).</p>
+<h2 id="synopsis">Synopsis</h2>
+<h3 id="venv_1">venv</h3>
+<div class="highlight"><pre><span></span><code>Description:
+  Create, activate and remove virtual environments.
 
+Usage:
+  venv [options] [--] [&lt;name&gt;]
 
+Arguments:
+  name                           The environment name.
+
+Options:
+  -g, --global                   Manage virtual environments in the global scope instead of the local directory.
+  -a, --activate                 Activate the environment given by the environment name. Note that using this option if used directly with the Slam CLI will cause an error because it needs to be shadowed by a function of your shell.
+  -c, --create                   Create the environment with the given environment name.
+  -d, --delete                   Delete the environment with the given environment name.
+  -l, --list                     List the available environments.
+  -i, --init-code=INIT-CODE      Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash
+  -p, --python=PYTHON            The Python executable to use to create the virtual environment. If this is not specified, it defaults to python + the environment name if the environment name looks like a version number (contains numbers and dots). Otehrwise, it defaults to python3.
+      --called-from-shadow-func  Passed by the shell shadow function to inform the command that it was not invoked directly.
+  -h, --help                     Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet                    Do not output any message.
+  -V, --version                  Display this application version.
+      --ansi                     Force ANSI output.
+      --no-ansi                  Disable ANSI output.
+  -n, --no-interaction           Do not ask any interactive question.
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Create, activate and remove virtual environments.
+
+  This command makes it easy to create and manage virtual environments, locally as well
+  as globally. Local environments are stored in the `.venvs/` directory in the current
+  directory. Global environments are stored in `~/.local/venvs`.
+
+  In order to be able to use the -a,--activate option directly from this command,
+  it must be shadowed by a function in your shell. Use the -i,--init-code command
+  to get a code snippet that you can place in your shell&#39;s init scripts.
+</code></pre></div>
+<h3 id="venv-link">venv link</h3>
+<div class="highlight"><pre><span></span><code>Description:
+  Link executables from a global virtual environment.
+
+Usage:
+  venv link [options] [--] &lt;name&gt; &lt;program&gt;
+
+Arguments:
+  name                  The global environment name.
+  program               The name of the program to link.
+
+Options:
+  -f, --force           Overwrite the link target if it already exists.
+  -h, --help            Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet           Do not output any message.
+  -V, --version         Display this application version.
+      --ansi            Force ANSI output.
+      --no-ansi         Disable ANSI output.
+  -n, --no-interaction  Do not ask any interactive question.
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+</code></pre></div>
 
               
             </article>
@@ -694,7 +865,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../check/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Check" rel="prev">
+        <a href="../test/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Test" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -703,20 +874,20 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              Check
+              Test
             </div>
           </div>
         </a>
       
       
         
-        <a href="../init/" class="md-footer__link md-footer__link--next" aria-label="Next: Init" rel="next">
+        <a href="../../guides/github/" class="md-footer__link md-footer__link--next" aria-label="Next: GitHub" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Init
+              GitHub
             </div>
           </div>
           <div class="md-footer__button md-icon">
