@@ -7,6 +7,7 @@ from slam import __version__
 from slam.application import Application, Command, argument, option
 from slam.plugins import ApplicationPlugin
 from slam.util.external.licenses import get_license_metadata, wrap_license_text
+from slam.util.vcs import get_git_author
 
 TEMPLATES = {
   'poetry': {
@@ -153,7 +154,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
       return 1
 
     vcs = self.app.repository.vcs()
-    author = vcs.get_author() if vcs else None
+    author = get_git_author()
     directory = Path(self.argument("directory") or self.option("name").replace('.', '-'))
 
     scope = {

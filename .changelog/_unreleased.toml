@@ -9,3 +9,9 @@ id = "c6891ffa-be1b-40e4-9d0f-b4358cdf95f9"
 type = "feature"
 description = "add `slam venv` and `slam venv link` commands"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "37af7703-8dcb-4512-868b-1ab42e21b1be"
+type = "fix"
+description = "`slam init` now identifies the author to use in the template from Git's global config if the current directory is not already a Git repository"
+author = "@NiklasRosenstein"

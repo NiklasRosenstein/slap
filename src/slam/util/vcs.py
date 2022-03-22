@@ -145,15 +145,7 @@ class Git(Vcs):
       return None
 
   def get_author(self) -> Author:
-    import subprocess as sp
-    try:
-      name = self._git.get_config('user.name')
-      email = self._git.get_config('user.email')
-    except sp.CalledProcessError as exc:
-      if exc.returncode != 1:
-        raise
-      return Author(None, None)
-    return Author(name, email)
+    return get_git_author(self._git.path)
 
   def get_all_files(self) -> t.Sequence[Path]:
     return [self._git.path / f for f in self._git.get_files()]
@@ -224,6 +216,20 @@ class Git(Vcs):
       'D': FileStatus.DELETED,
       '?': FileStatus.UNKNOWN,
     }[mode]
+
+
+def get_git_author(path: Path | None = None) -> None:
+  import subprocess as sp
+  git = _Git(path)
+  global_ = git.get_toplevel() is not None
+  try:
+    name = git.get_config('user.name', global_=global_)
+    email = git.get_config('user.email', global_=global_)
+  except sp.CalledProcessError as exc:
+    if exc.returncode != 1:
+      raise
+    return Author(None, None)
+  return Author(name, email)
 
 
 def detect_vcs(path: Path) -> Vcs | None:
