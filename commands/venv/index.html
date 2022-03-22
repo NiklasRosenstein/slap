@@ -478,6 +478,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#synopsis" class="md-nav__link">
     Synopsis
   </a>
@@ -740,6 +747,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#synopsis" class="md-nav__link">
     Synopsis
   </a>
@@ -787,6 +801,34 @@
 <h1 id="venv">Venv</h1>
 <p>The <code>slam venv</code> command is a utility for managing virtual environments created using the standard library <code>venv</code>
 module in the current directory or globally (in <code>~/.local/venvs</code>).</p>
+<h2 id="usage">Usage</h2>
+<p>First, the <code>slam</code> command needs to be shadowed by a function in your shell to make proper use of the <code>-a,--activate</code>
+option. The <code>-i,--init-code</code> option can provide you with a snippet to place in your shell init scripts. Currently,
+it only supports Bash.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">$ slam venv -i bash</label><label for="__tabbed_1_2">$ SLAM_SHADOW=true slam venv -i bash</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>which slam &gt;/dev/null &amp;&amp; eval &quot;$(SLAM_SHADOW=true slam venv -i bash)&quot;
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>function slam() {
+  local ORIGINAL=$(which slam)
+  if ! [ $? = 0 ]; then
+    &gt;&amp;2 echo &quot;error: command &#39;slam&#39; does not exist&quot;
+    return 127
+  fi
+  if [ &quot;$1&quot; == &quot;venv&quot; ] &amp;&amp; [[ &quot;$2&quot; =~ -[gc]*a[gc]* ]]; then
+    eval &quot;$(SLAM_SHADOW=true &quot;$ORIGINAL&quot; &quot;$@&quot;)&quot;
+  else
+    &quot;$ORIGINAL&quot; &quot;$@&quot;
+  fi
+  return $?
+}
+</code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="synopsis">Synopsis</h2>
 <h3 id="venv_1">venv</h3>
 <div class="highlight"><pre><span></span><code>Description:
@@ -796,24 +838,23 @@ Usage:
   venv [options] [--] [&lt;name&gt;]
 
 Arguments:
-  name                           The environment name.
+  name                       The environment name.
 
 Options:
-  -g, --global                   Manage virtual environments in the global scope instead of the local directory.
-  -a, --activate                 Activate the environment given by the environment name. Note that using this option if used directly with the Slam CLI will cause an error because it needs to be shadowed by a function of your shell.
-  -c, --create                   Create the environment with the given environment name.
-  -d, --delete                   Delete the environment with the given environment name.
-  -l, --list                     List the available environments.
-  -i, --init-code=INIT-CODE      Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash
-  -p, --python=PYTHON            The Python executable to use to create the virtual environment. If this is not specified, it defaults to python + the environment name if the environment name looks like a version number (contains numbers and dots). Otehrwise, it defaults to python3.
-      --called-from-shadow-func  Passed by the shell shadow function to inform the command that it was not invoked directly.
-  -h, --help                     Display help for the given command. When no command is given display help for the help command.
-  -q, --quiet                    Do not output any message.
-  -V, --version                  Display this application version.
-      --ansi                     Force ANSI output.
-      --no-ansi                  Disable ANSI output.
-  -n, --no-interaction           Do not ask any interactive question.
-  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+  -g, --global               Manage virtual environments in the global scope instead of the local directory.
+  -a, --activate             Activate the environment given by the environment name. Note that using this option if used directly with the Slam CLI will cause an error because it needs to be shadowed by a function of your shell.
+  -c, --create               Create the environment with the given environment name.
+  -d, --delete               Delete the environment with the given environment name.
+  -l, --list                 List the available environments.
+  -i, --init-code=INIT-CODE  Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash
+  -p, --python=PYTHON        The Python executable to use to create the virtual environment. If this is not specified, it defaults to python + the environment name if the environment name looks like a version number (contains numbers and dots). Otehrwise, it defaults to python3.
+  -h, --help                 Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet                Do not output any message.
+  -V, --version              Display this application version.
+      --ansi                 Force ANSI output.
+      --no-ansi              Disable ANSI output.
+  -n, --no-interaction       Do not ask any interactive question.
+  -v|vv|vvv, --verbose       Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
 
 Help:
   Create, activate and remove virtual environments.
