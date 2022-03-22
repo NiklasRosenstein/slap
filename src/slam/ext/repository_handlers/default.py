@@ -1,9 +1,9 @@
 
-from types import NoneType
 import dataclasses
 import typing as t
 
 from databind.core.annotations import alias
+from nr.util.fs import get_file_in_directory
 
 from slam.plugins import RepositoryHandlerPlugin
 from slam.project import Project
@@ -24,7 +24,20 @@ class DefaultRepositoryConfig:
 
 
 class DefaultRepositoryHandler(RepositoryHandlerPlugin):
-  """ The default implementation of the repository handler. """
+  """ The default implementation of the repository handler.
+
+  Applies only if either
+
+  * A VCS can be detected (and projects are loaded from the VCS root).
+  * If a README file, LICENSE file, or a Pyproject or Slam configuration file exists. This is to avoid mistakenly
+    considering a directory that contains independent Python projects as a monorepository.
+
+  !!! note
+
+      In a future version, this handler may update the #Repository.directory to point to the VCS root directory
+      (if a VCS can be detected) to allow using the Slam CLI from a subdirectory as if it were used in the root
+      directory.
+  """
 
   def _get_config(self, repository: Repository) -> DefaultRepositoryConfig:
     import databind.json
@@ -34,7 +47,18 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
     return config
 
   def matches_repository(self, repository: Repository) -> bool:
-    return True
+    if repository.pyproject_toml.exists() or repository.slam_toml.exists():
+      return True
+    # NOTE(@NiklasRosenstein): This is where we would update the repository root directory.
+    # vcs = self.get_vcs(repository)
+    # if vcs is not None:
+    #   repository.__init__(vcs.get_toplevel())
+    #   return True
+    if get_file_in_directory(repository.directory, 'readme', [], case_sensitive=False):
+      return True
+    if get_file_in_directory(repository.directory, 'license', [], case_sensitive=False):
+      return True
+    return False
 
   def get_vcs(self, repository: Repository) -> Vcs | None:
     return detect_vcs(repository.directory)

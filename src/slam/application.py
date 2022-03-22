@@ -60,7 +60,7 @@ class CleoApplication(BaseCleoApplication):
 
   _styles: dict[str, Style]
 
-  def __init__(self, init: t.Callable[[], t.Any], name: str = "console", version: str = "") -> None:
+  def __init__(self, init: t.Callable[[IO], t.Any], name: str = "console", version: str = "") -> None:
     super().__init__(name, version)
     self._init_callback = init
     self._styles = {}
@@ -143,9 +143,8 @@ class CleoApplication(BaseCleoApplication):
     formatter.install('tty')
     formatter.install('notty')  # Hack for now to enable it also in CI
 
-    self._init_callback()
-
-    return super()._configure_io(io)
+    super()._configure_io(io)
+    self._init_callback(io)
 
   def _run_command(self, command: Command, io: IO) -> int:
     return super()._run_command(command, io)
@@ -181,7 +180,7 @@ class Application:
     self.repository = Repository(directory or Path.cwd())
     self._plugins_loaded = False
     self.config = Once(self._get_application_configuration)
-    self.cleo = CleoApplication(lambda: self.load_plugins(), name, version)
+    self.cleo = CleoApplication(self._cleo_init, name, version)
     self.main_project = Once(self._get_main_project)
 
   def _get_application_configuration(self) -> ApplicationConfig:
@@ -249,6 +248,18 @@ class Application:
       else:
         plugin_config = plugin.load_configuration(self)
         plugin.activate(self, plugin_config)
+
+  def _cleo_init(self, io: IO) -> None:
+    import sys
+    from slam.repository import NotASlamRepository
+
+    try:
+      self.repository.load()
+    except NotASlamRepository as exc:
+      io.write_error_line(f'<error>error: this does not appear to be a directorty in which you want to use Slam</error>')
+      sys.exit(1)
+
+    self.load_plugins()
 
   def run(self) -> None:
     """ Loads and activates application plugins and then invokes the CLI. """

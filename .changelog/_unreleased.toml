@@ -1,0 +1,5 @@
+[[entries]]
+id = "4633c865-b69e-4fa6-acc5-e1bafdd37f34"
+type = "improvement"
+description = "The default repository handler now only matches if it appears to make sense to use the Slam CLI inside it."
+author = "@NiklasRosenstein"

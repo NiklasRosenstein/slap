@@ -1,4 +1,5 @@
 
+import os
 from pathlib import Path
 from slam.application import Application, Command, option
 from slam.plugins import ApplicationPlugin
@@ -18,7 +19,7 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
-    self.line('Repository')
+    self.line(f'Repository <s>"{self.app.repository.directory}"</s>')
     self.line(f'  vcs: <opt>{self.app.repository.vcs()}</opt>')
     self.line(f'  host: <opt>{self.app.repository.host()}</opt>')
     self.line(f'  projects: <opt>{[p.id for p in self.app.repository.projects()]}</opt>')
@@ -30,8 +31,8 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
         '<i>none</i>'
         if packages_list is None
         else '[]' if len(packages_list or []) == 0
-        else ", ".join(f"<opt>{p.name} ({p.root.relative_to(project.directory)})</opt>" for p in packages_list))
-      self.line(f'Project <s>"{project.directory.relative_to(Path.cwd())}" (id: <opt>{project.id}</opt>)</s>')
+        else ", ".join(f"<opt>{p.name} ({os.path.relpath(p.root, project.directory)})</opt>" for p in packages_list))
+      self.line(f'Project <s>"{os.path.relpath(project.directory, Path.cwd())}" (id: <opt>{project.id}</opt>)</s>')
       self.line(f'  dist-name: <opt>{project.dist_name()}</opt>')
       self.line(f'  packages: {packages}')
       self.line(f'  readme: <opt>{project.handler().get_readme(project)}</opt>')
