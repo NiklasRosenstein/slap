@@ -114,7 +114,7 @@ class VenvCommand(Command):
     option(
       "activate", "a",
       description="Activate the environment given by the environment name. Note that using this option if used "
-        "directly with the Clap CLI will cause an error because it needs to be shadowed by a function of your shell.",
+        "directly with the Slap CLI will cause an error because it needs to be shadowed by a function of your shell.",
     ),
     option(
       "create", "c",

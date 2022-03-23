@@ -121,14 +121,14 @@ class ChangelogAddCommand(BaseChangelogCommand):
       "pr", None,
       description="The pull request that the change is introduced to the main branch with. This is not usually "
         "known at the time the changelog entry is created, so this option is not often used. If the remote "
-        "repository is well supported by Clap, a pull request number may be specified and converted to a full "
-        "URL by Clap, otherwise a full URL must be specified.",
+        "repository is well supported by Slap, a pull request number may be specified and converted to a full "
+        "URL by Slap, otherwise a full URL must be specified.",
       flag=False,
     ),
     option(
       "issue", "i",
-      description="An issue related to this changelog. If the remote repository is well supported by Clap, an issue "
-        "number may be specified and converted to a full URL by Clap, otherwise a full URL must be specified.",
+      description="An issue related to this changelog. If the remote repository is well supported by Slap, an issue "
+        "number may be specified and converted to a full URL by Slap, otherwise a full URL must be specified.",
       flag=False,
       multiple=True,
     ),
@@ -491,7 +491,7 @@ class ChangelogFormatCommand(BaseChangelogCommand):
 
 
 class ChangelogConvertCommand(BaseChangelogCommand):
-  """ Convert Clap's old YAML based changelogs to new style TOML changelogs.
+  """ Convert Slap's old YAML based changelogs to new style TOML changelogs.
 
   Sometimes the changelog entries in the old style would be suffixed with the
   author's username in the format of <code>@Name</code> or <code>(@Name)</code>, so this command will

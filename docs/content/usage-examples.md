@@ -1,6 +1,6 @@
 # Usage examples
 
-Clap provides a variety of features to increase productivity for Python developers. It supports dealing with
+Slap provides a variety of features to increase productivity for Python developers. It supports dealing with
 multiple Python projects managed from a monorepository, in which case most operations are homogenously applied
 across all projects.
 
@@ -8,9 +8,9 @@ All features are implemented as {@pylink slap.plugins.ApplicationPlugin} and mos
 interfaces to plug into their functionality (such as additional plugins for the `slap check` and `slap release`
 command).
 
-## Inspect Clap's understanding of your project
+## Inspect Slap's understanding of your project
 
-Using the `slap info` command, you can get an overview of the project details that Clap understands of your project.
+Using the `slap info` command, you can get an overview of the project details that Slap understands of your project.
 
 ``` title="$ slap info"
 @shell cd .. && slap info

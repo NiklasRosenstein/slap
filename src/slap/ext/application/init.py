@@ -132,7 +132,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
     ),
     option(
       "--as-markdown",
-      description="Render the content as Markdown (uses by the Clap docs)",
+      description="Render the content as Markdown (uses by the Slap docs)",
     ),
   ]
 

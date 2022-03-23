@@ -1,5 +1,5 @@
 
-""" With the application object we manage the CLI commands and other types of plugins as well as access to the Clap
+""" With the application object we manage the CLI commands and other types of plugins as well as access to the Slap
 user and project configuration. """
 
 from __future__ import annotations
@@ -183,7 +183,7 @@ class Application:
 
   @property
   def repository(self) -> Repository:
-    """ Return the Clap repository that is the subject of the current application. There may be command plugins
+    """ Return the Slap repository that is the subject of the current application. There may be command plugins
     that do not require the repository to function, so this property creates the repository lazily. """
 
     from slap.repository import Repository
@@ -232,7 +232,7 @@ class Application:
     By default, all plugins available in the `slap.application.ApplicationPlugin` entry point group are loaded. This
     behaviour can be modified by setting either the `[tool.slap.plugins.disable]` or `[tool.slap.plugins.enable]`
     configuration option (without the `tool.slap` prefix in case of a `slap.toml` configuration file). The default
-    plugins delivered immediately with Clap are enabled by default unless disabled explicitly with the `disable`
+    plugins delivered immediately with Slap are enabled by default unless disabled explicitly with the `disable`
     option. """
 
     from nr.util.plugins import iter_entrypoints

@@ -14,7 +14,7 @@ from slap.util.vcs import Vcs, detect_vcs
 @dataclasses.dataclass
 class DefaultRepositoryConfig:
   #: A list of paths pointing to projects to include in the application invokation. This is useful if multiple
-  #: projects should be usable with the Clap CLI in unison. Note that if this option is not set and either no
+  #: projects should be usable with the Slap CLI in unison. Note that if this option is not set and either no
   #: configuration file exists in the CWD or the `slap.toml` is used, all immediate subdirectories that contain
   #: a `pyproject.toml` will be considered included projects.
   include: list[str] | None = None
@@ -29,13 +29,13 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
   Applies only if either
 
   * A VCS can be detected (and projects are loaded from the VCS root).
-  * If a README file, LICENSE file, or a Pyproject or Clap configuration file exists. This is to avoid mistakenly
+  * If a README file, LICENSE file, or a Pyproject or Slap configuration file exists. This is to avoid mistakenly
     considering a directory that contains independent Python projects as a monorepository.
 
   !!! note
 
       In a future version, this handler may update the #Repository.directory to point to the VCS root directory
-      (if a VCS can be detected) to allow using the Clap CLI from a subdirectory as if it were used in the root
+      (if a VCS can be detected) to allow using the Slap CLI from a subdirectory as if it were used in the root
       directory.
   """
 

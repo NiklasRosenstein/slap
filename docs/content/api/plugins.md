@@ -1,7 +1,7 @@
 # Plugins
 
-A lot of Clap's internal functionality is provided through a plugin interface, allowing other tools to extend the
-functionality of Clap further.
+A lot of Slap's internal functionality is provided through a plugin interface, allowing other tools to extend the
+functionality of Slap further.
 
 ## Types of plugins
 

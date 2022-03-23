@@ -6,7 +6,7 @@ from slap.plugins import ApplicationPlugin
 
 
 class InfoCommandPlugin(Command, ApplicationPlugin):
-  """ Show info about the Clap application workspace and the loaded projects. """
+  """ Show info about the Slap application workspace and the loaded projects. """
 
   app: Application
   name = "info"

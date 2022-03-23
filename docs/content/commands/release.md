@@ -1,7 +1,7 @@
 # Release
 
 The `slap release` command updates references to the version number in `pyproject.toml` and your source code, updates
-the unreleased changelog if you make use of Clap's structured changelogs, as well as updating any other versions
+the unreleased changelog if you make use of Slap's structured changelogs, as well as updating any other versions
 specified in the configuration or detected by other plugins.
 
 It covers the following use cases:
@@ -67,7 +67,7 @@ __Type__: `list[VersionRefConfig]`
 __Default__: `[]`
 
 A list of version references that should be considered in addition to the version references that are automatically
-detected by Clap when updating version numbers across the project with the `slap release` command.
+detected by Slap when updating version numbers across the project with the `slap release` command.
 
 A `VersionRefConfig` contains the fields `file: str` and `pattern: str`. The `file` is considered relative to the
 project directory (which is the directory where the `slap.toml` or `pyproject.toml` configuration file resides).

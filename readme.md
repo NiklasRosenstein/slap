@@ -1,6 +1,6 @@
 # slap
 
-Clap is a command-line tool for developing Python projects that provides a common interface for many tasks independent
+Slap is a command-line tool for developing Python projects that provides a common interface for many tasks independent
 of the build system you use (currently supporting Setuptools via Pyproject, Poetry and Flit). It makes it easier to
 manage monorepositories of multiple projects which may even have inter-dependencies.
 
@@ -9,7 +9,7 @@ manage monorepositories of multiple projects which may even have inter-dependenc
 > use the Poetry CLI because I too often run into issues with it's dependency resolution and installation mechanism
 > as well as its implicitly created virtual environments.
 
-Clap provides a variety of features, including but not limited to
+Slap provides a variety of features, including but not limited to
 
 * Sanity check your project configuration
 * Install your project and it's dependencies via Pip (in the right order in case of a monorepository)
@@ -23,16 +23,16 @@ Clap provides a variety of features, including but not limited to
 
 ## Installation
 
-It is recommended to install Clap via Pipx, but you can also install it with Pip directly.
+It is recommended to install Slap via Pipx, but you can also install it with Pip directly.
 
-    $ pipx install clam-cli
+    $ pipx install slap-cli
 
-> __Note__: Currently, Clap relies on an alpha version of `poetry-core` (`^1.1.0a6`). If you install it into
+> __Note__: Currently, Slap relies on an alpha version of `poetry-core` (`^1.1.0a6`). If you install it into
 > the same environment as Poetry itself, you may also need to use an alpha version of Poetry (e.g. `1.2.0a2`).
 
 ## Usage examples
 
-Bootstrap a (opinionated) Poetry project using Clap.
+Bootstrap a (opinionated) Poetry project using Slap.
 
     $ slap init --name my.pkg
     write my-pkg/pyproject.toml

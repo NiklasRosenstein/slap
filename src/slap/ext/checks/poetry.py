@@ -28,7 +28,7 @@ def get_readme_path(project: Project) -> Path | None:
 
 
 class PoetryChecksPlugin(CheckPlugin):
-  """ Check plugin to validate the Poetry configuration and compare it with Clap's expectations. """
+  """ Check plugin to validate the Poetry configuration and compare it with Slap's expectations. """
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
     self.project = project

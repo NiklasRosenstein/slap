@@ -2,26 +2,26 @@
 title: GitHub
 ---
 
-# Using Clap in GitHub repositories
+# Using Slap in GitHub repositories
 
-Most of Clap's functionality is independent of the repository hosting service that you use. However, Clap comes with
+Most of Slap's functionality is independent of the repository hosting service that you use. However, Slap comes with
 some built-in utities to make integration with GitHub easier.
 
 ## GitHub Actions
 
-### Install Clap
+### Install Slap
 
   [0]: https://github.com/NiklasRosenstein/slap/tree/github-action/install/v1
 
-The [`NiklasRosenstein/slap@github-action/install/v1`][0] action installs Clap for you. It does this by setting up
-Python 3.10 and installing Clap via Pipx.
+The [`NiklasRosenstein/slap@github-action/install/v1`][0] action installs Slap for you. It does this by setting up
+Python 3.10 and installing Slap via Pipx.
 
 !!! note
 
     Use this action _before_ you run your own step of `actions/setup-python@v2` as after this action the current
     Python version will be 3.10.
 
-    The `version` option defaults to `*`, which installs the latest version of Clap. It is recommended that you
+    The `version` option defaults to `*`, which installs the latest version of Slap. It is recommended that you
     pick an exact version for your configuration to avoid surprises.
 
 ```yaml title=".github/workflows/python.yml"

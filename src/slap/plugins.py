@@ -24,9 +24,9 @@ class ApplicationPlugin(t.Generic[T], abc.ABC):
 
   @abc.abstractmethod
   def load_configuration(self, app: Application) -> T:
-    """ Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Clap
+    """ Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Slap
     configuration, which is either loaded from `pyproject.toml` or `slap.toml`. Use #Application.raw_config
-    to access the Clap configuration. """
+    to access the Slap configuration. """
 
   @abc.abstractmethod
   def activate(self, app: Application, config: T) -> None:
@@ -58,8 +58,8 @@ class RepositoryHandlerPlugin(abc.ABC):
 
 class ProjectHandlerPlugin(abc.ABC):
   """ A plugin that implements the core functionality of a project. Project handlers are intermediate layers between
-  the Clap tooling and the actual project configuration, allowing different types of configurations to be adapted and
-  used with Clap. """
+  the Slap tooling and the actual project configuration, allowing different types of configurations to be adapted and
+  used with Slap. """
 
   ENTRYPOINT = 'slap.plugins.project'
 

@@ -20,11 +20,11 @@ __Todo__: Error if a specified plugin does not exist.
 
 ### `log`
 
-The `ChangelogConsistencyCheck` checks if the changelogs managed by Clap are in order.
+The `ChangelogConsistencyCheck` checks if the changelogs managed by Slap are in order.
 
 #### Check `log:validate`
 
-Checks if all structured changelog files managed by Clap can be loaded and are valid.
+Checks if all structured changelog files managed by Slap can be loaded and are valid.
 
 ---
 
@@ -34,7 +34,7 @@ Checks if all structured changelog files managed by Clap can be loaded and are v
 
 #### Check `slap:packages`
 
-Checks if Clap can detect at least one package.
+Checks if Slap can detect at least one package.
 
 #### Check `slap:typed`
 
@@ -51,7 +51,7 @@ This currently relies on the `$.typed` configuration and does not inspect the co
 
 Checks if the project readme is configured correctly or if Poetry is able to automatically
 pick up the readme file if it is not configured. This inspects te `[tool.poetry.readme]` or `[project.readme]`
-settings in `pyproject.toml` and compares it with the readme file that was automatically identified by Clap
+settings in `pyproject.toml` and compares it with the readme file that was automatically identified by Slap
 (which is a file called README, case-insensitive with one of the suffixes in the order of `.md`, `.rst`, `.txt`,
 or if that does not match, any file beginning with `README.`).
 

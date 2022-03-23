@@ -2,7 +2,7 @@
 
 > TODO: This guide needs to be updated.
 
-# Publishing with Clap
+# Publishing with Slap
 
 By default, every package is configured to publish to PyPI using the `warehouse:pypi` publishing
 target. A test publish to `test.pypi.org` can be performed by using the `--test` option when using
@@ -58,7 +58,7 @@ numbers. If you want to publish snapshots, you need an alternative package regis
 
 __Important__: Many CI systems may not fetch tags when cloning your repository. This means `bump --snapshot`
 can not figure out the commit distance and the generated snapshot version number will begin with `0.0.0`. If
-you encounter this issue, run `git fetch --tags` before Clap.
+you encounter this issue, run `git fetch --tags` before Slap.
 
 If you do try to use snapshot versions with PyPI, you will see this type of error:
 

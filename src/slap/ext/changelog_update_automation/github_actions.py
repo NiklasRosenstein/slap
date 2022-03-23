@@ -26,7 +26,7 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with: {{ python-version: '3.10' }}
-    - name: Install Clap
+    - name: Install Slap
       run: pip install slap-cli==1.0.2
     - name: Update PR references in changelogs
       run: slap changelog update-pr --use github-actions

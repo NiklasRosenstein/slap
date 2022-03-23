@@ -48,11 +48,11 @@ class ProjectConfig:
 
 
 class Project(Configuration):
-  """ Represents one Python project. Clap can work with multiple projects at the same time, for example if the same
+  """ Represents one Python project. Slap can work with multiple projects at the same time, for example if the same
   repository or source code project contains multiple individual Python projects. Every project has its own
   configuration, either loaded from `slap.toml` or `pyproject.toml`. """
 
-  #: Reference to the Clap application object.
+  #: Reference to the Slap application object.
   repository: Repository
 
   #: The parsed configuration, accessible as a #Once.

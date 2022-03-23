@@ -9,7 +9,7 @@ from slap.release import VersionRef
 
 class InterdependenciesReleasePlugin(ReleasePlugin):
   """ This plugin identifies version references of another project in the set of projects loaded in the application.
-  This is relevant in case when Clap is used in a monorepository where all projects share the same version, and bumping
+  This is relevant in case when Slap is used in a monorepository where all projects share the same version, and bumping
   version numbers should also bump the version number of dependencies between projects in that monorepository.
 
   You can disable this behaviour by setting the `tool.slap.release.interdependencies` setting to `False` on the

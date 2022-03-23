@@ -28,7 +28,7 @@ class Configuration:
   #: or to access its contents.
   slap_toml: TomlFile
 
-  #: Use this to access the Clap configuration, automatically loaded from either `slap.toml` or the `tool.slap`
+  #: Use this to access the Slap configuration, automatically loaded from either `slap.toml` or the `tool.slap`
   #: section in `pyproject.toml`. The attribute is a #Once instance, thus it needs to be called to retrieve
   #: the contents. This is the same as #get_raw_configuration(), but is more efficient.
   raw_config: Once[dict[str, t.Any]]
@@ -44,7 +44,7 @@ class Configuration:
     return f'{type(self).__name__}(directory="{self.directory}")'
 
   def get_raw_configuration(self) -> dict[str, t.Any]:
-    """ Loads the raw configuration data for Clap from either the `slap.toml` configuration file or `pyproject.toml`
+    """ Loads the raw configuration data for Slap from either the `slap.toml` configuration file or `pyproject.toml`
     under the `[slap.tool]` section. If neither of the files exist or the section in the pyproject does not exist,
     an empty dictionary will be returned. """
 
