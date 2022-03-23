@@ -39,3 +39,9 @@ id = "1ca3f595-8aed-4fd2-b395-28cce4312dad"
 type = "improvement"
 description = "move interdependencies version ref detection into `DefaultProjectHandler`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "fb08ead1-ea8e-45ad-ab7e-b1922dd31756"
+type = "improvement"
+description = "add overload for `match_version_ref_pattern()` that can return a fallback value"
+author = "@NiklasRosenstein"

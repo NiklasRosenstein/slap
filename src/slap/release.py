@@ -4,14 +4,26 @@ import re
 import typing as t
 from pathlib import Path
 
+from nr.util.generic import T
+from nr.util.singleton import NotSet
 
-def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef':
+
+@t.overload
+def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef': ...
+
+
+@t.overload
+def match_version_ref_pattern(filename: Path, pattern: str, fallback: T) -> T | 'VersionRef': ...
+
+
+def match_version_ref_pattern(filename: Path, pattern: str, fallback: NotSet | T = NotSet.Value) -> T | 'VersionRef':
   """ Matches a regular expression in the given file and returns the location of the match. The *pattern*
   should contain at least one capturing group. The first capturing group is considered the one that contains
   the version number exactly.
 
-  @param filename The file of which the contents will be checked against the pattern.
-  @param pattern The regular expression that contains at least one capturing group.
+  Arguments:
+    filename: The file of which the contents will be checked against the pattern.
+    pattern: The regular expression that contains at least one capturing group.
   """
 
   compiled_pattern = re.compile(pattern, re.M | re.S)
@@ -25,6 +37,8 @@ def match_version_ref_pattern(filename: Path, pattern: str) -> 'VersionRef':
     if match:
       return VersionRef(filename, match.start(1), match.end(1), match.group(1), match.group(0))
 
+  if fallback is not NotSet.Value:
+    return fallback
   raise ValueError(f'pattern {pattern!r} does not match in file {filename!r}')
 
 

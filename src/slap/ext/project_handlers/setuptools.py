@@ -72,13 +72,9 @@ class SetuptoolsProjectHandler(DefaultProjectHandler):
     """ Returns the version reference in `setup.cfg`. """
 
     VERSION_PATTERN = r'^version\s*=\s*(.*?)$'
-
-    try:
-      version_ref = match_version_ref_pattern(project.directory / 'setup.cfg', VERSION_PATTERN)
-    except ValueError:
-      version_ref = None
-
-    return [version_ref] if version_ref else []
+    version_ref = match_version_ref_pattern(project.directory / 'setup.cfg', VERSION_PATTERN, None)
+    refs = [version_ref] if version_ref else []
+    return refs
 
 
 def parse_list_semi(val: str) -> t.List[str]:

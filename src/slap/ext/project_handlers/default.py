@@ -89,20 +89,12 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     interdependencies (you can disable the interdependencies bit by setting `tool.slap.release.interdependencies`
     setting to `False` on the Slap root directory, usually in a `slap.toml` file). """
 
-    version_ref = get_pyproject_version_ref(project)
+    PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
+    version_ref = match_version_ref_pattern(project.pyproject_toml.path, PYPROJECT_TOML_PATTERN, None)
     refs = [version_ref] if version_ref else []
     if project.repository.raw_config().get('release', {}).get('interdependencies', True):
       refs += get_pyproject_interdependency_version_refs(project)
     return refs
-
-
-def get_pyproject_version_ref(project: Project) -> VersionRef | None:
-  PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
-
-  try:
-    return match_version_ref_pattern(project.pyproject_toml.path, PYPROJECT_TOML_PATTERN)
-  except ValueError:
-    return None
 
 
 def get_pyproject_interdependency_version_refs(project: Project) -> list[VersionRef]:
