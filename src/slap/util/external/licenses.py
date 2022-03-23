@@ -109,7 +109,7 @@ def wrap_license_text(license_text: str, width: int = 79) -> str:
     line = raw_line.split(' ')
     length = sum(map(len, line)) + len(line) - 1
     if length > width:
-      words: t.List[str] = []
+      words: list[str] = []
       length = -1
       for word in line:
         if length + 1 + len(word) >= width:

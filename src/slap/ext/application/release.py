@@ -195,7 +195,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
       self.io.write(f'  <fg=cyan>{(filename).ljust(max_w1)}</fg> {ref.value.ljust(max_w2)}')
       if increment_to:
         self.io.write(f' → <b>{increment_to}</b>')
-      self.io.write_line(f' <fg=dark_gray># {ref.content}</fg>')
+      self.io.write_line(f' <fg=dark_gray># {ref.content!r}</fg>')
       prev = ref
 
   def _validate_version_refs(self, version_refs: list[VersionRef], version: str | None) -> int:

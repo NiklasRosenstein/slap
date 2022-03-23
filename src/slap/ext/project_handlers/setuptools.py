@@ -1,11 +1,13 @@
 
 """ Project handler for projects using the Setuptools build system. """
 
+from pwd import struct_passwd
+import re
 import typing as t
 
-from slap.ext.project_handlers.default import DefaultProjectHandler
+from slap.ext.project_handlers.default import DefaultProjectHandler, interdependencies_enabled
 from slap.project import Dependencies, Package, Project
-from slap.release import VersionRef, match_version_ref_pattern
+from slap.release import VersionRef, match_version_ref_pattern, match_version_ref_pattern_on_lines
 
 
 class SetuptoolsProjectHandler(DefaultProjectHandler):
@@ -74,13 +76,36 @@ class SetuptoolsProjectHandler(DefaultProjectHandler):
     VERSION_PATTERN = r'^version\s*=\s*(.*?)$'
     version_ref = match_version_ref_pattern(project.directory / 'setup.cfg', VERSION_PATTERN, None)
     refs = [version_ref] if version_ref else []
+    if interdependencies_enabled(project):
+      refs += get_setup_cfg_interdependency_version_refs(project)
     return refs
 
 
-def parse_list_semi(val: str) -> t.List[str]:
+def parse_list_semi(val: str) -> list[str]:
   """ Parses a string to a list of strinsg according to the `list-semi` specification in the [setuptools docs][1].
 
   [1]: https://setuptools.pypa.io/en/latest/userguide/declarative_config.html#specifying-values """
 
   from nr.util.stream import Stream
   return Stream(val.splitlines()).map(lambda v: v.split(';')).concat().map(str.strip).filter(bool).collect()
+
+
+def get_setup_cfg_interdependency_version_refs(project: Project) -> list[VersionRef]:
+  setup_cfg = project.directory / 'setup.cfg'
+  other_projects: list[str] = [
+    t.cast(str, p.dist_name()) for p in project.repository.projects()
+    if p.is_python_project and p is not project and p.dist_name()
+  ]
+
+  refs = []
+  for project_name in other_projects:
+    # Look for occurrences of the project name in the context of requirements.
+    expressions = [
+      # Match requirements split over multiple lines.
+      re.compile(r'^\w+_requires?\s*=.*^\s+(?:' + re.escape(project_name) + r'\s*(?:==|>=|<=|>|<)\s*(?P<version>[^\n;]+))', re.M | re.S),
+      # TODO (@NiklasRosenstein): Also match if the requirements is on the same line
+      # TODO (@NiklasRosenstein): Also match extra requires
+    ]
+    for expr in expressions:
+      refs += match_version_ref_pattern_on_lines(setup_cfg, expr)
+  return refs
