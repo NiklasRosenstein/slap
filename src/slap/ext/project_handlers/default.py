@@ -1,6 +1,7 @@
 
 """ Implements the default package detection plugin. """
 
+import re
 import typing as t
 from pathlib import Path
 
@@ -84,13 +85,73 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     return []
 
   def get_version_refs(self, project: Project) -> list[VersionRef]:
-    """ Returns the version ref in `pyproject.toml` it can be found. """
+    """ Returns the version ref in `pyproject.toml` it can be found, as well as the version references of project
+    interdependencies (you can disable the interdependencies bit by setting `tool.slap.release.interdependencies`
+    setting to `False` on the Slap root directory, usually in a `slap.toml` file). """
 
-    PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
+    version_ref = get_pyproject_version_ref(project)
+    refs = [version_ref] if version_ref else []
+    if project.repository.raw_config().get('release', {}).get('interdependencies', True):
+      refs += get_pyproject_interdependency_version_refs(project)
+    return refs
 
-    try:
-      version_ref = match_version_ref_pattern(project.pyproject_toml.path, PYPROJECT_TOML_PATTERN)
-    except ValueError:
-      version_ref = None
 
-    return [version_ref] if version_ref else []
+def get_pyproject_version_ref(project: Project) -> VersionRef | None:
+  PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
+
+  try:
+    return match_version_ref_pattern(project.pyproject_toml.path, PYPROJECT_TOML_PATTERN)
+  except ValueError:
+    return None
+
+
+def get_pyproject_interdependency_version_refs(project: Project) -> list[VersionRef]:
+  """ Identifies version references of another project in the set of projects loaded in the application. This is
+  relevant in case when Slap is used in a monorepository where all projects share the same version, and bumping
+  version numbers should also bump the version number of dependencies between projects in that monorepository. """
+
+  pyproject_file = project.pyproject_toml.path
+  if not pyproject_file.exists():
+    return []
+
+  enabled = project.repository.raw_config().get('release', {}).get('interdependencies', True)
+  if not enabled:
+    return []
+
+  other_projects: list[str] = [
+    t.cast(str, p.dist_name()) for p in project.repository.projects()
+    if p.is_python_project and p is not project and p.dist_name()
+  ]
+
+  refs = []
+
+  with pyproject_file.open('r') as fp:
+    while True:
+      line = fp.readline()
+      if not line:
+        break
+
+      SELECTOR = r'([\^<>=!~\*]*)(?P<version>\d+\.[\w\d\.\-]+)'
+
+      for name in other_projects:
+        # Look for something that looks like a version number. In common TOML formats, that is usually as an entire
+        # requirement string or as an assignment.
+        expressions = [
+          # This first one matches TOML key/value pairs.
+          r'([\'"])?' + re.escape(name) + r'\1\s*=\s*([\'"])' + SELECTOR + r'\1',
+          re.escape(name) + r'\s*=\s*([\'"])' + SELECTOR + r'\1',
+          # This second one matches a TOML string that contains the dependency.
+          r'([\'"])' + re.escape(name) + r'(?![^\w\d\_\.\-\ ])\s*' + SELECTOR + r'\1\s*($|,|\]|\})'
+        ]
+
+        for expr in expressions:
+          for match in re.finditer(expr, line):
+            refs.append(VersionRef(
+              file=pyproject_file,
+              start=fp.tell() -len(line) + match.start('version'),
+              end=fp.tell() -len(line) + match.end('version'),
+              value=match.group('version'),
+              content=line.rstrip(),
+            ))
+
+  return refs

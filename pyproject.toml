@@ -73,7 +73,6 @@ release = "slap.ext.checks.release:ReleaseChecksPlugin"
 
 [tool.poetry.plugins."slap.plugins.release"]
 changelog_release = "slap.ext.release.changelog:ChangelogReleasePlugin"
-interdependencies = "slap.ext.release.interdependencies:InterdependenciesReleasePlugin"
 source_code_version = "slap.ext.release.source_code_version:SourceCodeVersionReferencesPlugin"
 
 [tool.poetry.plugins."slap.plugins.version_incrementing_rule"]

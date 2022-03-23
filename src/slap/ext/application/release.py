@@ -45,7 +45,7 @@ class ReleaseConfig:
 
   #: A list of #ReleasePlugins to use. Defaults to contain the #SourceCodeVersionReferencesPlugin
   #: and #ChangelogReleasePlugin.
-  plugins: list[str] = dataclasses.field(default_factory=lambda: ['changelog_release', 'interdependencies', 'source_code_version'])
+  plugins: list[str] = dataclasses.field(default_factory=lambda: ['changelog_release', 'source_code_version'])
 
   # Extra settings for other things, for example by plugins.
   extra: te.Annotated[dict[str, t.Any], Remainder()] = dataclasses.field(default_factory=dict)
