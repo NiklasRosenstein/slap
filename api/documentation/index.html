@@ -1230,7 +1230,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/api/documentation.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/content/api/documentation.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -1242,7 +1242,7 @@
 <h2 id="class-application">Class Application</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Application</span><span class="p">()</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L162">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/application.py#L162">[view_source]</a></p>
 <p>The application object is the main hub for command-line interactions. It is responsible for managing the project
 that is the main subject of the command-line invokation (or multiple of such), provide the <a href="#pydoc:slap.application.Application.cleo">cleo</a> command-line
 application that <a href="#pydoc:slap.plugins.ApplicationPlugin">ApplicationPlugins</a> can register commands to, etc.</p>
@@ -1260,7 +1260,7 @@ application that <a href="#pydoc:slap.plugins.ApplicationPlugin">ApplicationPlug
 <div class="highlight"><pre><span></span><code><span class="nd">@property</span>
 <span class="k">def</span> <span class="nf">repository</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Repository</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L185">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/application.py#L185">[view_source]</a></p>
 <p>Return the Slap repository that is the subject of the current application. There may be command plugins
 that do not require the repository to function, so this property creates the repository lazily.</p>
 <p><a id="slap.application.Application.load_plugins"></a></p>
@@ -1268,7 +1268,7 @@ that do not require the repository to function, so this property creates the rep
 <h4 id="load_plugins">load_plugins</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_plugins</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L229">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/application.py#L229">[view_source]</a></p>
 <p>Loads all application plugins (see <a href="#pydoc:slap.plugins.ApplicationPlugin">ApplicationPlugin</a>) and activates them.</p>
 <p>By default, all plugins available in the <code>slap.application.ApplicationPlugin</code> entry point group are loaded. This
 behaviour can be modified by setting either the <code>[tool.slap.plugins.disable]</code> or <code>[tool.slap.plugins.enable]</code>
@@ -1280,7 +1280,7 @@ option.</p>
 <h4 id="run">run</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L262">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/application.py#L262">[view_source]</a></p>
 <p>Loads and activates application plugins and then invokes the CLI.</p>
 <hr />
 <p><a id="slap.plugins.ApplicationPlugin"></a></p>
@@ -1288,7 +1288,7 @@ option.</p>
 <h2 id="class-applicationplugin">Class ApplicationPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ApplicationPlugin</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L20">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L20">[view_source]</a></p>
 <p>A plugin that is activated on application load, usually used to register additional CLI commands.</p>
 <p><a id="slap.plugins.ApplicationPlugin.load_configuration"></a></p>
 <p><a id="pydoc:slap.plugins.ApplicationPlugin.load_configuration"></a></p>
@@ -1296,7 +1296,7 @@ option.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">load_configuration</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L26">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L26">[view_source]</a></p>
 <p>Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Slap
 configuration, which is either loaded from <code>pyproject.toml</code> or <code>slap.toml</code>. Use <code>Application.raw_config</code>
 to access the Slap configuration.</p>
@@ -1306,7 +1306,7 @@ to access the Slap configuration.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L32">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L32">[view_source]</a></p>
 <p>Activate the plugin. Register a <code>Command</code> to <a href="#pydoc:slap.application.Application.cleo">Application.cleo</a> or another type of plugin to
 the <code>Application.plugins</code> registry.</p>
 <p><a id="slap.plugins.RepositoryHandlerPlugin"></a></p>
@@ -1314,7 +1314,7 @@ the <code>Application.plugins</code> registry.</p>
 <h2 id="class-repositoryhandlerplugin">Class RepositoryHandlerPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RepositoryHandlerPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L37">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L37">[view_source]</a></p>
 <p>A plugin to provide data and operations on a repository level.</p>
 <p><a id="slap.plugins.RepositoryHandlerPlugin.matches_repository"></a></p>
 <p><a id="pydoc:slap.plugins.RepositoryHandlerPlugin.matches_repository"></a></p>
@@ -1322,7 +1322,7 @@ the <code>Application.plugins</code> registry.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">matches_repository</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L43">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L43">[view_source]</a></p>
 <p>Return <code>True</code> if the handler is able to provide data for the given project.</p>
 <p><a id="slap.plugins.RepositoryHandlerPlugin.get_vcs"></a></p>
 <p><a id="pydoc:slap.plugins.RepositoryHandlerPlugin.get_vcs"></a></p>
@@ -1330,7 +1330,7 @@ the <code>Application.plugins</code> registry.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_vcs</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vcs</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L47">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L47">[view_source]</a></p>
 <p>Return the version control system that the repository is managed with.</p>
 <p><a id="slap.plugins.RepositoryHandlerPlugin.get_repository_host"></a></p>
 <p><a id="pydoc:slap.plugins.RepositoryHandlerPlugin.get_repository_host"></a></p>
@@ -1338,7 +1338,7 @@ the <code>Application.plugins</code> registry.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_repository_host</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RepositoryHost</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L51">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L51">[view_source]</a></p>
 <p>Return the interface for interacting with the VCS hosting service.</p>
 <p><a id="slap.plugins.RepositoryHandlerPlugin.get_projects"></a></p>
 <p><a id="pydoc:slap.plugins.RepositoryHandlerPlugin.get_projects"></a></p>
@@ -1346,14 +1346,14 @@ the <code>Application.plugins</code> registry.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Project</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L55">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L55">[view_source]</a></p>
 <p>Return the projects of this repository.</p>
 <p><a id="slap.plugins.ProjectHandlerPlugin"></a></p>
 <p><a id="pydoc:slap.plugins.ProjectHandlerPlugin"></a></p>
 <h2 id="class-projecthandlerplugin">Class ProjectHandlerPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProjectHandlerPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L59">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L59">[view_source]</a></p>
 <p>A plugin that implements the core functionality of a project. Project handlers are intermediate layers between
 the Slap tooling and the actual project configuration, allowing different types of configurations to be adapted and
 used with Slap.</p>
@@ -1363,7 +1363,7 @@ used with Slap.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">matches_project</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L67">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L67">[view_source]</a></p>
 <p>Return <code>True</code> if the handler is able to provide data for the given project.</p>
 <p><a id="slap.plugins.ProjectHandlerPlugin.get_dist_name"></a></p>
 <p><a id="pydoc:slap.plugins.ProjectHandlerPlugin.get_dist_name"></a></p>
@@ -1371,7 +1371,7 @@ used with Slap.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_dist_name</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L71">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L71">[view_source]</a></p>
 <p>Return the distribution name for the project.</p>
 <p><a id="slap.plugins.ProjectHandlerPlugin.get_readme"></a></p>
 <p><a id="pydoc:slap.plugins.ProjectHandlerPlugin.get_readme"></a></p>
@@ -1379,7 +1379,7 @@ used with Slap.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_readme</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L75">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L75">[view_source]</a></p>
 <p>Return the readme file configured for the project.</p>
 <p><a id="slap.plugins.ProjectHandlerPlugin.get_packages"></a></p>
 <p><a id="pydoc:slap.plugins.ProjectHandlerPlugin.get_packages"></a></p>
@@ -1387,7 +1387,7 @@ used with Slap.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_packages</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Package</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L79">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L79">[view_source]</a></p>
 <p>Return a list of packages for the project. Return <code>None</code> to indicate that the project is expected to
 not contain any packages.</p>
 <p><a id="slap.plugins.ProjectHandlerPlugin.get_dependencies"></a></p>
@@ -1396,21 +1396,21 @@ not contain any packages.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_dependencies</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dependencies</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L84">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L84">[view_source]</a></p>
 <p>Return the dependencies of the project.</p>
 <p><a id="slap.plugins.ProjectHandlerPlugin.get_version"></a></p>
 <p><a id="pydoc:slap.plugins.ProjectHandlerPlugin.get_version"></a></p>
 <h4 id="get_version">get_version</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L87">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L87">[view_source]</a></p>
 <p>Return the main project version string.</p>
 <p><a id="slap.plugins.ProjectHandlerPlugin.get_version_refs"></a></p>
 <p><a id="pydoc:slap.plugins.ProjectHandlerPlugin.get_version_refs"></a></p>
 <h4 id="get_version_refs">get_version_refs</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_version_refs</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">VersionRef</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L93">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L93">[view_source]</a></p>
 <p>Allows the project handler to return additional version refs. Usually returns the version reference in
 <code>pyproject.toml</code>.</p>
 <p><a id="slap.plugins.CheckPlugin"></a></p>
@@ -1418,7 +1418,7 @@ not contain any packages.</p>
 <h2 id="class-checkplugin">Class CheckPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">CheckPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L100">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L100">[view_source]</a></p>
 <p>This plugin type can be implemented to add custom checks to the <code>shut check</code> command. Note that checks will
 be grouped and their names prefixed with the plugin name, so that name does not need to be included in the name
 of the returned checks.</p>
@@ -1427,7 +1427,7 @@ of the returned checks.</p>
 <h2 id="class-releaseplugin">Class ReleasePlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReleasePlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L114">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L114">[view_source]</a></p>
 <p>This plugin type provides additional references to the project's version number allowing <code>slap release</code> to
 update these references to a new version number.</p>
 <p><a id="slap.plugins.ReleasePlugin.get_version_refs"></a></p>
@@ -1435,7 +1435,7 @@ update these references to a new version number.</p>
 <h4 id="get_version_refs_1">get_version_refs</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_version_refs</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">VersionRef</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L124">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L124">[view_source]</a></p>
 <p>Return a list of occurrences of the project version.</p>
 <p><a id="slap.plugins.ReleasePlugin.create_release"></a></p>
 <p><a id="pydoc:slap.plugins.ReleasePlugin.create_release"></a></p>
@@ -1443,7 +1443,7 @@ update these references to a new version number.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">create_release</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">,</span> <span class="n">target_version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                    <span class="n">dry</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L129">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L129">[view_source]</a></p>
 <p>Gives the plugin a chance to perform an arbitrary action after all version references have been bumped,
 being informed of the target version. If <em>dry</em> is <code>True</code>, the plugin should only act as if it was performing
 its usual actions but not commit the changes to disk. It should return the list of files that it modifies
@@ -1453,7 +1453,7 @@ or would have modified.</p>
 <h2 id="class-versionincrementingruleplugin">Class VersionIncrementingRulePlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">VersionIncrementingRulePlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L138">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L138">[view_source]</a></p>
 <p>This plugin type can be implemented to provide rules accepted by the <code>slap release &lt;rule&gt;</code> command to "bump" an
 existing version number to another. The builtin rules implemented in <code>slap.ext.version_incrementing_rules</code>.</p>
 <p><a id="slap.plugins.ChangelogUpdateAutomationPlugin"></a></p>
@@ -1461,7 +1461,7 @@ existing version number to another. The builtin rules implemented in <code>slap.
 <h2 id="class-changelogupdateautomationplugin">Class ChangelogUpdateAutomationPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ChangelogUpdateAutomationPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L148">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/rename-to-slap/docs/../src/slap/plugins.py#L148">[view_source]</a></p>
 <p>This plugin type can be used with the <code>slap changelog update-pr -use &lt;plugin_name&gt;</code> option. It provides all the
 details derivable from the environment (e.g. environment variables available from CI builds) that can be used to
 detect which changelog entries have been added in a pull request, the pull request URL and the means to publish
