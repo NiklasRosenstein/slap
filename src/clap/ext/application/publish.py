@@ -1,4 +1,5 @@
 
+import contextlib
 import tempfile
 from pathlib import Path
 
@@ -15,6 +16,9 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
   backend to be installed already.
 
   The command-line options are almost identical to the <code>twine upload</code> command.
+
+  Note: You can combine the `-d` and `-b` options to effectively perform a build, storing
+  the artifacts into the specified directory but not publishing them.
   """
 
   app: Application
@@ -37,6 +41,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
     #option("verbose"),
     option("disable-progress-bar"),
     option("dry", "d"),
+    option("build-directory", "b", flag=False),
   ]
 
   def load_configuration(self, app: Application) -> None:
@@ -52,7 +57,11 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
     distributions: list[Path] = []
 
-    with tempfile.TemporaryDirectory() as tmpdir:
+    with contextlib.ExitStack() as stack:
+      build_dir = self.option("build-directory")
+      if build_dir is None:
+        build_dir = stack.enter_context(tempfile.TemporaryDirectory())
+
       for project in self.app.repository.projects():
         if not project.is_python_project: continue
 
@@ -60,7 +69,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
         backend = Pep517BuildBackend(
           project.pyproject_toml.value()['build-system']['build-backend'],
           project.directory,
-          Path(tmpdir)
+          Path(build_dir)
         )
 
         sdist = backend.build_sdist()

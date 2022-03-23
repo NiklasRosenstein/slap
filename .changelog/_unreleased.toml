@@ -15,3 +15,9 @@ id = "52a29516-ef0a-4b53-bd22-1ca5d36b3d9d"
 type = "improvement"
 description = "Split default project handler into separate implementations for Poetry, Flit and Setuptools and properly support Setuptools now (reading `setup.cfg`)"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "71d0c4b2-e7c4-4474-b688-20bc9a06a624"
+type = "feature"
+description = "add `-b,--build-directory` option to `clap publish` command"
+author = "@NiklasRosenstein"
