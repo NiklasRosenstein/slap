@@ -13,7 +13,7 @@
     
     
       
-        <title>Publishing - Clap</title>
+        <title>Publishing - Slap</title>
       
     
     
@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#publishing-with-clap" class="md-skip">
+        <a href="#publishing-with-slap" class="md-skip">
           Skip to content
         </a>
       
@@ -77,7 +77,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Clap" class="md-header__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href="../.." title="Slap" class="md-header__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -90,7 +90,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Clap
+            Slap
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -175,13 +175,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Clap" class="md-nav__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href="../.." title="Slap" class="md-nav__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
-    Clap
+    Slap
   </label>
   
     <div class="md-nav__source">
@@ -764,7 +764,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-clap/docs/content/guides/publishing.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-slap/docs/content/guides/publishing.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -773,10 +773,10 @@
 <blockquote>
 <p>TODO: This guide needs to be updated.</p>
 </blockquote>
-<h1 id="publishing-with-clap">Publishing with Clap</h1>
+<h1 id="publishing-with-slap">Publishing with Slap</h1>
 <p>By default, every package is configured to publish to PyPI using the <code>warehouse:pypi</code> publishing
 target. A test publish to <code>test.pypi.org</code> can be performed by using the <code>--test</code> option when using
-the <code>clap pkg publish</code> command.</p>
+the <code>slap pkg publish</code> command.</p>
 <h2 id="automate-publishing-in-ci-checls">Automate publishing in CI checls</h2>
 <p>You can specify the username and password in the config as environment variables. Most CI systems
 allow you to securely store a secret as an environment variable.</p>
@@ -791,29 +791,29 @@ publish:
       test_password: &#39;$TESTPYPI_TOKEN&#39;
 </code></pre></div>
 <p>When you're ready to publish from the CI checks, make it run the following commands:</p>
-<div class="highlight"><pre><span></span><code>- pip install clap
-- clap pkg update --verify-tag &quot;$CI_TAG&quot;
-- clap pkg publish warehouse:pypi
+<div class="highlight"><pre><span></span><code>- pip install slap
+- slap pkg update --verify-tag &quot;$CI_TAG&quot;
+- slap pkg publish warehouse:pypi
 </code></pre></div>
 <p>It is also recommended that you add a trial-publish step. Note that we add the <code>--allow-empty-tag</code>
 to flag to allow that the value passed to <code>--verify-tag</code> can be empty. This is important because
 most commits won't be tagged during development.</p>
-<div class="highlight"><pre><span></span><code>- pip install clap
-- clap pkg update --verify-tag &quot;$CI_TAG&quot; --allow-empty-tag
-- clap pkg publish warehouse:pypi --test
+<div class="highlight"><pre><span></span><code>- pip install slap
+- slap pkg update --verify-tag &quot;$CI_TAG&quot; --allow-empty-tag
+- slap pkg publish warehouse:pypi --test
 </code></pre></div>
 <h3 id="publishing-snapshots">Publishing Snapshots</h3>
 <p>The <code>bump</code> command can be used with the <code>--snapshot</code> option to update the version to one that
 indicates the Git commit distance since the last tagged version. This is useful to publish
 development snapshots. <strong>Note</strong> that PyPI/Warehouse does not actually (yet?) support snapshot version
 numbers. If you want to publish snapshots, you need an alternative package registry such as Artifactory).</p>
-<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clap pkg update --verify-tag &quot;$CI_TAG&quot; --allow-empty-tag</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clap pkg bump --snapshot</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clap pkg publish warehouse:pypi --test</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap pkg update --verify-tag &quot;$CI_TAG&quot; --allow-empty-tag</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap pkg bump --snapshot</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap pkg publish warehouse:pypi --test</span><span class="w"></span>
 </code></pre></div>
 <p><strong>Important</strong>: Many CI systems may not fetch tags when cloning your repository. This means <code>bump --snapshot</code>
 can not figure out the commit distance and the generated snapshot version number will begin with <code>0.0.0</code>. If
-you encounter this issue, run <code>git fetch --tags</code> before Clap.</p>
+you encounter this issue, run <code>git fetch --tags</code> before Slap.</p>
 <p>If you do try to use snapshot versions with PyPI, you will see this type of error:</p>
 <div class="highlight"><pre><span></span><code>HTTPError: 400 Bad Request from https://test.pypi.org/legacy/
 &#39;0.17.1+1.g986bed6&#39; is an invalid value for Version. Error: Can&#39;t use PEP 440 local versions. See https://packaging.python.org/specifications/core-metadata for more information.

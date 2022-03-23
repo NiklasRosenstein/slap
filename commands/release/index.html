@@ -13,7 +13,7 @@
     
     
       
-        <title>Release - Clap</title>
+        <title>Release - Slap</title>
       
     
     
@@ -77,7 +77,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Clap" class="md-header__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href="../.." title="Slap" class="md-header__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -90,7 +90,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Clap
+            Slap
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -175,13 +175,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Clap" class="md-nav__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href="../.." title="Slap" class="md-nav__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
-    Clap
+    Slap
   </label>
   
     <div class="md-nav__source">
@@ -806,15 +806,15 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-clap/docs/content/commands/release.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-slap/docs/content/commands/release.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
 <h1 id="release">Release</h1>
-<p>The <code>clap release</code> command updates references to the version number in <code>pyproject.toml</code> and your source code, updates
-the unreleased changelog if you make use of Clap's structured changelogs, as well as updating any other versions
+<p>The <code>slap release</code> command updates references to the version number in <code>pyproject.toml</code> and your source code, updates
+the unreleased changelog if you make use of Slap's structured changelogs, as well as updating any other versions
 specified in the configuration or detected by other plugins.</p>
 <p>It covers the following use cases:</p>
 <ol>
@@ -822,7 +822,7 @@ specified in the configuration or detected by other plugins.</p>
 <li>Validate that the version number is consistent across the project</li>
 </ol>
 <p><strong>Example</strong></p>
-<div class="highlight"><pre><span></span><code>$ clap release patch --tag --push
+<div class="highlight"><pre><span></span><code>$ slap release patch --tag --push
 bumping 2 version references:
   pyproject.toml: 0.1.0 → 0.1.1
   src/my_package/__init__.py: 0.1.0 → 0.1.1
@@ -850,7 +850,7 @@ To https://github.com/username/repo
 <h3 id="releasebranch"><code>release.branch</code></h3>
 <p><strong>Type</strong>: <code>str</code><br />
 <strong>Default</strong>: <code>"develop"</code></p>
-<p>The branch on which releases are created. Unless <code>--no-branch-check</code> is passed to <code>clap release</code>, the command will
+<p>The branch on which releases are created. Unless <code>--no-branch-check</code> is passed to <code>slap release</code>, the command will
 refuse to continue if the current branch name does not match this value.</p>
 <h3 id="releasecommit-message"><code>release.commit-message</code></h3>
 <p><strong>Type</strong>: <code>str</code><br />
@@ -866,9 +866,9 @@ version number.</p>
 <p><strong>Type</strong>: <code>list[VersionRefConfig]</code><br />
 <strong>Default</strong>: <code>[]</code></p>
 <p>A list of version references that should be considered in addition to the version references that are automatically
-detected by Clap when updating version numbers across the project with the <code>clap release</code> command.</p>
+detected by Slap when updating version numbers across the project with the <code>slap release</code> command.</p>
 <p>A <code>VersionRefConfig</code> contains the fields <code>file: str</code> and <code>pattern: str</code>. The <code>file</code> is considered relative to the
-project directory (which is the directory where the <code>clap.toml</code> or <code>pyproject.toml</code> configuration file resides).</p>
+project directory (which is the directory where the <code>slap.toml</code> or <code>pyproject.toml</code> configuration file resides).</p>
 
               
             </article>

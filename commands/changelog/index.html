@@ -13,7 +13,7 @@
     
     
       
-        <title>Changelog - Clap</title>
+        <title>Changelog - Slap</title>
       
     
     
@@ -77,7 +77,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Clap" class="md-header__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href="../.." title="Slap" class="md-header__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -90,7 +90,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Clap
+            Slap
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -175,13 +175,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Clap" class="md-nav__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href="../.." title="Slap" class="md-nav__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
-    Clap
+    Slap
   </label>
   
     <div class="md-nav__source">
@@ -806,19 +806,19 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-clap/docs/content/commands/changelog.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-slap/docs/content/commands/changelog.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
 <h1 id="changelog">Changelog</h1>
-<p>The <code>clap log</code> command can be used to manage changelog files which are usually stored in a <code>.changelog/</code> directory,
-but the directory can be changed using the <code>tool.clap.changelog-dir</code> option. The CLI allows you to add new entries
+<p>The <code>slap log</code> command can be used to manage changelog files which are usually stored in a <code>.changelog/</code> directory,
+but the directory can be changed using the <code>tool.slap.changelog-dir</code> option. The CLI allows you to add new entries
 as well as print them in a pretty format in the terminal or render the changelog as Markdown.</p>
 <p>A changelog entry has a unique ID, one or more tags that categorize the type of change, one or more authors,
 a short description, maybe a link to a pull request and links to issues that are fixed by the change.</p>
-<div class="highlight"><pre><span></span><code><span class="err">$</span><span class="w"> </span><span class="n">clap</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="err">-</span><span class="n">t</span><span class="w"> </span><span class="n">fix</span><span class="p">,</span><span class="n">docs</span><span class="w"> </span><span class="err">-</span><span class="n">m</span><span class="w"> </span><span class="s">&#39;Fix the documentation&#39;</span><span class="w"> </span><span class="err">--</span><span class="n">fixes</span><span class="w"> </span><span class="mi">231</span><span class="p">,</span><span class="mi">234</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="err">$</span><span class="w"> </span><span class="n">slap</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="err">-</span><span class="n">t</span><span class="w"> </span><span class="n">fix</span><span class="p">,</span><span class="n">docs</span><span class="w"> </span><span class="err">-</span><span class="n">m</span><span class="w"> </span><span class="s">&#39;Fix the documentation&#39;</span><span class="w"> </span><span class="err">--</span><span class="n">fixes</span><span class="w"> </span><span class="mi">231</span><span class="p">,</span><span class="mi">234</span><span class="w"></span>
 <span class="c1"># Added changelog entry to .changelog/_unreleased.toml</span><span class="w"></span>
 <span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;d0092ba&quot;</span><span class="w"></span>
 <span class="n">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s">&quot;fix&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;docs&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"></span>
@@ -830,7 +830,7 @@ a short description, maybe a link to a pull request and links to issues that are
 <span class="n">pr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">null</span><span class="w"></span>
 </code></pre></div>
 <p>The <code>pr</code> value can be set manually once a PR was created, or be updated automatically for example through a GitHub
-action or other type of CI job (the <code>clap log inject-pr-url</code> command can help with that).</p>
+action or other type of CI job (the <code>slap log inject-pr-url</code> command can help with that).</p>
 <h2 id="update-the-pr-field-in-ci-checks">Update the PR field in CI checks</h2>
 <p><strong>Example for GitHub Actions</strong></p>
 <div class="highlight"><pre><span></span><code>  update-pr-numbers:
@@ -843,10 +843,10 @@ action or other type of CI job (the <code>clap log inject-pr-url</code> command 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with: { python-version: &quot;3.10&quot; }
-    - name: Install Clap
-      run: pip install clap-cli==1.0.0
+    - name: Install Slap
+      run: pip install slap-cli==1.0.0
     - name: Update PR references in changelogs
-      run: clap -vv changelog update-pr --use github-actions
+      run: slap -vv changelog update-pr --use github-actions
 </code></pre></div>
 <p>Note that you still have to configure Git such that it has an author email and name to create the commit with.</p>
 <h2 id="configuration">Configuration</h2>

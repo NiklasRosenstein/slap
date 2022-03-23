@@ -13,7 +13,7 @@
     
     
       
-        <title>Glossary - Clap</title>
+        <title>Glossary - Slap</title>
       
     
     
@@ -77,7 +77,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Clap" class="md-header__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href=".." title="Slap" class="md-header__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -90,7 +90,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Clap
+            Slap
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -175,13 +175,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Clap" class="md-nav__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href=".." title="Slap" class="md-nav__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
-    Clap
+    Slap
   </label>
   
     <div class="md-nav__source">
@@ -750,7 +750,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-clap/docs/content/glossary.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-slap/docs/content/glossary.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -759,21 +759,21 @@
 <h1 id="glossary">Glossary</h1>
 <h2 id="project">Project</h2>
 <p>At it's core, any directory can be a "project", but most projects would have a <code>pyproject.toml</code> or <code>shut.toml</code>
-configuration file. Most commonly, it will have a <code>pyproject.toml</code> file that contains the Clap configuration
-under the <code>[tool.clap]</code> namespace. Many concepts in Clap are attached directly to a project. For example if
+configuration file. Most commonly, it will have a <code>pyproject.toml</code> file that contains the Slap configuration
+under the <code>[tool.slap]</code> namespace. Many concepts in Slap are attached directly to a project. For example if
 the project has a <code>pyproject.toml</code>, it is considered a Python project, and Python projects can have packages
 that can be installed, built or published to PyPI or another repository.</p>
-<p>A project with a <code>clap.toml</code> configuration file (or with no configuration file) is usually used as the parent
+<p>A project with a <code>slap.toml</code> configuration file (or with no configuration file) is usually used as the parent
 project for two or more sub-projects. This configuration represents a mono-repository where multiple projects
 are stored and versioned together.</p>
-<p>Clap understands most details about a project through a <a href="/clap/api/documentation#pydoc:clap.plugins.ProjectHandlerPlugin">Class ProjectHandlerPlugin</a>. It comes
+<p>Slap understands most details about a project through a <a href="/slap/api/documentation#pydoc:slap.plugins.ProjectHandlerPlugin">Class ProjectHandlerPlugin</a>. It comes
 with a default implementation that supports Poetry and Flit Python projects.</p>
 <h2 id="repository">Repository</h2>
 <p>A repository is a directory that contains one or more projects. For singular projects, the repository directory
 is the same as the project directory. For a mono-repository configuration, any directory that contains multiple
 projects is considered the repository directory (it usually contains a <code>shut.toml</code> configuration file).</p>
 <p>Note that the repository directory is <em>also</em> considered a project directory, but if it isn't also a Python
-project (i.e. if it has a <code>pyproject.toml</code> instead of a <code>clap.toml</code>) it will be ignored for most Clap commands.</p>
+project (i.e. if it has a <code>pyproject.toml</code> instead of a <code>slap.toml</code>) it will be ignored for most Slap commands.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Single project</label><label for="__tabbed_1_2">Mono repository</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -801,7 +801,7 @@ project (i.e. if it has a <code>pyproject.toml</code> instead of a <code>clap.to
 </div>
 </div>
 </div>
-<p>Clap understands most details about a repository through a <a href="/clap/api/documentation#pydoc:clap.plugins.RepositoryHandlerPlugin">Class RepositoryHandlerPlugin</a>. It
+<p>Slap understands most details about a repository through a <a href="/slap/api/documentation#pydoc:slap.plugins.RepositoryHandlerPlugin">Class RepositoryHandlerPlugin</a>. It
 comes with a default implementation that supports Git repositories and GitHub.</p>
 
               

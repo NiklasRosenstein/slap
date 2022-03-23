@@ -13,7 +13,7 @@
     
     
       
-        <title>Configuration - Clap</title>
+        <title>Configuration - Slap</title>
       
     
     
@@ -77,7 +77,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Clap" class="md-header__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href=".." title="Slap" class="md-header__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -90,7 +90,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Clap
+            Slap
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -175,13 +175,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Clap" class="md-nav__button md-logo" aria-label="Clap" data-md-component="logo">
+    <a href=".." title="Slap" class="md-nav__button md-logo" aria-label="Slap" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
     </a>
-    Clap
+    Slap
   </label>
   
     <div class="md-nav__source">
@@ -804,15 +804,15 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-clap/docs/content/configuration.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slam/blob/rename-to-slap/docs/content/configuration.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
 <h1 id="configuration">Configuration</h1>
-<p>The Clap configuration is read either from a <code>clap.toml</code> file or from the <code>[tool.clap]</code> section in <code>pyproject.toml</code>.</p>
-<p>When a configuration value is described in the documentation, it is referenced without the <code>[tool.clap]</code> prefix that
+<p>The Slap configuration is read either from a <code>slap.toml</code> file or from the <code>[tool.slap]</code> section in <code>pyproject.toml</code>.</p>
+<p>When a configuration value is described in the documentation, it is referenced without the <code>[tool.slap]</code> prefix that
 is needed in the case where the configuration is loaded from <code>pyproject.toml</code>.</p>
 <p>Check out the documentation for each command separately to understand how they can be configured.</p>
 <h2 id="application-configuration">Application configuration</h2>
@@ -820,16 +820,16 @@ is needed in the case where the configuration is loaded from <code>pyproject.tom
 <p><strong>Type</strong>: <code>list[str] | None</code><br />
 <strong>Default</strong>: <code>None</code></p>
 <p>A list of plugins to disable, subtracting from the list of plugins that are loaded by default. By default, all builtin
-plugins provided directly by Clap will be loaded. External plugins need to be enabled explicitly with <code>plugins.enable</code>.</p>
+plugins provided directly by Slap will be loaded. External plugins need to be enabled explicitly with <code>plugins.enable</code>.</p>
 <h3 id="pluginsenable"><code>plugins.enable</code></h3>
 <p><strong>Type</strong>: <code>list[str] | None</code><br />
 <strong>Default</strong>: <code>None</code></p>
-<p>A list of plugins to enable in addition to the list of plugins that are loaded by default (i.e. all the Clap builtin
+<p>A list of plugins to enable in addition to the list of plugins that are loaded by default (i.e. all the Slap builtin
 plugins). External plugins need to be enabled explicitly with this option.</p>
 <h2 id="source-directory"><code>source-directory</code></h2>
 <p><strong>Type</strong>: <code>str | None</code><br />
 <strong>Default</strong>: <code>None</code></p>
-<p>The directory in which the Python source code resides. If not set, Clap will attempt to look into <code>./src/</code> first and
+<p>The directory in which the Python source code resides. If not set, Slap will attempt to look into <code>./src/</code> first and
 then <code>./</code>. This is used to detect the Python packages.</p>
 <blockquote>
 <p><strong>Todo</strong>: If <code>[tool.poetry.packages]</code> is set, try and use that over manually detecting the packages.</p>
