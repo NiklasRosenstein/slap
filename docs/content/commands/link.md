@@ -4,7 +4,7 @@ This is particularly interesting when managing the package with [Poetry][] as it
 installs (as of Poetry 1.2.0a2 on 2022-01-14). This is a little helper command that will temporarily reorganize the
 `pyproject.toml` to be compatible with [Flit] and make use if it's symlink installation feature (`flit install -s`).
 
-    $ slam link
+    $ slap link
     Extras to install for deps 'all': {'.none'}
     Symlinking src/my_package -> /home/niklas/.local/venvs/craftr/lib/python3.10/site-packages/my_package
 

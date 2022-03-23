@@ -2,11 +2,11 @@
 
 > TODO: This guide needs to be updated.
 
-# Publishing with Slam
+# Publishing with Slap
 
 By default, every package is configured to publish to PyPI using the `warehouse:pypi` publishing
 target. A test publish to `test.pypi.org` can be performed by using the `--test` option when using
-the `slam pkg publish` command.
+the `slap pkg publish` command.
 
 ## Automate publishing in CI checls
 
@@ -28,9 +28,9 @@ publish:
 When you're ready to publish from the CI checks, make it run the following commands:
 
 ```yml
-- pip install slam
-- slam pkg update --verify-tag "$CI_TAG"
-- slam pkg publish warehouse:pypi
+- pip install slap
+- slap pkg update --verify-tag "$CI_TAG"
+- slap pkg publish warehouse:pypi
 ```
 
 It is also recommended that you add a trial-publish step. Note that we add the `--allow-empty-tag`
@@ -38,9 +38,9 @@ to flag to allow that the value passed to `--verify-tag` can be empty. This is i
 most commits won't be tagged during development.
 
 ```yml
-- pip install slam
-- slam pkg update --verify-tag "$CI_TAG" --allow-empty-tag
-- slam pkg publish warehouse:pypi --test
+- pip install slap
+- slap pkg update --verify-tag "$CI_TAG" --allow-empty-tag
+- slap pkg publish warehouse:pypi --test
 ```
 
 ### Publishing Snapshots
@@ -51,14 +51,14 @@ development snapshots. __Note__ that PyPI/Warehouse does not actually (yet?) sup
 numbers. If you want to publish snapshots, you need an alternative package registry such as Artifactory).
 
 ```yaml
-- slam pkg update --verify-tag "$CI_TAG" --allow-empty-tag
-- slam pkg bump --snapshot
-- slam pkg publish warehouse:pypi --test
+- slap pkg update --verify-tag "$CI_TAG" --allow-empty-tag
+- slap pkg bump --snapshot
+- slap pkg publish warehouse:pypi --test
 ```
 
 __Important__: Many CI systems may not fetch tags when cloning your repository. This means `bump --snapshot`
 can not figure out the commit distance and the generated snapshot version number will begin with `0.0.0`. If
-you encounter this issue, run `git fetch --tags` before Slam.
+you encounter this issue, run `git fetch --tags` before Slap.
 
 If you do try to use snapshot versions with PyPI, you will see this type of error:
 

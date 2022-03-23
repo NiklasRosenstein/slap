@@ -3,3 +3,45 @@ id = "3f6cc68c-9ae1-4814-a9d9-a5799af9a300"
 type = "improvement"
 description = "upgrade to using `databind` 2.x"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f0bcce7c-345c-42eb-851f-7c4b8f44a546"
+type = "breaking change"
+description = "Rename Slam to Slap"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "52a29516-ef0a-4b53-bd22-1ca5d36b3d9d"
+type = "improvement"
+description = "Split default project handler into separate implementations for Poetry, Flit and Setuptools and properly support Setuptools now (reading `setup.cfg`)"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "71d0c4b2-e7c4-4474-b688-20bc9a06a624"
+type = "feature"
+description = "add `-b,--build-directory` option to `slap publish` command"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "fb745286-30a0-40cf-9a2f-b40970e48ffa"
+type = "feature"
+description = "add `slap.check.check()` decorator and `slap.check.get_checks()` function to make implementing check plugins more convenient"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "ac717886-ad1e-4e5c-a918-b8729e215745"
+type = "improvement"
+description = "add `Project.version()` and `Project.get_version_refs()`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "1ca3f595-8aed-4fd2-b395-28cce4312dad"
+type = "improvement"
+description = "move interdependencies version ref detection into `DefaultProjectHandler`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "fb08ead1-ea8e-45ad-ab7e-b1922dd31756"
+type = "improvement"
+description = "add overload for `match_version_ref_pattern()` that can return a fallback value"
+author = "@NiklasRosenstein"

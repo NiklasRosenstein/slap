@@ -1,10 +1,10 @@
 # Test
 
-Configure the commands to run with `slam test` under the `tool.slam.test` table:
+Configure the commands to run with `slap test` under the `tool.slap.test` table:
 
 ```toml
-[tool.slam.test]
-check = "slam check"
+[tool.slap.test]
+check = "slap check"
 mypy = "mypy src/"
 pytest = "pytest test/"
 ```

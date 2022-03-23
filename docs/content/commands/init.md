@@ -1,13 +1,13 @@
 # Init
 
-The `slam init` command is a small helper to bootstrap Python project files.
+The `slap init` command is a small helper to bootstrap Python project files.
 
 ## Templates
 
 ### Poetry
 
-``` title="$ slam init -t poetry --name my.pkg"
-@shell slam init -t poetry --name my.pkg -f --dry
+``` title="$ slap init -t poetry --name my.pkg"
+@shell slap init -t poetry --name my.pkg -f --dry
 ```
 
-@shell slam init -t poetry --name my.pkg --as-markdown -q
+@shell slap init -t poetry --name my.pkg --as-markdown -q
