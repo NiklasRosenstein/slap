@@ -842,15 +842,15 @@
 <p>The <code>slap init</code> command is a small helper to bootstrap Python project files.</p>
 <h2 id="templates">Templates</h2>
 <h3 id="poetry">Poetry</h3>
-<div class="highlight"><span class="filename">$ slap init -t poetry --name my.pkg</span><pre><span></span><code>write my-pkg/pyproject.toml
-write my-pkg/LICENSE
-write my-pkg/readme.md
-write my-pkg/.gitignore
-write my-pkg/src/my/pkg/__init__.py
-write my-pkg/test/test_import.py
-write my-pkg/src/my/pkg/py.typed
+<div class="highlight"><span class="filename">$ slap init -t poetry --name my.pkg</span><pre><span></span><code>write /home/runner/work/slap/slap/docs/pyproject.toml
+write /home/runner/work/slap/slap/docs/LICENSE
+write /home/runner/work/slap/slap/docs/readme.md
+write /home/runner/work/slap/slap/docs/.gitignore
+write /home/runner/work/slap/slap/docs/src/my/pkg/__init__.py
+write /home/runner/work/slap/slap/docs/test/test_import.py
+write /home/runner/work/slap/slap/docs/src/my/pkg/py.typed
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/pyproject.toml</span><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/pyproject.toml</span><pre><span></span><code><span class="k">[build-system]</span><span class="w"></span>
 <span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;poetry-core&quot;</span><span class="p">]</span><span class="w"></span>
 <span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;poetry.core.masonry.api&quot;</span><span class="w"></span>
 
@@ -896,7 +896,7 @@ write my-pkg/src/my/pkg/py.typed
 <span class="n">show_error_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 <span class="n">show_error_codes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/LICENSE</span><pre><span></span><code>The MIT License
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/LICENSE</span><pre><span></span><code>The MIT License
 
 Copyright (c) 2022 Unknown
 
@@ -917,9 +917,9 @@ BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 USE OR OTHER DEALINGS IN THE SOFTWARE.     
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/readme.md</span><pre><span></span><code><span class="gh"># my.pkg</span>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/readme.md</span><pre><span></span><code><span class="gh"># my.pkg</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/.gitignore</span><pre><span></span><code>/.vscode
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/.gitignore</span><pre><span></span><code>/.vscode
 /dist
 /build
 .venv/
@@ -927,18 +927,43 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 __pycache__/
 poetry.lock
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/src/my/pkg/__init__.py</span><pre><span></span><code><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/src/my/pkg/__init__.py</span><pre><span></span><code><span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/test/test_import.py</span><pre><span></span><code><span class="k">def</span> <span class="nf">test_import</span><span class="p">():</span>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/test/test_import.py</span><pre><span></span><code><span class="k">def</span> <span class="nf">test_import</span><span class="p">():</span>
   <span class="n">exec</span><span class="p">(</span><span class="s1">&#39;from my.pkg import *&#39;</span><span class="p">)</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">my-pkg/src/my/pkg/py.typed</span><pre><span></span><code>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/src/my/pkg/py.typed</span><pre><span></span><code>
 </code></pre></div>
 <h3 id="github">Github</h3>
-<div class="highlight"><span class="filename">$ slap init -t github</span><pre><span></span><code>    $ slap init -t github -f --dry  # exited with return code 1
-    error: --name is required
+<div class="highlight"><span class="filename">$ slap init -t github</span><pre><span></span><code>write /home/runner/work/slap/slap/docs/.github/workflows/python-package.yml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>$ slap init -t github --as-markdown -q  # exited with return code 1
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/.github/workflows/python-package.yml</span><pre><span></span><code>name: Python application
+
+on:
+  push: { branches: [ develop ], tags: [ &quot;*&quot; ] }
+  pull_request: { branches: [ develop ] }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ &quot;3.7&quot;, &quot;3.8&quot;, &quot;3.9&quot;, &quot;3.10&quot;, &quot;3.x&quot; ]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: NiklasRosenstein/slap@gha/install/v1
+    - uses: actions/setup-python@v2
+      with: { python-version: &quot;${{ matrix.python-version }}&quot; }
+    - run: slap install -vv --no-venv-check
+    - run: slap test
+
+  update-changelog:
+    runs-on: ubuntu-latest
+    if: github.event_name == &#39;pull_request&#39;
+    steps:
+      - uses: actions/checkout@v2
+      - uses: NiklasRosenstein/slap@gha/changelog/update/v1
 </code></pre></div>
 
               
