@@ -102,7 +102,7 @@ def get_setup_cfg_interdependency_version_refs(project: Project) -> list[Version
     # Look for occurrences of the project name in the context of requirements.
     expressions = [
       # Match requirements split over multiple lines.
-      re.compile(r'^\w+_requires?\s*=.*^\s+(?:' + re.escape(project_name) + r'\s*(?:==|>=|<=|>|<)\s*(?P<version>[^\n;]+))', re.M | re.S),
+      r'^\w+_requires?\s*=.*^\s+(?:' + re.escape(project_name) + r'\s*(?:==|>=|<=|>|<)\s*(?P<version>[^\n;]+))',
       # TODO (@NiklasRosenstein): Also match if the requirements is on the same line
       # TODO (@NiklasRosenstein): Also match extra requires
     ]

@@ -45,10 +45,11 @@ def match_version_ref_pattern(filename: Path, pattern: str, fallback: NotSet | T
 
 def match_version_ref_pattern_on_lines(filename: Path, pattern: str) -> list[VersionRef]:
   """ Like #match_version_ref_pattern(), but returns all matches, but matches it on a line-by-line basis. The
-  *pattern* must have a `version` group. """
+  *pattern* must have a `version` group. The pattern is compiled with #re.M and #re.S flags. """
 
+  compiled_pattern = re.compile(pattern, re.M | re.S)
   refs = []
-  for match in re.finditer(pattern, filename.read_text()):
+  for match in re.finditer(compiled_pattern, filename.read_text()):
     refs.append(VersionRef(
       file=filename,
       start=match.start('version'),
