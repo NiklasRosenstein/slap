@@ -47,7 +47,6 @@ mypy = "^0.931"
 docs = ["mkdocs", "mkdocs-material", "novella==0.1.15", "pydoc-markdown==4.6.0"]
 
 [tool.poetry.scripts]
-slam = "clap.__main__:main"  # For backwards compatibility
 clap = "clap.__main__:main"
 
 [tool.poetry.plugins."clap.plugins.application"]
