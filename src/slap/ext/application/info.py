@@ -33,6 +33,7 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
         else '[]' if len(packages_list or []) == 0
         else ", ".join(f"<opt>{p.name} ({os.path.relpath(p.root, project.directory)})</opt>" for p in packages_list))
       self.line(f'Project <s>"{os.path.relpath(project.directory, Path.cwd())}" (id: <opt>{project.id}</opt>)</s>')
+      self.line(f'  version: <opt>{project.version()}</opt>')
       self.line(f'  dist-name: <opt>{project.dist_name()}</opt>')
       self.line(f'  packages: {packages}')
       self.line(f'  readme: <opt>{project.handler().get_readme(project)}</opt>')

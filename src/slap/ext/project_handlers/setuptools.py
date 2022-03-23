@@ -3,8 +3,9 @@
 
 import typing as t
 
-from slap.project import Dependencies, Package, Project
 from slap.ext.project_handlers.default import DefaultProjectHandler
+from slap.project import Dependencies, Package, Project
+from slap.release import VersionRef, match_version_ref_pattern
 
 
 class SetuptoolsProjectHandler(DefaultProjectHandler):
@@ -66,6 +67,18 @@ class SetuptoolsProjectHandler(DefaultProjectHandler):
       parse_list_semi(options.get('setup_requires', '')) + parse_list_semi(options.get('tests_require', '')),
       {extra: parse_list_semi(value) for extra, value in options.get('extras_require', {}).items()}
     )
+
+  def get_version_refs(self, project: Project) -> list[VersionRef]:
+    """ Returns the version reference in `setup.cfg`. """
+
+    VERSION_PATTERN = r'^version\s*=\s*(.*?)$'
+
+    try:
+      version_ref = match_version_ref_pattern(project.directory / 'setup.cfg', VERSION_PATTERN)
+    except ValueError:
+      version_ref = None
+
+    return [version_ref] if version_ref else []
 
 
 def parse_list_semi(val: str) -> t.List[str]:
