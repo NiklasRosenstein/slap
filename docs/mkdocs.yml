@@ -17,6 +17,8 @@ nav:
   - Guides:
     - guides/github.md
     - guides/publishing.md
+  - Plugins:
+    - plugins/project-handlers.md
   - API:
     - api/plugins.md
     - api/documentation.md
