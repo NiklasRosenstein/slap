@@ -52,8 +52,14 @@ class ChangelogDeser(abc.ABC):
   @abc.abstractmethod
   def load(self, fp: t.TextIO, filename: str) -> Changelog: ...
 
+  def save(self, changelog: Changelog, fp: t.TextIO, filename: str) -> None:
+    fp.write(self.dump(changelog))
+
   @abc.abstractmethod
-  def save(self, changelog: Changelog, fp: t.TextIO, filename: str) -> None: ...
+  def dump(self, changelog: Changelog) -> str: ...
+
+  @abc.abstractmethod
+  def dump_entry(self, entry: ChangelogEntry) -> str: ...
 
 
 class TomlChangelogDeser(ChangelogDeser):
@@ -63,10 +69,18 @@ class TomlChangelogDeser(ChangelogDeser):
     import tomli
     return databind.json.load(tomli.loads(fp.read()), Changelog, filename=filename)
 
-  def save(self, changelog: Changelog, fp: t.TextIO, filename: str) -> None:
+  def dump(self, changelog: Changelog) -> str:
     import databind.json
+    from databind.core.settings import SerializeDefaults
     import tomli_w
-    fp.write(tomli_w.dumps(t.cast(dict, databind.json.dump(changelog, Changelog))))
+    data = databind.json.dump(changelog, Changelog, settings=[SerializeDefaults(False)])
+    return tomli_w.dumps(t.cast(dict, data))
+
+  def dump_entry(self, entry: ChangelogEntry) -> str:
+    import databind.json
+    from databind.core.settings import SerializeDefaults
+    import tomli_w
+    return tomli_w.dumps(t.cast(dict, databind.json.dump(entry, ChangelogEntry, settings=[SerializeDefaults(False)])))
 
 
 class ManagedChangelog:

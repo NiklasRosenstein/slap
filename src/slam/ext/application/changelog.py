@@ -10,7 +10,7 @@ from databind.core.settings import Alias
 
 from slam.application import Application, Command, argument, option
 from slam.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
-from slam.changelog import Changelog, ChangelogManager, ManagedChangelog
+from slam.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
 from slam.project import Project
 from slam.repository import Issue, PullRequest, Repository
 from slam.util.pygments import toml_highlight
@@ -175,7 +175,7 @@ class ChangelogAddCommand(BaseChangelogCommand):
     changelog.entries.append(entry)
     unreleased.save(changelog)
 
-    print(toml_highlight(t.cast(dict, databind.json.dump(entry))))
+    print(toml_highlight(self.manager.deser.dump_entry(entry)))
 
     if self.option("commit"):
       assert vcs is not None
@@ -600,7 +600,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
 
     if self.option("dry"):
       self.io.write_line(f'<fg=cyan;options=underline># {dest.path}</fg>')
-      print(toml_highlight(t.cast(dict, databind.json.dump(changelog))))
+      print(toml_highlight(self.manager.deser.dump(changelog)))
     else:
       dest.save(changelog)
 
