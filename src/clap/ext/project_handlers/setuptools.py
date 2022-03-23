@@ -11,7 +11,7 @@ class SetuptoolsProjectHandler(DefaultProjectHandler):
 
   def __init__(self) -> None:
     self._project: Project | None = None
-    self._setup_cfg: t.Dict[str, t.Dict[str, t.Any]] = None
+    self._setup_cfg: t.Dict[str, t.Dict[str, t.Any]] | None = None
 
   def _get_setup_cfg(self, project: Project) -> t.Dict[str, t.Any]:
     import configparser
@@ -22,6 +22,7 @@ class SetuptoolsProjectHandler(DefaultProjectHandler):
       self._project = project
     else:
       assert self._project is project
+      assert self._setup_cfg is not None
     return self._setup_cfg
 
   # ProjectHandlerPlugin
@@ -33,9 +34,7 @@ class SetuptoolsProjectHandler(DefaultProjectHandler):
     return build_backend == 'setuptools.build_meta'
 
   def get_dist_name(self, project: Project) -> str | None:
-    cfg = self._get_setup_cfg(project)
-    print(cfg)
-    return cfg.get('metadata', {}).get('name')
+    return self._get_setup_cfg(project).get('metadata', {}).get('name')
 
   def get_readme(self, project: Project) -> str | None:
     cfg = self._get_setup_cfg(project)
@@ -46,8 +45,8 @@ class SetuptoolsProjectHandler(DefaultProjectHandler):
 
   def get_packages(self, project: Project) -> list[Package] | None:
     # TODO (@NiklasRosenstein): Handle namespace_packages as well
-    options = self._get_setup_cfg(project).get('options')
-    packages = options.get('packages')
+    options = self._get_setup_cfg(project).get('options', {})
+    packages: str | None = options.get('packages')
     if packages is None or packages.strip() == 'find:':
       # Auto detect packages
       # TODO (@NiklasRosenstein): Limit to the package_dir in setup.cfg?

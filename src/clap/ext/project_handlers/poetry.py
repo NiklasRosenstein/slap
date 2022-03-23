@@ -10,11 +10,6 @@ from clap.ext.project_handlers.default import DefaultProjectHandler
 
 class PoetryProjectHandler(DefaultProjectHandler):
 
-  def _get_pyproject(self, project: Project) -> dict[str, t.Any] :
-    if not project.is_python_project:
-      return None
-    return project.pyproject_toml.value_or({})
-
   # ProjectHandlerPlugin
 
   def matches_project(self, project: Project) -> bool:

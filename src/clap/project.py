@@ -96,7 +96,7 @@ class Project(Configuration):
 
     handler_name = self.config().handler
     if handler_name is None:
-      for handler_name, loader in iter_entrypoints(ProjectHandlerPlugin):
+      for handler_name, loader in iter_entrypoints(ProjectHandlerPlugin):  # type: ignore[misc]
         handler = loader()()
         if handler.matches_project(self):
           break

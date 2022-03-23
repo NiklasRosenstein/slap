@@ -1,10 +1,13 @@
 
 """ Project handler for projects using the Flit build system. """
 
+import logging
 import typing as t
 
 from clap.project import Dependencies, Project
 from clap.ext.project_handlers.default import DefaultProjectHandler
+
+logger = logging.getLogger(__name__)
 
 
 class FlitProjectHandler(DefaultProjectHandler):
@@ -28,10 +31,23 @@ class FlitProjectHandler(DefaultProjectHandler):
     )
 
   def get_dependencies(self, project: Project) -> Dependencies:
-    flit: dict[str, t.Any] = project.pyproject_toml.get('tool', {}).get('flit', {})
-    optional = flit.get('requires-extra', {}).get('dev', [])
-    return Dependencies(
-      flit.get('requires', []),
-      optional.pop('dev', []),
-      optional,
-    )
+    flit: dict[str, t.Any] | None = project.pyproject_toml.get('tool', {}).get('flit')
+    project_conf: dict[str, t.Any] | None = project.pyproject_toml.get('project')
+
+    if project_conf is not None:
+      optional = project_conf.get('optional-dependencies', {})
+      return Dependencies(
+        project_conf.get('dependencies', []),
+        optional.pop('dev', []),
+        optional,
+      )
+    elif flit is not None:
+      optional = flit.get('requires-extra', {}).get('dev', [])
+      return Dependencies(
+        flit.get('requires', []),
+        optional.pop('dev', []),
+        optional,
+      )
+    else:
+      logger.warning('Unable to read dependencies for project <subj>%s</subj>', project)
+      return Dependencies([], [], {})

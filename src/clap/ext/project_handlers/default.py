@@ -1,9 +1,6 @@
 
 """ Implements the default package detection plugin. """
 
-import logging
-import re
-import typing as t
 from pathlib import Path
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
@@ -14,7 +11,6 @@ from clap.plugins import ProjectHandlerPlugin
 from clap.project import Dependencies, Package, Project
 
 IGNORED_MODULES = ['test', 'tests', 'docs', 'build']
-logger = logging.getLogger(__name__)
 
 
 def detect_packages(directory: Path) -> list[Package]:
@@ -67,7 +63,8 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     return type(self).__name__
 
   def get_readme(self, project: Project) -> str | None:
-    return get_file_in_directory(project.directory, 'README', ['README.rst'])
+    path = get_file_in_directory(project.directory, 'README', ['README.rst'])
+    return path.name if path else None
 
   def get_packages(self, project: Project) -> list[Package] | None:
     source_dir = project.config().source_directory
@@ -82,26 +79,3 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
 
   def get_dependencies(self, project: Project) -> Dependencies:
     return Dependencies([], [], {})
-
-    flit: dict[str, t.Any] | None = pyproject.get('tool', {}).get('flit')
-    project_conf: dict[str, t.Any] | None = pyproject.get('project')
-
-    if project_conf:
-      logger.info('Reading <val>[project]</val> dependencies for project <subj>%s</subj>', project)
-      optional = project_conf.get('optional-dependencies', {})
-      return Dependencies(
-        project_conf.get('dependencies', []),
-        optional.pop('dev', []),
-        optional,
-      )
-    elif flit:
-      logger.info('Reading <val>[tool.flit]</val> dependencies for project <subj>%s</subj>', project)
-      optional = flit.get('requires-extra', {}).get('dev', [])
-      return Dependencies(
-        flit.get('requires', []),
-        optional.pop('dev', []),
-        optional,
-      )
-    else:
-      logger.info('Unable to identify dependencies source for project <subj>%s</subj>', project)
-      return Dependencies([], [], {})
