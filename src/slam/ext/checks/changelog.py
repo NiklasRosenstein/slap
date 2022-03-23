@@ -16,7 +16,7 @@ class ChangelogValidationCheckPlugin(CheckPlugin):
     yield self._check_changelogs()
 
   def _check_changelogs(self) -> Check:
-    from databind.core import ConversionError
+    from databind.core.converter import ConversionError
 
     bad_changelogs = []
     count = 0

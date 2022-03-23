@@ -6,7 +6,7 @@ import dataclasses
 import typing as t
 from pathlib import Path
 
-from databind.core.annotations import union
+from databind.core.settings import Union
 from nr.util.functional import Once
 
 from slam.configuration import Configuration
@@ -35,7 +35,7 @@ class PullRequest:
   shortform: str
 
 
-@union(union.Subtypes.entrypoint('slam.plugins.repository_host'))
+@Union('!slam.plugins.repository_host')
 class RepositoryHost(abc.ABC):
   """ Interface for repository hosting services to resolve issue and pull request references, comment on issues
   and create releases. """

@@ -7,7 +7,8 @@ import typing as t
 import typing_extensions as te
 from pathlib import Path
 
-from databind.core.annotations import alias, fieldinfo
+from databind.core.settings import Alias
+from databind.json.settings import Remainder
 
 from slam.application import Application, Command, argument, option
 from slam.configuration import Configuration
@@ -32,10 +33,10 @@ class ReleaseConfig:
   branch: str = 'develop'
 
   #: The template for the commit message when a release is created and the `--tag, -t` option is used.
-  commit_message: t.Annotated[str, alias('commit-message')] = 'release {version}'
+  commit_message: t.Annotated[str, Alias('commit-message')] = 'release {version}'
 
   #: The template for the tag name when a release is created and the `--tag, -t` option is used.
-  tag_format: t.Annotated[str, alias('tag-format')] = '{version}'
+  tag_format: t.Annotated[str, Alias('tag-format')] = '{version}'
 
   #: A list of references to the version number that should be updated along with the version numbers
   #: that the release command knows about by default (like the `version` in `pyproject.toml` and the
@@ -47,7 +48,7 @@ class ReleaseConfig:
   plugins: list[str] = dataclasses.field(default_factory=lambda: ['changelog_release', 'interdependencies', 'source_code_version'])
 
   # Extra settings for other things, for example by plugins.
-  extra: te.Annotated[dict[str, t.Any], fieldinfo(flat=True)] = dataclasses.field(default_factory=dict)
+  extra: te.Annotated[dict[str, t.Any], Remainder()] = dataclasses.field(default_factory=dict)
 
 
 class ReleaseCommandPlugin(Command, ApplicationPlugin):

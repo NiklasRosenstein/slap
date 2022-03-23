@@ -2,7 +2,7 @@
 import dataclasses
 import typing as t
 
-from databind.core.annotations import alias
+from databind.core.settings import Alias
 from nr.util.fs import get_file_in_directory
 
 from slam.plugins import RepositoryHandlerPlugin
@@ -20,7 +20,7 @@ class DefaultRepositoryConfig:
   include: list[str] | None = None
 
   #: The repository hosting service. If not specified, it will be detected automatically.
-  repository_host: t.Annotated[RepositoryHost | None, alias('repository-host')] = None
+  repository_host: t.Annotated[RepositoryHost | None, Alias('repository-host')] = None
 
 
 class DefaultRepositoryHandler(RepositoryHandlerPlugin):

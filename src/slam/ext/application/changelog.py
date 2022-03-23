@@ -6,7 +6,7 @@ import re
 import typing as t
 from pathlib import Path
 
-from databind.core.annotations import alias
+from databind.core.settings import Alias
 
 from slam.application import Application, Command, argument, option
 from slam.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
@@ -52,7 +52,7 @@ class ChangelogConfig:
 
   #: The list of valid types that can be used in changelog entries. The default types are
   #: #DEFAULT_CHANGELOG_TYPES.
-  valid_types: t.Annotated[list[str] | None, alias('valid-types')] = dataclasses.field(
+  valid_types: t.Annotated[list[str] | None, Alias('valid-types')] = dataclasses.field(
       default_factory=lambda: list(DEFAULT_VALID_TYPES))
 
 

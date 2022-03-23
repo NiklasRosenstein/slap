@@ -16,7 +16,7 @@ from cleo.helpers import argument, option  # type: ignore[import]
 from cleo.io.inputs.argument import Argument  # type: ignore[import]
 from cleo.io.inputs.option import Option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
-from databind.core.annotations import alias
+from databind.core.settings import Alias
 
 from slam import __version__
 
@@ -156,7 +156,7 @@ class ApplicationConfig:
   disable: list[str] = dataclasses.field(default_factory=list)
 
   #: A list of plugins to enable only, causing the default plugins to not be loaded.
-  enable_only: t.Annotated[list[str] | None, alias('enable-only')] = None
+  enable_only: t.Annotated[list[str] | None, Alias('enable-only')] = None
 
 
 class Application:
@@ -196,14 +196,11 @@ class Application:
   def _get_application_configuration(self) -> ApplicationConfig:
     """ Loads the application-level configuration. """
 
-    import databind.json
-    from databind.core.annotations import enable_unknowns
+    from databind.json import load
+    from databind.json.settings import ExtraKeys
 
-    return databind.json.load(
-      self.repository.raw_config().get('application', {}),
-      ApplicationConfig,
-      options=[enable_unknowns()]
-    )
+    raw_config = self.repository.raw_config().get('application', {})
+    return load(raw_config, ApplicationConfig, settings=[ExtraKeys(True)])
 
   def _get_main_project(self) -> Project | None:
     """ Returns the main project, which is the one closest to the current working directory. """

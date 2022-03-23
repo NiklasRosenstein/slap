@@ -9,7 +9,7 @@ import typing as t
 import uuid
 from pathlib import Path
 
-from databind.core.annotations import alias
+from databind.core.settings import Alias
 from nr.util.weak import weak_property
 
 
@@ -44,7 +44,7 @@ class ChangelogEntry:
 @dataclasses.dataclass
 class Changelog:
   entries: list[ChangelogEntry] = dataclasses.field(default_factory=list)
-  release_date: t.Annotated[datetime.date | None, alias("release-date")] = None
+  release_date: t.Annotated[datetime.date | None, Alias("release-date")] = None
 
 
 class ChangelogDeser(abc.ABC):

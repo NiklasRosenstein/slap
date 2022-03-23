@@ -13,7 +13,7 @@ import requests
 import textwrap
 import typing as t
 
-from databind.core.annotations import alias
+from databind.core.settings import Alias
 
 BASE_URL = 'https://enterprise.dejacode.com/licenses/public/{}/'
 
@@ -21,47 +21,47 @@ BASE_URL = 'https://enterprise.dejacode.com/licenses/public/{}/'
 @dataclasses.dataclass
 class SpdxLicense:
   reference: str
-  is_deprecated_license_id: t.Annotated[bool, alias('isDeprecatedLicenseId')]
-  details_url: t.Annotated[str, alias('detailsUrl')]
-  reference_number: t.Annotated[int, alias('referenceNumber')]
+  is_deprecated_license_id: t.Annotated[bool, Alias('isDeprecatedLicenseId')]
+  details_url: t.Annotated[str, Alias('detailsUrl')]
+  reference_number: t.Annotated[int, Alias('referenceNumber')]
   name: str
-  license_id: t.Annotated[str, alias('licenseId')]
-  see_also: t.Annotated[list[str], alias('seeAlso')]
-  is_osi_approved: t.Annotated[bool, alias('isOsiApproved')]
-  is_fsf_libre: t.Annotated[bool | None, alias('isFsfLibre')] = None
+  license_id: t.Annotated[str, Alias('licenseId')]
+  see_also: t.Annotated[list[str], Alias('seeAlso')]
+  is_osi_approved: t.Annotated[bool, Alias('isOsiApproved')]
+  is_fsf_libre: t.Annotated[bool | None, Alias('isFsfLibre')] = None
 
 
 @dataclasses.dataclass
 class DejaCodeLicense:
   license_text: str
-  key: t.Annotated[str, alias('Key')]
-  name: t.Annotated[str, alias('Name')]
-  short_name: t.Annotated[str, alias('Short Name')]
-  category: t.Annotated[str, alias('Category')]
-  license_type: t.Annotated[str, alias('License type')]
-  license_profile: t.Annotated[str, alias('License profile')]
-  license_style: t.Annotated[str, alias('License style')]
-  owner: t.Annotated[str, alias('Owner')]
-  spdx_short_identifier: t.Annotated[str, alias('SPDX short identifier')]
-  keywords: t.Annotated[str, alias('Keywords')]
-  standard_notice: t.Annotated[str | None, alias('Standard notice')]
-  special_obligations: t.Annotated[str | None, alias('Special obligations')]
-  publication_year: t.Annotated[int, alias('Publication year')]
-  urn: t.Annotated[str, alias('URN')]
-  dataspace: t.Annotated[str, alias('Dataspace')]
-  homepage_url: t.Annotated[str, alias('Homepage URL')]
-  text_urls: t.Annotated[str, alias('Text URLs')]
-  osi_url: t.Annotated[str, alias('OSI URL')]
-  faq_url: t.Annotated[str, alias('FAQ URL')]
-  guidance_url: t.Annotated[str | None, alias('Guidance URL')]
-  other_urls: t.Annotated[str, alias('Other URLs')]
+  key: t.Annotated[str, Alias('Key')]
+  name: t.Annotated[str, Alias('Name')]
+  short_name: t.Annotated[str, Alias('Short Name')]
+  category: t.Annotated[str, Alias('Category')]
+  license_type: t.Annotated[str, Alias('License type')]
+  license_profile: t.Annotated[str, Alias('License profile')]
+  license_style: t.Annotated[str, Alias('License style')]
+  owner: t.Annotated[str, Alias('Owner')]
+  spdx_short_identifier: t.Annotated[str, Alias('SPDX short identifier')]
+  keywords: t.Annotated[str, Alias('Keywords')]
+  standard_notice: t.Annotated[str | None, Alias('Standard notice')]
+  special_obligations: t.Annotated[str | None, Alias('Special obligations')]
+  publication_year: t.Annotated[int, Alias('Publication year')]
+  urn: t.Annotated[str, Alias('URN')]
+  dataspace: t.Annotated[str, Alias('Dataspace')]
+  homepage_url: t.Annotated[str, Alias('Homepage URL')]
+  text_urls: t.Annotated[str, Alias('Text URLs')]
+  osi_url: t.Annotated[str, Alias('OSI URL')]
+  faq_url: t.Annotated[str, Alias('FAQ URL')]
+  guidance_url: t.Annotated[str | None, Alias('Guidance URL')]
+  other_urls: t.Annotated[str | None, Alias('Other URLs')]
 
 
 def _get_table_value_by_key(soup, key):
   regex = re.compile('\s*' + re.escape(key) + '\s*')
   item = soup.find('span', text=regex)
   if item is None:
-    raise ValueError('<span/> for {!r} not found'.format(key))
+    raise ValueError('<span/> for key {!r} not found'.format(key))
   value = item.parent.findNext('dd').find('pre').text
   if value == '\xa0':
     value = ''
@@ -86,10 +86,10 @@ def get_license_metadata(license_name: str) -> DejaCodeLicense:
   html = response.text
   soup = bs4.BeautifulSoup(html, 'html.parser')
 
-  # Get the keys that need to be extracted from the dataclass field aliases.
-  from databind.core.types.schema import dataclass_to_schema
-  from databind.json import mapper, load
-  schema = dataclass_to_schema(DejaCodeLicense, mapper())
+  # Get the keys that need to be extracted from the dataclass field aliases
+  from databind.core.schema import convert_dataclass_to_schema
+  from databind.json import load
+  schema = convert_dataclass_to_schema(DejaCodeLicense)
   extract_keys = [field.aliases[0] for field in schema.fields.values() if field.aliases]
 
   data = {}

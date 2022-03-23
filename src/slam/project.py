@@ -6,7 +6,7 @@ import logging
 import typing as t
 from pathlib import Path
 
-from databind.core.annotations import alias
+from databind.core.settings import Alias
 
 from slam.configuration import Configuration
 
@@ -41,7 +41,7 @@ class ProjectConfig:
 
   #: The source directory to use when relying on automatic package detection. If not set, the default project
   #: handler will search in `"src/"`` and then `"./"``.
-  source_directory: t.Annotated[str | None, alias('source-directory')] = None
+  source_directory: t.Annotated[str | None, Alias('source-directory')] = None
 
   #: Whether the project source code is inteded to be typed.
   typed: bool | None = None
@@ -84,9 +84,9 @@ class Project(Configuration):
   def _get_project_configuration(self) -> ProjectConfig:
     """ Loads the project-level configuration. """
 
-    import databind.json
-    from databind.core.annotations import enable_unknowns
-    return databind.json.load(self.raw_config(), ProjectConfig, options=[enable_unknowns()])
+    from databind.json import load
+    from databind.json.settings import ExtraKeys
+    return load(self.raw_config(), ProjectConfig, settings=[ExtraKeys(True)])
 
   def _get_project_handler(self) -> ProjectHandlerPlugin:
     """ Returns the handler for this project. """
