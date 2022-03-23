@@ -15,10 +15,10 @@ it only supports Bash.
 @shell clap venv -i bash :with prefix = "    " @
     ```
 
-=== "$ SLAM_SHADOW=true clap venv -i bash"
+=== "$ CLAP_SHADOW=true clap venv -i bash"
 
     ```
-@shell SLAM_SHADOW=true clap venv -i bash :with prefix = "    " @
+@shell CLAP_SHADOW=true clap venv -i bash :with prefix = "    " @
     ```
 
 ## Synopsis
