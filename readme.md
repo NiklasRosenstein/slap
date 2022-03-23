@@ -1,7 +1,8 @@
-# Install Slam
+# slap &ndash; Install
 
-This action installs the [Slam](https://niklasrosenstein.github.io/slam/) program into your GitHub actions environment
-using Python 3.10 and Pipx.
+  [Slap]: https://github.com/NiklasRosenstein/slap
+
+This action installs the [Slap][] tool into your GitHub actions environment using Python 3.10 and Pipx.
 
 ## Usage
 
@@ -9,9 +10,8 @@ using Python 3.10 and Pipx.
 jobs:
   build:
     steps:
-      - uses: NiklasRosenstein/slam@github-action/install/v1
-        with:
-          version: '1.1.2'
+      - uses: NiklasRosenstein/slam@gha/install/v1
+        with: { version: '1.3.0' }
 ```
 
 If no `version` is specified, or the version is set to `*`, the newest version will be installed.
