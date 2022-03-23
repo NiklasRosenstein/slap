@@ -84,6 +84,18 @@ class ProjectHandlerPlugin(abc.ABC):
   def get_dependencies(self, project: Project) -> Dependencies:
     """ Return the dependencies of the project. """
 
+  def get_version(self, project: Project) -> str | None:
+    """ Return the main project version string. """
+
+    ref = next(iter(self.get_version_refs(project)), None)
+    return ref.value if ref else None
+
+  def get_version_refs(self, project: Project) -> list[VersionRef]:
+    """ Allows the project handler to return additional version refs. Usually returns the version reference in
+    `pyproject.toml`. """
+
+    return []
+
 
 class CheckPlugin(abc.ABC):
   """ This plugin type can be implemented to add custom checks to the `shut check` command. Note that checks will

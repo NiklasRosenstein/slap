@@ -14,6 +14,7 @@ if t.TYPE_CHECKING:
   from nr.util.functional import Once
   from slap.repository import Repository
   from slap.plugins import ProjectHandlerPlugin
+  from slap.release import VersionRef
 
 
 logger = logging.getLogger(__name__)
@@ -80,6 +81,7 @@ class Project(Configuration):
     self.readme = Once(self._get_readme)
     self.dependencies = Once(self._get_dependencies)
     self.dist_name = Once(self._get_dist_name)
+    self.version = Once(self._get_version)
 
   def _get_project_configuration(self) -> ProjectConfig:
     """ Loads the project-level configuration. """
@@ -135,6 +137,12 @@ class Project(Configuration):
 
   def _get_dependencies(self) -> Dependencies:
     return self.handler().get_dependencies(self)
+
+  def _get_version(self) -> str | None:
+    return self.handler().get_version(self)
+
+  def get_version_refs(self) -> list[VersionRef]:
+    return self.handler().get_version_refs(self)
 
   def get_interdependencies(self, projects: t.Sequence[Project]) -> list[Project]:
     """ Returns the dependencies of this project in the list of other projects. The returned dictionary maps

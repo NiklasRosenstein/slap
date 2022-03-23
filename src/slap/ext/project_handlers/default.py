@@ -1,6 +1,7 @@
 
 """ Implements the default package detection plugin. """
 
+import typing as t
 from pathlib import Path
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
@@ -9,6 +10,7 @@ from setuptools import find_namespace_packages, find_packages
 
 from slap.plugins import ProjectHandlerPlugin
 from slap.project import Dependencies, Package, Project
+from slap.release import VersionRef, match_version_ref_pattern
 
 IGNORED_MODULES = ['test', 'tests', 'docs', 'build']
 
@@ -59,6 +61,8 @@ def detect_packages(directory: Path) -> list[Package]:
 class DefaultProjectHandler(ProjectHandlerPlugin):
   """ Base class for other project handlers. It cannot be used directly by a project. """
 
+  package_dirs: t.Sequence[str] = ('src', '.')
+
   def __repr__(self) -> str:
     return type(self).__name__
 
@@ -67,15 +71,26 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     return path.name if path else None
 
   def get_packages(self, project: Project) -> list[Package] | None:
+    """ Detects packages in #package_dirs. """
+
     source_dir = project.config().source_directory
     if source_dir:
       return detect_packages(project.directory / source_dir)
     else:
-      for source_dir in ('src', '.'):
+      for source_dir in self.package_dirs:
         packages = detect_packages(project.directory / source_dir)
         if packages:
           return packages
     return []
 
-  def get_dependencies(self, project: Project) -> Dependencies:
-    return Dependencies([], [], {})
+  def get_version_refs(self, project: Project) -> list[VersionRef]:
+    """ Returns the version ref in `pyproject.toml` it can be found. """
+
+    PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
+
+    try:
+      version_ref = match_version_ref_pattern(project.pyproject_toml.path, PYPROJECT_TOML_PATTERN)
+    except ValueError:
+      version_ref = None
+
+    return [version_ref] if version_ref else []

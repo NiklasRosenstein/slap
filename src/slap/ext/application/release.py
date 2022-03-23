@@ -284,7 +284,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
     from poetry.core.semver.version import Version
 
-    current_version = {r.value for r in version_refs if r.file.name == 'pyproject.toml'}
+    current_version = {r.value for r in version_refs}
     if len(current_version) != 1:
       raise ValueError('could not determine current version number')
 
@@ -388,23 +388,16 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
     from slap.release import match_version_ref_pattern
 
-    PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
-
     version_refs = []
 
     # Understand the version references defined in the project configuration.
     for project in self.app.repository.projects():
-      references = self.config[project].references[:]
 
       # Always consider the version number in the pyproject.toml.
       if project.pyproject_toml.exists():
-        pyproject_ref_config = VersionRefConfig(
-          str(project.pyproject_toml.path.relative_to(project.directory)),
-          PYPROJECT_TOML_PATTERN
-        )
-        references.insert(0, pyproject_ref_config)
+        version_refs += project.get_version_refs()
 
-      for config in references:
+      for config in self.config[project].references:
         pattern = config.pattern.replace('{version}', r'(.*?)')
         version_ref = match_version_ref_pattern(project.directory / config.file, pattern)
         if version_ref and version_ref.value == '':

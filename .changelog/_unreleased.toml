@@ -27,3 +27,9 @@ id = "fb745286-30a0-40cf-9a2f-b40970e48ffa"
 type = "feature"
 description = "add `slap.check.check()` decorator and `slap.check.get_checks()` function to make implementing check plugins more convenient"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "ac717886-ad1e-4e5c-a918-b8729e215745"
+type = "improvement"
+description = "add `Project.version()` and `Project.get_version_refs()`"
+author = "@NiklasRosenstein"
