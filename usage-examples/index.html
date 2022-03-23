@@ -820,7 +820,7 @@ Project &quot;.&quot; (id: slam-cli)
     run:
       - beautifulsoup4 (&gt;=4.10.0,&lt;5.0.0)
       - cleo (&gt;=1.0.0a4)
-      - databind (&gt;=1.5.1,&lt;2.0.0)
+      - databind (&gt;=2.0.0a1,&lt;3.0.0)
       - flit (&gt;=3.6.0,&lt;4.0.0)
       - nr.util (&gt;=0.8.4,&lt;1.0.0)
       - poetry-core (&gt;=1.1.0a6,&lt;2.0.0)
@@ -864,7 +864,7 @@ want to deliberately install into a global Python environment, pass the <code>--
 </blockquote>
 <h2 id="check-your-project-configuration">Check your project configuration</h2>
 <p>The <code>slam check</code> command provides some feedback on the sanity of your project configuration.</p>
-<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 73 changelogs are valid.
+<div class="highlight"><span class="filename">$ slam check</span><pre><span></span><code>  changelog:validate           OK             — All 74 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slam/slam/src/slam
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -906,6 +906,8 @@ bumping 2 version references to 1.2.5
   pyproject.toml:       1.2.4 → 1.2.5 # version = &quot;1.2.4&quot;
   src/slam/__init__.py: 1.2.4 → 1.2.5 # __version__ = &#39;1.2.4&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.2.5.toml
 
 tagging 1.2.5
 
