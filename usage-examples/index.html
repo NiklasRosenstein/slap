@@ -866,7 +866,7 @@ command).</p>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;, &#39;slam-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.2.4
+  version: 1.3.0
   dist-name: slap-cli
   packages: slap (src)
   readme: readme.md
@@ -897,7 +897,7 @@ Project &quot;.&quot; (id: slap-cli)
       - novella (==0.1.15)
       - pydoc-markdown (==4.6.0)
 Project &quot;slam-cli&quot; (id: slam-cli)
-  version: 1.2.4
+  version: 1.3.0
   dist-name: slam-cli
   packages: none
   readme: readme.md
@@ -905,7 +905,7 @@ Project &quot;slam-cli&quot; (id: slam-cli)
   depends on: slap-cli
   dependencies:
     run:
-      - slap-cli == 1.2.4
+      - slap-cli == 1.3.0
     dev: none
 </code></pre></div>
 <blockquote>
@@ -972,25 +972,23 @@ it to the <code>origin</code> remote. It can also be used to validate if all ver
 further configuration, the command will find the version in your <code>pyproject.toml</code> as well as the version numbers of
 dependencies to projects in the same monorepository (if applicable) and the <code>__version__</code> in your source code.</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.2.4 # &#39;version = &quot;1.2.4&quot;&#39;
-  slam-cli/setup.cfg:   1.2.4 # &#39;version = 1.2.4&#39;
-                        1.2.4 # &#39;install_requires =\n    slap-cli == 1.2.4&#39;
-  src/slap/__init__.py: 1.2.4 # &quot;__version__ = &#39;1.2.4&#39;&quot;
+  pyproject.toml:       1.3.0 # &#39;version = &quot;1.3.0&quot;&#39;
+  slam-cli/setup.cfg:   1.3.0 # &#39;version = 1.3.0&#39;
+                        1.3.0 # &#39;install_requires =\n    slap-cli == 1.3.0&#39;
+  src/slap/__init__.py: 1.3.0 # &quot;__version__ = &#39;1.3.0&#39;&quot;
 </code></pre></div>
 <p>To create a new release, pass the version number of a version bump rule instead.</p>
 <div class="highlight"><span class="filename">$ slap release --tag --push patch --dry</span><pre><span></span><code>dry mode enabled, no changes will be committed to disk
-bumping 4 version references to 1.2.5
-  pyproject.toml:       1.2.4 → 1.2.5 # &#39;version = &quot;1.2.4&quot;&#39;
-  slam-cli/setup.cfg:   1.2.4 → 1.2.5 # &#39;version = 1.2.4&#39;
-                        1.2.4 → 1.2.5 # &#39;install_requires =\n    slap-cli == 1.2.4&#39;
-  src/slap/__init__.py: 1.2.4 → 1.2.5 # &quot;__version__ = &#39;1.2.4&#39;&quot;
+bumping 4 version references to 1.3.1
+  pyproject.toml:       1.3.0 → 1.3.1 # &#39;version = &quot;1.3.0&quot;&#39;
+  slam-cli/setup.cfg:   1.3.0 → 1.3.1 # &#39;version = 1.3.0&#39;
+                        1.3.0 → 1.3.1 # &#39;install_requires =\n    slap-cli == 1.3.0&#39;
+  src/slap/__init__.py: 1.3.0 → 1.3.1 # &quot;__version__ = &#39;1.3.0&#39;&quot;
 
-releasing changelog
-  .changelog/_unreleased.toml → .changelog/1.2.5.toml
 
-tagging 1.2.5
+tagging 1.3.1
 
-pushing develop, 1.2.5 to origin
+pushing develop, 1.3.1 to origin
 </code></pre></div>
 <blockquote>
 <p><a href="../commands/release/">More details</a></p>
