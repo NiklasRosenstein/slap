@@ -1,8 +1,8 @@
-name: 'Install Slam'
-description: 'Install Slam into your Action environment using Python 3.10 and Pipx.'
+name: 'Install Slap'
+description: 'Install Slap into your Action environment using Python 3.10 and Pipx.'
 inputs:
   version:
-    description: The Slam version
+    description: The version of Slap to install
     required: true
     default: '*'
 runs:
@@ -13,7 +13,7 @@ runs:
       uses: actions/setup-python@v2
       with: { python-version: "3.10" }
 
-    - name: Install Slam
+    - name: Install Slap
       shell: bash
       run: |
         VERSION='${{ inputs.version }}'
@@ -22,4 +22,4 @@ runs:
         else
           VERSION="==$VERSION"
         fi
-        pip install pipx -q && pipx install "slam-cli$VERSION"
+        pip install pipx -q && pipx install "slap-cli$VERSION"
