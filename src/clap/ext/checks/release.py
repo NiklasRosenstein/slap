@@ -4,7 +4,7 @@ import typing as t
 from cleo.io.null_io import NullIO  # type: ignore[import]
 
 from clap.application import Application
-from clap.check import Check
+from clap.check import Check, CheckResult, check, get_checks
 from clap.ext.release.source_code_version import SourceCodeVersionReferencesPlugin
 from clap.ext.application.release import ReleaseCommandPlugin
 from clap.plugins import CheckPlugin
@@ -14,14 +14,15 @@ from clap.project import Project
 class ReleaseChecksPlugin(CheckPlugin):
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
-    yield self._check_packages_have_source_code_version(project)
+    return get_checks(self, project)
 
   def get_application_checks(self, app: Application) -> t.Iterable[Check]:
-    yield self._check_version_number_consistency(app)
+    return get_checks(self, app)
 
-  def _check_packages_have_source_code_version(self, project: Project) -> Check:
+  @check('source-code-version')
+  def _check_packages_have_source_code_version(self, project: Project) -> tuple[CheckResult, str]:
     if not project.packages():
-      return Check('source-code-version', Check.Result.WARNING, 'No packages detected')
+      return Check.WARNING, 'No packages detected'
 
     matcher = SourceCodeVersionReferencesPlugin()
     matcher.io = NullIO()
@@ -33,15 +34,15 @@ class ReleaseChecksPlugin(CheckPlugin):
         if ref.file.is_relative_to(package.path):
           packages_without_version.discard(package.name)
 
-    return Check(
-      'source-code-version',
+    return (
       Check.ERROR if packages_without_version else Check.OK,
       (f'The following packages have no <b>__version__</b>: <b>{", ".join(packages_without_version)}</b>')
         if packages_without_version else
         f'Found <b>__version__</b> in <b>{", ".join(x.name for x in project.packages() or [])}</b>'
     )
 
-  def _check_version_number_consistency(self, app: Application) -> Check:
+  @check('consistent-versions')
+  def _check_version_number_consistency(self, app: Application) -> tuple[CheckResult, str]:
     releaser = ReleaseCommandPlugin()
     releaser.load_configuration(app)
 
@@ -58,4 +59,4 @@ class ReleaseChecksPlugin(CheckPlugin):
       result = Check.ERROR
       message = f'Found <b>{cardinality}</b> differing version references'
 
-    return Check('consistent-versions', result, message)
+    return result, message

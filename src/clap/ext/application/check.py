@@ -123,7 +123,7 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
             yield check
             checks.append(check)
         except Exception as exc:
-          logger.exception('Uncaught exception in application checks for plugin <val>%s</val>', plugin_name)
+          logger.exception('Uncaught exception in project checks for plugin <val>%s</val>', plugin_name)
           check = Check(f'{plugin_name}', CheckResult.ERROR, str(exc))
           yield check
           checks.append(check)
@@ -140,8 +140,14 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
     checks = []
     for plugin_name in sorted(plugin_names):
       plugin = load_entrypoint(CheckPlugin, plugin_name)()
-      for check in sorted(plugin.get_application_checks(self.app), key=lambda c: c.name):
-        check.name = f'{plugin_name}:{check.name}'
+      try:
+        for check in sorted(plugin.get_application_checks(self.app), key=lambda c: c.name):
+          check.name = f'{plugin_name}:{check.name}'
+          yield check
+          checks.append(check)
+      except Exception as exc:
+        logger.exception('Uncaught exception in application checks for plugin <val>%s</val>', plugin_name)
+        check = Check(f'{plugin_name}', CheckResult.ERROR, str(exc))
         yield check
         checks.append(check)
 

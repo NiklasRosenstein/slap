@@ -2,7 +2,7 @@
 import typing as t
 
 from clap.plugins import CheckPlugin
-from clap.check import Check
+from clap.check import Check, CheckResult, check, get_checks
 from clap.project import Project
 
 
@@ -11,22 +11,21 @@ class GeneralChecksPlugin(CheckPlugin):
   # TODO (@NiklasRosenstein): Check if VCS remote is configured?
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
-    yield self._check_detect_packages(project)
-    yield self._check_py_typed(project)
+    return get_checks(self, project)
 
-  def _check_detect_packages(self, project: Project) -> Check:
+  @check('packages')
+  def _check_detect_packages(self, project: Project) -> tuple[CheckResult, str | None]:
     packages = project.packages()
-    return Check(
-      'packages',
-      Check.Result.SKIPPED if packages is None else Check.Result.OK if packages else Check.Result.ERROR,
-      'Detected ' + ", ".join(f'<b>{p.root}/{p.name}</b>' for p in packages) if packages else None
-    )
+    result = Check.Result.SKIPPED if packages is None else Check.Result.OK if packages else Check.Result.ERROR
+    message = 'Detected ' + ", ".join(f'<b>{p.root}/{p.name}</b>' for p in packages) if packages else None
+    return result, message
 
-  def _check_py_typed(self, project: Project) -> Check:
+  @check('typed')
+  def _check_py_typed(self, project: Project) -> tuple[CheckResult, str]:
     check_name = 'typed'
     expect_typed = project.config().typed
     if expect_typed is None:
-      return Check(check_name, Check.Result.WARNING, '<b>tool.clap.typed</b> is not set')
+      return Check.Result.WARNING, '<b>tool.clap.typed</b> is not set'
 
     has_py_typed = set[str]()
     has_no_py_typed = set[str]()
@@ -43,8 +42,7 @@ class GeneralChecksPlugin(CheckPlugin):
       error = False
       message = '<b>py.typed</b> exists as expected' if expect_typed else '<b>py.typed</b> does not exist as expected'
 
-    return Check(
-      check_name,
+    return (
       Check.Result.ERROR if error else Check.Result.OK,
       message
     )

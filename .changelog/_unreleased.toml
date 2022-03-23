@@ -21,3 +21,9 @@ id = "71d0c4b2-e7c4-4474-b688-20bc9a06a624"
 type = "feature"
 description = "add `-b,--build-directory` option to `clap publish` command"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "fb745286-30a0-40cf-9a2f-b40970e48ffa"
+type = "feature"
+description = "add `slam.check.check()` decorator and `slam.check.get_checks()` function to make implementing check plugins more convenient"
+author = "@NiklasRosenstein"
