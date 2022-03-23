@@ -135,3 +135,16 @@ def get_spdx_licenses() -> dict[str, SpdxLicense]:
   response.raise_for_status()
   licenses = databind.json.load(response.json()['licenses'], list[SpdxLicense], filename=url)
   return {l.license_id: l for l in licenses}
+
+
+if __name__ == '__main__':
+  import argparse
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-l", "--list", action="store_true")
+  parser.add_argument("license", nargs='?')
+  args = parser.parse_args()
+  if args.list:
+    for key, value in get_spdx_licenses().items():
+      print(key, value)
+  else:
+    print(get_license_metadata(args.license))
