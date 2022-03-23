@@ -175,9 +175,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
     app.cleo.add(self)
 
   def handle(self) -> int:
-    if not self.option("name"):
-      self.line_error('error: <opt>--name</opt> is required', 'error')
-      return 1
+    from nr.util.optional import Optional
 
     template = self.option("template")
     if template not in TEMPLATES:
@@ -185,7 +183,13 @@ class InitCommandPlugin(ApplicationPlugin, Command):
       return 1
 
     author = get_git_author()
-    directory = Path(self.argument("directory") or self.option("name").replace('.', '-'))
+    name = self.option("name")
+    directory = (
+      Optional(self.argument("directory"))
+      .map(Path)
+      .map(lambda v: v or (name.replace('.', '-') if name else None))
+      .or_else_get(Path.cwd)
+    )
 
     scope = {
       'license': self.option("license"),
