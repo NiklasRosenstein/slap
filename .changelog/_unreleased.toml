@@ -3,3 +3,9 @@ id = "3f6cc68c-9ae1-4814-a9d9-a5799af9a300"
 type = "improvement"
 description = "upgrade to using `databind` 2.x"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f0bcce7c-345c-42eb-851f-7c4b8f44a546"
+type = "breaking change"
+description = "Rename Slam to Clap"
+author = "@NiklasRosenstein"

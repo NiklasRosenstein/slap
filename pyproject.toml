@@ -3,23 +3,23 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "slam-cli"
+name = "clap-cli"
 version = "1.2.4"
 description = "Slam is a command-line utility for developing Python applications."
 authors = ["Niklas Rosenstein <rosensteinniklas@gmail.com>"]
 license = "MIT"
 readme = "readme.md"
-packages = [{ include="slam", from="src" }]
+packages = [{ include="clap", from="src" }]
 classifiers = [
-"Development Status :: 3 - Alpha",
-"Environment :: Console",
-"Programming Language :: Python :: 3.10",
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Programming Language :: Python :: 3.10",
 ]
 
 [tool.poetry.urls]
-Documentation = "https://niklasrosenstein.github.io/slam/"
-Homepage = "https://github.com/NiklasRosenstein/slam"
-Repository = "https://github.com/NiklasRosenstein/slam.git"
+Documentation = "https://niklasrosenstein.github.io/clap/"
+Homepage = "https://github.com/NiklasRosenstein/clap"
+Repository = "https://github.com/NiklasRosenstein/clap.git"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -47,61 +47,62 @@ mypy = "^0.931"
 docs = ["mkdocs", "mkdocs-material", "novella==0.1.15", "pydoc-markdown==4.6.0"]
 
 [tool.poetry.scripts]
-slam = "slam.__main__:main"
+slam = "clap.__main__:main"  # For backwards compatibility
+clap = "clap.__main__:main"
 
-[tool.poetry.plugins."slam.plugins.application"]
-changelog = "slam.ext.application.changelog:ChangelogCommandPlugin"
-check = "slam.ext.application.check:CheckCommandPlugin"
-info = "slam.ext.application.info:InfoCommandPlugin"
-init = "slam.ext.application.init:InitCommandPlugin"
-install = "slam.ext.application.install:InstallCommandPlugin"
-link = "slam.ext.application.link:LinkCommandPlugin"
-publish = "slam.ext.application.publish:PublishCommandPlugin"
-release = "slam.ext.application.release:ReleaseCommandPlugin"
-run = "slam.ext.application.run:RunCommandPlugin"
-test = "slam.ext.application.test:TestCommandPlugin"
-venv = "slam.ext.application.venv:VenvPlugin"
+[tool.poetry.plugins."clap.plugins.application"]
+changelog = "clap.ext.application.changelog:ChangelogCommandPlugin"
+check = "clap.ext.application.check:CheckCommandPlugin"
+info = "clap.ext.application.info:InfoCommandPlugin"
+init = "clap.ext.application.init:InitCommandPlugin"
+install = "clap.ext.application.install:InstallCommandPlugin"
+link = "clap.ext.application.link:LinkCommandPlugin"
+publish = "clap.ext.application.publish:PublishCommandPlugin"
+release = "clap.ext.application.release:ReleaseCommandPlugin"
+run = "clap.ext.application.run:RunCommandPlugin"
+test = "clap.ext.application.test:TestCommandPlugin"
+venv = "clap.ext.application.venv:VenvPlugin"
 
-[tool.poetry.plugins."slam.plugins.changelog_update_automation"]
-github-actions = "slam.ext.changelog_update_automation.github_actions:GithubActionsChangelogUpdateAutomationPlugin"
+[tool.poetry.plugins."clap.plugins.changelog_update_automation"]
+github-actions = "clap.ext.changelog_update_automation.github_actions:GithubActionsChangelogUpdateAutomationPlugin"
 
-[tool.poetry.plugins."slam.plugins.check"]
-changelog = "slam.ext.checks.changelog:ChangelogValidationCheckPlugin"
-general = "slam.ext.checks.general:GeneralChecksPlugin"
-poetry = "slam.ext.checks.poetry:PoetryChecksPlugin"
-release = "slam.ext.checks.release:ReleaseChecksPlugin"
+[tool.poetry.plugins."clap.plugins.check"]
+changelog = "clap.ext.checks.changelog:ChangelogValidationCheckPlugin"
+general = "clap.ext.checks.general:GeneralChecksPlugin"
+poetry = "clap.ext.checks.poetry:PoetryChecksPlugin"
+release = "clap.ext.checks.release:ReleaseChecksPlugin"
 
-[tool.poetry.plugins."slam.plugins.release"]
-changelog_release = "slam.ext.release.changelog:ChangelogReleasePlugin"
-interdependencies = "slam.ext.release.interdependencies:InterdependenciesReleasePlugin"
-source_code_version = "slam.ext.release.source_code_version:SourceCodeVersionReferencesPlugin"
+[tool.poetry.plugins."clap.plugins.release"]
+changelog_release = "clap.ext.release.changelog:ChangelogReleasePlugin"
+interdependencies = "clap.ext.release.interdependencies:InterdependenciesReleasePlugin"
+source_code_version = "clap.ext.release.source_code_version:SourceCodeVersionReferencesPlugin"
 
-[tool.poetry.plugins."slam.plugins.version_incrementing_rule"]
-major = "slam.ext.version_incrementing_rule:major"
-premajor = "slam.ext.version_incrementing_rule:premajor"
-minor = "slam.ext.version_incrementing_rule:minor"
-preminor = "slam.ext.version_incrementing_rule:preminor"
-patch = "slam.ext.version_incrementing_rule:patch"
-prepatch = "slam.ext.version_incrementing_rule:prepatch"
-prerelease = "slam.ext.version_incrementing_rule:prerelease"
+[tool.poetry.plugins."clap.plugins.version_incrementing_rule"]
+major = "clap.ext.version_incrementing_rule:major"
+premajor = "clap.ext.version_incrementing_rule:premajor"
+minor = "clap.ext.version_incrementing_rule:minor"
+preminor = "clap.ext.version_incrementing_rule:preminor"
+patch = "clap.ext.version_incrementing_rule:patch"
+prepatch = "clap.ext.version_incrementing_rule:prepatch"
+prerelease = "clap.ext.version_incrementing_rule:prerelease"
 
-[tool.poetry.plugins."slam.plugins.project"]
-default = "slam.ext.project_handlers.default:DefaultProjectHandler"
+[tool.poetry.plugins."clap.plugins.project"]
+default = "clap.ext.project_handlers.default:DefaultProjectHandler"
 
-[tool.poetry.plugins."slam.plugins.repository"]
-default = "slam.ext.repository_handlers.default:DefaultRepositoryHandler"
+[tool.poetry.plugins."clap.plugins.repository"]
+default = "clap.ext.repository_handlers.default:DefaultRepositoryHandler"
 
-[tool.poetry.plugins."slam.plugins.repository_host"]
-github = "slam.ext.repository_hosts.github:GithubRepositoryHost"
+[tool.poetry.plugins."clap.plugins.repository_host"]
+github = "clap.ext.repository_hosts.github:GithubRepositoryHost"
 
-[tool.slam]
+[tool.clap]
 typed = true
 
-[tool.slam.test]
+[tool.clap.test]
 mypy = "mypy src --namespace-packages"
-check = "slam check"
+check = "clap check"
 
-[tool.slam.run]
+[tool.clap.run]
 "docs:dev" = "cd docs && novella --serve"
 
 [tool.mypy]

@@ -1,24 +1,24 @@
 # Venv
 
-The `slam venv` command is a utility for managing virtual environments created using the standard library `venv`
+The `clap venv` command is a utility for managing virtual environments created using the standard library `venv`
 module in the current directory or globally (in `~/.local/venvs`).
 
 ## Usage
 
-First, the `slam` command needs to be shadowed by a function in your shell to make proper use of the `-a,--activate`
+First, the `clap` command needs to be shadowed by a function in your shell to make proper use of the `-a,--activate`
 option. The `-i,--init-code` option can provide you with a snippet to place in your shell init scripts. Currently,
 it only supports Bash.
 
-=== "$ slam venv -i bash"
+=== "$ clap venv -i bash"
 
     ```
-@shell slam venv -i bash :with prefix = "    " @
+@shell clap venv -i bash :with prefix = "    " @
     ```
 
-=== "$ SLAM_SHADOW=true slam venv -i bash"
+=== "$ SLAM_SHADOW=true clap venv -i bash"
 
     ```
-@shell SLAM_SHADOW=true slam venv -i bash :with prefix = "    " @
+@shell SLAM_SHADOW=true clap venv -i bash :with prefix = "    " @
     ```
 
 ## Synopsis
@@ -26,11 +26,11 @@ it only supports Bash.
 ### venv
 
 ```
-@shell cd .. && slam venv -h
+@shell cd .. && clap venv -h
 ```
 
 ### venv link
 
 ```
-@shell cd .. && slam venv link -h
+@shell cd .. && clap venv link -h
 ```
