@@ -1,8 +1,8 @@
 # Configuration
 
-The Clap configuration is read either from a `clap.toml` file or from the `[tool.clap]` section in `pyproject.toml`.
+The Clap configuration is read either from a `slap.toml` file or from the `[tool.slap]` section in `pyproject.toml`.
 
-When a configuration value is described in the documentation, it is referenced without the `[tool.clap]` prefix that
+When a configuration value is described in the documentation, it is referenced without the `[tool.slap]` prefix that
 is needed in the case where the configuration is loaded from `pyproject.toml`.
 
 Check out the documentation for each command separately to understand how they can be configured.

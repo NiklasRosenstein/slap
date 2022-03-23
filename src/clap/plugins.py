@@ -9,23 +9,23 @@ from nr.util.generic import T
 if t.TYPE_CHECKING:
   from pathlib import Path
   from poetry.core.semver.version import Version  # type: ignore[import]
-  from clap.application import Application, IO
-  from clap.check import Check
-  from clap.project import Dependencies, Package, Project
-  from clap.release import VersionRef
-  from clap.repository import Repository, RepositoryHost
-  from clap.util.vcs import Vcs
+  from slap.application import Application, IO
+  from slap.check import Check
+  from slap.project import Dependencies, Package, Project
+  from slap.release import VersionRef
+  from slap.repository import Repository, RepositoryHost
+  from slap.util.vcs import Vcs
 
 
 class ApplicationPlugin(t.Generic[T], abc.ABC):
   """ A plugin that is activated on application load, usually used to register additional CLI commands. """
 
-  ENTRYPOINT = 'clap.plugins.application'
+  ENTRYPOINT = 'slap.plugins.application'
 
   @abc.abstractmethod
   def load_configuration(self, app: Application) -> T:
     """ Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Clap
-    configuration, which is either loaded from `pyproject.toml` or `clap.toml`. Use #Application.raw_config
+    configuration, which is either loaded from `pyproject.toml` or `slap.toml`. Use #Application.raw_config
     to access the Clap configuration. """
 
   @abc.abstractmethod
@@ -37,7 +37,7 @@ class ApplicationPlugin(t.Generic[T], abc.ABC):
 class RepositoryHandlerPlugin(abc.ABC):
   """ A plugin to provide data and operations on a repository level. """
 
-  ENTRYPOINT = 'clap.plugins.repository'
+  ENTRYPOINT = 'slap.plugins.repository'
 
   @abc.abstractmethod
   def matches_repository(self, repository: Repository) -> bool:
@@ -61,7 +61,7 @@ class ProjectHandlerPlugin(abc.ABC):
   the Clap tooling and the actual project configuration, allowing different types of configurations to be adapted and
   used with Clap. """
 
-  ENTRYPOINT = 'clap.plugins.project'
+  ENTRYPOINT = 'slap.plugins.project'
 
   @abc.abstractmethod
   def matches_project(self, project: Project) -> bool:
@@ -90,7 +90,7 @@ class CheckPlugin(abc.ABC):
   be grouped and their names prefixed with the plugin name, so that name does not need to be included in the name
   of the returned checks. """
 
-  ENTRYPOINT = 'clap.plugins.check'
+  ENTRYPOINT = 'slap.plugins.check'
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
     return []
@@ -100,11 +100,11 @@ class CheckPlugin(abc.ABC):
 
 
 class ReleasePlugin(abc.ABC):
-  """ This plugin type provides additional references to the project's version number allowing `clap release` to
+  """ This plugin type provides additional references to the project's version number allowing `slap release` to
   update these references to a new version number.
   """
 
-  ENTRYPOINT = 'clap.plugins.release'
+  ENTRYPOINT = 'slap.plugins.release'
 
   app: Application
   io: IO
@@ -124,23 +124,23 @@ class ReleasePlugin(abc.ABC):
 
 
 class VersionIncrementingRulePlugin(abc.ABC):
-  """ This plugin type can be implemented to provide rules accepted by the `clap release <rule>` command to "bump" an
-  existing version number to another. The builtin rules implemented in #clap.ext.version_incrementing_rules.
+  """ This plugin type can be implemented to provide rules accepted by the `slap release <rule>` command to "bump" an
+  existing version number to another. The builtin rules implemented in #slap.ext.version_incrementing_rules.
   """
 
-  ENTRYPOINT = 'clap.plugins.version_incrementing_rule'
+  ENTRYPOINT = 'slap.plugins.version_incrementing_rule'
 
   def increment_version(self, version: Version) -> Version: ...
 
 
 class ChangelogUpdateAutomationPlugin(abc.ABC):
-  """ This plugin type can be used with the `clap changelog update-pr -use <plugin_name>` option. It provides all the
+  """ This plugin type can be used with the `slap changelog update-pr -use <plugin_name>` option. It provides all the
   details derivable from the environment (e.g. environment variables available from CI builds) that can be used to
   detect which changelog entries have been added in a pull request, the pull request URL and the means to publish
   the changes back to the original repository.
   """
 
-  ENTRYPOINT = 'clap.plugins.changelog_update_automation'
+  ENTRYPOINT = 'slap.plugins.changelog_update_automation'
 
   io: IO
 

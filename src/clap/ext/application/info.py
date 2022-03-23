@@ -1,8 +1,8 @@
 
 import os
 from pathlib import Path
-from clap.application import Application, Command, option
-from clap.plugins import ApplicationPlugin
+from slap.application import Application, Command, option
+from slap.plugins import ApplicationPlugin
 
 
 class InfoCommandPlugin(Command, ApplicationPlugin):

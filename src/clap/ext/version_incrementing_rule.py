@@ -3,7 +3,7 @@ import typing as t
 
 from poetry.core.semver.version import Version  # type: ignore[import]
 
-from clap.plugins import VersionIncrementingRulePlugin
+from slap.plugins import VersionIncrementingRulePlugin
 
 
 def incrementing_rule(func: t.Callable[[Version], Version]) -> type[VersionIncrementingRulePlugin]:

@@ -5,8 +5,8 @@ import textwrap
 import typing as t
 from pathlib  import Path
 
-from clap.application import Application, Command, option
-from clap.plugins import ApplicationPlugin
+from slap.application import Application, Command, option
+from slap.plugins import ApplicationPlugin
 from .install import venv_check, venv_check_option
 
 
@@ -37,7 +37,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
 
   <b>Example usage:</b>
 
-    <fg=yellow>$</fg> clap link
+    <fg=yellow>$</fg> slap link
     <fg=dark_gray>Discovered modules in /projects/my_package/src: my_package
     Extras to install for deps 'all': {{'.none'}}
     Symlinking src/my_package -> .venv/lib/python3.10/site-packages/my_package</fg>
@@ -114,7 +114,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
     from flit.install import Installer  # type: ignore[import]
     from nr.util.fs import atomic_swap
 
-    from clap.util.pygments import toml_highlight
+    from slap.util.pygments import toml_highlight
 
     if not venv_check(self, 'refusing to link'):
       return 1
@@ -134,7 +134,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
 
       num_projects += 1
       if len(packages) > 1:
-        self.line_error('warning: multiple packages can not currently be installed with <opt>clap link</opt>')
+        self.line_error('warning: multiple packages can not currently be installed with <opt>slap link</opt>')
         num_skipped += 1
         continue
 

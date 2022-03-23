@@ -6,8 +6,8 @@ from pathlib import Path
 
 import requests
 
-from clap.changelog import is_url
-from clap.repository import Issue, PullRequest, Repository, RepositoryHost
+from slap.changelog import is_url
+from slap.repository import Issue, PullRequest, Repository, RepositoryHost
 
 
 @functools.lru_cache()

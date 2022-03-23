@@ -5,10 +5,10 @@ import shlex
 from pathlib import Path
 import subprocess as sp
 
-from clap.application import Application, Command, option
-from clap.plugins import ApplicationPlugin
-from clap.project import Project
-from clap.util.python import Environment
+from slap.application import Application, Command, option
+from slap.plugins import ApplicationPlugin
+from slap.project import Project
+from slap.util.python import Environment
 
 logger = logging.getLogger(__name__)
 venv_check_option = option(
@@ -41,7 +41,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     ),
     option(
       "link",
-      description="Symlink the root project using <opt>clap link</opt> instead of installing it directly.",
+      description="Symlink the root project using <opt>slap link</opt> instead of installing it directly.",
     ),
     option(
       "no-dev",

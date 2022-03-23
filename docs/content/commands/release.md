@@ -1,6 +1,6 @@
 # Release
 
-The `clap release` command updates references to the version number in `pyproject.toml` and your source code, updates
+The `slap release` command updates references to the version number in `pyproject.toml` and your source code, updates
 the unreleased changelog if you make use of Clap's structured changelogs, as well as updating any other versions
 specified in the configuration or detected by other plugins.
 
@@ -11,7 +11,7 @@ It covers the following use cases:
 
 __Example__
 
-    $ clap release patch --tag --push
+    $ slap release patch --tag --push
     bumping 2 version references:
       pyproject.toml: 0.1.0 → 0.1.1
       src/my_package/__init__.py: 0.1.0 → 0.1.1
@@ -42,7 +42,7 @@ __Example__
 __Type__: `str`  
 __Default__: `"develop"`
 
-The branch on which releases are created. Unless `--no-branch-check` is passed to `clap release`, the command will
+The branch on which releases are created. Unless `--no-branch-check` is passed to `slap release`, the command will
 refuse to continue if the current branch name does not match this value.
 
 ### `release.commit-message`
@@ -67,7 +67,7 @@ __Type__: `list[VersionRefConfig]`
 __Default__: `[]`
 
 A list of version references that should be considered in addition to the version references that are automatically
-detected by Clap when updating version numbers across the project with the `clap release` command.
+detected by Clap when updating version numbers across the project with the `slap release` command.
 
 A `VersionRefConfig` contains the fields `file: str` and `pattern: str`. The `file` is considered relative to the
-project directory (which is the directory where the `clap.toml` or `pyproject.toml` configuration file resides).
+project directory (which is the directory where the `slap.toml` or `pyproject.toml` configuration file resides).

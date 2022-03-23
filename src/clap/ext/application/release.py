@@ -10,14 +10,14 @@ from pathlib import Path
 from databind.core.settings import Alias
 from databind.json.settings import Remainder
 
-from clap.application import Application, Command, argument, option
-from clap.configuration import Configuration
-from clap.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRulePlugin
+from slap.application import Application, Command, argument, option
+from slap.configuration import Configuration
+from slap.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRulePlugin
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
-  from clap.project import Project
-  from clap.release import VersionRef
+  from slap.project import Project
+  from slap.release import VersionRef
 
 
 @dataclasses.dataclass
@@ -60,14 +60,13 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
   1. Bump the version number in <u>pyproject.toml</u> and in other files
   2. Add the changed files to Git, create a commit and a tag (<opt>--tag, -t</opt>)
   3. Push the commit and tag to the remote repository (<opt>--push, -p</opt>)
-  4. Create a new release on the repository host (eg. <u>GitHub</u>) (<opt>--create-release, -R</opt>)
 
   In addition to the <u>pyproject.toml</u>, the command will automatically detect the file(s)
   in your Python source code that contain a <b>__version__</b> member and update it as well.
-  Additional files can be updated by configuring the <fg=green>[tool.clap.release.references]</fg>
+  Additional files can be updated by configuring the <fg=green>[tool.slap.release.references]</fg>
   option:
 
-    <fg=green>[tool.clap.release]</fg>
+    <fg=green>[tool.slap.release]</fg>
     <fg=dark_gray>references</fg> = [
       {{ <fg=dark_gray>file</fg> = <fg=yellow>"../frontend/package.json"</fg>, <fg=dark_gray>pattern</fg> = <fg=yellow>"  \\"version\\": \\"{{VERSION}}\\""</fg> }}
     ]
@@ -86,7 +85,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     <u>prerelease</u>.
 
     <u>[Git]</u>: The command will prevent you from bumping the version unless you are on
-    the branch configured under <fg=green>[tool.clap.release.branch]</fg> or "develop" by default.
+    the branch configured under <fg=green>[tool.slap.release.branch]</fg> or "develop" by default.
     If you want to skip that check, pass <opt>--no-branch-check</opt>.
 
   <b>Commit & tag</b>
@@ -94,8 +93,8 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     <u>[Git]</u>: You can use the <opt>--tag, -t</opt> flag to automatically add the updated files,
     create a new commit and tag the commit with the version number. The tag name
     by default will just be the version number, but can be changed by setting the
-    <fg=green>[tool.clap.release.tag_format]</fg>. Similarly, the commit message used can be
-    configured with <fg=green>[tool.clap.release.commit_message]</fg>.
+    <fg=green>[tool.slap.release.tag_format]</fg>. Similarly, the commit message used can be
+    configured with <fg=green>[tool.slap.release.commit_message]</fg>.
 
   <b>Push to remote</b>
 
@@ -103,27 +102,6 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     commit and tag to the remote Git repository immediately. You can specify the
     <opt>--remote, -r</opt> option to change the remote which will be pushed to (defaults
     to "origin").
-
-  <b>Create a release</b>
-
-    You can use the <opt>--create-release, -R</opt> flag to enable creating a release on the
-    repository hosting service. The following hosting services are supported and
-    can be automatically detected or explicitly configured.
-
-    If you make use of changelogs, the changelog contents will be included in the
-    release description.
-
-    <u>[GitHub]</u>: Creates a GitHub release on the repository. Automatically detected
-    for repositories that have a <u>github.com</u> "origin" remote. Otherwise, it can be
-    configured like this:
-
-      <fg=green>[tool.clap.]</fg>
-      <fg=dark_gray>type</fg> = <fg=yellow>"github"</fg>
-      <fg=dark_gray>repo</fg> = <fg=yellow>"my-github-enterprise.com/owner/repo"</fg>
-
-  <b>Environment variables</b>
-
-    <u>SLAM_RELEASE_NO_PLUGINS</u>: If set, no release plugins will be loaded besides the builtin.
   """
 
   app: Application
@@ -136,7 +114,6 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
   options = [
     option("tag", "t", "Create a Git tag after the version numbers were updated."),
     option("push", "p", "Push the changes to the Git remote repository."),
-    option("create-release", "R", "Create a release on the repository service (e.g. GitHub)."),
     option("remote", "r", "The Git remote to push to (only when <opt>--push</opt> is specified).", False),
     option("dry", "d", "Do not commit changes to disk."),
     option("force", "f", "Force tag creation and push."),
@@ -379,7 +356,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     config = self.config[self.app.repository]
 
     if '{version}' not in config.tag_format:
-      self.line_error('<info>tool.clap.release.tag-format<info> must contain <info>{version}</info>', 'error')
+      self.line_error('<info>tool.slap.release.tag-format<info> must contain <info>{version}</info>', 'error')
       sys.exit(1)
     tag_name = config.tag_format.replace('{version}', str(target_version))
     self.line('')
@@ -409,7 +386,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
   def _get_version_refs(self) -> list[VersionRef]:
     """ Extracts all version references in the projects controlled by the application and returns them. """
 
-    from clap.release import match_version_ref_pattern
+    from slap.release import match_version_ref_pattern
 
     PYPROJECT_TOML_PATTERN = r'^version\s*=\s*[\'"]?(.*?)[\'"]'
 

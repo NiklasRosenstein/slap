@@ -5,17 +5,17 @@ import typing as t
 from databind.core.settings import Alias
 from nr.util.fs import get_file_in_directory
 
-from clap.plugins import RepositoryHandlerPlugin
-from clap.project import Project
-from clap.repository import Repository, RepositoryHost
-from clap.util.vcs import Vcs, detect_vcs
+from slap.plugins import RepositoryHandlerPlugin
+from slap.project import Project
+from slap.repository import Repository, RepositoryHost
+from slap.util.vcs import Vcs, detect_vcs
 
 
 @dataclasses.dataclass
 class DefaultRepositoryConfig:
   #: A list of paths pointing to projects to include in the application invokation. This is useful if multiple
   #: projects should be usable with the Clap CLI in unison. Note that if this option is not set and either no
-  #: configuration file exists in the CWD or the `clap.toml` is used, all immediate subdirectories that contain
+  #: configuration file exists in the CWD or the `slap.toml` is used, all immediate subdirectories that contain
   #: a `pyproject.toml` will be considered included projects.
   include: list[str] | None = None
 
@@ -47,7 +47,7 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
     return config
 
   def matches_repository(self, repository: Repository) -> bool:
-    if repository.pyproject_toml.exists() or repository.slam_toml.exists():
+    if repository.pyproject_toml.exists() or repository.slap_toml.exists():
       return True
     # NOTE(@NiklasRosenstein): This is where we would update the repository root directory.
     # vcs = self.get_vcs(repository)
@@ -74,7 +74,7 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
     return None
 
   def get_projects(self, repository: Repository) -> list[Project]:
-    from clap.project import Project
+    from slap.project import Project
 
     projects = []
     if repository.pyproject_toml.exists():

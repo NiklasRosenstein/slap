@@ -1,7 +1,7 @@
 # API Documentation
 
-@pydoc clap.application.Application
+@pydoc slap.application.Application
 
 ---
 
-@pydoc clap.plugins
+@pydoc slap.plugins

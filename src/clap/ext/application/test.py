@@ -6,9 +6,9 @@ from pathlib import Path
 
 from nr.util.singleton import NotSet
 
-from clap.application import Application, Command, IO, argument, option
-from clap.plugins import ApplicationPlugin
-from clap.project import Project
+from slap.application import Application, Command, IO, argument, option
+from slap.plugins import ApplicationPlugin
+from slap.project import Project
 
 logger = logging.getLogger(__name__)
 
@@ -81,17 +81,17 @@ class Test(t.NamedTuple):
 
 class TestCommandPlugin(Command, ApplicationPlugin):
   """
-  Execute commands configured in <code>[tool.clap.test]</code>.
+  Execute commands configured in <code>[tool.slap.test]</code>.
 
   <b>Example configuration:</b>
 
-    <fg=cyan>[tool.clap.test]</fg>
+    <fg=cyan>[tool.slap.test]</fg>
     <fg=green>pytest</fg> = <fg=yellow>"pytest --cov=my_package tests/"</fg>
     <fg=green>mypy</fg> = <fg=yellow>"mypy src"</fg>
 
   <b>Example usage:</b>
 
-    <fg=yellow>$</fg> clap test
+    <fg=yellow>$</fg> slap test
     <fg=dark_gray>mypy | Success: no issues found in 12 source files
     pytest | ===================================== test session starts ======================================
     pytest | platform linux -- Python 3.10.2, pytest-6.2.5, py-1.11.0, pluggy-1.0.0

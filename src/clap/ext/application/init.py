@@ -3,11 +3,11 @@ import datetime
 import textwrap
 from pathlib import Path
 
-from clap import __version__
-from clap.application import Application, Command, argument, option
-from clap.plugins import ApplicationPlugin
-from clap.util.external.licenses import get_license_metadata, wrap_license_text
-from clap.util.vcs import get_git_author
+from slap import __version__
+from slap.application import Application, Command, argument, option
+from slap.plugins import ApplicationPlugin
+from slap.util.external.licenses import get_license_metadata, wrap_license_text
+from slap.util.vcs import get_git_author
 
 TEMPLATES = {
   'poetry': {
@@ -40,11 +40,11 @@ TEMPLATES = {
       mypy = "*"
       pytest = "*"
 
-      [tool.clap]
+      [tool.slap]
       typed = true
 
-      [tool.clap.test]
-      check = "clap check"
+      [tool.slap.test]
+      check = "slap check"
       mypy = "MYPYPATH=src mypy src/ --namespace-packages --explicit-package-bases"
       pytest = "pytest test/ -vv"
 

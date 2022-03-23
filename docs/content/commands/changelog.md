@@ -1,14 +1,14 @@
 # Changelog
 
-The `clap log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
-but the directory can be changed using the `tool.clap.changelog-dir` option. The CLI allows you to add new entries
+The `slap log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
+but the directory can be changed using the `tool.slap.changelog-dir` option. The CLI allows you to add new entries
 as well as print them in a pretty format in the terminal or render the changelog as Markdown.
 
 A changelog entry has a unique ID, one or more tags that categorize the type of change, one or more authors,
 a short description, maybe a link to a pull request and links to issues that are fixed by the change.
 
 ```toml
-$ clap log add -t fix,docs -m 'Fix the documentation' --fixes 231,234
+$ slap log add -t fix,docs -m 'Fix the documentation' --fixes 231,234
 # Added changelog entry to .changelog/_unreleased.toml
 id = "d0092ba"
 tags = [ "fix", "docs" ]
@@ -21,7 +21,7 @@ pr = null
 ```
 
 The `pr` value can be set manually once a PR was created, or be updated automatically for example through a GitHub
-action or other type of CI job (the `clap log inject-pr-url` command can help with that).
+action or other type of CI job (the `slap log inject-pr-url` command can help with that).
 
 ## Update the PR field in CI checks
 
@@ -39,9 +39,9 @@ __Example for GitHub Actions__
       uses: actions/setup-python@v2
       with: { python-version: "3.10" }
     - name: Install Clap
-      run: pip install clap-cli==1.0.0
+      run: pip install slap-cli==1.0.0
     - name: Update PR references in changelogs
-      run: clap -vv changelog update-pr --use github-actions
+      run: slap -vv changelog update-pr --use github-actions
 ```
 
 Note that you still have to configure Git such that it has an author email and name to create the commit with.

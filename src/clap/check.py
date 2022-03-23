@@ -8,8 +8,8 @@ import typing as t
 from nr.util.generic import T
 
 if t.TYPE_CHECKING:
-  from clap.application import Application
-  from clap.project import Project
+  from slap.application import Application
+  from slap.project import Project
 
 
 class CheckResult(enum.IntEnum):
@@ -66,8 +66,8 @@ def check(name: str) -> t.Callable[
   """
 
   import functools
-  from clap.application import Application
-  from clap.project import Project
+  from slap.application import Application
+  from slap.project import Project
 
   def decorator(f: t.Callable) -> t.Callable:
     sig = inspect.signature(f)

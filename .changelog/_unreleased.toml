@@ -7,7 +7,7 @@ author = "@NiklasRosenstein"
 [[entries]]
 id = "f0bcce7c-345c-42eb-851f-7c4b8f44a546"
 type = "breaking change"
-description = "Rename Slam to Clap"
+description = "Rename Slam to Slap"
 author = "@NiklasRosenstein"
 
 [[entries]]
@@ -19,11 +19,11 @@ author = "@NiklasRosenstein"
 [[entries]]
 id = "71d0c4b2-e7c4-4474-b688-20bc9a06a624"
 type = "feature"
-description = "add `-b,--build-directory` option to `clap publish` command"
+description = "add `-b,--build-directory` option to `slap publish` command"
 author = "@NiklasRosenstein"
 
 [[entries]]
 id = "fb745286-30a0-40cf-9a2f-b40970e48ffa"
 type = "feature"
-description = "add `slam.check.check()` decorator and `slam.check.get_checks()` function to make implementing check plugins more convenient"
+description = "add `slap.check.check()` decorator and `slap.check.get_checks()` function to make implementing check plugins more convenient"
 author = "@NiklasRosenstein"

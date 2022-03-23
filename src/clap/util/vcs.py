@@ -11,7 +11,7 @@ from nr.util.functional import Consumer
 from nr.util.git import Git as _Git, NoCurrentBranchError
 from nr.util.generic import T
 
-from clap.changelog import is_url
+from slap.changelog import is_url
 
 
 class FileStatus(enum.Enum):

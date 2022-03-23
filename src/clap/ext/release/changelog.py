@@ -2,9 +2,9 @@
 import typing as t
 from pathlib import Path
 
-from clap.ext.application.changelog import get_changelog_manager
-from clap.plugins import ReleasePlugin
-from clap.project import Project
+from slap.ext.application.changelog import get_changelog_manager
+from slap.plugins import ReleasePlugin
+from slap.project import Project
 
 
 class ChangelogReleasePlugin(ReleasePlugin):

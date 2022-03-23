@@ -15,7 +15,7 @@ from nr.util.weak import weak_property
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
-  from clap.repository import RepositoryHost
+  from slap.repository import RepositoryHost
 
 
 def is_url(s: str) -> bool:

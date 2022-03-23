@@ -1,9 +1,9 @@
 
 import logging
 
-from clap.plugins import ReleasePlugin
-from clap.project import Project
-from clap.release import VersionRef, match_version_ref_pattern
+from slap.plugins import ReleasePlugin
+from slap.project import Project
+from slap.release import VersionRef, match_version_ref_pattern
 
 logger = logging.getLogger(__name__)
 

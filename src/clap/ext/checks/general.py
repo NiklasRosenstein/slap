@@ -1,9 +1,9 @@
 
 import typing as t
 
-from clap.plugins import CheckPlugin
-from clap.check import Check, CheckResult, check, get_checks
-from clap.project import Project
+from slap.plugins import CheckPlugin
+from slap.check import Check, CheckResult, check, get_checks
+from slap.project import Project
 
 
 class GeneralChecksPlugin(CheckPlugin):
@@ -25,7 +25,7 @@ class GeneralChecksPlugin(CheckPlugin):
     check_name = 'typed'
     expect_typed = project.config().typed
     if expect_typed is None:
-      return Check.Result.WARNING, '<b>tool.clap.typed</b> is not set'
+      return Check.Result.WARNING, '<b>tool.slap.typed</b> is not set'
 
     has_py_typed = set[str]()
     has_no_py_typed = set[str]()

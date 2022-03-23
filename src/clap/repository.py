@@ -9,12 +9,12 @@ from pathlib import Path
 from databind.core.settings import Union
 from nr.util.functional import Once
 
-from clap.configuration import Configuration
+from slap.configuration import Configuration
 
 if t.TYPE_CHECKING:
-  from clap.plugins import RepositoryHandlerPlugin
-  from clap.project import Project
-  from clap.util.vcs import Vcs
+  from slap.plugins import RepositoryHandlerPlugin
+  from slap.project import Project
+  from slap.util.vcs import Vcs
 
 
 @dataclasses.dataclass
@@ -35,12 +35,12 @@ class PullRequest:
   shortform: str
 
 
-@Union('!clap.plugins.repository_host')
+@Union('!slap.plugins.repository_host')
 class RepositoryHost(abc.ABC):
   """ Interface for repository hosting services to resolve issue and pull request references, comment on issues
   and create releases. """
 
-  ENTRYPOINT = 'clap.plugins.repository_host'
+  ENTRYPOINT = 'slap.plugins.repository_host'
 
   @abc.abstractmethod
   def get_username(self, repository: Repository) -> str | None: ...
@@ -85,8 +85,8 @@ class Repository(Configuration):
     """ Returns the handler for this repository. """
 
     from nr.util.plugins import load_entrypoint
-    from clap.plugins import RepositoryHandlerPlugin
-    from clap.ext.repository_handlers.default import DefaultRepositoryHandler
+    from slap.plugins import RepositoryHandlerPlugin
+    from slap.ext.repository_handlers.default import DefaultRepositoryHandler
 
     handler: RepositoryHandlerPlugin
     handler_name = self.raw_config().get('repository', {}).get('handler')

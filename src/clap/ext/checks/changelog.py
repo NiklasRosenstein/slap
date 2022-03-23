@@ -2,10 +2,10 @@
 import dataclasses
 import typing as t
 
-from clap.check import Check
-from clap.ext.application.changelog import get_changelog_manager
-from clap.plugins import CheckPlugin
-from clap.project import Project
+from slap.check import Check
+from slap.ext.application.changelog import get_changelog_manager
+from slap.plugins import CheckPlugin
+from slap.project import Project
 
 
 @dataclasses.dataclass

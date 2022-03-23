@@ -8,12 +8,12 @@ from pathlib import Path
 
 from databind.core.settings import Alias
 
-from clap.application import Application, Command, argument, option
-from clap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
-from clap.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
-from clap.project import Project
-from clap.repository import Issue, PullRequest, Repository
-from clap.util.pygments import toml_highlight
+from slap.application import Application, Command, argument, option
+from slap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
+from slap.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
+from slap.project import Project
+from slap.repository import Issue, PullRequest, Repository
+from slap.util.pygments import toml_highlight
 
 logger = logging.getLogger(__name__)
 DEFAULT_VALID_TYPES = [
@@ -91,12 +91,12 @@ class ChangelogAddCommand(BaseChangelogCommand):
     <fg=green>author</fg> = <fg=yellow>"username"</fg>
     <fg=green>pr</fg> = <fg=yellow>"https://github.com/username/my_package/pulls/13"</fg>
 
-  Changelog entries can be managed easily using the <info>clap log</info> command.
+  Changelog entries can be managed easily using the <info>slap log</info> command.
 
-    <fg=yellow>$</fg> clap log add -t feature -d 'Improvement to `my_package.util`"
+    <fg=yellow>$</fg> slap log add -t feature -d 'Improvement to `my_package.util`"
 
   The <fg=green>pr</fg> field is usually set manually after the PR is created or updated
-  automatically by a CI action using the <info>clap log update-pr-field</info> command.
+  automatically by a CI action using the <info>slap log update-pr-field</info> command.
   """
 
   name = "changelog add"

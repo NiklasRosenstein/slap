@@ -11,9 +11,9 @@ some built-in utities to make integration with GitHub easier.
 
 ### Install Clap
 
-  [0]: https://github.com/NiklasRosenstein/clap/tree/github-action/install/v1
+  [0]: https://github.com/NiklasRosenstein/slap/tree/github-action/install/v1
 
-The [`NiklasRosenstein/clap@github-action/install/v1`][0] action installs Clap for you. It does this by setting up
+The [`NiklasRosenstein/slap@github-action/install/v1`][0] action installs Clap for you. It does this by setting up
 Python 3.10 and installing Clap via Pipx.
 
 !!! note
@@ -30,21 +30,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: NiklasRosenstein/clap@github-action/install/v1
+      - uses: NiklasRosenstein/slap@github-action/install/v1
         with: { version: '*' }
       - uses: actions/setup-python@v2
         with: { python-version: "3.x" }
-      - run: clap install --no-venv-check
-      - run: clap test
+      - run: slap install --no-venv-check
+      - run: slap test
 ```
 
 ### Update Changelogs
 
-  [1]: https://github.com/NiklasRosenstein/clap/tree/github-action/changelog-update/v1
+  [1]: https://github.com/NiklasRosenstein/slap/tree/github-action/changelog-update/v1
 
-The `clap changelog update-pr` command updates the PR references of changelogs added between two Git revisions. In
+The `slap changelog update-pr` command updates the PR references of changelogs added between two Git revisions. In
 addition, by passing `--use github-actions`, there is almost no need for any additional configuration inside of a
-GitHub action run for a Pull Request event. The [`NiklasRosenstein/clap@github-action/changelog-update/v1`][1] action
+GitHub action run for a Pull Request event. The [`NiklasRosenstein/slap@github-action/changelog-update/v1`][1] action
 makes automatically updated changelogs a breeze:
 
 ```yaml title=".github/workflows/python.yml"
@@ -55,6 +55,6 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
-      - uses: NiklasRosenstein/clap@github-action/changelog-update/v1
+      - uses: NiklasRosenstein/slap@github-action/changelog-update/v1
         with: { version: '*' }
 ```

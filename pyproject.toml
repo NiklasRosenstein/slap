@@ -3,13 +3,13 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "clap-cli"
+name = "slap-cli"
 version = "1.2.4"
-description = "Slam is a command-line utility for developing Python applications."
+description = "Slap is a command-line utility for developing Python applications."
 authors = ["Niklas Rosenstein <rosensteinniklas@gmail.com>"]
 license = "MIT"
 readme = "readme.md"
-packages = [{ include="clap", from="src" }]
+packages = [{ include="slap", from="src" }]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
@@ -17,9 +17,9 @@ classifiers = [
 ]
 
 [tool.poetry.urls]
-Documentation = "https://niklasrosenstein.github.io/clap/"
-Homepage = "https://github.com/NiklasRosenstein/clap"
-Repository = "https://github.com/NiklasRosenstein/clap.git"
+Documentation = "https://niklasrosenstein.github.io/slap/"
+Homepage = "https://github.com/NiklasRosenstein/slap"
+Repository = "https://github.com/NiklasRosenstein/slap.git"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -47,63 +47,63 @@ mypy = "^0.931"
 docs = ["mkdocs", "mkdocs-material", "novella==0.1.15", "pydoc-markdown==4.6.0"]
 
 [tool.poetry.scripts]
-clap = "clap.__main__:main"
+slap = "slap.__main__:main"
 
-[tool.poetry.plugins."clap.plugins.application"]
-changelog = "clap.ext.application.changelog:ChangelogCommandPlugin"
-check = "clap.ext.application.check:CheckCommandPlugin"
-info = "clap.ext.application.info:InfoCommandPlugin"
-init = "clap.ext.application.init:InitCommandPlugin"
-install = "clap.ext.application.install:InstallCommandPlugin"
-link = "clap.ext.application.link:LinkCommandPlugin"
-publish = "clap.ext.application.publish:PublishCommandPlugin"
-release = "clap.ext.application.release:ReleaseCommandPlugin"
-run = "clap.ext.application.run:RunCommandPlugin"
-test = "clap.ext.application.test:TestCommandPlugin"
-venv = "clap.ext.application.venv:VenvPlugin"
+[tool.poetry.plugins."slap.plugins.application"]
+changelog = "slap.ext.application.changelog:ChangelogCommandPlugin"
+check = "slap.ext.application.check:CheckCommandPlugin"
+info = "slap.ext.application.info:InfoCommandPlugin"
+init = "slap.ext.application.init:InitCommandPlugin"
+install = "slap.ext.application.install:InstallCommandPlugin"
+link = "slap.ext.application.link:LinkCommandPlugin"
+publish = "slap.ext.application.publish:PublishCommandPlugin"
+release = "slap.ext.application.release:ReleaseCommandPlugin"
+run = "slap.ext.application.run:RunCommandPlugin"
+test = "slap.ext.application.test:TestCommandPlugin"
+venv = "slap.ext.application.venv:VenvPlugin"
 
-[tool.poetry.plugins."clap.plugins.changelog_update_automation"]
-github-actions = "clap.ext.changelog_update_automation.github_actions:GithubActionsChangelogUpdateAutomationPlugin"
+[tool.poetry.plugins."slap.plugins.changelog_update_automation"]
+github-actions = "slap.ext.changelog_update_automation.github_actions:GithubActionsChangelogUpdateAutomationPlugin"
 
-[tool.poetry.plugins."clap.plugins.check"]
-changelog = "clap.ext.checks.changelog:ChangelogValidationCheckPlugin"
-general = "clap.ext.checks.general:GeneralChecksPlugin"
-poetry = "clap.ext.checks.poetry:PoetryChecksPlugin"
-release = "clap.ext.checks.release:ReleaseChecksPlugin"
+[tool.poetry.plugins."slap.plugins.check"]
+changelog = "slap.ext.checks.changelog:ChangelogValidationCheckPlugin"
+general = "slap.ext.checks.general:GeneralChecksPlugin"
+poetry = "slap.ext.checks.poetry:PoetryChecksPlugin"
+release = "slap.ext.checks.release:ReleaseChecksPlugin"
 
-[tool.poetry.plugins."clap.plugins.release"]
-changelog_release = "clap.ext.release.changelog:ChangelogReleasePlugin"
-interdependencies = "clap.ext.release.interdependencies:InterdependenciesReleasePlugin"
-source_code_version = "clap.ext.release.source_code_version:SourceCodeVersionReferencesPlugin"
+[tool.poetry.plugins."slap.plugins.release"]
+changelog_release = "slap.ext.release.changelog:ChangelogReleasePlugin"
+interdependencies = "slap.ext.release.interdependencies:InterdependenciesReleasePlugin"
+source_code_version = "slap.ext.release.source_code_version:SourceCodeVersionReferencesPlugin"
 
-[tool.poetry.plugins."clap.plugins.version_incrementing_rule"]
-major = "clap.ext.version_incrementing_rule:major"
-premajor = "clap.ext.version_incrementing_rule:premajor"
-minor = "clap.ext.version_incrementing_rule:minor"
-preminor = "clap.ext.version_incrementing_rule:preminor"
-patch = "clap.ext.version_incrementing_rule:patch"
-prepatch = "clap.ext.version_incrementing_rule:prepatch"
-prerelease = "clap.ext.version_incrementing_rule:prerelease"
+[tool.poetry.plugins."slap.plugins.version_incrementing_rule"]
+major = "slap.ext.version_incrementing_rule:major"
+premajor = "slap.ext.version_incrementing_rule:premajor"
+minor = "slap.ext.version_incrementing_rule:minor"
+preminor = "slap.ext.version_incrementing_rule:preminor"
+patch = "slap.ext.version_incrementing_rule:patch"
+prepatch = "slap.ext.version_incrementing_rule:prepatch"
+prerelease = "slap.ext.version_incrementing_rule:prerelease"
 
-[tool.poetry.plugins."clap.plugins.project"]
-flit = "clap.ext.project_handlers.flit:FlitProjectHandler"
-poetry = "clap.ext.project_handlers.poetry:PoetryProjectHandler"
-setuptools = "clap.ext.project_handlers.setuptools:SetuptoolsProjectHandler"
+[tool.poetry.plugins."slap.plugins.project"]
+flit = "slap.ext.project_handlers.flit:FlitProjectHandler"
+poetry = "slap.ext.project_handlers.poetry:PoetryProjectHandler"
+setuptools = "slap.ext.project_handlers.setuptools:SetuptoolsProjectHandler"
 
-[tool.poetry.plugins."clap.plugins.repository"]
-default = "clap.ext.repository_handlers.default:DefaultRepositoryHandler"
+[tool.poetry.plugins."slap.plugins.repository"]
+default = "slap.ext.repository_handlers.default:DefaultRepositoryHandler"
 
-[tool.poetry.plugins."clap.plugins.repository_host"]
-github = "clap.ext.repository_hosts.github:GithubRepositoryHost"
+[tool.poetry.plugins."slap.plugins.repository_host"]
+github = "slap.ext.repository_hosts.github:GithubRepositoryHost"
 
-[tool.clap]
+[tool.slap]
 typed = true
 
-[tool.clap.test]
+[tool.slap.test]
 mypy = "mypy src --namespace-packages"
-check = "clap check"
+check = "slap check"
 
-[tool.clap.run]
+[tool.slap.run]
 "docs:dev" = "cd docs && novella --serve"
 
 [tool.mypy]

@@ -4,16 +4,16 @@ Run a command configured under the `run` section.
 
 ## Example
 
-    $ clap run docs:dev
+    $ slap run docs:dev
 
 === "pyproject.toml"
 
     ```toml
-    [tool.clap.run]
+    [tool.slap.run]
     "docs:dev" = "cd docs && novella --serve"
     ```
 
-=== "clap.toml"
+=== "slap.toml"
 
     ```toml
     [run]

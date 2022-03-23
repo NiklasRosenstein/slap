@@ -18,13 +18,13 @@ from cleo.io.inputs.option import Option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
 from databind.core.settings import Alias
 
-from clap import __version__
+from slap import __version__
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
-  from clap.project import Project
-  from clap.repository import Repository
-  from clap.util.vcs import Vcs
+  from slap.project import Project
+  from slap.repository import Repository
+  from slap.util.vcs import Vcs
 
 __all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
 logger = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ class CleoApplication(BaseCleoApplication):
     self._styles = {}
 
     self._initialized = True
-    from clap.util.cleo import HelpCommand
+    from slap.util.cleo import HelpCommand
     self.add(HelpCommand())
     self._default_command = 'help'
 
@@ -86,7 +86,7 @@ class CleoApplication(BaseCleoApplication):
     output: Output | None = None,
     error_output: Output | None = None
   ) -> IO:
-    from clap.util.cleo import add_style
+    from slap.util.cleo import add_style
 
     io = super().create_io(input, output, error_output)
     for style_name, style in self._styles.items():
@@ -172,7 +172,7 @@ class Application:
   #: The cleo application to which new commands can be registered via #ApplicationPlugin#s.
   cleo: CleoApplication
 
-  def __init__(self, directory: Path | None = None, name: str = 'clap', version: str = __version__) -> None:
+  def __init__(self, directory: Path | None = None, name: str = 'slap', version: str = __version__) -> None:
     from nr.util.functional import Once
     self._directory = directory or Path.cwd()
     self._repository: t.Optional[Repository] = None
@@ -186,7 +186,7 @@ class Application:
     """ Return the Clap repository that is the subject of the current application. There may be command plugins
     that do not require the repository to function, so this property creates the repository lazily. """
 
-    from clap.repository import Repository
+    from slap.repository import Repository
 
     if self._repository is None:
       self._repository = Repository(self._directory)
@@ -229,14 +229,14 @@ class Application:
   def load_plugins(self) -> None:
     """ Loads all application plugins (see #ApplicationPlugin) and activates them.
 
-    By default, all plugins available in the `clap.application.ApplicationPlugin` entry point group are loaded. This
-    behaviour can be modified by setting either the `[tool.clap.plugins.disable]` or `[tool.clap.plugins.enable]`
-    configuration option (without the `tool.clap` prefix in case of a `clap.toml` configuration file). The default
+    By default, all plugins available in the `slap.application.ApplicationPlugin` entry point group are loaded. This
+    behaviour can be modified by setting either the `[tool.slap.plugins.disable]` or `[tool.slap.plugins.enable]`
+    configuration option (without the `tool.slap` prefix in case of a `slap.toml` configuration file). The default
     plugins delivered immediately with Clap are enabled by default unless disabled explicitly with the `disable`
     option. """
 
     from nr.util.plugins import iter_entrypoints
-    from clap.plugins import ApplicationPlugin
+    from slap.plugins import ApplicationPlugin
 
     assert not self._plugins_loaded
     self._plugins_loaded = True

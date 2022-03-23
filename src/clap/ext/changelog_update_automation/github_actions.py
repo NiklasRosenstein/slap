@@ -4,12 +4,12 @@ import os
 import subprocess as sp
 from pathlib import Path
 
-from clap import __version__
-from clap.plugins import ChangelogUpdateAutomationPlugin
+from slap import __version__
+from slap.plugins import ChangelogUpdateAutomationPlugin
 
 
 class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlugin):
-  """ A plugin for use in GitHub Actions via `clap changelog update-pr --use github-actions` which will do all steps
+  """ A plugin for use in GitHub Actions via `slap changelog update-pr --use github-actions` which will do all steps
   to push the updated changelogs back to a pull request branch. It should be used only in an action that is run as
   part of a GitHub pull request.
 
@@ -27,9 +27,9 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
       uses: actions/setup-python@v2
       with: {{ python-version: '3.10' }}
     - name: Install Clap
-      run: pip install clap-cli==1.0.2
+      run: pip install slap-cli==1.0.2
     - name: Update PR references in changelogs
-      run: clap changelog update-pr --use github-actions
+      run: slap changelog update-pr --use github-actions
   ```
 
   GitHub environment variables used:

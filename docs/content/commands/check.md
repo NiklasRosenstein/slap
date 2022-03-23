@@ -1,13 +1,13 @@
 # Check
 
-The `clap check` command performs sanity checks on your project.
+The `slap check` command performs sanity checks on your project.
 
 ## Configuration
 
 ### `check.plugins`
 
 __Type__: `list[str]`  
-__Default__: `["log", "poetry", "release", "clap"]`
+__Default__: `["log", "poetry", "release", "slap"]`
 
 A list of check plugins to use. Note that the Poetry plugin will only fire checks if your project appears to be using
 Poetry, so there is no harm in leaving it enabled even if you don't use it.
@@ -28,15 +28,15 @@ Checks if all structured changelog files managed by Clap can be loaded and are v
 
 ---
 
-### `clap`
+### `slap`
 
 > The `ShutChecksPlugin` provides all Python specific checks.
 
-#### Check `clap:packages`
+#### Check `slap:packages`
 
 Checks if Clap can detect at least one package.
 
-#### Check `clap:typed`
+#### Check `slap:typed`
 
 Checks if the project is typed but does not contain a `py.typed` file or the other way round.
 This currently relies on the `$.typed` configuration and does not inspect the code for type hints.
@@ -77,7 +77,7 @@ __TODO__ Check if the license is a valid SPDX license identifier.
 
 ### `release`
 
-> The `ReleaseChecksPlugin` performs checks to validate that `clap release` can be used properly.
+> The `ReleaseChecksPlugin` performs checks to validate that `slap release` can be used properly.
 
 #### Check `release:version`
 
@@ -86,4 +86,4 @@ Checks if the `__version__` can be detected in the source code of all detected p
 #### Check `release:remote`
 
 __TODO__ Checks if the VCS remote is configured or can be detected automatically such that the
-`clap release --create-release` option can be used.
+`slap release --create-release` option can be used.

@@ -7,8 +7,8 @@ from nr.util.algorithm.longest_common_substring import longest_common_substring
 from nr.util.fs import get_file_in_directory
 from setuptools import find_namespace_packages, find_packages
 
-from clap.plugins import ProjectHandlerPlugin
-from clap.project import Dependencies, Package, Project
+from slap.plugins import ProjectHandlerPlugin
+from slap.project import Dependencies, Package, Project
 
 IGNORED_MODULES = ['test', 'tests', 'docs', 'build']
 

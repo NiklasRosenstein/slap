@@ -6,10 +6,10 @@ import typing as t
 
 from nr.util.plugins import load_entrypoint
 
-from clap.application import Application, Command, option
-from clap.plugins import ApplicationPlugin, CheckPlugin
-from clap.check import Check, CheckResult
-from clap.project import Project
+from slap.application import Application, Command, option
+from slap.plugins import ApplicationPlugin, CheckPlugin
+from slap.check import Check, CheckResult
+from slap.project import Project
 
 logger = logging.getLogger(__name__)
 DEFAULT_PLUGINS = ['changelog', 'general', 'poetry', 'release']

@@ -4,8 +4,8 @@
 import logging
 import typing as t
 
-from clap.project import Dependencies, Project
-from clap.ext.project_handlers.default import DefaultProjectHandler
+from slap.project import Dependencies, Project
+from slap.ext.project_handlers.default import DefaultProjectHandler
 
 logger = logging.getLogger(__name__)
 

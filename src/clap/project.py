@@ -8,12 +8,12 @@ from pathlib import Path
 
 from databind.core.settings import Alias
 
-from clap.configuration import Configuration
+from slap.configuration import Configuration
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
-  from clap.repository import Repository
-  from clap.plugins import ProjectHandlerPlugin
+  from slap.repository import Repository
+  from slap.plugins import ProjectHandlerPlugin
 
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class Package:
 @dataclasses.dataclass
 class ProjectConfig:
   #: The name of the project handler plugin. If none is specified, the built-in project handlers are tested
-  #: (see the #clap.ext.project_handlers module for more info on those).
+  #: (see the #slap.ext.project_handlers module for more info on those).
   handler: str | None = None
 
   #: The source directory to use when relying on automatic package detection. If not set, the default project
@@ -50,7 +50,7 @@ class ProjectConfig:
 class Project(Configuration):
   """ Represents one Python project. Clap can work with multiple projects at the same time, for example if the same
   repository or source code project contains multiple individual Python projects. Every project has its own
-  configuration, either loaded from `clap.toml` or `pyproject.toml`. """
+  configuration, either loaded from `slap.toml` or `pyproject.toml`. """
 
   #: Reference to the Clap application object.
   repository: Repository
@@ -70,10 +70,10 @@ class Project(Configuration):
   def __init__(self, repository: Repository, directory: Path) -> None:
     super().__init__(directory)
     from nr.util.functional import Once
-    from clap.util.toml_file import TomlFile
+    from slap.util.toml_file import TomlFile
 
     self.repository = repository
-    self.usercfg = TomlFile(Path('~/.config/clap/config.toml').expanduser())
+    self.usercfg = TomlFile(Path('~/.config/slap/config.toml').expanduser())
     self.handler = Once(self._get_project_handler)
     self.config = Once(self._get_project_configuration)
     self.packages = Once(self._get_packages)
@@ -92,7 +92,7 @@ class Project(Configuration):
     """ Returns the handler for this project. """
 
     from nr.util.plugins import iter_entrypoints, load_entrypoint
-    from clap.plugins import ProjectHandlerPlugin
+    from slap.plugins import ProjectHandlerPlugin
 
     handler_name = self.config().handler
     if handler_name is None:

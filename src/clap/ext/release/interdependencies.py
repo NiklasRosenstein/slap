@@ -2,9 +2,9 @@
 import re
 import typing as t
 
-from clap.plugins import ReleasePlugin
-from clap.project import Project
-from clap.release import VersionRef
+from slap.plugins import ReleasePlugin
+from slap.project import Project
+from slap.release import VersionRef
 
 
 class InterdependenciesReleasePlugin(ReleasePlugin):
@@ -12,8 +12,8 @@ class InterdependenciesReleasePlugin(ReleasePlugin):
   This is relevant in case when Clap is used in a monorepository where all projects share the same version, and bumping
   version numbers should also bump the version number of dependencies between projects in that monorepository.
 
-  You can disable this behaviour by setting the `tool.clap.release.interdependencies` setting to `False` on the
-  root project (usually in a `clap.toml` file). """
+  You can disable this behaviour by setting the `tool.slap.release.interdependencies` setting to `False` on the
+  root project (usually in a `slap.toml` file). """
 
   def get_version_refs(self, project: Project) -> list[VersionRef]:
     pyproject_file = project.pyproject_toml.path

@@ -4,8 +4,8 @@
 import re
 import typing as t
 
-from clap.project import Dependencies, Package, Project
-from clap.ext.project_handlers.default import DefaultProjectHandler
+from slap.project import Dependencies, Package, Project
+from slap.ext.project_handlers.default import DefaultProjectHandler
 
 
 class PoetryProjectHandler(DefaultProjectHandler):

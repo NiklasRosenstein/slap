@@ -6,11 +6,11 @@ import requests
 from nr.util import Optional
 from nr.util.fs import get_file_in_directory
 
-from clap.check import Check, CheckResult, check, get_checks
-from clap.ext.project_handlers.poetry import PoetryProjectHandler
-from clap.plugins import CheckPlugin
-from clap.project import Project
-from clap.util.external.pypi_classifiers import get_classifiers
+from slap.check import Check, CheckResult, check, get_checks
+from slap.ext.project_handlers.poetry import PoetryProjectHandler
+from slap.plugins import CheckPlugin
+from slap.project import Project
+from slap.util.external.pypi_classifiers import get_classifiers
 
 
 def get_readme_path(project: Project) -> Path | None:
@@ -92,7 +92,7 @@ class PoetryChecksPlugin(CheckPlugin):
 
   @check('license')
   def get_license_check(self, project: Project) -> tuple[CheckResult, str]:
-    from clap.util.external.licenses import get_spdx_licenses
+    from slap.util.external.licenses import get_spdx_licenses
     license = self.poetry.get('license')
     if not license:
       return Check.ERROR, 'Missing license'

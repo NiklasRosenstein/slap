@@ -6,22 +6,22 @@ import subprocess as sp
 import typing as t
 from pathlib import Path
 
-from clap.application import Application, Command, argument, option
-from clap.plugins import ApplicationPlugin
+from slap.application import Application, Command, argument, option
+from slap.plugins import ApplicationPlugin
 
 GLOBAL_BIN_DIRECTORY = Path('~/.local/bin').expanduser()
 GLOBAL_VENVS_DIRECTORY = Path('~/.local/venvs').expanduser()\
 
 SHADOW_INIT_SCRIPTS = {
   'bash': '''
-    function clap() {
-      local ORIGINAL=$(which clap)
+    function slap() {
+      local ORIGINAL=$(which slap)
       if ! [ $? = 0 ]; then
-        >&2 echo "error: command 'clap' does not exist"
+        >&2 echo "error: command 'slap' does not exist"
         return 127
       fi
       if [ "$1" == "venv" ] && [[ "$2" =~ -[gc]*a[gc]* ]]; then
-        eval "$(CLAP_SHADOW=true "$ORIGINAL" "$@")"
+        eval "$(SLAP_SHADOW=true "$ORIGINAL" "$@")"
       else
         "$ORIGINAL" "$@"
       fi
@@ -31,7 +31,7 @@ SHADOW_INIT_SCRIPTS = {
 }
 
 USER_INIT_SCRIPTS = {
-  'bash': 'which clap >/dev/null && eval "$(CLAP_SHADOW=true clap venv -i bash)"',
+  'bash': 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i bash)"',
 }
 
 
@@ -182,7 +182,7 @@ class VenvCommand(Command):
       self.line(f'• {venv.name.ljust(maxw)}  <code>{venv.get_python_version().splitlines()[0]}</code>')
 
   def _is_called_from_shadow(self) -> bool:
-    return os.getenv('CLAP_SHADOW') == 'true'
+    return os.getenv('SLAP_SHADOW') == 'true'
 
   def _get_init_code(self, shell: str) -> int:
     import textwrap

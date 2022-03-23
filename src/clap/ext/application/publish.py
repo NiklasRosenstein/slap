@@ -3,9 +3,9 @@ import contextlib
 import tempfile
 from pathlib import Path
 
-from clap.application import Application, Command, option
-from clap.plugins import ApplicationPlugin
-from clap.util.python import Pep517BuildBackend
+from slap.application import Application, Command, option
+from slap.plugins import ApplicationPlugin
+from slap.util.python import Pep517BuildBackend
 
 
 class PublishCommandPlugin(Command, ApplicationPlugin):

@@ -1,17 +1,17 @@
 
 import subprocess as sp
-from clap.application import Application, Command, argument
-from clap.plugins import ApplicationPlugin
+from slap.application import Application, Command, argument
+from slap.plugins import ApplicationPlugin
 
 
 class RunCommandPlugin(Command, ApplicationPlugin):
-  """ Run a command configured in <code>[tool.clap.run]</code>"""
+  """ Run a command configured in <code>[tool.slap.run]</code>"""
 
   name = "run"
   arguments = [
     argument(
       "cmd",
-      description="The name of the command to run as it is defined under the <code>clap.run</code> section.",
+      description="The name of the command to run as it is defined under the <code>slap.run</code> section.",
     ),
   ]
 
