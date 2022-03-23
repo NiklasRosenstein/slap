@@ -7,6 +7,7 @@ import typing as t
 from pathlib import Path
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
+from nr.util.fs import get_file_in_directory
 from setuptools import find_namespace_packages, find_packages
 
 from clap.plugins import ProjectHandlerPlugin
@@ -59,72 +60,16 @@ def detect_packages(directory: Path) -> list[Package]:
   return [Package(module, paths[module], directory) for module in modules]
 
 
-def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> list[str]:
-  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
-
-  if isinstance(dependencies, list):
-    result = []
-    for dep in dependencies:
-      match = re.match(r'\s*[\w\d\-\_]+', dep)
-      if match and not dep.startswith('git+'):
-        result.append(Dependency(match.group(0), dep[match.end():]).to_pep_508())
-      else:
-        result.append(dep)
-    return result
-  elif isinstance(dependencies, dict):
-    result = []
-    for key, version in dependencies.items():
-      if key == 'python': continue
-      result.append(Dependency(key, version).to_pep_508())
-    return result
-  else:
-    raise TypeError(type(dependencies))
-
-
 class DefaultProjectHandler(ProjectHandlerPlugin):
+  """ Base class for other project handlers. It cannot be used directly by a project. """
 
   def __repr__(self) -> str:
     return type(self).__name__
 
-  def _get_pyproject(self, project: Project) -> dict[str, t.Any] | None:
-    if not project.is_python_project:
-      return None
-    return project.pyproject_toml.value_or({})
-
-  def matches_project(self, project: Project) -> bool:
-    return True
-
-  def get_dist_name(self, project: Project) -> str | None:
-    if (pyproject := self._get_pyproject(project)) is None:
-      return None
-    if (name := pyproject.get('project', {}).get('name')):
-      return name
-    if (name := pyproject.get('tool', {}).get('poetry', {}).get('name')):
-      return name
-    return None
-
   def get_readme(self, project: Project) -> str | None:
-    if (pyproject := self._get_pyproject(project)) is None:
-      return None
-    if (readme := pyproject.get('tool', {}).get('poetry', {}).get('readme')):
-      return readme
-    return None
+    return get_file_in_directory(project.directory, 'README', ['README.rst'])
 
   def get_packages(self, project: Project) -> list[Package] | None:
-    if (pyproject := self._get_pyproject(project)) is not None:
-      packages = pyproject.get('tool', {}).get('poetry', {}).get('packages')
-      if packages is not None:
-        if not packages:
-          return None  # Indicate explicitly that the project does not expose packages
-        return [
-          Package(
-            name=p['include'].replace('/', '.'),
-            path=project.directory / p.get('from', '') / p['include'],
-            root=project.directory / p.get('from', ''),
-          )
-          for p in packages
-        ]
-
     source_dir = project.config().source_directory
     if source_dir:
       return detect_packages(project.directory / source_dir)
@@ -136,10 +81,8 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
     return []
 
   def get_dependencies(self, project: Project) -> Dependencies:
-    if (pyproject := self._get_pyproject(project)) is None:
-      return Dependencies([], [], {})
+    return Dependencies([], [], {})
 
-    poetry: dict[str, t.Any] | None = pyproject.get('tool', {}).get('poetry')
     flit: dict[str, t.Any] | None = pyproject.get('tool', {}).get('flit')
     project_conf: dict[str, t.Any] | None = pyproject.get('project')
 
@@ -150,13 +93,6 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
         project_conf.get('dependencies', []),
         optional.pop('dev', []),
         optional,
-      )
-    elif poetry:
-      logger.info('Reading <val>[tool.poetry]</val> dependencies for project <subj>%s</subj>', project)
-      return Dependencies(
-        convert_poetry_dependencies(poetry.get('dependencies', [])),
-        convert_poetry_dependencies(poetry.get('dev-dependencies', [])),
-        {k: convert_poetry_dependencies(v) for k, v in poetry.get('extras', {}).items()},
       )
     elif flit:
       logger.info('Reading <val>[tool.flit]</val> dependencies for project <subj>%s</subj>', project)

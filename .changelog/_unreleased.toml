@@ -9,3 +9,9 @@ id = "f0bcce7c-345c-42eb-851f-7c4b8f44a546"
 type = "breaking change"
 description = "Rename Slam to Clap"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "52a29516-ef0a-4b53-bd22-1ca5d36b3d9d"
+type = "improvement"
+description = "Split default project handler into separate implementations for Poetry, Flit and Setuptools and properly support Setuptools now (reading `setup.cfg`)"
+author = "@NiklasRosenstein"

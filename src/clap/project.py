@@ -91,14 +91,21 @@ class Project(Configuration):
   def _get_project_handler(self) -> ProjectHandlerPlugin:
     """ Returns the handler for this project. """
 
-    from nr.util.plugins import load_entrypoint
+    from nr.util.plugins import iter_entrypoints, load_entrypoint
     from clap.plugins import ProjectHandlerPlugin
 
-    handler_name = self.config().handler or 'default'
-    assert isinstance(handler_name, str), repr(handler_name)
-
-    handler = load_entrypoint(ProjectHandlerPlugin, handler_name)()  # type: ignore[misc]
-    assert handler.matches_project(self), (self, handler)
+    handler_name = self.config().handler
+    if handler_name is None:
+      for handler_name, loader in iter_entrypoints(ProjectHandlerPlugin):
+        handler = loader()()
+        if handler.matches_project(self):
+          break
+      else:
+        raise RuntimeError(f'unable to identify project handler for {self!r}')
+    else:
+      assert isinstance(handler_name, str), repr(handler_name)
+      handler = load_entrypoint(ProjectHandlerPlugin, handler_name)()  # type: ignore[misc]
+      assert handler.matches_project(self), (self, handler)
     return handler
 
   def _get_packages(self) -> list[Package] | None:

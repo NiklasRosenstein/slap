@@ -87,7 +87,9 @@ prepatch = "clap.ext.version_incrementing_rule:prepatch"
 prerelease = "clap.ext.version_incrementing_rule:prerelease"
 
 [tool.poetry.plugins."clap.plugins.project"]
-default = "clap.ext.project_handlers.default:DefaultProjectHandler"
+flit = "clap.ext.project_handlers.flit:FlitProjectHandler"
+poetry = "clap.ext.project_handlers.poetry:PoetryProjectHandler"
+setuptools = "clap.ext.project_handlers.setuptools:SetuptoolsProjectHandler"
 
 [tool.poetry.plugins."clap.plugins.repository"]
 default = "clap.ext.repository_handlers.default:DefaultRepositoryHandler"
