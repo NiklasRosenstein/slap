@@ -2,7 +2,7 @@ name: "Python Package"
 
 on:
   push:
-    branches: [ "develop" , "rename-to-slap" ]
+    branches: [ "develop" ]
     tags: [ '*' ]
   pull_request:
     branches: [ "develop" ]
