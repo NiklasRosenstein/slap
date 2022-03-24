@@ -129,7 +129,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     extras = {x.strip() for x in (self.option("extras") or self.option("only-extras") or '').split(',') if x.strip()}
     found_extras = {'dev'}
 
-    if not self.option("no-dev"):
+    if not self.option("no-dev") and self.app.repository in self.config:
       extras.update(self.config[self.app.repository].dev_extras or [])
 
     dependencies = []

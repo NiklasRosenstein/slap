@@ -1,0 +1,5 @@
+[[entries]]
+id = "9c86aab8-397c-4aff-a1b9-bc07b983bc57"
+type = "fix"
+description = "Fix `NameError` in non-monorepository scenario when using `slap install`"
+author = "@NiklasRosenstein"
