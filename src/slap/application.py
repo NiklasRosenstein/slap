@@ -211,7 +211,6 @@ class Application:
       path = project.directory.resolve()
       if path == cwd:
         return project
-        closest = project
 
     return None
 
