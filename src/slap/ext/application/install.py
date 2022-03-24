@@ -4,6 +4,7 @@ import logging
 import os
 import shlex
 import subprocess as sp
+import typing as t
 from pathlib import Path
 
 from slap.application import Application, Command, option
@@ -12,7 +13,7 @@ from slap.plugins import ApplicationPlugin
 from slap.project import Project
 from slap.util.python import Environment
 
-from databind.json.settings import ExtraKeys
+from databind.core.settings import Alias, ExtraKeys
 
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,10 @@ class InstallConfig:
   #: for projects as well as the monorepository root. They may contain semantic version selector (same style
   #: as supported by Poetry).
   extras: dict[str, list[str]] = dataclasses.field(default_factory=dict)
+
+  #: A list of extra names to install in addition to `dev` when using `slap install` (unless `--no-dev` is
+  #: specified). If this option is not set, _all_ extras are installed.
+  dev_extras: t.Annotated[list[str] | None, Alias('dev-extras')] = None
 
 
 class InstallCommandPlugin(Command, ApplicationPlugin):
@@ -125,6 +130,9 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     extras = {x.strip() for x in (self.option("extras") or self.option("only-extras") or '').split(',') if x.strip()}
     found_extras = {'dev'}
 
+    if not self.option("no-dev"):
+      extras.update(self.config[self.app.repository].dev_extras or [])
+
     dependencies = []
     for project in projects + project_dependencies:
       if not project.is_python_project: continue
@@ -135,11 +143,22 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     for project in projects:
       if (not self.option("no-dev") and not self.option("only-extras")) or 'dev' in extras:
         dependencies += project.dependencies().dev
-      for extra in extras - {'dev'}:
-        project_extras = project.dependencies().extra.get(extra)
-        if project_extras is not None:
+
+      # Determine the extras to install.
+      config = self.config[project]
+      project_extras = set(extras)
+      if not self.option("no-dev"):
+        if config.dev_extras is None:
+          project_extras.update(project.dependencies().extra.keys())
+          project_extras.update(config.extras.keys())
+        else:
+          project_extras.update(config.dev_extras)
+
+      for extra in project_extras - {'dev'}:
+        extra_deps = project.dependencies().extra.get(extra)
+        if extra_deps is not None:
           found_extras.add(extra)
-          dependencies += project_extras
+          dependencies += extra_deps
 
     # Look for extras also in the Slap specific install configuration.
     for obj, config in self.config.items():

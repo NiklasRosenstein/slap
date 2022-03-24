@@ -1,0 +1,5 @@
+[[entries]]
+id = "1ee0ef1c-40de-4177-b578-8e688fa45b4a"
+type = "improvement"
+description = "`slam install` without `--no-dev` now installs _all_ extras for a project unless the new `[install.dev-extras]` option is set"
+author = "@NiklasRosenstein"

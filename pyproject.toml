@@ -105,6 +105,9 @@ check = "slap check"
 [tool.slap.run]
 "docs:dev" = "cd docs && novella --serve"
 
+[tool.slap.install]
+dev-extras = []
+
 [tool.mypy]
 pretty = true
 warn_redundant_casts = true
