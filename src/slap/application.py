@@ -22,6 +22,7 @@ from slap import __version__
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
+  from slap.configuration import Configuration
   from slap.project import Project
   from slap.repository import Repository
   from slap.util.vcs import Vcs
@@ -213,6 +214,15 @@ class Application:
         return project
 
     return None
+
+  def configurations(self) -> list[Configuration]:
+    """ Return a list of all configuration objects, i.e. all projects and eventually the #Repository, unless one
+    project is from the same directory as the repository. """
+
+    result: list[Configuration] = list(self.repository.projects())
+    if self.repository.directory not in tuple(p.directory for p in self.repository.projects()):
+      result.insert(0, self.repository)
+    return result
 
   def load_plugins(self) -> None:
     """ Loads all application plugins (see #ApplicationPlugin) and activates them.

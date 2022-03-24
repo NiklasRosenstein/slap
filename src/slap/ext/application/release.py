@@ -7,8 +7,7 @@ import typing as t
 import typing_extensions as te
 from pathlib import Path
 
-from databind.core.settings import Alias
-from databind.json.settings import Remainder
+from databind.core.settings import Alias, ExtraKeys, Remainder
 
 from slap.application import Application, Command, argument, option
 from slap.configuration import Configuration
@@ -27,6 +26,7 @@ class VersionRefConfig:
 
 
 @dataclasses.dataclass
+@ExtraKeys(True)
 class ReleaseConfig:
   #: The VCS branch on which releases are allowed. The release command will prevent you from creating a release
   #: while on a different branch (unless `--no-branch-check` is set).
@@ -46,9 +46,6 @@ class ReleaseConfig:
   #: A list of #ReleasePlugins to use. Defaults to contain the #SourceCodeVersionReferencesPlugin
   #: and #ChangelogReleasePlugin.
   plugins: list[str] = dataclasses.field(default_factory=lambda: ['changelog_release', 'source_code_version'])
-
-  # Extra settings for other things, for example by plugins.
-  extra: te.Annotated[dict[str, t.Any], Remainder()] = dataclasses.field(default_factory=dict)
 
 
 class ReleaseCommandPlugin(Command, ApplicationPlugin):
@@ -391,7 +388,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     version_refs = []
 
     # Understand the version references defined in the project configuration.
-    for project in self.app.repository.projects():
+    for project in self.app.configurations():
 
       # Always consider the version number in the pyproject.toml.
       if project.pyproject_toml.exists():

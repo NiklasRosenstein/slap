@@ -93,10 +93,9 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
   ]
 
   def load_configuration(self, app: Application) -> None:
-    from nr.util.stream import Stream
     from databind.json import load
     self.config: dict[Configuration, InstallConfig] = {}
-    for obj in Stream([(  app.repository,), app.repository.projects()]).concat():
+    for obj in app.configurations():
       self.config[obj] = load(obj.raw_config().get('install', {}), InstallConfig, filename=str(obj))
     return None
 
