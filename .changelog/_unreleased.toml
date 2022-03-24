@@ -1,0 +1,5 @@
+[[entries]]
+id = "526cee77-df13-4b71-b974-e0640cfc7a36"
+type = "fix"
+description = "Fix how `[install.extras]` is taken into account (used to always take all extras)"
+author = "@NiklasRosenstein"

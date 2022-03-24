@@ -143,7 +143,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
 
     # Look for extras also in the Slap specific install configuration.
     for obj, config in self.config.items():
-      for extra in config.extras:
+      for extra in extras:
         dependencies += convert_poetry_dependencies(config.extras.get(extra, []))
         found_extras.add(extra)
 
