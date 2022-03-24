@@ -3,3 +3,9 @@ id = "a2daee85-5134-493d-9013-8f87a403f23d"
 type = "feature"
 description = "add `github` template to `slap init`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "ac74d490-a8a4-4189-9990-ec82527fcb90"
+type = "fix"
+description = "`slap run` now uses the reopsitory `slap.toml` configuration file to read the run configuration if no main project exists; `Application.main_project()` no longer tries to find the \"closest\" project because right now Slap does not actually try to find a \"better\" project root than the current working directory"
+author = "@NiklasRosenstein"

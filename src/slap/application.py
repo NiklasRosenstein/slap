@@ -203,28 +203,17 @@ class Application:
     return load(raw_config, ApplicationConfig, settings=[ExtraKeys(True)])
 
   def _get_main_project(self) -> Project | None:
-    """ Returns the main project, which is the one closest to the current working directory. """
+    """ Returns the main project, which is the one that the current working directory is pointing to. """
 
-    closest: Project | None = None
-    distance: int = 99999
     cwd = Path.cwd()
 
     for project in self.repository.projects():
       path = project.directory.resolve()
       if path == cwd:
+        return project
         closest = project
-        break
 
-      try:
-        relative = path.relative_to(cwd)
-      except ValueError:
-        continue
-
-      if len(relative.parts) < distance:
-        closest = project
-        distance = len(relative.parts)
-
-    return closest
+    return None
 
   def load_plugins(self) -> None:
     """ Loads all application plugins (see #ApplicationPlugin) and activates them.
