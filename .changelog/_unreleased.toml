@@ -1,0 +1,5 @@
+[[entries]]
+id = "ed53ae06-f485-43a4-b220-3e726e2447bb"
+type = "feature"
+description = "support `[install.extras]` option in the monorepository and project config"
+author = "@NiklasRosenstein"

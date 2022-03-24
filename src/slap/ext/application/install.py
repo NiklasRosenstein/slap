@@ -1,14 +1,19 @@
 
+import dataclasses
 import logging
 import os
 import shlex
-from pathlib import Path
 import subprocess as sp
+from pathlib import Path
 
 from slap.application import Application, Command, option
+from slap.configuration import Configuration
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
 from slap.util.python import Environment
+
+from databind.json.settings import ExtraKeys
+
 
 logger = logging.getLogger(__name__)
 venv_check_option = option(
@@ -25,6 +30,18 @@ def venv_check(cmd: Command, message='refusing to install') -> bool:
       cmd.line_error('       enter a virtual environment or use <opt>--no-venv-check</opt>', 'error')
       return False
   return True
+
+
+@dataclasses.dataclass
+@ExtraKeys(True)
+class InstallConfig:
+  """ Separate install configuration under Slap that is entirely separate from the build system that is being used.
+  This configures the behaviour of the `slap install` command. """
+
+  #: Additional extras that are installable with `--extras` or `--only-extras`. These are taken into account
+  #: for projects as well as the monorepository root. They may contain semantic version selector (same style
+  #: as supported by Poetry).
+  extras: dict[str, list[str]] = dataclasses.field(default_factory=dict)
 
 
 class InstallCommandPlugin(Command, ApplicationPlugin):
@@ -71,6 +88,11 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
   ]
 
   def load_configuration(self, app: Application) -> None:
+    from nr.util.stream import Stream
+    from databind.json import load
+    self.config: dict[Configuration, InstallConfig] = {}
+    for obj in Stream([(  app.repository,), app.repository.projects()]).concat():
+      self.config[obj] = load(obj.raw_config().get('install', {}), InstallConfig, filename=str(obj))
     return None
 
   def activate(self, app: Application, config: None) -> None:
@@ -78,6 +100,8 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
+    from slap.ext.project_handlers.poetry import convert_poetry_dependencies
+
     for a, b in [("only-extras", "extras"), ("no-root", "link"), ("only-extras", "link")]:
       if self.option(a) and self.option(b):
         self.line_error(f'error: conflicting options <opt>--{a}</opt> and <opt>--{b}</opt>', 'error')
@@ -117,8 +141,14 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
           found_extras.add(extra)
           dependencies += project_extras
 
+    # Look for extras also in the Slap specific install configuration.
+    for obj, config in self.config.items():
+      for extra in config.extras:
+        dependencies += convert_poetry_dependencies(config.extras.get(extra, []))
+        found_extras.add(extra)
+
     if missing_extras := extras - found_extras:
-      self.line_error(f'error: the follow extras do not exist: <fg=yellow>{missing_extras}</fg>', 'error')
+      self.line_error(f'error: extras that do not exist: <fg=yellow>{missing_extras}</fg>', 'error')
       return 1
 
     pip_command = [self.option("python"), "-m", "pip", "install"] + dependencies
