@@ -21,6 +21,12 @@ venv_check_option = option(
   "--no-venv-check",
   description="Do not check if the target Python environment is a virtual environment.",
 )
+python_option = option(
+  "python", "p",
+  description="The Python executable to install to.",
+  flag=False,
+  default=os.getenv('PYTHON', 'python'),
+)
 
 
 def venv_check(cmd: Command, message='refusing to install') -> bool:
@@ -84,12 +90,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       flag=False,
     ),
     venv_check_option,
-    option(
-      "python", "p",
-      description="The Python executable to install to.",
-      flag=False,
-      default=os.getenv('PYTHON', 'python'),
-    ),
+    python_option,
   ]
 
   def load_configuration(self, app: Application) -> None:

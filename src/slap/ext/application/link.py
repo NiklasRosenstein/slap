@@ -7,7 +7,7 @@ from pathlib  import Path
 
 from slap.application import Application, Command, option
 from slap.plugins import ApplicationPlugin
-from .install import venv_check, venv_check_option
+from .install import python_option, venv_check, venv_check_option
 
 
 class LinkCommandPlugin(Command, ApplicationPlugin):
@@ -61,12 +61,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
   name = "link"
   help = textwrap.dedent(__doc__)
   options = [
-    option(
-      "python", "p",
-      description="The Python executable to link the package to.",
-      flag=False,
-      default=os.getenv('PYTHON', 'python'),
-    ),
+    python_option,
     option(
       "dump-pyproject",
       description="Dump the updated pyproject.toml and do not actually do the linking.",
