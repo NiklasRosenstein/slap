@@ -4,13 +4,14 @@
 import logging
 import typing as t
 
+from poetry.core.packages.dependency import Dependency
 from slap.project import Dependencies, Project
-from slap.ext.project_handlers.default import DefaultProjectHandler
+from slap.ext.project_handlers.base import PyprojectHandler
 
 logger = logging.getLogger(__name__)
 
 
-class FlitProjectHandler(DefaultProjectHandler):
+class FlitProjectHandler(PyprojectHandler):
 
   # ProjectHandlerPlugin
 
@@ -42,7 +43,7 @@ class FlitProjectHandler(DefaultProjectHandler):
         optional,
       )
     elif flit is not None:
-      optional = flit.get('requires-extra', {}).get('dev', [])
+      optional = flit.get('requires-extra', {})
       return Dependencies(
         flit.get('requires', []),
         optional.pop('dev', []),

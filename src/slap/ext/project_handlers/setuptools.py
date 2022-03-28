@@ -1,16 +1,16 @@
 
 """ Project handler for projects using the Setuptools build system. """
 
-from pwd import struct_passwd
 import re
 import typing as t
 
-from slap.ext.project_handlers.default import DefaultProjectHandler, interdependencies_enabled
+from poetry.core.packages.dependency import Dependency
+from slap.ext.project_handlers.base import BaseProjectHandler, interdependencies_enabled
 from slap.project import Dependencies, Package, Project
 from slap.release import VersionRef, match_version_ref_pattern, match_version_ref_pattern_on_lines
 
 
-class SetuptoolsProjectHandler(DefaultProjectHandler):
+class SetuptoolsProjectHandler(BaseProjectHandler):
 
   def __init__(self) -> None:
     self._project: Project | None = None

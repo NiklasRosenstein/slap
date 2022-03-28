@@ -1,16 +1,18 @@
 
 """ Implements the default package detection plugin. """
 
+import abc
 import re
 import typing as t
 from pathlib import Path
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
 from nr.util.fs import get_file_in_directory
+from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 from setuptools import find_namespace_packages, find_packages
 
 from slap.plugins import ProjectHandlerPlugin
-from slap.project import Dependencies, Package, Project
+from slap.project import Package, Project
 from slap.release import VersionRef, match_version_ref_pattern, match_version_ref_pattern_on_lines
 
 IGNORED_MODULES = ['test', 'tests', 'docs', 'build']
@@ -59,7 +61,7 @@ def detect_packages(directory: Path) -> list[Package]:
   return [Package(module, paths[module], directory) for module in modules]
 
 
-class DefaultProjectHandler(ProjectHandlerPlugin):
+class BaseProjectHandler(ProjectHandlerPlugin):
   """ Base class for other project handlers. It cannot be used directly by a project. """
 
   package_dirs: t.Sequence[str] = ('src', '.')
@@ -83,6 +85,11 @@ class DefaultProjectHandler(ProjectHandlerPlugin):
         if packages:
           return packages
     return []
+
+
+class PyprojectHandler(BaseProjectHandler):
+  """ A subclass that implements some functionality based on whether the project is configured using a
+  `pyproject.toml` file. """
 
   def get_version_refs(self, project: Project) -> list[VersionRef]:
     """ Returns the version ref in `pyproject.toml` it can be found, as well as the version references of project
