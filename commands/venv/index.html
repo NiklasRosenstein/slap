@@ -862,7 +862,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/commands/venv.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/commands/venv.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -936,6 +936,17 @@ Help:
   In order to be able to use the -a,--activate option directly from this command,
   it must be shadowed by a function in your shell. Use the -i,--init-code command
   to get a code snippet that you can place in your shell&#39;s init scripts.
+
+  Usage Example:
+
+      $ slap venv -i bash &gt;&gt; ~/.profile; source ~/.profile
+      $ slap venv -cg craftr
+      creating global environment &quot;craftr&quot; (using python3)
+      $ slap venv -lg
+      1 environment in &quot;/home/niklas/.local/venvs&quot;
+      • craftr   3.10.2 (main, Jan 15 2022, 18:02:07) [GCC 9.3.0]
+      $ slap venv -ag craftr
+      (craftr) $ 
 </code></pre></div>
 <h3 id="venv-link">venv link</h3>
 <div class="highlight"><pre><span></span><code>Description:
