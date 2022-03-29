@@ -1,0 +1,5 @@
+[[entries]]
+id = "b04948f0-abde-4327-a090-7e8ee30180c6"
+type = "improvement"
+description = "Enhance docs and output of `slap venv` command"
+author = "@NiklasRosenstein"

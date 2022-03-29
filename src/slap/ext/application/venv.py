@@ -85,7 +85,6 @@ class VenvManager:
     return Venv(self.directory / venv_name)
 
 
-
 class VenvCommand(Command):
   """ Create, activate and remove virtual environments.
 
@@ -96,6 +95,18 @@ class VenvCommand(Command):
   In order to be able to use the <opt>-a,--activate</opt> option directly from this command,
   it must be shadowed by a function in your shell. Use the <opt>-i,--init-code</opt> command
   to get a code snippet that you can place in your shell's init scripts.
+
+  <u>Usage Example:</u>
+
+      <code>$ slap venv -i bash >> ~/.profile; source ~/.profile
+      $ slap venv -cg craftr
+      <info>creating global environment <s>"craftr"</s> (using <code>python3</code>)</info>
+      $ slap venv -lg</code>
+      <info>1 environment in <s>"/home/niklas/.local/venvs"</s></info>
+      • craftr   <code>3.10.2 (main, Jan 15 2022, 18:02:07) [GCC 9.3.0]</code>
+      <code>$ slap venv -ag craftr
+      (craftr) $ </code>
+
   """
 
   name = "venv"
@@ -215,7 +226,8 @@ class VenvCommand(Command):
       if venv.exists():
         self.line_error(f'error: environment <s>"{venv.name}"</s> already exists', 'error')
         return 1
-      self.line_error(f'creating environment <s>"{venv.name}"</s> (using <code>{python}</code>)', 'info')
+      location = 'global' if self.option("global") else 'local'
+      self.line_error(f'creating {location} environment <s>"{venv.name}"</s> (using <code>{python}</code>)', 'info')
       venv.create(python)
 
     if self.option("activate"):
@@ -233,7 +245,8 @@ class VenvCommand(Command):
         self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         return 1
       venv.delete()
-      self.line_error(f'deleted environment <s>"{venv.name}"</s>', 'info')
+      location = 'global' if self.option("global") else 'local'
+      self.line_error(f'deleted {location} environment <s>"{venv.name}"</s>', 'info')
 
     return 0
 
