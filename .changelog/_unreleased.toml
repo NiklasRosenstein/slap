@@ -3,3 +3,9 @@ id = "79037034-fdc7-44ef-a782-90cef1729cb9"
 type = "feature"
 description = "Add `ProjectHandler.add_dependency()` and `Project.add_dependency()"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "12b6b886-eb72-444e-8118-29fc8b72246c"
+type = "feature"
+description = "Add `slap add` command"
+author = "@NiklasRosenstein"

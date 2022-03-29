@@ -50,6 +50,7 @@ docs = ["mkdocs", "mkdocs-material", "novella==0.1.15", "pydoc-markdown==4.6.0"]
 slap = "slap.__main__:main"
 
 [tool.poetry.plugins."slap.plugins.application"]
+add = "slap.ext.application.add:AddCommandPlugin"
 changelog = "slap.ext.application.changelog:ChangelogCommandPlugin"
 check = "slap.ext.application.check:CheckCommandPlugin"
 info = "slap.ext.application.info:InfoCommandPlugin"
