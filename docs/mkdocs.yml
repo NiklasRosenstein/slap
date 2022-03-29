@@ -4,6 +4,7 @@ nav:
   - configuration.md
   - glossary.md
   - Features:
+    - commands/add.md
     - commands/changelog.md
     - commands/check.md
     - commands/info.md
