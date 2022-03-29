@@ -168,13 +168,13 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
     return 0
 
-  def _load_plugins(self, project: Project) -> list[ReleasePlugin]:
-    """ Internal. Loads the plugins for the given project. """
+  def _load_plugins(self, configuration: Configuration) -> list[ReleasePlugin]:
+    """ Internal. Loads the plugins for the given configuration. """
 
     from nr.util.plugins import load_entrypoint
 
     plugins = []
-    for plugin_name in self.config[project].plugins:
+    for plugin_name in self.config[configuration].plugins:
       plugin = load_entrypoint(ReleasePlugin, plugin_name)()
       plugin.app = self.app
       plugin.io = self.io
@@ -333,13 +333,12 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         with open(filename, 'w') as fp:
           fp.write(content)
 
-    for project in self.app.repository.projects():
-      for plugin in self._load_plugins(project):
-        try:
-          changed_files.extend(plugin.create_release(project, str(target_version), dry))
-        except:
-          self.line_error(f'error with {type(plugin).__name__}.bump_version()', 'error')
-          raise
+    for plugin in self._load_plugins(self.app.repository):
+      try:
+        changed_files.extend(plugin.create_release(self.app.repository, str(target_version), dry))
+      except:
+        self.line_error(f'error with {type(plugin).__name__}.bump_version()', 'error')
+        raise
 
     return changed_files
 

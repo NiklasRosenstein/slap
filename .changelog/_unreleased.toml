@@ -9,3 +9,9 @@ id = "07c4879b-bbce-4a60-b9fb-7389ad1d3ef5"
 type = "improvement"
 description = "The `slap venv` command can now be used with `-a,--activate` and without a `name` argument to activate the previously activated environment or the only one that is available in the context (local vs. global)."
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "8d85b2a5-5fdc-49b2-916a-905348e3978f"
+type = "improvement"
+description = "Improve `ChangelogReleasePlugin` to write \"releasing changelog\" line only once"
+author = "@NiklasRosenstein"
