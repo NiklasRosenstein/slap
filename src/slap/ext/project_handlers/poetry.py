@@ -59,7 +59,7 @@ class PoetryProjectHandler(PyprojectHandler):
     where: str,
   ) -> tuple[list[str], list | dict]:
     locator = ['dependencies'] if where == 'run' else ['dev-dependencies'] if where == 'dev' else ['extras', where]
-    value = {selector.name: str(selector.pretty_constraint)} if where in ('run', 'dev') else [f'{selector.name} {selector.pretty_constraint}']
+    value: list | dict = {selector.name: str(selector.pretty_constraint)} if where in ('run', 'dev') else [f'{selector.name} {selector.pretty_constraint}']
     return ['tool', 'poetry'] + locator, value
 
 

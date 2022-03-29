@@ -110,7 +110,7 @@ class PyprojectHandler(BaseProjectHandler):
     root = tomlkit.parse(project.pyproject_toml.path.read_text())
     keys, value = self.get_dependency_location_key_sequence(project, selector, where)
     assert isinstance(value, list | dict), type(value)
-    current: tomlkit.items.Item | tomlkit.TOMLDocument = root
+    current: tomlkit.items.Item | tomlkit.container.Container = root
     for idx, key in enumerate(keys):
       if not isinstance(current, tomlkit.items.Table | tomlkit.container.Container):
         break  # Will triger an error below
