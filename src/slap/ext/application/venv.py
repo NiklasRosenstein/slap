@@ -74,15 +74,34 @@ class VenvManager:
 
   def __init__(self, directory: Path | None = None) -> None:
     self.directory = directory or Path('.venvs')
+    self.state_file = self.directory / '.state'
+
+  def _get_state(self) -> dict[str, t.Any]:
+    import json
+    return json.loads(self.state_file.read_text()) if self.state_file.exists() else {}
+
+  def _set_state(self, state: dict[str, t.Any]) -> None:
+    import json
+    self.state_file.write_text(json.dumps(state))
 
   def ls(self) -> t.Iterable[Venv]:
     if not self.directory.exists():
       return
     for path in self.directory.iterdir():
-      yield Venv(path)
+      if path.is_dir() and not path.name.startswith('.'):
+        yield Venv(path)
 
   def get(self, venv_name: str) -> Venv:
     return Venv(self.directory / venv_name)
+
+  def get_last_activated(self) -> Venv | None:
+    venv_name = self._get_state().get('last_active_environment')
+    return self.get(venv_name) if venv_name else None
+
+  def set_last_activated(self, venv_name: str) -> None:
+    state = self._get_state()
+    state['last_active_environment'] = venv_name
+    self._set_state(state)
 
 
 class VenvCommand(Command):
@@ -163,6 +182,7 @@ class VenvCommand(Command):
       if self.option("list") and self.option(opt):
         self.line_error(f'error: <opt>-l,--list</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
         return False
+    for opt in ('create', 'delete'):
       if self.option(opt) and not self.argument("name"):
         self.line_error('error: missing <opt>name</opt> argument', 'error')
         return False
@@ -178,7 +198,7 @@ class VenvCommand(Command):
   def _get_python_bin(self) -> str:
     python = self.option("python")
     name = self.argument("name")
-    if not python and set(name).issubset(string.digits + '.'):
+    if name and not python and set(name).issubset(string.digits + '.'):
       python = f'python{name}'
     return python or 'python3'
 
@@ -205,6 +225,24 @@ class VenvCommand(Command):
       self.line_error(f'error: init code for shell <s>{shell}</s> is not supported', 'error')
       return 1
 
+  def _pick_venv(self, location: str, manager: VenvManager) -> Venv | None:
+    """ Picks either the last virtual environment that was activated, or the only one that is available. """
+
+    venv = manager.get_last_activated()
+    if venv and venv.exists():
+      return venv
+
+    venvs = list(manager.ls())
+    if not venvs:
+      self.line_error(f'error: no {location} environments', 'error')
+      return None
+
+    if len(venvs) == 1:
+      return venvs[0]
+
+    self.line_error(f'error: multiple {location} environments exist, not sure which to pick', 'error')
+    return None
+
   def handle(self) -> int:
     if not self._validate_args():
       return 1
@@ -220,32 +258,45 @@ class VenvCommand(Command):
       return 0
 
     python = self._get_python_bin()
-    venv = manager.get(self.argument("name"))
+    venv = manager.get(self.argument("name")) if self.argument("name") else None
+    location = 'global' if self.option("global") else 'local'
 
     if self.option("create"):
+      if not venv:
+        self.line_error(f'error: missing environment name', 'error')
+        return 1
       if venv.exists():
         self.line_error(f'error: environment <s>"{venv.name}"</s> already exists', 'error')
         return 1
-      location = 'global' if self.option("global") else 'local'
       self.line_error(f'creating {location} environment <s>"{venv.name}"</s> (using <code>{python}</code>)', 'info')
       venv.create(python)
 
     if self.option("activate"):
+      if not venv:
+        venv = self._pick_venv(location, manager)
+        if not venv:
+          return 1
+
       if not venv.exists():
         self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         return 1
-      # TODO (@NiklasRosenstein): Adjust output based on the shell that this is called from?
-      # TODO (@NiklasRosenstein): This also needs to be a different path on Windows.
+
       if not self._is_called_from_shadow():
         self.line_error('warning: the <opt>-a,--activate</opt> option only works when shadowed by a shell function', 'warning')
+
+      # TODO (@NiklasRosenstein): Adjust output based on the shell that this is called from?
+      # TODO (@NiklasRosenstein): Must be activate.cmd on Windows
       print(f'source "{venv.get_bin("activate")}"')
+      manager.set_last_activated(venv.name)
 
     if self.option("delete"):
+      if not venv:
+        self.line_error(f'error: missing environment name', 'error')
+        return 1
       if not venv.exists():
         self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         return 1
       venv.delete()
-      location = 'global' if self.option("global") else 'local'
       self.line_error(f'deleted {location} environment <s>"{venv.name}"</s>', 'info')
 
     return 0

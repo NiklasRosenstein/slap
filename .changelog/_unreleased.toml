@@ -3,3 +3,9 @@ id = "b04948f0-abde-4327-a090-7e8ee30180c6"
 type = "improvement"
 description = "Enhance docs and output of `slap venv` command"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "07c4879b-bbce-4a60-b9fb-7389ad1d3ef5"
+type = "improvement"
+description = "The `slap venv` command can now be used with `-a,--activate` and without a `name` argument to activate the previously activated environment or the only one that is available in the context (local vs. global)."
+author = "@NiklasRosenstein"
