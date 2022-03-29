@@ -70,7 +70,7 @@ def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> lis
     result = []
     for dep in dependencies:
       if not dep.startswith('git+'):
-        result.append(parse_dependency(dep))
+        result.append(parse_dependency(dep).to_pep_508())
       else:
         result.append(dep)
     return result
