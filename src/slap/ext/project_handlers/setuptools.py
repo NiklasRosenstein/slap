@@ -80,6 +80,13 @@ class SetuptoolsProjectHandler(BaseProjectHandler):
       refs += get_setup_cfg_interdependency_version_refs(project)
     return refs
 
+  def get_dependency_location_key_sequence(
+    self,
+    project: Project,
+    selector: Dependency,
+    where: str,
+  ) -> tuple[list[str], list | dict]:
+    raise NotImplementedError
 
 def parse_list_semi(val: str) -> list[str]:
   """ Parses a string to a list of strinsg according to the `list-semi` specification in the [setuptools docs][1].

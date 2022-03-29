@@ -49,6 +49,15 @@ class PoetryProjectHandler(PyprojectHandler):
       {k: convert_poetry_dependencies(v) for k, v in poetry.get('extras', {}).items()},
     )
 
+  def get_dependency_location_key_sequence(
+    self,
+    project: Project,
+    selector: Dependency,
+    where: str,
+  ) -> tuple[list[str], list | dict]:
+    locator = ['dependencies'] if where == 'run' else ['dev-dependencies'] if where == 'dev' else ['extras', where]
+    return ['tool', 'poetry'] + locator, {selector.name: str(selector.pretty_constraint)}
+
 
 def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> list[str]:
   from poetry.core.packages.dependency import Dependency  # type: ignore[import]
@@ -56,9 +65,8 @@ def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> lis
   if isinstance(dependencies, list):
     result = []
     for dep in dependencies:
-      match = re.match(r'\s*[\w\d\-\_]+', dep)
-      if match and not dep.startswith('git+'):
-        result.append(Dependency(match.group(0), dep[match.end():]).to_pep_508())
+      if not dep.startswith('git+'):
+        result.append(parse_dependency(dep))
       else:
         result.append(dep)
     return result

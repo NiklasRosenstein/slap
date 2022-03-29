@@ -1,8 +1,10 @@
 
 import dataclasses
 import importlib
+import functools
 import json
 import os
+import pkg_resources
 import subprocess as sp
 import textwrap
 import typing as t
@@ -62,7 +64,8 @@ class Environment:
     return bool(self.real_prefix or (self.base_prefix and self.prefix != self.base_prefix))
 
   @staticmethod
-  def of(python: str | list[str]) -> 'Environment':
+  @functools.lru_cache()
+  def of(python: str | t.Sequence[str]) -> 'Environment':
     code = textwrap.dedent('''
       import sys, platform, json
       print(json.dumps({
@@ -77,3 +80,23 @@ class Environment:
     if isinstance(python, str):
       python = [python]
     return Environment(**json.loads(sp.check_output(python + ['-c', code]).decode()))
+
+  def get_distribution(self, distribution: str) -> pkg_resources.DistInfoDistribution | None:
+    return self.get_distributions([distribution])[distribution]
+
+  def get_distributions(self, distributions: t.Collection[str]) -> dict[str, pkg_resources.DistInfoDistribution | None]:
+    import pickle
+    code = textwrap.dedent('''
+      import sys, pkg_resources, pickle
+      result = []
+      for arg in sys.argv[1:]:
+        try:
+          dist = pkg_resources.get_distribution(arg)
+        except pkg_resources.DistributionNotFound:
+          dist = None
+        result.append(dist  )
+      sys.stdout.buffer.write(pickle.dumps(result))
+    ''')
+    keys = list(distributions)
+    result = pickle.loads(sp.check_output([self.executable, '-c', code] + keys))
+    return dict(zip(keys, result))

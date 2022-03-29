@@ -52,3 +52,18 @@ class FlitProjectHandler(PyprojectHandler):
     else:
       logger.warning('Unable to read dependencies for project <subj>%s</subj>', project)
       return Dependencies([], [], {})
+
+  def get_dependency_location_key_sequence(
+    self,
+    project: Project,
+    selector: Dependency,
+    where: str,
+  ) -> tuple[list[str], list | dict]:
+    flit: dict[str, t.Any] | None = project.pyproject_toml.get('tool', {}).get('flit')
+
+    if flit is not None:
+      locator = ['requires'] if where == 'run' else ['requires-extras', where]
+      return ['tool', 'flit'] + locator, [selector.to_pep_508()]
+    else:
+      locator = ['dependencies'] if where == 'run' else ['optional-dependencies', where]
+      return ['project'] + locator, [selector.to_pep_508()]

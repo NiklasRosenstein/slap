@@ -12,6 +12,7 @@ from slap.configuration import Configuration
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
+  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
   from slap.repository import Repository
   from slap.plugins import ProjectHandlerPlugin
   from slap.release import VersionRef
@@ -162,6 +163,24 @@ class Project(Configuration):
         result.append(project)
 
     return result
+
+  def add_dependency(self, dependency: Dependency, where: str) -> None:
+    """ Add a dependency to the project configuration.
+
+    Arguments:
+      selector: The dependency to add.
+      where: The location of where to add the dependency. This is either `'run'`, `'dev'`, or otherwise
+        refers to the name of an extra requirement.
+    Raises:
+      NotImplementedError: If the operation is not supported on the project.
+    """
+
+    from poetry.core.packages.dependency import Dependency  # type: ignore[import]
+    assert isinstance(dependency, Dependency), type(dependency)
+    self.handler().add_dependency(self, dependency, where)
+    # TODO(@NiklasRosenstein): Use a method to flush the cache of Once when it is available in `nr.utils`.
+    self.raw_config.get(True)
+    self.dependencies.get(True)
 
   @property
   def id(self) -> str:

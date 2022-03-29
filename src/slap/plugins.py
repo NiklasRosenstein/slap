@@ -8,6 +8,7 @@ from nr.util.generic import T
 
 if t.TYPE_CHECKING:
   from pathlib import Path
+  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
   from poetry.core.semver.version import Version  # type: ignore[import]
   from slap.application import Application, IO
   from slap.check import Check
@@ -95,6 +96,19 @@ class ProjectHandlerPlugin(abc.ABC):
     `pyproject.toml`. """
 
     return []
+
+  def add_dependency(self, project: Project, selector: Dependency, where: str) -> None:
+    """ Add a dependency to the project configuration.
+
+    Arguments:
+      project: The project to update.
+      selector: The dependency to add.
+      where: The location of where to add the dependency. This is either `'run'`, `'dev'`, or otherwise
+        refers to the name of an extra requirement.
+      Raises NotImplementedError: If the operation is not supported by the project handler.
+    """
+
+    raise NotImplementedError
 
 
 class CheckPlugin(abc.ABC):

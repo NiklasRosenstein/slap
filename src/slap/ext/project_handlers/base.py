@@ -103,6 +103,49 @@ class PyprojectHandler(BaseProjectHandler):
       refs += get_pyproject_interdependency_version_refs(project)
     return refs
 
+  def add_dependency(self, project: Project, selector: Dependency, where: str) -> None:
+    """ Adds a dependency to the respective location in the `pyproject.toml` file. """
+
+    import tomlkit, tomlkit.items
+    root = current = tomlkit.parse(project.pyproject_toml.path.read_text())
+    keys, value = self.get_dependency_location_key_sequence(self, selector, where)
+    assert isinstance(value, list | dict), type(value)
+    for idx, key in enumerate(keys):
+      if key not in current:
+        if idx == len(keys) - 1:
+          current[key] = tomlkit.array() if isinstance(value, list) else tomlkit.table()
+        else:
+          current[key] = tomlkit.table()
+      current = current[key]
+
+    if isinstance(value, list):
+      if not isinstance(current, tomlkit.items.Array):
+        raise RuntimeError(f'expected array at {keys!r}, got {type(current).__name__}')
+      current.extend(value)
+    elif isinstance(value, dict):
+      if not isinstance(current, tomlkit.items.Table):
+        raise RuntimeError(f'expected table at {keys!r}, got {type(current).__name__}')
+      current.update(value)
+    else:
+      assert False, type(value)
+
+    project.pyproject_toml.path.write_text(tomlkit.dumps(root))
+
+  @abc.abstractmethod
+  def get_dependency_location_key_sequence(
+    self,
+    project: Project,
+    selector: Dependency,
+    where: str,
+  ) -> tuple[list[str], list | dict]:
+    """ Return the sequencce of keys where the dependencies of the project are listed given the *where* string.
+    Refer to the #ProjectHandler.add_dependency() documentation for information on the meaning of the parameter.
+
+    Returns:
+      1. The sequence of keys that contains the dependencies based on the *where* argument.
+      2. The element to inject extend/merge into the key at the location specified by the first tuple element.
+    """
+
 
 def interdependencies_enabled(project: Project) -> bool:
   return bool(project.repository.raw_config().get('release', {}).get('interdependencies', True))
