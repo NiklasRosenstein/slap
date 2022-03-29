@@ -59,7 +59,8 @@ class PoetryProjectHandler(PyprojectHandler):
     where: str,
   ) -> tuple[list[str], list | dict]:
     locator = ['dependencies'] if where == 'run' else ['dev-dependencies'] if where == 'dev' else ['extras', where]
-    return ['tool', 'poetry'] + locator, {selector.name: str(selector.pretty_constraint)}
+    value = {selector.name: str(selector.pretty_constraint)} if where in ('run', 'dev') else [f'{selector.name} {selector.pretty_constraint}']
+    return ['tool', 'poetry'] + locator, value
 
 
 def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> list[str]:

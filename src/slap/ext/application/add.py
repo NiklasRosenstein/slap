@@ -55,7 +55,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
   def handle(self) -> int:
     from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 
-    if not self.option("no-install") and not venv_check(self):
+    if not self._validate_options():
       return 1
 
     project = self.app.main_project()
@@ -73,6 +73,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
 
     python = Environment.of(self.option("python"))
     distributions = python.get_distributions(dependencies.keys())
+    where = 'dev' if self.option("dev") else (self.option("extra") or "run")
 
     to_install = [d.to_pep_508() for d in dependencies.values() if distributions[d.name] is None]
     if to_install:
@@ -81,17 +82,26 @@ class AddCommandPlugin(Command, ApplicationPlugin):
       logger.info('Running <subj>$ %s</subj>', ' '.join(map(shlex.quote, pip_install)))
       sp.check_call(pip_install)
 
+    distributions.update(python.get_distributions({k for k in distributions if distributions[k] is None}))
     for package_name, dep in dependencies.items():
       if package_name == dep.name:
         dist = distributions[dep.name]
         if not dist:
           self.line_error(
-            f'error: unable to find distribution <subj>{package_name!r}</subj> in <s>{python.executable}</s>',
+            f'error: unable to find distribution <fg=cyan>{package_name!r}</fg> in <s>{python.executable}</s>',
             'error'
           )
           return 1
         dep = Dependency(package_name, '^' + dist.version)
       self.line(f'Adding <fg=cyan>{dep.name} {dep.pretty_constraint}</fg>')
-      project.add_dependency(dep, 'run')
+      project.add_dependency(dep, where)
 
     return 0
+
+  def _validate_options(self) -> bool:
+    if not self.option("no-install") and not venv_check(self):
+      return False
+    if self.option("dev") and self.option("extra"):
+      self.line_error('error: cannot combine --dev and --extra', 'error')
+      return False
+    return True

@@ -106,13 +106,13 @@ class PyprojectHandler(BaseProjectHandler):
   def add_dependency(self, project: Project, selector: Dependency, where: str) -> None:
     """ Adds a dependency to the respective location in the `pyproject.toml` file. """
 
-    import tomlkit, tomlkit.items
+    import tomlkit, tomlkit.items, tomlkit.container
     root = tomlkit.parse(project.pyproject_toml.path.read_text())
     keys, value = self.get_dependency_location_key_sequence(project, selector, where)
     assert isinstance(value, list | dict), type(value)
     current: tomlkit.items.Item | tomlkit.TOMLDocument = root
     for idx, key in enumerate(keys):
-      if not isinstance(current, tomlkit.items.Table):
+      if not isinstance(current, tomlkit.items.Table | tomlkit.container.Container):
         break  # Will triger an error below
       if key not in current:
         if idx == len(keys) - 1:
@@ -124,9 +124,10 @@ class PyprojectHandler(BaseProjectHandler):
     if isinstance(value, list):
       if not isinstance(current, tomlkit.items.Array):
         raise RuntimeError(f'expected array at {keys!r}, got {type(current).__name__}')
-      current.extend(value)
+      for v in value:
+        current.append(v)
     elif isinstance(value, dict):
-      if not isinstance(current, tomlkit.items.Table):
+      if not isinstance(current, tomlkit.items.Table | tomlkit.container.Container):
         raise RuntimeError(f'expected table at {keys!r}, got {type(current).__name__}')
       current.update(value)
     else:
