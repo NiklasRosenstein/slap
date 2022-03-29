@@ -1,12 +1,15 @@
 
 """ Project handler for projects using the Poetry build system. """
 
+from __future__ import annotations
 import typing as t
 
-from poetry.core.packages.dependency import Dependency
 from slap.ext.project_handlers.base import PyprojectHandler
 from slap.project import Dependencies, Package, Project
 from slap.util.semver import parse_dependency
+
+if t.TYPE_CHECKING:
+  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 
 
 class PoetryProjectHandler(PyprojectHandler):

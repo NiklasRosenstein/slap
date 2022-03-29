@@ -383,6 +383,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
   def _get_version_refs(self) -> list[VersionRef]:
     """ Extracts all version references in the projects controlled by the application and returns them. """
 
+    from slap.project import Project
     from slap.release import match_version_ref_pattern
 
     version_refs = []
@@ -391,7 +392,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     for project in self.app.configurations():
 
       # Always consider the version number in the pyproject.toml.
-      if project.pyproject_toml.exists():
+      if project.pyproject_toml.exists() and isinstance(project, Project):
         version_refs += project.get_version_refs()
 
       for config in self.config[project].references:

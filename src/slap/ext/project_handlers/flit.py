@@ -1,12 +1,16 @@
 
 """ Project handler for projects using the Flit build system. """
 
+from __future__ import annotations
 import logging
 import typing as t
 
-from poetry.core.packages.dependency import Dependency
 from slap.project import Dependencies, Project
 from slap.ext.project_handlers.base import PyprojectHandler
+
+if t.TYPE_CHECKING:
+  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
+
 
 logger = logging.getLogger(__name__)
 

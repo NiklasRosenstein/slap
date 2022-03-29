@@ -107,10 +107,13 @@ class PyprojectHandler(BaseProjectHandler):
     """ Adds a dependency to the respective location in the `pyproject.toml` file. """
 
     import tomlkit, tomlkit.items
-    root = current = tomlkit.parse(project.pyproject_toml.path.read_text())
-    keys, value = self.get_dependency_location_key_sequence(self, selector, where)
+    root = tomlkit.parse(project.pyproject_toml.path.read_text())
+    keys, value = self.get_dependency_location_key_sequence(project, selector, where)
     assert isinstance(value, list | dict), type(value)
+    current: tomlkit.items.Item | tomlkit.TOMLDocument = root
     for idx, key in enumerate(keys):
+      if not isinstance(current, tomlkit.items.Table):
+        break  # Will triger an error below
       if key not in current:
         if idx == len(keys) - 1:
           current[key] = tomlkit.array() if isinstance(value, list) else tomlkit.table()

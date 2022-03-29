@@ -1,6 +1,6 @@
 
 import re
-from poetry.core.packages.dependency import Dependency
+from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 
 
 def parse_dependency(s: str) -> Dependency:

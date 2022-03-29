@@ -79,12 +79,12 @@ class Environment:
     ''')
     if isinstance(python, str):
       python = [python]
-    return Environment(**json.loads(sp.check_output(python + ['-c', code]).decode()))
+    return Environment(**json.loads(sp.check_output(list(python) + ['-c', code]).decode()))
 
-  def get_distribution(self, distribution: str) -> pkg_resources.DistInfoDistribution | None:
+  def get_distribution(self, distribution: str) -> pkg_resources.Distribution | None:
     return self.get_distributions([distribution])[distribution]
 
-  def get_distributions(self, distributions: t.Collection[str]) -> dict[str, pkg_resources.DistInfoDistribution | None]:
+  def get_distributions(self, distributions: t.Collection[str]) -> dict[str, pkg_resources.Distribution | None]:
     import pickle
     code = textwrap.dedent('''
       import sys, pkg_resources, pickle

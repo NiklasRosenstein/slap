@@ -53,9 +53,14 @@ class AddCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
-    from poetry.core.packages.dependency import Dependency
+    from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 
     if not self.option("no-install") and not venv_check(self):
+      return 1
+
+    project = self.app.main_project()
+    if not project or not project.is_python_project:
+      self.line_error(f'error: not situated in a Python project', 'error')
       return 1
 
     dependencies: dict[str, Dependency] = {}
@@ -87,4 +92,6 @@ class AddCommandPlugin(Command, ApplicationPlugin):
           return 1
         dep = Dependency(package_name, '^' + dist.version)
       self.line(f'Adding <fg=cyan>{dep.name} {dep.pretty_constraint}</fg>')
-      self.app.main_project().add_dependency(dep, 'run')
+      project.add_dependency(dep, 'run')
+
+    return 0
