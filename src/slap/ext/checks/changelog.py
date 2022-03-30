@@ -18,7 +18,7 @@ class ChangelogValidationCheckPlugin(CheckPlugin):
     return get_checks(self, project)
 
   @check('validate')
-  def _validate_changelogs(self, project: Project) -> tuple[CheckResult, str | None]:
+  def _validate_changelogs(self, project: Project) -> tuple[CheckResult, str | None, str | None]:
     import tomli
     from databind.core.converter import ConversionError
 
@@ -38,12 +38,12 @@ class ChangelogValidationCheckPlugin(CheckPlugin):
         bad_files.append((changelog.path.name, str(exc)))
 
     if not count:
-      return CheckResult.SKIPPED, None
+      return CheckResult.SKIPPED, None, None
 
     return (
       Check.ERROR if bad_changelogs else Check.Result.OK,
       f'Broken or invalid changelogs' if bad_changelogs else
         f'All {count} changelogs are valid.',
-      '\n'.join(f'<i>{fn}</i>: {err}' for fn, err in bad_files) if bad_files else None + '\n' +
-      '\n'.join(f'<i>{fn}</i>: id=<fg=yellow>"{entry_id}"</fg>: {err}' for fn, err, entry_id in bad_changelogs) if bad_changelogs else None,
+      ('\n'.join(f'<i>{fn}</i>: {err}' for fn, err in bad_files) if bad_files else '' + '\n' +
+      '\n'.join(f'<i>{fn}</i>: id=<fg=yellow>"{entry_id}"</fg>: {err}' for fn, err, entry_id in bad_changelogs) if bad_changelogs else '').strip() or None,
     )
