@@ -11,7 +11,7 @@ class ChangelogReleasePlugin(ReleasePlugin):
   """ Renames the `_unreleased.toml` file when a release is created. """
 
   def create_release(self, repository: Repository, target_version: str, dry: bool) -> t.Sequence[Path]:
-    changed_files = []
+    changed_files: list[Path] = []
     for project in repository.projects():
       manager = get_changelog_manager(repository, project)
       unreleased = manager.unreleased()
