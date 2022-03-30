@@ -16,6 +16,8 @@ from slap.repository import Issue, PullRequest, Repository
 from slap.util.pygments import toml_highlight
 
 logger = logging.getLogger(__name__)
+
+#: The default set of types a changelog entry can have.
 DEFAULT_VALID_TYPES = [
   'breaking change',
   'deprecation',

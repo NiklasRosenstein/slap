@@ -1,70 +1,110 @@
-# Changelog
+# `slap changelog`
 
-The `slap log` command can be used to manage changelog files which are usually stored in a `.changelog/` directory,
-but the directory can be changed using the `tool.slap.changelog-dir` option. The CLI allows you to add new entries
-as well as print them in a pretty format in the terminal or render the changelog as Markdown.
-
-A changelog entry has a unique ID, one or more tags that categorize the type of change, one or more authors,
-a short description, maybe a link to a pull request and links to issues that are fixed by the change.
-
-```toml
-$ slap log add -t fix,docs -m 'Fix the documentation' --fixes 231,234
-# Added changelog entry to .changelog/_unreleased.toml
-id = "d0092ba"
-tags = [ "fix", "docs" ]
-message = "Fix the documentation"
-fixes = [
-  "https://github.com/username/repo/issues/231",
-  "https://github.com/username/repo/issues/234",
-]
-pr = null
-```
-
-The `pr` value can be set manually once a PR was created, or be updated automatically for example through a GitHub
-action or other type of CI job (the `slap log inject-pr-url` command can help with that).
-
-## Update the PR field in CI checks
-
-__Example for GitHub Actions__
-
-```yml
-  update-pr-numbers:
-    if: github.event_name == 'pull_request'
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with: { python-version: "3.10" }
-    - name: Install Slap
-      run: pip install slap-cli==1.0.0
-    - name: Update PR references in changelogs
-      run: slap -vv changelog update-pr --use github-actions
-```
-
-Note that you still have to configure Git such that it has an author email and name to create the commit with.
+This command provides four sub-commands that allow you to interact with Slap's structured changelog format: `add`,
+`convert`, `format` and `update-pr`.
 
 ## Configuration
 
-### `log.directory`
+All options described below must be placed in the `[tool.slap.changelog]` (for `pyproject.toml`) or `[changelog]`
+(`slap.toml`) section.
 
-__Type__: `str`  
-__Default__: `.changelog/`
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `enabled` | `bool` | `True` | Whether the changelog feature is enabled for the directory in which the option is configured. This is useful to disable on the root of a monorepository that contains multiple Python projects if one wants to prevent accidentally add changelog entries to the root directory. |
+| `directory` | `str` | `.changelog/` | The directory in which the changelogs are stored. |
+| `valid-types` | `list[str]` | `["breaking change", "docs", "feature", "fix", "hygiene", "improvement", "tests"]` | A list of strings that are accepted in changelog entries as types. |
 
-The directory in which the changelogs are stored.
+<details><summary><code>ChangelogConfig</code> documentation</code></summary>
 
-### `log.valid-types`
+@pydoc slap.ext.application.changelog.ChangelogConfig
 
-__Type__: `list[str]`  
-__Default__: `["breaking change", "docs", "feature", "fix", "hygiene", "improvement", "tests"]`
+</details>
 
-A list of strings that are accepted in changelog entries as types.
+## Subcommands
 
-### `log.remote`
+### `slap changelog add`
 
-__Type__: `RemoteProvider | None`  
-__Default__: `None`
+Add an entry to the unreleased changelog. Given the `-c,--commit` option, it will also create a Git commit with
+the same message as the entry description, prefixed by the changelog type. If used in a sub-directory of a project,
+the commit message is prefixed by the sub-directory.
 
-If `None`, will be automatically detected using the `RemoteDetectorPlugin` plugins.
+__Example__
+
+```toml
+$ slap changelog add -t fix -d 'Fix the documentation' --issue 231 --issue 234
+# Added changelog entry to .changelog/_unreleased.toml
+id = "e0ee08af-ff2e-4aee-b795-e6c37e4c16de"
+type = "fix"
+description = "Fix the documentation"
+author = "@NiklasRosenstein"
+issues = [
+  "https://github.com/username/repo/issues/231",
+  "https://github.com/username/repo/issues/234",
+]
+```
+
+<details><summary>Default changelog types</summary>
+```py
+DEFAULT_VALID_TYPES = [
+  'breaking change',
+  'deprecation',
+  'docs',
+  'feature',
+  'fix',
+  'hygiene',
+  'improvement',
+  'refactor',
+  'tests'
+]
+```
+<!--
+@pydoc slap.ext.application.changelog.DEFAULT_VALID_TYPES :with { render_title = false, render_signature = true }
+-->
+</details>
+
+<details><summary>Synopsis</summary>
+```
+@shell slap changelog add --help
+```
+</details>
+
+### `slap changelog convert`
+
+This command converts changelogs from the previous YAML-based format used by Shut (a predecessor to Slap) to the
+TOML format.
+
+<details><summary>Synopsis</summary>
+```
+@shell slap changelog convert --help
+```
+</details>
+
+### `slap changelog format`
+
+  [Novella]: https://niklasrosenstein.github.io/novella/
+
+Pretty print a changelog for the terminal or formatted as Markdown. Use the `-a,--all` option to format all changelogs.
+This command is particularly useful to embed the changelog contents into generated documentation. For example, if you
+use [Novella][], you can use the below bit in your documentation:
+
+    @shell cd .. && slap changelog format --as-markdown --all
+
+This is actually used in this very documentation: Check out the [Changelog](../changelog.md) page.
+
+<details><summary>Synopsis</summary>
+```
+@shell slap changelog format --help
+```
+</details>
+
+### `slap changelog update-pr`
+
+Updates the `pr` field of entries in the unreleased changelog. This is useful to run from continuous integration
+jobs to avoid having to manually inject the pull request URL into changelog entries. If you are using GitHub, try
+using the [`NiklasRosenstein/slap@gha/changelog/update/v1`](../guides/github.md#update-changelogs) action.
+
+<details><summary>Synopsis</summary>
+```
+@shell slap changelog update-pr --help
+```
+</details>

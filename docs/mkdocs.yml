@@ -4,17 +4,17 @@ nav:
   - configuration.md
   - glossary.md
   - Features:
-    - commands/add.md
-    - commands/changelog.md
-    - commands/check.md
-    - commands/info.md
-    - commands/init.md
-    - commands/install.md
-    - commands/link.md
-    - commands/release.md
-    - commands/run.md
-    - commands/test.md
-    - commands/venv.md
+    - slap add: commands/add.md
+    - slap changelog: commands/changelog.md
+    - slap check: commands/check.md
+    - slap info: commands/info.md
+    - slap init: commands/init.md
+    - slap install: commands/install.md
+    - slap link: commands/link.md
+    - slap release: commands/release.md
+    - slap run: commands/run.md
+    - slap test: commands/test.md
+    - slap venv: commands/venv.md
   - Guides:
     - guides/github.md
     - guides/publishing.md

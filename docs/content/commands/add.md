@@ -1,24 +1,33 @@
-# Add
+# `slap add`
 
-Add a Python package to the dependencies of your package. Support for this command depends on the project handler
-that supports your project. Currently supported natively for Poetry and Flit projects.
+This command adds one or more Python packages to the dependencies defined in `pyproject.toml`. If the packages
+are not already installed, they will be installed into the current Python environment using Pip.
 
-__Example__:
+<details><summary>Synopsis</summary>
+```
+@shell slap add --help
+```
+</details>
 
-    $ git diff
+## Usage example
+
+The below example installs `httpx` using Pip and adds the dependency to `pyproject.toml`. If your project is using
+Poetry as the build backend, it will add `httpx = "^0.22.0"` wheras if it is using Flit, the command will add instead
+`'httpx (>=0.22.0,<0.23.0)'`.
+
     $ slap add httpx
     Installing httpx
     Adding httpx ^0.22.0
-    $ git diff
-    diff --git a/pyproject.toml b/pyproject.toml
-    index 4763fd1..c0652b5 100644
-    --- a/pyproject.toml
-    +++ b/pyproject.toml
-    @@ -23,6 +23,7 @@ keywords = []
-    python = "^3.7"
-    databind = "^2.0.0a2"
-    prometheus-client = "0.13.1"
-    +httpx = "^0.22.0"
 
-    [tool.poetry.dev-dependencies]
-    mypy = "*"
+!!! note
+
+    Slap uses `pkg_resources.get_distribution()` to retrieve the version of the package that got installed, or was
+    already installed, and assumes that the package is available in the target Python environment.
+
+## Support matrix
+
+| Build system | Supported |
+| ------------ | --------- |
+| Flit | ✅ |
+| Poetry | ✅ |
+| Setuptools | ❌ (dependencies defined in `setup.cfg`) |
