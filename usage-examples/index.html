@@ -577,8 +577,6 @@
         
           
         
-          
-        
       
       
         <label class="md-nav__link" for="__nav_6">
@@ -601,20 +599,6 @@
     <li class="md-nav__item">
       <a href="../guides/github/" class="md-nav__link">
         GitHub
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../guides/publishing.md" class="md-nav__link">
-        None
       </a>
     </li>
   
@@ -647,71 +631,17 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7">
-          Plugins
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" aria-label="Plugins" data-md-level="1">
-        <label class="md-nav__title" for="__nav_7">
-          <span class="md-nav__icon md-icon"></span>
-          Plugins
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plugins/project-handlers.md" class="md-nav__link">
-        None
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
-      
-      
-      
-        
-          
-        
-          
-        
-      
-      
-        <label class="md-nav__link" for="__nav_8">
           API
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_8">
+        <label class="md-nav__title" for="__nav_7">
           <span class="md-nav__icon md-icon"></span>
           API
         </label>
@@ -764,7 +694,7 @@
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
       
       
       
@@ -773,13 +703,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_9">
+        <label class="md-nav__link" for="__nav_8">
           Other
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Other" data-md-level="1">
-        <label class="md-nav__title" for="__nav_9">
+        <label class="md-nav__title" for="__nav_8">
           <span class="md-nav__icon md-icon"></span>
           Other
         </label>
@@ -892,7 +822,8 @@ across all projects.</p>
 interfaces to plug into their functionality (such as additional plugins for the <code>slap check</code> and <code>slap release</code>
 command).</p>
 <h2 id="inspect-slaps-understanding-of-your-project">Inspect Slap's understanding of your project</h2>
-<p>Using the <code>slap info</code> command, you can get an overview of the project details that Slap understands of your project.</p>
+<p>Using the <a href="../commands/info/"><code>slap info</code></a> command, you can get an overview of the project details that Slap understands
+of your project.</p>
 <div class="highlight"><span class="filename">$ slap info</span><pre><span></span><code>Repository &quot;/home/runner/work/slap/slap&quot;
   vcs: Git(&quot;/home/runner/work/slap/slap&quot;)
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
@@ -940,14 +871,11 @@ Project &quot;slam-cli&quot; (id: slam-cli)
       - slap-cli == 1.4.0
     dev: none
 </code></pre></div>
-<blockquote>
-<p><a href="../commands/info/">More details</a></p>
-</blockquote>
 <h2 id="install-your-project-and-its-dependencies">Install your project and its dependencies</h2>
-<p>Using the <code>slap install</code> command, you can install your project using Pip. This is useful for example if you want
-to use Pip even if your project uses <a href="https://python-poetry.org/">Poetry</a> as a build system. Passing the <code>--link</code> option will make use of
-<a href="https://flit.readthedocs.io/en/latest/">Flit's</a> symlinking installation method, independent of the project build system (so also good if you use
-Poetry because it does not support editable installs).</p>
+<p>Using the <a href="../commands/install/"><code>slap install</code></a> command, you can install your project using Pip. This is useful for
+example if you want to use Pip even if your project uses <a href="https://python-poetry.org/">Poetry</a> as a build system. Passing the <code>--link</code> option will
+make use of <a href="https://flit.readthedocs.io/en/latest/">Flit's</a> symlinking installation method, independent of the project build system (so also good if you
+use Poetry because it does not support editable installs).</p>
 <p>You can also use the <code>--only-extras</code> option to pick only a set of extras to install from the <code>pyproject.toml</code>
 and not install the project itself (this often comes in handy in CI checks).</p>
 <div class="highlight"><pre><span></span><code>$ slap install --link
@@ -957,11 +885,8 @@ and not install the project itself (this often comes in handy in CI checks).</p>
 <p>The command will check if you are in a virtual environment before continuing to instal your project(s). If you
 want to deliberately install into a global Python environment, pass the <code>--no-venv-check</code> flag.</p>
 </div>
-<blockquote>
-<p><a href="../commands/install/">More details</a></p>
-</blockquote>
 <h2 id="check-your-project-configuration">Check your project configuration</h2>
-<p>The <code>slap check</code> command provides some feedback on the sanity of your project configuration.</p>
+<p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration.</p>
 <div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>Global checks:
   release:consistent-versions  OK             — All version references are equal
 
@@ -983,26 +908,21 @@ Checks for project slam-cli
 
 Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
 </code></pre></div>
-<blockquote>
-<p><a href="../commands/check/">More details</a></p>
-</blockquote>
 <h2 id="test-your-project">Test your project</h2>
-<p>The <code>slap test</code> command simply runs commands configured in your <code>pyproject.toml</code> configuration intended to test
-your project. It is quite common to add <code>slap check</code> as one of the tests, as well as static type checking and
-unit tests.</p>
+<p>The <a href="../commands/test/"><code>slap test</code></a> command simply runs commands configured in your <code>pyproject.toml</code> configuration
+intended to test your project. It is quite common to add <code>slap check</code> as one of the tests, as well as static type
+checking and unit tests.</p>
 <div class="highlight"><span class="filename">Example pyproject.toml</span><pre><span></span><code><span class="k">[tool.slap.test]</span><span class="w"></span>
 <span class="n">check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;slap check&quot;</span><span class="w"></span>
 <span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy src/&quot;</span><span class="w"></span>
 <span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest test/&quot;</span><span class="w"></span>
 </code></pre></div>
-<blockquote>
-<p><a href="../commands/test/">More details</a></p>
-</blockquote>
 <h2 id="manage-version-references-and-create-releases">Manage version references and create releases</h2>
-<p>The <code>slap release</code> command updates version numbers in your code base and can create a Git commit and tag, and push
-it to the <code>origin</code> remote. It can also be used to validate if all version references that can be found match. Without
-further configuration, the command will find the version in your <code>pyproject.toml</code> as well as the version numbers of
-dependencies to projects in the same monorepository (if applicable) and the <code>__version__</code> in your source code.</p>
+<p>The <a href="../commands/release/"><code>slap release</code></a> command updates version numbers in your code base and can create a Git commit
+and tag, and push it to the <code>origin</code> remote. It can also be used to validate if all version references that can be
+found match. Without further configuration, the command will find the version in your <code>pyproject.toml</code> as well as the
+version numbers of dependencies to projects in the same monorepository (if applicable) and the <code>__version__</code> in your
+source code.</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
   pyproject.toml:       1.4.0 # &#39;version = &quot;1.4.0&quot;&#39;
   slam-cli/setup.cfg:   1.4.0 # &#39;version = 1.4.0&#39;
@@ -1024,9 +944,6 @@ tagging 1.4.1
 
 pushing develop, 1.4.1 to origin
 </code></pre></div>
-<blockquote>
-<p><a href="../commands/release/">More details</a></p>
-</blockquote>
 
               
             </article>
