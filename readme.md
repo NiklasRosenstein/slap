@@ -6,7 +6,7 @@
 
   [PEP 517]: https://peps.python.org/pep-0517/
 
-Slap is an extensive command-line tool to assist in the development of Python projects independent of the [PEP 517][]
+Slap is an extensible command-line tool to assist in the development of Python projects independent of the [PEP 517][]
 build backend being used, capable of managing single- and multi-project repositories.
 
 ## Installation
