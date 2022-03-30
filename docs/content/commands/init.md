@@ -1,6 +1,12 @@
-# Init
+# `slap init`
 
-The `slap init` command is a small helper to bootstrap Python project files.
+This command bootstrap Python project files.
+
+<details><summary>Synopsis</summary>
+```
+@shell slap init --help
+```
+</details>
 
 ## Templates
 

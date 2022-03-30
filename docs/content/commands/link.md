@@ -1,13 +1,25 @@
-# Link
+# `slap link`
 
-This is particularly interesting when managing the package with [Poetry][] as it does not currently support editable
-installs (as of Poetry 1.2.0a2 on 2022-01-14). This is a little helper command that will temporarily reorganize the
-`pyproject.toml` to be compatible with [Flit] and make use if it's symlink installation feature (`flit install -s`).
-
-    $ slap link
-    Extras to install for deps 'all': {'.none'}
-    Symlinking src/my_package -> /home/niklas/.local/venvs/craftr/lib/python3.10/site-packages/my_package
-
-  [PEP 621]: https://www.python.org/dev/peps/pep-0621
   [Flit]: https://flit.readthedocs.io/en/latest/
   [Poetry]: https://python-poetry.org/
+
+Symlink your project or all projects in a monorepository into the current Python environment. This works for [Poetry][]
+projects as well.
+
+!!! warning
+
+    Independent from the Python build system you are using, Slap reuses [Flit][]'s symlinking feature to perform
+    this action. This actually symbolically links your source code into the Python site-packages. Be aware that this
+    _can_ cause your code to be overwritten for example by Pip if you end up overwriting the symlinked installation
+    of your package by installing another version of it into the same environment.
+
+!!! note
+
+    Currently, `slap install` does not support linking Python projects that contain more than one package. It _does_
+    support symlinking monorepositories that contain multiple Python projects (each with one package).
+
+<details><summary>Synopsis</summary>
+```
+@shell slap link --help
+```
+</details>

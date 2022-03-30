@@ -21,7 +21,14 @@ if t.TYPE_CHECKING:
 
 @dataclasses.dataclass
 class VersionRefConfig:
+  """ Version reference. """
+
+  #: The file in which the reference occurs.
   file: str
+
+  #: A regex pattern that matches the version. Must not contain any captured groups except for one that represents
+  #: the version number itself. The expression for that group can be writen as `{version}` instead (example:
+  #: `version: "{version}"`).
   pattern: str
 
 

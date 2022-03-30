@@ -2,42 +2,28 @@
 
 The Slap configuration is read either from a `slap.toml` file or from the `[tool.slap]` section in `pyproject.toml`.
 
-When a configuration value is described in the documentation, it is referenced without the `[tool.slap]` prefix that
-is needed in the case where the configuration is loaded from `pyproject.toml`.
+!!! note
 
-Check out the documentation for each command separately to understand how they can be configured.
+    A `slap.toml` configuration file is usually only used at the project root in case of monorepositories for multiple
+    Python projects. The file is often used to
+    
+    * disable monorepository-level changelogs ([`slap changelog`](commands/changelog.md#configuration))
+    * configure global tests or commands ([`slap run`](commands/run.md#configuration), [`slap test`](commands/test.md#configuration))
+    * global version references ([`slap release`](commands/release.md#configuration))
 
-## Application configuration
+In this section, we describe the global configuration options that affect Slap directly and are not specifically
+tied to any single Slap command.
 
-### `plugins.disable`
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `typed` | `bool | None` | `None` | Whether the Python code uses type hints. If not set, Slap acts as if this is not known. |
+| `disable` | `list[str]` | `[]` | A list of Slap application plugins to disable. |
+| `enable-only` | `list[str]` | `[]` | A list of Slap application plugins to enable. |
 
-__Type__: `list[str] | None`  
-__Default__: `None`
+## Plugin loading
 
-A list of plugins to disable, subtracting from the list of plugins that are loaded by default. By default, all builtin
-plugins provided directly by Slap will be loaded. External plugins need to be enabled explicitly with `plugins.enable`.
+All Slap commands are implemented as {@pylink slap.plugins.ApplicationPlugin}s. By default, Slap will load plugin
+that is registered under the `slap.plugins.application` entrypoint, however plugins can be disabled using the `disable`
+option or an explicit list of plugins to load and none other can be set with `enable-only`.
 
-### `plugins.enable`
-
-__Type__: `list[str] | None`  
-__Default__: `None`
-
-A list of plugins to enable in addition to the list of plugins that are loaded by default (i.e. all the Slap builtin
-plugins). External plugins need to be enabled explicitly with this option.
-
-## `source-directory`
-
-__Type__: `str | None`  
-__Default__: `None`
-
-The directory in which the Python source code resides. If not set, Slap will attempt to look into `./src/` first and
-then `./`. This is used to detect the Python packages.
-
-> __Todo__: If `[tool.poetry.packages]` is set, try and use that over manually detecting the packages.
-
-## `typed`
-
-__Type__: `bool`  
-__Default__: `True`
-
-Whether the project uses type hints.
+Restricting the plugins to load will impact the set of commands available at your disposal through the Slap CLI.

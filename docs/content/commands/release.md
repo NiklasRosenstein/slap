@@ -1,73 +1,62 @@
-# Release
+# `slap release`
 
-The `slap release` command updates references to the version number in `pyproject.toml` and your source code, updates
-the unreleased changelog if you make use of Slap's structured changelogs, as well as updating any other versions
-specified in the configuration or detected by other plugins.
+This command updates the version numbers in your project(s).
 
-It covers the following use cases:
+<details><summary>Synopsis</summary>
+```
+@shell slap release --help
+```
+</details>
 
-1. Bump the version number (and various features around that event)
-2. Validate that the version number is consistent across the project
+## Tool comparison
 
-__Example__
+| Feature | `poetry bump` | `slap release` |
+| ------- | ------ | ---- |
+| Check for consistent version numbers across files in your repository | ❌ | ✅ |
+| Update version number in `pyproject.toml` | ✅ | ✅ |
+| Update dependencies of another project within the same monorepository (interdependencies) | | ✅ |
+| Update `__version__` in source code | ❌ | ✅ |
+| Update and rename Slap structure changelog files | | ✅ |
+| Commit changes, create a tag and push to Git remote | ❌ | ✅ |
+| Create GitHub releases | ❌ | ❌ (planned in [#29](https://github.com/NiklasRosenstein/slap/issues/29)) |
 
-    $ slap release patch --tag --push
-    bumping 2 version references:
-      pyproject.toml: 0.1.0 → 0.1.1
-      src/my_package/__init__.py: 0.1.0 → 0.1.1
-
-    release staged changelog
-      .changelog/_unreleased.toml → .changelog/0.1.0.toml
-
-    tagging 0.1.1
-    [develop] ec1e9b3] release 0.1.0
-    3 files changed, 3 insertions(+), 4 deletions(-)
-    rename .changelog/{_unreleased.yml => 0.1.0.yml} (78%)
-
-    pushing develop, 0.1.1 to origin
-    Enumerating objects: 24, done.
-    Counting objects: 100% (24/24), done.
-    Delta compression using up to 8 threads
-    Compressing objects: 100% (17/17), done.
-    Writing objects: 100% (24/24), 3.87 KiB | 566.00 KiB/s, done.
-    Total 24 (delta 4), reused 0 (delta 0)
-    To https://github.com/username/repo
-    * [new branch]      develop -> develop
-    * [new tag]         0.1.1 -> 0.1.1
+> __Legend__: ✅ supported, ❌ not supported, (blank) conceptually irrelevant
 
 ## Configuration
 
-### `release.branch`
+Option scope: `[tool.slap.release]` or `[release]`
 
-__Type__: `str`  
-__Default__: `"develop"`
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `branch` | `str` | `"develop"` | The branch on which releases are created. Unless `--no-branch-check` is passed to `slap release`, the command will refuse to continue if the current branch name does not match this value. |
+| `commit-message` | `str` | `release {version}` | The commit message to use when using the `--tag, -t` option. The string `{version}` will be replaced with the new version number. |
+| `tag-name` | `str` | `{version}` | The tag name to use when using the `--tag, -t` option. The string `{version}` will be replaced with the new version number. |
+| `references` | `list[VersionRefConfig]` | `[]` | A list of version references that should be considered in addition to the version references that are automatically detected by Slap when updating version numbers across the project with the `slap release` command. A `VersionRefConfig` contains the fields `file: str` and `pattern: str`. The `file` is considered relative to the project directory (which is the directory where the `slap.toml` or `pyproject.toml` configuration file resides). |
 
-The branch on which releases are created. Unless `--no-branch-check` is passed to `slap release`, the command will
-refuse to continue if the current branch name does not match this value.
+<details><summary><code>ReleaseConfig</code></summary>
 
-### `release.commit-message`
+@pydoc slap.ext.application.release.ReleaseConfig
 
-__Type__: `str`  
-__Default__: `"release {version}"`
+</details>
 
-The commit message to use when using the `--tag, -t` option. The string `{version}` will be replaced with the new
-version number.
+<details><summary><code>VersionRefConfig</code></summary>
 
-### `release.tag-name`
+@pydoc slap.ext.application.release.VersionRefConfig
 
-__Type__: `str`  
-__Default__: `"{version}"`
+</details>
 
-The tag name to use when using the `--tag, -t` option. The string `{version}` will be replaced with the new
-version number.
+## Usage example
 
-### `release.references`
+```
+$ slap release patch --tag --push
+bumping 2 version references:
+  pyproject.toml: 0.1.0 → 0.1.1
+  src/my_package/__init__.py: 0.1.0 → 0.1.1
 
-__Type__: `list[VersionRefConfig]`  
-__Default__: `[]`
+release staged changelog
+  .changelog/_unreleased.toml → .changelog/0.1.1.toml
 
-A list of version references that should be considered in addition to the version references that are automatically
-detected by Slap when updating version numbers across the project with the `slap release` command.
+tagging 0.1.1
 
-A `VersionRefConfig` contains the fields `file: str` and `pattern: str`. The `file` is considered relative to the
-project directory (which is the directory where the `slap.toml` or `pyproject.toml` configuration file resides).
+pushing develop, 0.1.1 to origin
+```

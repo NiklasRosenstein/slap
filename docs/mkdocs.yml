@@ -3,7 +3,7 @@ nav:
   - usage-examples.md
   - configuration.md
   - glossary.md
-  - Features:
+  - Commands:
     - slap add: commands/add.md
     - slap changelog: commands/changelog.md
     - slap check: commands/check.md

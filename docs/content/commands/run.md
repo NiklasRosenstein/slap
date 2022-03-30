@@ -1,15 +1,28 @@
-# Run
+# `slap run`
 
-Run a command configured under the `run` section.
+Runs one of the commands from the Slap configuration. This is similar to `npm run` and `yarn run` for JavaScript projects.
 
-## Example
+<details><summary>Synopsis</summary>
+```
+@shell slap run --help
+```
+</details>
 
-    $ slap run docs:dev
+## Configuration
+
+Option scope: `[tool.slap.run]` or `[run]`
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `<name>` | `str` | n/a | A command as a string to run with the system shell. |
+
+__Example configuration__
 
 === "pyproject.toml"
 
     ```toml
     [tool.slap.run]
+    "docs:build" = "cd docs && novella --base-url slap/"
     "docs:dev" = "cd docs && novella --serve"
     ```
 
@@ -17,5 +30,11 @@ Run a command configured under the `run` section.
 
     ```toml
     [run]
+    "docs:build" = "cd docs && novella --base-url slap/"
     "docs:dev" = "cd docs && novella --serve"
     ```
+
+```
+$ slap run docs:dev
+...
+```

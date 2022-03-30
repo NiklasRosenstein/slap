@@ -5,8 +5,7 @@ This command provides four sub-commands that allow you to interact with Slap's s
 
 ## Configuration
 
-All options described below must be placed in the `[tool.slap.changelog]` (for `pyproject.toml`) or `[changelog]`
-(`slap.toml`) section.
+Option scope: `[tool.slap.changelog]` or `[changelog]`
 
 | Option | Type | Default | Description |
 | ------ | ---- | ------- | ----------- |
