@@ -13,7 +13,7 @@
     
     
       
-        <title>Add - Slap</title>
+        <title>slap add - Slap</title>
       
     
     
@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#add" class="md-skip">
+        <a href="#slap-add" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Add
+              slap add
             
           </span>
         </div>
@@ -329,9 +329,47 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          slap add
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
-        Add
+        slap add
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage-example" class="md-nav__link">
+    Usage example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#support-matrix" class="md-nav__link">
+    Support matrix
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -345,7 +383,7 @@
   
     <li class="md-nav__item">
       <a href="../changelog/" class="md-nav__link">
-        Changelog
+        slap changelog
       </a>
     </li>
   
@@ -359,7 +397,7 @@
   
     <li class="md-nav__item">
       <a href="../check/" class="md-nav__link">
-        Check
+        slap check
       </a>
     </li>
   
@@ -373,7 +411,7 @@
   
     <li class="md-nav__item">
       <a href="../info/" class="md-nav__link">
-        Info
+        slap info
       </a>
     </li>
   
@@ -387,7 +425,7 @@
   
     <li class="md-nav__item">
       <a href="../init/" class="md-nav__link">
-        Init
+        slap init
       </a>
     </li>
   
@@ -401,7 +439,7 @@
   
     <li class="md-nav__item">
       <a href="../install/" class="md-nav__link">
-        Install
+        slap install
       </a>
     </li>
   
@@ -415,7 +453,7 @@
   
     <li class="md-nav__item">
       <a href="../link/" class="md-nav__link">
-        Link
+        slap link
       </a>
     </li>
   
@@ -429,7 +467,7 @@
   
     <li class="md-nav__item">
       <a href="../release/" class="md-nav__link">
-        Release
+        slap release
       </a>
     </li>
   
@@ -443,7 +481,7 @@
   
     <li class="md-nav__item">
       <a href="../run/" class="md-nav__link">
-        Run
+        slap run
       </a>
     </li>
   
@@ -457,7 +495,7 @@
   
     <li class="md-nav__item">
       <a href="../test/" class="md-nav__link">
-        Test
+        slap test
       </a>
     </li>
   
@@ -471,7 +509,7 @@
   
     <li class="md-nav__item">
       <a href="../venv/" class="md-nav__link">
-        Venv
+        slap venv
       </a>
     </li>
   
@@ -752,6 +790,28 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage-example" class="md-nav__link">
+    Usage example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#support-matrix" class="md-nav__link">
+    Support matrix
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -768,28 +828,71 @@
 
 
 
-<h1 id="add">Add</h1>
-<p>Add a Python package to the dependencies of your package. Support for this command depends on the project handler
-that supports your project. Currently supported natively for Poetry and Flit projects.</p>
-<p><strong>Example</strong>:</p>
-<div class="highlight"><pre><span></span><code>$ git diff
-$ slap add httpx
+<h1 id="slap-add"><code>slap add</code></h1>
+<p>This command adds one or more Python packages to the dependencies defined in <code>pyproject.toml</code>. If the packages
+are not already installed, they will be installed into the current Python environment using Pip.</p>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Add one or more dependencies to a project.
+
+Usage:
+  add [options] [--] &lt;packages&gt;...
+
+Arguments:
+  packages              One or more packages to install with Pip and add to the project configuration.
+
+Options:
+  -d, --dev             Add as development dependencies.
+  -e, --extra=EXTRA     Add as extra dependencies for the specified extra name.
+      --no-install      Do not actually install the dependencies with Pip. Note that if the dependency is not already installed and no version selector is specified with the package name, it will fall back to a match-all version range (`*`).
+      --no-venv-check   Do not check if the target Python environment is a virtual environment.
+  -p, --python=PYTHON   The Python executable to install to. [default: &quot;python&quot;]
+  -h, --help            Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet           Do not output any message.
+  -V, --version         Display this application version.
+      --ansi            Force ANSI output.
+      --no-ansi         Disable ANSI output.
+  -n, --no-interaction  Do not ask any interactive question.
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+</code></pre></div>
+</details>
+
+<h2 id="usage-example">Usage example</h2>
+<p>The below example installs <code>httpx</code> using Pip and adds the dependency to <code>pyproject.toml</code>. If your project is using
+Poetry as the build backend, it will add <code>httpx = "^0.22.0"</code> wheras if it is using Flit, the command will add instead
+<code>'httpx (&gt;=0.22.0,&lt;0.23.0)'</code>.</p>
+<div class="highlight"><pre><span></span><code>$ slap add httpx
 Installing httpx
 Adding httpx ^0.22.0
-$ git diff
-diff --git a/pyproject.toml b/pyproject.toml
-index 4763fd1..c0652b5 100644
---- a/pyproject.toml
-+++ b/pyproject.toml
-@@ -23,6 +23,7 @@ keywords = []
-python = &quot;^3.7&quot;
-databind = &quot;^2.0.0a2&quot;
-prometheus-client = &quot;0.13.1&quot;
-+httpx = &quot;^0.22.0&quot;
-
-[tool.poetry.dev-dependencies]
-mypy = &quot;*&quot;
 </code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Slap uses <code>pkg_resources.get_distribution()</code> to retrieve the version of the package that got installed, or was
+already installed, and assumes that the package is available in the target Python environment.</p>
+</div>
+<h2 id="support-matrix">Support matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Build system</th>
+<th>Supported</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flit</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Poetry</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Setuptools</td>
+<td>❌ (dependencies defined in <code>setup.cfg</code>)</td>
+</tr>
+</tbody>
+</table>
 
               
             </article>
@@ -824,13 +927,13 @@ mypy = &quot;*&quot;
       
       
         
-        <a href="../changelog/" class="md-footer__link md-footer__link--next" aria-label="Next: Changelog" rel="next">
+        <a href="../changelog/" class="md-footer__link md-footer__link--next" aria-label="Next: slap changelog" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Changelog
+              slap changelog
             </div>
           </div>
           <div class="md-footer__button md-icon">
