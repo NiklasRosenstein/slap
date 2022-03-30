@@ -46,7 +46,7 @@ You can find the documentation for Slap here: https://niklasrosenstein.github.io
 | Bootstrap project files | | ✅ | | [slap init](https://niklasrosenstein.github.io/slap/commands/init/) |
 | Install projects using Pip | ✅ | ✅ | ✅ | [slap install](https://niklasrosenstein.github.io/slap/commands/install/) |
 | Symlink projects (editable installs) | ✅ | ✅ | ✅ | [slap link](https://niklasrosenstein.github.io/slap/commands/link/) |
-| Bump interdependencies in monorepository | ✅ | ✅ | ✅ (partial) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
+| Bump interdependencies in monorepository | ✅ (not tested regularly) | ✅ | ✅ (partial) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
 
 > __Legend__: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or curerntly not supported
 
