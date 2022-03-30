@@ -15,3 +15,9 @@ id = "8d85b2a5-5fdc-49b2-916a-905348e3978f"
 type = "improvement"
 description = "Improve `ChangelogReleasePlugin` to write \"releasing changelog\" line only once"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "790ff132-9782-43fa-99f1-f2866f01cf17"
+type = "improvement"
+description = "Improve changelog checks plugin to catch more types of errors to return in the check details"
+author = "@NiklasRosenstein"
