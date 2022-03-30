@@ -62,6 +62,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#slap-install" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -298,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -390,6 +395,8 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
+      
+        
       
       
       <a href="./" class="md-nav__link md-nav__link--active">
@@ -732,6 +739,24 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
@@ -743,9 +768,37 @@
 
 
 
-  <h1>slap install</h1>
+<h1 id="slap-install"><code>slap install</code></h1>
+<p>Install the current project or all projects in a monorepository into the current Python environment, including
+development dependencies and extras. After cloning a new repository, this is often the first command you run
+after creating a virtual environment (for that, see <a href="../venv/"><code>slap venv</code></a>).</p>
+<p>Common options to add are <code>--link</code> if you want to develop on the project(s) and <code>--no-venv-check</code> if you want
+don't want Slap to protect you from accidentally installing the project(s) into a non-virtual Python environment.</p>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Install your project and its dependencies via Pip.
 
+Usage:
+  install [options]
 
+Options:
+      --only=ONLY                Path to the subproject to install only. May still cause other projects to be installed if required by the selected project via inter dependencies, but only their run dependencies will be installed.
+      --link                     Symlink the root project using slap link instead of installing it directly.
+      --no-dev                   Do not install development dependencies.
+      --no-root                  Do not install the package itself, but only its dependencies.
+      --extras=EXTRAS            A comma-separated list of extras to install. Note that &quot;dev&quot; is a valid extras.
+      --only-extras=ONLY-EXTRAS  Install only the specified extras. Note that &quot;dev&quot; is a valid extras.
+      --no-venv-check            Do not check if the target Python environment is a virtual environment.
+  -p, --python=PYTHON            The Python executable to install to. [default: &quot;python&quot;]
+  -h, --help                     Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet                    Do not output any message.
+  -V, --version                  Display this application version.
+      --ansi                     Force ANSI output.
+      --no-ansi                  Disable ANSI output.
+  -n, --no-interaction           Do not ask any interactive question.
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+</code></pre></div>
+</details>
 
               
             </article>

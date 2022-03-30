@@ -62,6 +62,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#slap-info" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -298,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -362,6 +367,8 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
+      
+        
       
       
       <a href="./" class="md-nav__link md-nav__link--active">
@@ -732,6 +739,24 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
@@ -743,9 +768,74 @@
 
 
 
-  <h1>slap info</h1>
+<h1 id="slap-info"><code>slap info</code></h1>
+<p>Shows details about your repository and project(s) as Slap understands them.</p>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Show info about the Slap application workspace and the loaded projects.
 
+Usage:
+  info [options]
 
+Options:
+  -h, --help            Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet           Do not output any message.
+  -V, --version         Display this application version.
+      --ansi            Force ANSI output.
+      --no-ansi         Disable ANSI output.
+  -n, --no-interaction  Do not ask any interactive question.
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+</code></pre></div>
+</details>
+
+<p><strong>Example from the Slap repository itself:</strong></p>
+<div class="highlight"><span class="filename">$ slap info</span><pre><span></span><code>Repository &quot;/home/runner/work/slap/slap&quot;
+  vcs: Git(&quot;/home/runner/work/slap/slap&quot;)
+  host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
+  projects: [&#39;slap-cli&#39;, &#39;slam-cli&#39;]
+Project &quot;.&quot; (id: slap-cli)
+  version: 1.4.0
+  dist-name: slap-cli
+  packages: slap (src)
+  readme: readme.md
+  handler: PoetryProjectHandler
+  dependencies:
+    run:
+      - beautifulsoup4 (&gt;=4.10.0,&lt;5.0.0)
+      - cleo (&gt;=1.0.0a4)
+      - databind (&gt;=2.0.0a2,&lt;3.0.0)
+      - flit (&gt;=3.6.0,&lt;4.0.0)
+      - nr.util (&gt;=0.8.4,&lt;1.0.0)
+      - poetry-core (&gt;=1.1.0a6,&lt;2.0.0)
+      - ptyprocess (&gt;=0.7.0,&lt;0.8.0)
+      - pygments (&gt;=2.11.2,&lt;3.0.0)
+      - PyYAML (&gt;=4.0)
+      - requests (&gt;=2.27.1,&lt;3.0.0)
+      - tomli (&gt;=2.0.0,&lt;3.0.0)
+      - twine (&gt;=3.7.0,&lt;4.0.0)
+    dev:
+      - mypy (&gt;=0.931,&lt;0.932)
+      - types-beautifulsoup4 (&gt;=4.10.0,&lt;5.0.0)
+      - types-pygments (&gt;=2.9.16,&lt;3.0.0)
+      - types-PyYAML (&gt;=6.0.3,&lt;7.0.0)
+      - types-requests (&gt;=2.27.7,&lt;3.0.0)
+    extra.docs:
+      - mkdocs
+      - mkdocs-material
+      - novella (==0.2.1)
+      - pydoc-markdown (==4.6.0)
+Project &quot;slam-cli&quot; (id: slam-cli)
+  version: 1.4.0
+  dist-name: slam-cli
+  packages: none
+  readme: readme.md
+  handler: SetuptoolsProjectHandler
+  depends on: slap-cli
+  dependencies:
+    run:
+      - slap-cli == 1.4.0
+    dev: none
+</code></pre></div>
 
               
             </article>

@@ -270,42 +270,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#application-configuration" class="md-nav__link">
-    Application configuration
-  </a>
-  
-    <nav class="md-nav" aria-label="Application configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pluginsdisable" class="md-nav__link">
-    plugins.disable
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pluginsenable" class="md-nav__link">
-    plugins.enable
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#source-directory" class="md-nav__link">
-    source-directory
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#typed" class="md-nav__link">
-    typed
+  <a href="#plugin-loading" class="md-nav__link">
+    Plugin loading
   </a>
   
 </li>
@@ -376,14 +342,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -822,42 +788,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#application-configuration" class="md-nav__link">
-    Application configuration
-  </a>
-  
-    <nav class="md-nav" aria-label="Application configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pluginsdisable" class="md-nav__link">
-    plugins.disable
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pluginsenable" class="md-nav__link">
-    plugins.enable
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#source-directory" class="md-nav__link">
-    source-directory
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#typed" class="md-nav__link">
-    typed
+  <a href="#plugin-loading" class="md-nav__link">
+    Plugin loading
   </a>
   
 </li>
@@ -882,32 +814,53 @@
 
 <h1 id="configuration">Configuration</h1>
 <p>The Slap configuration is read either from a <code>slap.toml</code> file or from the <code>[tool.slap]</code> section in <code>pyproject.toml</code>.</p>
-<p>When a configuration value is described in the documentation, it is referenced without the <code>[tool.slap]</code> prefix that
-is needed in the case where the configuration is loaded from <code>pyproject.toml</code>.</p>
-<p>Check out the documentation for each command separately to understand how they can be configured.</p>
-<h2 id="application-configuration">Application configuration</h2>
-<h3 id="pluginsdisable"><code>plugins.disable</code></h3>
-<p><strong>Type</strong>: <code>list[str] | None</code><br />
-<strong>Default</strong>: <code>None</code></p>
-<p>A list of plugins to disable, subtracting from the list of plugins that are loaded by default. By default, all builtin
-plugins provided directly by Slap will be loaded. External plugins need to be enabled explicitly with <code>plugins.enable</code>.</p>
-<h3 id="pluginsenable"><code>plugins.enable</code></h3>
-<p><strong>Type</strong>: <code>list[str] | None</code><br />
-<strong>Default</strong>: <code>None</code></p>
-<p>A list of plugins to enable in addition to the list of plugins that are loaded by default (i.e. all the Slap builtin
-plugins). External plugins need to be enabled explicitly with this option.</p>
-<h2 id="source-directory"><code>source-directory</code></h2>
-<p><strong>Type</strong>: <code>str | None</code><br />
-<strong>Default</strong>: <code>None</code></p>
-<p>The directory in which the Python source code resides. If not set, Slap will attempt to look into <code>./src/</code> first and
-then <code>./</code>. This is used to detect the Python packages.</p>
-<blockquote>
-<p><strong>Todo</strong>: If <code>[tool.poetry.packages]</code> is set, try and use that over manually detecting the packages.</p>
-</blockquote>
-<h2 id="typed"><code>typed</code></h2>
-<p><strong>Type</strong>: <code>bool</code><br />
-<strong>Default</strong>: <code>True</code></p>
-<p>Whether the project uses type hints.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A <code>slap.toml</code> configuration file is usually only used at the project root in case of monorepositories for multiple
+Python projects. The file is often used to</p>
+<ul>
+<li>disable monorepository-level changelogs (<a href="../commands/changelog/#configuration"><code>slap changelog</code></a>)</li>
+<li>configure global tests or commands (<a href="../commands/run/#configuration"><code>slap run</code></a>, <a href="../commands/test/#configuration"><code>slap test</code></a>)</li>
+<li>global version references (<a href="../commands/release/#configuration"><code>slap release</code></a>)</li>
+</ul>
+</div>
+<p>In this section, we describe the global configuration options that affect Slap directly and are not specifically
+tied to any single Slap command.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>typed</code></td>
+<td><code>bool | None</code></td>
+<td><code>None</code></td>
+<td>Whether the Python code uses type hints. If not set, Slap acts as if this is not known.</td>
+</tr>
+<tr>
+<td><code>disable</code></td>
+<td><code>list[str]</code></td>
+<td><code>[]</code></td>
+<td>A list of Slap application plugins to disable.</td>
+</tr>
+<tr>
+<td><code>enable-only</code></td>
+<td><code>list[str]</code></td>
+<td><code>[]</code></td>
+<td>A list of Slap application plugins to enable.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="plugin-loading">Plugin loading</h2>
+<p>All Slap commands are implemented as <a href="/slap/api/documentation#pydoc:slap.plugins.ApplicationPlugin">Class ApplicationPlugin</a>s. By default, Slap will load plugin
+that is registered under the <code>slap.plugins.application</code> entrypoint, however plugins can be disabled using the <code>disable</code>
+option or an explicit list of plugins to load and none other can be set with <code>enable-only</code>.</p>
+<p>Restricting the plugins to load will impact the set of commands available at your disposal through the Slap CLI.</p>
 
               
             </article>

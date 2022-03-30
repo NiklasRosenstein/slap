@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#release" class="md-skip">
+        <a href="#slap-release" class="md-skip">
           Skip to content
         </a>
       
@@ -303,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -452,43 +452,23 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#tool-comparison" class="md-nav__link">
+    Tool comparison
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     Configuration
   </a>
   
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#releasebranch" class="md-nav__link">
-    release.branch
-  </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#releasecommit-message" class="md-nav__link">
-    release.commit-message
+      
+        <li class="md-nav__item">
+  <a href="#usage-example" class="md-nav__link">
+    Usage example
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#releasetag-name" class="md-nav__link">
-    release.tag-name
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#releasereferences" class="md-nav__link">
-    release.references
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -824,43 +804,23 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#tool-comparison" class="md-nav__link">
+    Tool comparison
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     Configuration
   </a>
   
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#releasebranch" class="md-nav__link">
-    release.branch
-  </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#releasecommit-message" class="md-nav__link">
-    release.commit-message
+      
+        <li class="md-nav__item">
+  <a href="#usage-example" class="md-nav__link">
+    Usage example
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#releasetag-name" class="md-nav__link">
-    release.tag-name
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#releasereferences" class="md-nav__link">
-    release.references
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -882,63 +842,284 @@
 
 
 
-<h1 id="release">Release</h1>
-<p>The <code>slap release</code> command updates references to the version number in <code>pyproject.toml</code> and your source code, updates
-the unreleased changelog if you make use of Slap's structured changelogs, as well as updating any other versions
-specified in the configuration or detected by other plugins.</p>
-<p>It covers the following use cases:</p>
-<ol>
-<li>Bump the version number (and various features around that event)</li>
-<li>Validate that the version number is consistent across the project</li>
-</ol>
-<p><strong>Example</strong></p>
+<h1 id="slap-release"><code>slap release</code></h1>
+<p>This command updates the version numbers in your project(s).</p>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Create a new release of your Python package.
+
+Usage:
+  release [options] [--] [&lt;version&gt;]
+
+Arguments:
+  version                  The target version number or rule to apply to the current version.
+
+Options:
+  -t, --tag                Create a Git tag after the version numbers were updated.
+  -p, --push               Push the changes to the Git remote repository.
+  -r, --remote=REMOTE      The Git remote to push to (only when --push is specified).
+  -d, --dry                Do not commit changes to disk.
+  -f, --force              Force tag creation and push.
+      --validate           Instead of bumping the version, validate that all version references are consistent.
+                           If the version argument is specified, all version references must match it.
+      --no-branch-check    Do not validate the current Git branch matches the configured release branch.
+      --no-worktree-check  Do not check the worktree state.
+  -h, --help               Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet              Do not output any message.
+  -V, --version            Display this application version.
+      --ansi               Force ANSI output.
+      --no-ansi            Disable ANSI output.
+  -n, --no-interaction     Do not ask any interactive question.
+  -v|vv|vvv, --verbose     Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Create a new release of your Python package.
+
+  This command can perform the following operations in sequence (most of them need
+  to be enabled explicitly with flags):
+
+  1. Bump the version number in pyproject.toml and in other files
+  2. Add the changed files to Git, create a commit and a tag (--tag, -t)
+  3. Push the commit and tag to the remote repository (--push, -p)
+
+  In addition to the pyproject.toml, the command will automatically detect the file(s)
+  in your Python source code that contain a __version__ member and update it as well.
+  Additional files can be updated by configuring the [tool.slap.release.references]
+  option:
+
+    [tool.slap.release]
+    references = [
+      { file = &quot;../frontend/package.json&quot;, pattern = &quot;  \&quot;version\&quot;: \&quot;{VERSION}\&quot;&quot; }
+    ]
+
+  Furthermore, the --validate option can be used in CI to ensure that the version
+  numbers are consistent across the project. This is particularly useful when
+  automating publishing from CI builds.
+
+  Bumping the version number
+
+    Specifying an explicit version number or a version bump rule for the version
+    argument will update the version across all references that can be detected.
+    You can use --validate to show all files in which version numbers are found.
+
+    The supported rules are major, premajor, minor, preminor, patch, prepatch and
+    prerelease.
+
+    [Git]: The command will prevent you from bumping the version unless you are on
+    the branch configured under [tool.slap.release.branch] or &quot;develop&quot; by default.
+    If you want to skip that check, pass --no-branch-check.
+
+  Commit &amp; tag
+
+    [Git]: You can use the --tag, -t flag to automatically add the updated files,
+    create a new commit and tag the commit with the version number. The tag name
+    by default will just be the version number, but can be changed by setting the
+    [tool.slap.release.tag_format]. Similarly, the commit message used can be
+    configured with [tool.slap.release.commit_message].
+
+  Push to remote
+
+    [Git]: Using the --push, -p in combination with --tag, -t will push the new
+    commit and tag to the remote Git repository immediately. You can specify the
+    --remote, -r option to change the remote which will be pushed to (defaults
+    to &quot;origin&quot;).
+</code></pre></div>
+</details>
+
+<h2 id="tool-comparison">Tool comparison</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th><code>poetry bump</code></th>
+<th><code>slap release</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Check for consistent version numbers across files in your repository</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Update version number in <code>pyproject.toml</code></td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Update dependencies of another project within the same monorepository (interdependencies)</td>
+<td></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Update <code>__version__</code> in source code</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Update and rename Slap structure changelog files</td>
+<td></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Commit changes, create a tag and push to Git remote</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Create GitHub releases</td>
+<td>❌</td>
+<td>❌ (planned in <a href="https://github.com/NiklasRosenstein/slap/issues/29">#29</a>)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Legend</strong>: ✅ supported, ❌ not supported, (blank) conceptually irrelevant</p>
+</blockquote>
+<h2 id="configuration">Configuration</h2>
+<p>Option scope: <code>[tool.slap.release]</code> or <code>[release]</code></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>branch</code></td>
+<td><code>str</code></td>
+<td><code>"develop"</code></td>
+<td>The branch on which releases are created. Unless <code>--no-branch-check</code> is passed to <code>slap release</code>, the command will refuse to continue if the current branch name does not match this value.</td>
+</tr>
+<tr>
+<td><code>commit-message</code></td>
+<td><code>str</code></td>
+<td><code>release {version}</code></td>
+<td>The commit message to use when using the <code>--tag, -t</code> option. The string <code>{version}</code> will be replaced with the new version number.</td>
+</tr>
+<tr>
+<td><code>tag-name</code></td>
+<td><code>str</code></td>
+<td><code>{version}</code></td>
+<td>The tag name to use when using the <code>--tag, -t</code> option. The string <code>{version}</code> will be replaced with the new version number.</td>
+</tr>
+<tr>
+<td><code>references</code></td>
+<td><code>list[VersionRefConfig]</code></td>
+<td><code>[]</code></td>
+<td>A list of version references that should be considered in addition to the version references that are automatically detected by Slap when updating version numbers across the project with the <code>slap release</code> command. A <code>VersionRefConfig</code> contains the fields <code>file: str</code> and <code>pattern: str</code>. The <code>file</code> is considered relative to the project directory (which is the directory where the <code>slap.toml</code> or <code>pyproject.toml</code> configuration file resides).</td>
+</tr>
+</tbody>
+</table>
+<details><summary><code>ReleaseConfig</code></summary>
+
+<a id="slap.ext.application.release.ReleaseConfig"></a>
+
+<a id="pydoc:slap.ext.application.release.ReleaseConfig"></a>
+## Class ReleaseConfig
+
+<div class="highlight"><pre><span></span><code><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+
+<span class="nd">@ExtraKeys</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ReleaseConfig</span><span class="p">()</span>
+</code></pre></div>
+
+[[view_source]](https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/application/release.py#L37)
+
+<a id="slap.ext.application.release.ReleaseConfig.branch"></a>
+
+<a id="pydoc:slap.ext.application.release.ReleaseConfig.branch"></a>
+#### branch
+
+The VCS branch on which releases are allowed. The release command will prevent you from creating a release
+while on a different branch (unless `--no-branch-check` is set).
+
+<a id="slap.ext.application.release.ReleaseConfig.commit_message"></a>
+
+<a id="pydoc:slap.ext.application.release.ReleaseConfig.commit_message"></a>
+#### commit\_message
+
+The template for the commit message when a release is created and the `--tag, -t` option is used.
+
+<a id="slap.ext.application.release.ReleaseConfig.tag_format"></a>
+
+<a id="pydoc:slap.ext.application.release.ReleaseConfig.tag_format"></a>
+#### tag\_format
+
+The template for the tag name when a release is created and the `--tag, -t` option is used.
+
+<a id="slap.ext.application.release.ReleaseConfig.references"></a>
+
+<a id="pydoc:slap.ext.application.release.ReleaseConfig.references"></a>
+#### references
+
+A list of references to the version number that should be updated along with the version numbers
+that the release command knows about by default (like the `version` in `pyproject.toml` and the
+version number in the source code).
+
+<a id="slap.ext.application.release.ReleaseConfig.plugins"></a>
+
+<a id="pydoc:slap.ext.application.release.ReleaseConfig.plugins"></a>
+#### plugins
+
+A list of `ReleasePlugins` to use. Defaults to contain the {@link pydoc:slap.ext.release.source_code_version.SourceCodeVersionReferencesPlugin}
+and {@link pydoc:slap.ext.release.changelog.ChangelogReleasePlugin}.
+
+
+
+</details>
+
+<details><summary><code>VersionRefConfig</code></summary>
+
+<a id="slap.ext.application.release.VersionRefConfig"></a>
+
+<a id="pydoc:slap.ext.application.release.VersionRefConfig"></a>
+## Class VersionRefConfig
+
+<div class="highlight"><pre><span></span><code><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">VersionRefConfig</span><span class="p">()</span>
+</code></pre></div>
+
+[[view_source]](https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/application/release.py#L23)
+
+Version reference.
+
+<a id="slap.ext.application.release.VersionRefConfig.file"></a>
+
+<a id="pydoc:slap.ext.application.release.VersionRefConfig.file"></a>
+#### file
+
+The file in which the reference occurs.
+
+<a id="slap.ext.application.release.VersionRefConfig.pattern"></a>
+
+<a id="pydoc:slap.ext.application.release.VersionRefConfig.pattern"></a>
+#### pattern
+
+A regex pattern that matches the version. Must not contain any captured groups except for one that represents
+the version number itself. The expression for that group can be writen as `{version}` instead (example:
+`version: "{version}"`).
+
+
+
+</details>
+
+<h2 id="usage-example">Usage example</h2>
 <div class="highlight"><pre><span></span><code>$ slap release patch --tag --push
 bumping 2 version references:
   pyproject.toml: 0.1.0 → 0.1.1
   src/my_package/__init__.py: 0.1.0 → 0.1.1
 
 release staged changelog
-  .changelog/_unreleased.toml → .changelog/0.1.0.toml
+  .changelog/_unreleased.toml → .changelog/0.1.1.toml
 
 tagging 0.1.1
-[develop] ec1e9b3] release 0.1.0
-3 files changed, 3 insertions(+), 4 deletions(-)
-rename .changelog/{_unreleased.yml =&gt; 0.1.0.yml} (78%)
 
 pushing develop, 0.1.1 to origin
-Enumerating objects: 24, done.
-Counting objects: 100% (24/24), done.
-Delta compression using up to 8 threads
-Compressing objects: 100% (17/17), done.
-Writing objects: 100% (24/24), 3.87 KiB | 566.00 KiB/s, done.
-Total 24 (delta 4), reused 0 (delta 0)
-To https://github.com/username/repo
-* [new branch]      develop -&gt; develop
-* [new tag]         0.1.1 -&gt; 0.1.1
 </code></pre></div>
-<h2 id="configuration">Configuration</h2>
-<h3 id="releasebranch"><code>release.branch</code></h3>
-<p><strong>Type</strong>: <code>str</code><br />
-<strong>Default</strong>: <code>"develop"</code></p>
-<p>The branch on which releases are created. Unless <code>--no-branch-check</code> is passed to <code>slap release</code>, the command will
-refuse to continue if the current branch name does not match this value.</p>
-<h3 id="releasecommit-message"><code>release.commit-message</code></h3>
-<p><strong>Type</strong>: <code>str</code><br />
-<strong>Default</strong>: <code>"release {version}"</code></p>
-<p>The commit message to use when using the <code>--tag, -t</code> option. The string <code>{version}</code> will be replaced with the new
-version number.</p>
-<h3 id="releasetag-name"><code>release.tag-name</code></h3>
-<p><strong>Type</strong>: <code>str</code><br />
-<strong>Default</strong>: <code>"{version}"</code></p>
-<p>The tag name to use when using the <code>--tag, -t</code> option. The string <code>{version}</code> will be replaced with the new
-version number.</p>
-<h3 id="releasereferences"><code>release.references</code></h3>
-<p><strong>Type</strong>: <code>list[VersionRefConfig]</code><br />
-<strong>Default</strong>: <code>[]</code></p>
-<p>A list of version references that should be considered in addition to the version references that are automatically
-detected by Slap when updating version numbers across the project with the <code>slap release</code> command.</p>
-<p>A <code>VersionRefConfig</code> contains the fields <code>file: str</code> and <code>pattern: str</code>. The <code>file</code> is considered relative to the
-project directory (which is the directory where the <code>slap.toml</code> or <code>pyproject.toml</code> configuration file resides).</p>
 
               
             </article>

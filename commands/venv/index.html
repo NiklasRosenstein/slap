@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#venv" class="md-skip">
+        <a href="#slap-venv" class="md-skip">
           Skip to content
         </a>
       
@@ -303,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -494,36 +494,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
+  <a href="#configuration" class="md-nav__link">
+    Configuration
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
+  <a href="#activate-behaviour" class="md-nav__link">
+    Activate behaviour
   </a>
-  
-    <nav class="md-nav" aria-label="Synopsis">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#venv_1" class="md-nav__link">
-    venv
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#venv-link" class="md-nav__link">
-    venv link
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -817,36 +797,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
+  <a href="#configuration" class="md-nav__link">
+    Configuration
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
+  <a href="#activate-behaviour" class="md-nav__link">
+    Activate behaviour
   </a>
-  
-    <nav class="md-nav" aria-label="Synopsis">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#venv_1" class="md-nav__link">
-    venv
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#venv-link" class="md-nav__link">
-    venv link
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -868,39 +828,11 @@
 
 
 
-<h1 id="venv">Venv</h1>
+<h1 id="slap-venv"><code>slap venv</code></h1>
 <p>The <code>slap venv</code> command is a utility for managing virtual environments created using the standard library <code>venv</code>
-module in the current directory or globally (in <code>~/.local/venvs</code>).</p>
-<h2 id="usage">Usage</h2>
-<p>First, the <code>slap</code> command needs to be shadowed by a function in your shell to make proper use of the <code>-a,--activate</code>
-option. The <code>-i,--init-code</code> option can provide you with a snippet to place in your shell init scripts. Currently,
-it only supports Bash.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">$ slap venv -i bash</label><label for="__tabbed_1_2">$ SLAP_SHADOW=true slap venv -i bash</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>which slap &gt;/dev/null &amp;&amp; eval &quot;$(SLAP_SHADOW=true slap venv -i bash)&quot;
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>function slap() {
-  local ORIGINAL=$(which slap)
-  if ! [ $? = 0 ]; then
-    &gt;&amp;2 echo &quot;error: command &#39;slap&#39; does not exist&quot;
-    return 127
-  fi
-  if [ &quot;$1&quot; == &quot;venv&quot; ] &amp;&amp; [[ &quot;$2&quot; =~ -[gc]*a[gc]* ]]; then
-    eval &quot;$(SLAP_SHADOW=true &quot;$ORIGINAL&quot; &quot;$@&quot;)&quot;
-  else
-    &quot;$ORIGINAL&quot; &quot;$@&quot;
-  fi
-  return $?
-}
-</code></pre></div>
-</div>
-</div>
-</div>
-<h2 id="synopsis">Synopsis</h2>
-<h3 id="venv_1">venv</h3>
+module in the current directory or globally (in <code>~/.local/venvs</code>).
+s across multiple projects in a monorepository and prints a summary of the results at the end.</p>
+<details><summary>Synopsis <code>venv</code></summary>
 <div class="highlight"><pre><span></span><code>Description:
   Create, activate and remove virtual environments.
 
@@ -948,7 +880,9 @@ Help:
       $ slap venv -ag craftr
       (craftr) $ 
 </code></pre></div>
-<h3 id="venv-link">venv link</h3>
+</details>
+
+<details><summary>Synopsis <code>venv link</code></summary>
 <div class="highlight"><pre><span></span><code>Description:
   Link executables from a global virtual environment.
 
@@ -969,6 +903,36 @@ Options:
   -n, --no-interaction  Do not ask any interactive question.
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
 </code></pre></div>
+</details>
+
+<h2 id="configuration">Configuration</h2>
+<p>The <code>venv</code> command does not have any Slap configuration options. However, in order to use the <code>slap venv --activate</code>
+option properly, you need to configure your shell to shadow the <code>slap</code> command with a function such that it can
+source the activate script.</p>
+<p>To do this, run <code>$ slap venv -i &lt;shell&gt;</code> and add the output to your shell init scripts. Currently, the <code>-i</code> option
+only supports <code>bash</code> as an argument.</p>
+<div class="highlight"><span class="filename">$ slap venv -i bash</span><pre><span></span><code>which slap &gt;/dev/null <span class="o">&amp;&amp;</span> <span class="nb">eval</span> <span class="s2">&quot;</span><span class="k">$(</span><span class="nv">SLAP_SHADOW</span><span class="o">=</span><span class="nb">true</span> slap venv -i bash<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div>
+<p>What will be evaluated in your init script then implements the shadow function:</p>
+<div class="highlight"><span class="filename">$ SLAP_SHADOW=true slap venv -i bash</span><pre><span></span><code><span class="k">function</span> slap<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">local</span> <span class="nv">ORIGINAL</span><span class="o">=</span><span class="k">$(</span>which slap<span class="k">)</span>
+  <span class="k">if</span> ! <span class="o">[</span> <span class="nv">$?</span> <span class="o">=</span> <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    &gt;<span class="p">&amp;</span><span class="m">2</span> <span class="nb">echo</span> <span class="s2">&quot;error: command &#39;slap&#39; does not exist&quot;</span>
+    <span class="k">return</span> <span class="m">127</span>
+  <span class="k">fi</span>
+  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="s2">&quot;venv&quot;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span> <span class="o">=</span>~ -<span class="o">[</span>gc<span class="o">]</span>*a<span class="o">[</span>gc<span class="o">]</span>* <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">eval</span> <span class="s2">&quot;</span><span class="k">$(</span><span class="nv">SLAP_SHADOW</span><span class="o">=</span><span class="nb">true</span> <span class="s2">&quot;</span><span class="nv">$ORIGINAL</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span>
+  <span class="k">else</span>
+    <span class="s2">&quot;</span><span class="nv">$ORIGINAL</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
+  <span class="k">fi</span>
+  <span class="k">return</span> <span class="nv">$?</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>Now you can enjoy using <code>slap venv -a [-g] [&lt;env&gt;]</code> to activate a virtual environment.</p>
+<h2 id="activate-behaviour">Activate behaviour</h2>
+<p>Using <code>-a,--activate</code> without arguments will pick the most recently activated environment in the current context,
+or if that is not available, the one and only virtual environment. If multiple environments exist in that case,
+it is an error.</p>
 
               
             </article>

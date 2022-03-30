@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#run" class="md-skip">
+        <a href="#slap-run" class="md-skip">
           Skip to content
         </a>
       
@@ -303,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -466,8 +466,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
+  <a href="#configuration" class="md-nav__link">
+    Configuration
   </a>
   
 </li>
@@ -790,8 +790,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
+  <a href="#configuration" class="md-nav__link">
+    Configuration
   </a>
   
 </li>
@@ -814,25 +814,69 @@
 
 
 
-<h1 id="run">Run</h1>
-<p>Run a command configured under the <code>run</code> section.</p>
-<h2 id="example">Example</h2>
-<div class="highlight"><pre><span></span><code>$ slap run docs:dev
+<h1 id="slap-run"><code>slap run</code></h1>
+<p>Runs one of the commands from the Slap configuration. This is similar to <code>npm run</code> and <code>yarn run</code> for JavaScript projects.</p>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Run a command configured in [tool.slap.run]
+
+Usage:
+  run [options] [--] &lt;cmd&gt;
+
+Arguments:
+  cmd                   The name of the command to run as it is defined under the slap.run section.
+
+Options:
+  -h, --help            Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet           Do not output any message.
+  -V, --version         Display this application version.
+      --ansi            Force ANSI output.
+      --no-ansi         Disable ANSI output.
+  -n, --no-interaction  Do not ask any interactive question.
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
 </code></pre></div>
+</details>
+
+<h2 id="configuration">Configuration</h2>
+<p>Option scope: <code>[tool.slap.run]</code> or <code>[run]</code></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;name&gt;</code></td>
+<td><code>str</code></td>
+<td>n/a</td>
+<td>A command as a string to run with the system shell.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example configuration</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">pyproject.toml</label><label for="__tabbed_1_2">slap.toml</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="k">[tool.slap.run]</span><span class="w"></span>
+<span class="s">&quot;docs:build&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cd docs &amp;&amp; novella --base-url slap/&quot;</span><span class="w"></span>
 <span class="s">&quot;docs:dev&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cd docs &amp;&amp; novella --serve&quot;</span><span class="w"></span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="k">[run]</span><span class="w"></span>
+<span class="s">&quot;docs:build&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cd docs &amp;&amp; novella --base-url slap/&quot;</span><span class="w"></span>
 <span class="s">&quot;docs:dev&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cd docs &amp;&amp; novella --serve&quot;</span><span class="w"></span>
 </code></pre></div>
 </div>
 </div>
 </div>
+<div class="highlight"><pre><span></span><code>$ slap run docs:dev
+...
+</code></pre></div>
 
               
             </article>

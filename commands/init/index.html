@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#init" class="md-skip">
+        <a href="#slap-init" class="md-skip">
           Skip to content
         </a>
       
@@ -303,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -854,8 +854,42 @@
 
 
 
-<h1 id="init">Init</h1>
-<p>The <code>slap init</code> command is a small helper to bootstrap Python project files.</p>
+<h1 id="slap-init"><code>slap init</code></h1>
+<p>This command bootstrap Python project files.</p>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Bootstrap some files for a Python project.
+
+Usage:
+  init [options] [--] [&lt;directory&gt;]
+
+Arguments:
+  directory                The directory in which to create the generated files. If not specified, a new directory with the name specified via the --name option is created.
+
+Options:
+      --name=NAME          The name of the Python package.
+      --license=LICENSE    The package license. [default: &quot;MIT&quot;]
+  -t, --template=TEMPLATE  The template to use. [default: &quot;poetry&quot;]
+  -f, --overwrite          Overwrite files.
+  -d, --dry                Dont actually write files.
+      --as-markdown        Render the content as Markdown (uses by the Slap docs)
+  -h, --help               Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet              Do not output any message.
+  -V, --version            Display this application version.
+      --ansi               Force ANSI output.
+      --no-ansi            Disable ANSI output.
+  -n, --no-interaction     Do not ask any interactive question.
+  -v|vv|vvv, --verbose     Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Bootstrap some files for a Python project.
+
+  Currently available templates:
+
+  1. poetry
+</code></pre></div>
+</details>
+
 <h2 id="templates">Templates</h2>
 <h3 id="poetry">Poetry</h3>
 <div class="highlight"><span class="filename">$ slap init -t poetry --name my.pkg</span><pre><span></span><code>write /home/runner/work/slap/slap/docs/pyproject.toml

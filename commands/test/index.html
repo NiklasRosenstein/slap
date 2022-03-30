@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#test" class="md-skip">
+        <a href="#slap-test" class="md-skip">
           Skip to content
         </a>
       
@@ -303,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -455,9 +455,47 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          slap test
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         slap test
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-selection" class="md-nav__link">
+    Test selection
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -752,6 +790,28 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-selection" class="md-nav__link">
+    Test selection
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -768,13 +828,124 @@
 
 
 
-<h1 id="test">Test</h1>
-<p>Configure the commands to run with <code>slap test</code> under the <code>tool.slap.test</code> table:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[tool.slap.test]</span><span class="w"></span>
+<h1 id="slap-test"><code>slap test</code></h1>
+<p>Runs some or all of the tests from the Slap configuration. This is different from <a href="../run/"><code>slap run</code></a> in that by
+default it runs multiple commands, prefixes the output them with the test name (similar to <code>docker-compose logs</code>),
+works across multiple projects in a monorepository and prints a summary of the results at the end.</p>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Execute commands configured in [tool.slap.test].
+
+Usage:
+  test [options] [--] [&lt;test&gt;...]
+
+Arguments:
+  test                  One or more tests to run (runs all if none are specified)
+
+Options:
+  -s, --no-line-prefix  Do not prefix output from the test commands with the test name (default if a single argument for test is specified).
+  -l, --list            List all available tests
+  -h, --help            Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet           Do not output any message.
+  -V, --version         Display this application version.
+      --ansi            Force ANSI output.
+      --no-ansi         Disable ANSI output.
+  -n, --no-interaction  Do not ask any interactive question.
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Execute commands configured in [tool.slap.test].
+
+  Example configuration:
+
+    [tool.slap.test]
+    pytest = &quot;pytest --cov=my_package tests/&quot;
+    mypy = &quot;mypy src&quot;
+
+  Example usage:
+
+    $ slap test
+    mypy | Success: no issues found in 12 source files
+    pytest | ===================================== test session starts ======================================
+    pytest | platform linux -- Python 3.10.2, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+    ...
+</code></pre></div>
+</details>
+
+<h2 id="configuration">Configuration</h2>
+<p>Option scope: <code>[tool.slap.run]</code> or <code>[run]</code></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;name&gt;</code></td>
+<td><code>str</code></td>
+<td>n/a</td>
+<td>A command as a string to run with the system shell.</td>
+</tr>
+</tbody>
+</table>
+<details><summary>An example configuration</summary>
+
+<div class="highlight"><span class="filename">pyproject.toml</span><pre><span></span><code><span class="k">[tool.slap.test]</span><span class="w"></span>
 <span class="n">check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;slap check&quot;</span><span class="w"></span>
 <span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mypy src/&quot;</span><span class="w"></span>
 <span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest test/&quot;</span><span class="w"></span>
 </code></pre></div>
+
+</details>
+
+<details><summary>Example from the <a href="https://github.com/NiklasRosenstein/python-databind">databind</a> project</summary>
+
+Databind is a monorepository of three Python projects, two of which have tests set up. Running `slap test` in the
+project root folder runs all tests of all projects.
+
+<div class="highlight"><pre><span></span><code>$ slap test
+databind.core:mypy| Success: no issues found in 8 source files
+databind.core:pytest| ================== test session starts ==================
+databind.core:pytest| platform linux -- Python 3.10.2, pytest-7.1.1, pluggy-1.0.0
+databind.core:pytest| rootdir: /home/niklas/git/databind/databind.core
+collected 17 items
+databind.core:pytest|
+databind.core:pytest| test/test_context.py .                            [  5%]
+databind.core:pytest| test/test_schema.py ................              [100%]
+databind.core:pytest|
+databind.core:pytest| ================== 17 passed in 0.05s ===================
+databind.json:mypy| Success: no issues found in 5 source files
+databind.json:pytest| ================== test session starts ==================
+databind.json:pytest| platform linux -- Python 3.10.2, pytest-7.1.1, pluggy-1.0.0
+databind.json:pytest| rootdir: /home/niklas/git/databind/databind.json
+collected 32 items
+databind.json:pytest|
+databind.json:pytest| test/test_converters.py ......................... [ 78%]
+databind.json:pytest| .......                                           [100%]
+databind.json:pytest|
+databind.json:pytest| ================== 32 passed in 0.11s ===================
+
+test summary:
+  • databind.core:mypy (exit code: 0)
+  • databind.core:pytest (exit code: 0)
+  • databind.json:mypy (exit code: 0)
+  • databind.json:pytest (exit code: 0)
+</code></pre></div>
+
+</details>
+
+<h2 id="test-selection">Test selection</h2>
+<ul>
+<li>If no <code>test</code> positional argument is specified, all tests in the project or projects of the repository will be run. (<code>$ slap test</code>)</li>
+<li>To run the tests of only one project while in a monorepository folder, pass the project name as the <code>test</code> argument. (<code>$ slap test databind.core</code>)</li>
+<li>To run tests of the same name across all projects, pass the test name prefixed with a colon as the <code>test</code> argument. (<code>$ slap test :mypy</code>)</li>
+<li>To run only one particular test from a given project, pass the project name and test name separated by a colon as the
+  <code>test</code> argument. (<code>$ slap test databind.core:mypy</code>)</li>
+</ul>
 
               
             </article>

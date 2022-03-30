@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#link" class="md-skip">
+        <a href="#slap-link" class="md-skip">
           Skip to content
         </a>
       
@@ -303,14 +303,14 @@
       
       
         <label class="md-nav__link" for="__nav_5">
-          Features
+          Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Features" data-md-level="1">
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          Features
+          Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -768,14 +768,86 @@
 
 
 
-<h1 id="link">Link</h1>
-<p>This is particularly interesting when managing the package with <a href="https://python-poetry.org/">Poetry</a> as it does not currently support editable
-installs (as of Poetry 1.2.0a2 on 2022-01-14). This is a little helper command that will temporarily reorganize the
-<code>pyproject.toml</code> to be compatible with <a href="https://flit.readthedocs.io/en/latest/">Flit</a> and make use if it's symlink installation feature (<code>flit install -s</code>).</p>
-<div class="highlight"><pre><span></span><code>$ slap link
-Extras to install for deps &#39;all&#39;: {&#39;.none&#39;}
-Symlinking src/my_package -&gt; /home/niklas/.local/venvs/craftr/lib/python3.10/site-packages/my_package
+<h1 id="slap-link"><code>slap link</code></h1>
+<p>Symlink your project or all projects in a monorepository into the current Python environment. This works for <a href="https://python-poetry.org/">Poetry</a>
+projects as well.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Independent from the Python build system you are using, Slap reuses <a href="https://flit.readthedocs.io/en/latest/">Flit</a>'s symlinking feature to perform
+this action. This actually symbolically links your source code into the Python site-packages. Be aware that this
+<em>can</em> cause your code to be overwritten for example by Pip if you end up overwriting the symlinked installation
+of your package by installing another version of it into the same environment.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, <code>slap install</code> does not support linking Python projects that contain more than one package. It <em>does</em>
+support symlinking monorepositories that contain multiple Python projects (each with one package).</p>
+</div>
+<details><summary>Synopsis</summary>
+<div class="highlight"><pre><span></span><code>Description:
+  Symlink your Python package with the help of Flit.
+
+Usage:
+  link [options]
+
+Options:
+  -p, --python=PYTHON   The Python executable to install to. [default: &quot;python&quot;]
+      --dump-pyproject  Dump the updated pyproject.toml and do not actually do the linking.
+      --no-venv-check   Do not check if the target Python environment is a virtual environment.
+  -h, --help            Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet           Do not output any message.
+  -V, --version         Display this application version.
+      --ansi            Force ANSI output.
+      --no-ansi         Disable ANSI output.
+  -n, --no-interaction  Do not ask any interactive question.
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+
+  Symlink your Python package with the help of Flit.
+
+  This command uses Flit [0] to symlink the Python package you are currently
+  working on into your Python environment&#39;s site-packages. This is particulary
+  useful if your project is using a PEP 517 [1] compatible build system that does
+  not support editable installs.
+
+  When you run this command, the pyproject.toml will be temporarily rewritten such
+  that Flit can understand it. The following ways to describe a Python project are
+  currently supported be the rewriter:
+
+  1. Poetry [2]
+
+    Supported configurations:
+      - version
+      - plugins (aka. &quot;entrypoints&quot;)
+      - scripts
+
+  2. Flit [0]
+
+    Since the link command relies on Flit, no subset of configuration neeeds to be
+    explicitly supported.
+
+  Example usage:
+
+    $ slap link
+    Discovered modules in /projects/my_package/src: my_package
+    Extras to install for deps &#39;all&#39;: {&#39;.none&#39;}
+    Symlinking src/my_package -&gt; .venv/lib/python3.10/site-packages/my_package
+
+  Important notes:
+
+    This command will symlink your package into your Python environment; this is
+    much unlike a Pip editable install which instead points to your code via a
+    .pth file. If you install something into your environment that requires an
+    older version of the package you symlinked, Pip may write into those symlinked
+    files and effectively change your codebase, which could lead to potential loss
+    of changes.
+
+  [0]: https://flit.readthedocs.io/en/latest/
+  [1]: https://www.python.org/dev/peps/pep-0517/
+  [2]: https://python-poetry.org/
 </code></pre></div>
+</details>
 
               
             </article>
