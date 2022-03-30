@@ -247,9 +247,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage-examples" class="md-nav__link">
-    Usage examples
+  <a href="#documentation" class="md-nav__link">
+    Documentation
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feature-matrix" class="md-nav__link">
+    Feature Matrix
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    FAQ
+  </a>
+  
+    <nav class="md-nav" aria-label="FAQ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-slap" class="md-nav__link">
+    Why "Slap"?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-makes-this-different-to-the-poetry-cli" class="md-nav__link">
+    What makes this different to the Poetry CLI?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -802,9 +836,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage-examples" class="md-nav__link">
-    Usage examples
+  <a href="#documentation" class="md-nav__link">
+    Documentation
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feature-matrix" class="md-nav__link">
+    Feature Matrix
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    FAQ
+  </a>
+  
+    <nav class="md-nav" aria-label="FAQ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-slap" class="md-nav__link">
+    Why "Slap"?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-makes-this-different-to-the-poetry-cli" class="md-nav__link">
+    What makes this different to the Poetry CLI?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -827,79 +895,134 @@
 
 
 <h1 id="welcome-to-the-slap-documentation">Welcome to the Slap documentation!</h1>
-<p>Slap is a command-line tool for developing Python projects that provides a common interface for many tasks independent
-of the build system you use (currently supporting Setuptools via Pyproject, Poetry and Flit). It makes it easier to
-manage monorepositories of multiple projects which may even have inter-dependencies.</p>
+<p><img src="img/logo.svg" style="height: 200px !important"></p>
 <blockquote>
-<p>Developer's note: I personally use Poetry as the build system for some of its features, in particular because of
-its support for semantic version selectors which are not supported by Setuptools or Flit; but never actually
-use the Poetry CLI because I too often run into issues with it's dependency resolution and installation mechanism
-as well as its implicitly created virtual environments.</p>
+<p><em>It slaps.</em></p>
 </blockquote>
-<p>Slap provides a variety of features, including but not limited to</p>
-<ul>
-<li>Sanity check your project configuration</li>
-<li>Install your project and it's dependencies via Pip (in the right order in case of a monorepository)</li>
-<li>Symlink your project (using Flit's symlinking function internally, independent of your actual build system; Poetry
-  does not support editable installs so this is really convenient)</li>
-<li>Build and publish your project (and all its individual packages in case of a monorepository) to Pypi using Twine</li>
-<li>Release new versions (automatically update version numbers in code, create a Git tag and push)</li>
-<li>Run tests configured in your Pyproject config under <code>[tool.slap.test]</code></li>
-<li>Manage local (<code>~/.venvs</code>) and global (<code>~/.local/venvs</code>) virtual environments (backed by Python's <code>venv</code> module)</li>
-<li>Manage structured changelogs (TOML) via the CLI; easily inject PR URLs into changelog entries in pull requests via CI</li>
-</ul>
+<p>Slap is an extensive command-line tool to assist in the development of Python projects independent of the <a href="https://peps.python.org/pep-0517/">PEP 517</a>
+build backend being used, capable of managing single- and multi-project repositories.</p>
 <h2 id="installation">Installation</h2>
-<p>It is recommended to install Slap via Pipx, but you can also install it with Pip directly.</p>
+<p>We recommend installing Slap using Pipx.</p>
 <div class="highlight"><pre><span></span><code>$ pipx install slap-cli
 </code></pre></div>
 <blockquote>
-<p><strong>Note</strong>: Currently, Slap relies on an alpha version of <code>poetry-core</code> (<code>^1.1.0a6</code>). If you install it into
+<p><strong>Note</strong>: Currently Slap relies on an alpha version of <code>poetry-core</code> (<code>^1.1.0a6</code>). If you install it into
 the same environment as Poetry itself, you may also need to use an alpha version of Poetry (e.g. <code>1.2.0a2</code>).</p>
+<p>If you use Slap in GitHub Actions, try one of the actions provided by Slap directly:</p>
+<ul>
+<li><a href="https://niklasrosenstein.github.io/slap/guides/github/#install-slap"><code>NiklasRosenstein/slap@gha/install/v1</code></a></li>
+<li><a href="https://niklasrosenstein.github.io/slap/guides/github/#update-changelogs"><code>NiklasRosenstein/slap@gha/changelog/update/v1</code></a></li>
+</ul>
 </blockquote>
-<h2 id="usage-examples">Usage examples</h2>
-<p>Bootstrap a (opinionated) Poetry project using Slap.</p>
-<div class="highlight"><pre><span></span><code>$ slap init --name my.pkg
-write my-pkg/pyproject.toml
-write my-pkg/LICENSE
-write my-pkg/readme.md
-write my-pkg/.gitignore
-write my-pkg/src/my/pkg/__init__.py
-write my-pkg/test/test_import.py
-write my-pkg/src/my/pkg/py.typed
-</code></pre></div>
-<p>Sanity check your project configuration</p>
-<div class="highlight"><pre><span></span><code>$ slap check
-Checks for project slap-cli
-
-  changelog:validate           OK             — All 74 changelogs are valid.
-  general:packages             OK             — Detected /home/niklas/git/slap/src/slap
-  general:typed                OK             — py.typed exists as expected
-  poetry:classifiers           OK             — All classifiers are valid.
-  poetry:license               OK             — License &quot;MIT&quot; is a valid SPDX identifier.
-  poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
-  poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
-  release:source-code-version  OK             — Found __version__ in slap
-</code></pre></div>
-<p>Install and link your project (by default, the command protects you from accidentally installing the project; you can pass <code>--no-venv-check</code> to skip this safeguard).</p>
-<div class="highlight"><pre><span></span><code>$ slap install --link
-</code></pre></div>
-<p>Validate the version numbers in your project and release a new version.</p>
-<div class="highlight"><pre><span></span><code>$ slap release --validate
-versions are ok
-  pyproject.toml:          1.2.4 # version = &quot;1.2.4&quot;
-  src/slap/__init__.py:    1.2.4 # __version__ = &#39;1.2.4&#39;
-$ slap release --tag --push minor
-bumping 3 version references to 1.3.0
-  pyproject.toml:          1.2.4 → 1.3.0 # version = &quot;1.2.4&quot;
-  src/slap/__init__.py:    1.2.4 → 1.3.0 # __version__ = &#39;1.2.4&#39;
-
-releasing changelog
-  .changelog/_unreleased.toml → .changelog/1.3.0.toml
-
-tagging 1.3.0
-
-pushing develop, 1.3.0 to origin
-</code></pre></div>
+<h2 id="documentation">Documentation</h2>
+<p>You can find the documentation for Slap here: https://niklasrosenstein.github.io/slap/</p>
+<h2 id="feature-matrix">Feature Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manage structured changelog entries</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/changelog/">slap changelog</a></td>
+</tr>
+<tr>
+<td>Show project details</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/info/">slap info</a></td>
+</tr>
+<tr>
+<td>Build and publish to PyPI using Twine</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/publish/">slap publish</a></td>
+</tr>
+<tr>
+<td>Create a new release (bump version numbersr)</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/release/">slap release</a></td>
+</tr>
+<tr>
+<td>Run a command configured in <code>pyproject.toml</code></td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/run/">slap run</a></td>
+</tr>
+<tr>
+<td>Run tests configured in <code>pyproject.toml</code></td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/test/">slap test</a></td>
+</tr>
+<tr>
+<td>Manage Python virtualenv's</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/venv/">slap venv</a></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Feature / Build backend</th>
+<th>Flit</th>
+<th>Poetry</th>
+<th>Setuptools</th>
+<th>Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Add dependency</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/add/">slap add</a></td>
+</tr>
+<tr>
+<td>Sanity check project configuration</td>
+<td></td>
+<td>✅</td>
+<td></td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/check/">slap check</a></td>
+</tr>
+<tr>
+<td>Bootstrap project files</td>
+<td></td>
+<td>✅</td>
+<td></td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/init/">slap init</a></td>
+</tr>
+<tr>
+<td>Install projects using Pip</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/install/">slap install</a></td>
+</tr>
+<tr>
+<td>Symlink projects (editable installs)</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/link/">slap link</a></td>
+</tr>
+<tr>
+<td>Bump interdependencies in monorepository</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅ (partial)</td>
+<td><a href="https://niklasrosenstein.github.io/slap/commands/release/">slap release</a></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Legend</strong>: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or curerntly not supported</p>
+</blockquote>
+<h2 id="faq">FAQ</h2>
+<h3 id="why-slap">Why "Slap"?</h3>
+<p>Finding a good, catchy name that also types easily in the terminal and is not already widely used isn't easy, ok?</p>
+<h3 id="what-makes-this-different-to-the-poetry-cli">What makes this different to the Poetry CLI?</h3>
+<p>Poetry has it's own dependencies resolver and installer, but Slap just uses Pip. Slap also does not create or respect
+lock files, so it may be more suitable to the development of reusable code than applications. Unlike Poetry, Slap
+supports handling multiple Python projects under one repository (such as installing, symlinking, running tests,
+publishing). While Poetry will create a virtual environment for you, Slap gives you an easy way to manage virtual
+environments (backed by the <code>venv</code> stdlib module) and protects you from accidentally installing your project(s)
+without a virtual environment enabled.</p>
 
               
             </article>
