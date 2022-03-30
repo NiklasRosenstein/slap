@@ -777,7 +777,7 @@
 <h1 id="slap-test"><code>slap test</code></h1>
 <p>Runs some or all of the tests from the Slap configuration. This is different from <a href="../run/"><code>slap run</code></a> in that by
 default it runs multiple commands, prefixes the output them with the test name (similar to <code>docker-compose logs</code>),
-works across multiple projects in a monorepository and prints a summary of the results at the end.</p>
+works across multiple projects in a mono-repository and prints a summary of the results at the end.</p>
 <details><summary>Synopsis</summary>
 <div class="highlight"><pre><span></span><code>Description:
   Execute commands configured in [tool.slap.test].
@@ -850,7 +850,7 @@ Help:
 
 <details><summary>Example from the <a href="https://github.com/NiklasRosenstein/python-databind">databind</a> project</summary>
 
-Databind is a monorepository of three Python projects, two of which have tests set up. Running `slap test` in the
+Databind is a mono-repository of three Python projects, two of which have tests set up. Running `slap test` in the
 project root folder runs all tests of all projects.
 
 <div class="highlight"><pre><span></span><code>$ slap test
@@ -887,7 +887,7 @@ test summary:
 <h2 id="test-selection">Test selection</h2>
 <ul>
 <li>If no <code>test</code> positional argument is specified, all tests in the project or projects of the repository will be run. (<code>$ slap test</code>)</li>
-<li>To run the tests of only one project while in a monorepository folder, pass the project name as the <code>test</code> argument. (<code>$ slap test databind.core</code>)</li>
+<li>To run the tests of only one project while in a mono-repository folder, pass the project name as the <code>test</code> argument. (<code>$ slap test databind.core</code>)</li>
 <li>To run tests of the same name across all projects, pass the test name prefixed with a colon as the <code>test</code> argument. (<code>$ slap test :mypy</code>)</li>
 <li>To run only one particular test from a given project, pass the project name and test name separated by a colon as the
   <code>test</code> argument. (<code>$ slap test databind.core:mypy</code>)</li>

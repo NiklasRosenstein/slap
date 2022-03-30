@@ -816,7 +816,7 @@
 
 <h1 id="usage-examples">Usage examples</h1>
 <p>Slap provides a variety of features to increase productivity for Python developers. It supports dealing with
-multiple Python projects managed from a monorepository, in which case most operations are homogenously applied
+multiple Python projects managed from a mono-repository, in which case most operations are homogenously applied
 across all projects.</p>
 <p>All features are implemented as <a href="/slap/api/documentation#pydoc:slap.plugins.ApplicationPlugin">Class ApplicationPlugin</a> and most features provide additional
 interfaces to plug into their functionality (such as additional plugins for the <code>slap check</code> and <code>slap release</code>
@@ -921,7 +921,7 @@ checking and unit tests.</p>
 <p>The <a href="../commands/release/"><code>slap release</code></a> command updates version numbers in your code base and can create a Git commit
 and tag, and push it to the <code>origin</code> remote. It can also be used to validate if all version references that can be
 found match. Without further configuration, the command will find the version in your <code>pyproject.toml</code> as well as the
-version numbers of dependencies to projects in the same monorepository (if applicable) and the <code>__version__</code> in your
+version numbers of dependencies to projects in the same mono-repository (if applicable) and the <code>__version__</code> in your
 source code.</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
   pyproject.toml:       1.4.0 # &#39;version = &quot;1.4.0&quot;&#39;

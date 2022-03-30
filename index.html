@@ -261,6 +261,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#issues-suggestions-contributions" class="md-nav__link">
+    Issues / Suggestions / Contributions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
@@ -796,6 +803,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#issues-suggestions-contributions" class="md-nav__link">
+    Issues / Suggestions / Contributions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#faq" class="md-nav__link">
     FAQ
   </a>
@@ -848,7 +862,7 @@
 <p>Slap is an extensive command-line tool to assist in the development of Python projects independent of the <a href="https://peps.python.org/pep-0517/">PEP 517</a>
 build backend being used, capable of managing single- and multi-project repositories.</p>
 <h2 id="installation">Installation</h2>
-<p>We recommend installing Slap using Pipx. (Requires Python 3.10 or higher)</p>
+<p>I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)</p>
 <div class="highlight"><pre><span></span><code>$ pipx install slap-cli
 </code></pre></div>
 <blockquote>
@@ -861,7 +875,7 @@ the same environment as Poetry itself, you may also need to use an alpha version
 </ul>
 </blockquote>
 <h2 id="documentation">Documentation</h2>
-<p>You can find the documentation for Slap here: https://niklasrosenstein.github.io/slap/</p>
+<p>You can find the documentation for Slap here: <a href="https://niklasrosenstein.github.io/slap/">https://niklasrosenstein.github.io/slap/</a></p>
 <h2 id="feature-matrix">Feature Matrix</h2>
 <table>
 <thead>
@@ -948,7 +962,7 @@ the same environment as Poetry itself, you may also need to use an alpha version
 <td><a href="https://niklasrosenstein.github.io/slap/commands/link/">slap link</a></td>
 </tr>
 <tr>
-<td>Bump interdependencies in monorepository</td>
+<td>Bump interdependencies in mono-repository</td>
 <td>✅ (not tested regularly)</td>
 <td>✅</td>
 <td>✅ (partial)</td>
@@ -957,18 +971,37 @@ the same environment as Poetry itself, you may also need to use an alpha version
 </tbody>
 </table>
 <blockquote>
-<p><strong>Legend</strong>: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or curerntly not supported</p>
+<p><strong>Legend</strong>: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or currently not supported</p>
 </blockquote>
+<h2 id="issues-suggestions-contributions">Issues / Suggestions / Contributions</h2>
+<p>Slap is currently very opinionated by the fact that I built it as my personal workflow tool, but I welcome
+suggestions and contributions, and I am hopeful it will be useful to a wider audience than myself.</p>
+<p>Please report any issues you encounter via <a href="https://github.com/NiklasRosenstein/slap/issues">GitHub Issues</a>. Feel free to use the <a href="https://github.com/NiklasRosenstein/slap/discussions">GitHub Discussions</a> forum
+to ask questions or make suggestions on new features (e.g. if you would like a new build backend to be supported?).
+Lastly, feel free to submit pull requests to the <a href="https://github.com/NiklasRosenstein/slap">GitHub Repository</a>.</p>
 <h2 id="faq">FAQ</h2>
 <h3 id="why-slap">Why "Slap"?</h3>
 <p>Finding a good, catchy name that also types easily in the terminal and is not already widely used isn't easy, ok?</p>
 <h3 id="what-makes-this-different-to-the-poetry-cli">What makes this different to the Poetry CLI?</h3>
-<p>Poetry has it's own dependencies resolver and installer, but Slap just uses Pip. Slap also does not create or respect
-lock files, so it may be more suitable to the development of reusable code than applications. Unlike Poetry, Slap
-supports handling multiple Python projects under one repository (such as installing, symlinking, running tests,
-publishing). While Poetry will create a virtual environment for you, Slap gives you an easy way to manage virtual
-environments (backed by the <code>venv</code> stdlib module) and protects you from accidentally installing your project(s)
-without a virtual environment enabled.</p>
+<p>Some people might find this similar to tools like Poetry, and while there is some overlap in functionality, Slap is
+<strong>not a build backend</strong> and is more targeted towards library development. In fact, most of my projects use Poetry as
+the build backend but I never even once interact with the Poetry CLI throughout the lifetime of the project.</p>
+<p>The most notable differences to Poetry are</p>
+<ul>
+<li>Supports mono-repositories (i.e. multiple related Python projects in the same repository), to the extent that it
+  bumps version numbers of project inter-dependencies and installs your projects in topological order</li>
+<li>Supports development installs independent of the build backend (yes; this means you can install Poetry packages
+  in editable mode even though the Poetry backend right now does not support editable installs)</li>
+<li>Slap's version bump command (<code>slap release</code>) updates the version not just in your <code>pyproject.toml</code> but also the
+  <code>__version__</code> in your source code as well as in related projects (see mono-repositories above) and any additional
+  references you can configure via Regex patterns</li>
+<li>Does not automagically create a virtual environment for you when instal your project(s); instead, it errors when
+  you try to install into a non-virtual Python environment and gives you an easy-to-use tool to create and activate
+  virtual environments (and allowing multiple environments per project as well as global environments)</li>
+<li>Uses Pip to install your project(s), unlike Poetry which comes with its own dependency resolver and package
+  installer (which I personally have been having a lot of issues with in the past).</li>
+<li>Does not have a concept of lock files</li>
+</ul>
 
               
             </article>
