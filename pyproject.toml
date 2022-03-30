@@ -104,6 +104,7 @@ mypy = "mypy src --namespace-packages"
 check = "slap check"
 
 [tool.slap.run]
+"docs:build" = "cd docs && novella --base-url slap/"
 "docs:dev" = "cd docs && novella --serve"
 
 [tool.slap.install]

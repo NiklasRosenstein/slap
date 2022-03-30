@@ -11,7 +11,7 @@ build backend being used, capable of managing single- and multi-project reposito
 
 ## Installation
 
-We recommend installing Slap using Pipx.
+We recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
 
     $ pipx install slap-cli
 

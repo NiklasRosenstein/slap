@@ -15,50 +15,32 @@ jobs:
         python-version: ["3.10", "3.x"]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: python -m pip install poetry==1.2.0a2 .
-    - name: Install with poetry
-      run: pip install . && slap install --no-venv-check
-    - name: Test
-      run: slap info && slap test
+    - uses: actions/setup-python@v2
+      with: { python-version: "${{ matrix.python-version }}" }
+    - run: python -m pip install poetry==1.2.0a2 .
+    - run: pip install . && slap install --no-venv-check
+    - run: slap info && slap test
 
   docs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Checkout branch if PR
+      with: { fetch-depth: 0 }
+    - run: git checkout -b $GITHUB_HEAD_REF
       if: github.event_name == 'pull_request'
-      run: git checkout -b $GITHUB_HEAD_REF
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - uses: actions/setup-python@v2
       with: { python-version: "3.10" }
-    - name: Install dependencies
-      run: python -m pip install pipx -q && pipx install . && slap install --only-extras docs --no-venv-check -vv
-    - name: Build documentation
-      run: cd docs && novella --base-url slap/
+    - run: python -m pip install pipx -q && pipx install . && slap install --only-extras docs --no-venv-check -vv
+    - run: slap run docs:build
     - uses: actions/upload-artifact@v2
-      with:
-        name: docs
-        path: docs/_site
+      with: { name: docs, path: docs/_site }
 
   docs-publish:
     needs: [ test, docs ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v2
-      with:
-        name: docs
-        path: docs/_site
-    - name: Deploy to GitHub Pages
-      uses: Cecilapp/GitHub-Pages-deploy@v3
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        email: rosensteinniklas@gmail.com
-        build_dir: docs/_site
+      with: { name: docs, path: docs/_site }
+    - uses: Cecilapp/GitHub-Pages-deploy@v3
+      env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      with: { email: rosensteinniklas@gmail.com, build_dir: docs/_site }
