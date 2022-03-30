@@ -828,7 +828,7 @@
 
 <h1 id="glossary">Glossary</h1>
 <h2 id="project">Project</h2>
-<p>At it's core, any directory can be a "project", but most projects would have a <code>pyproject.toml</code> or <code>shut.toml</code>
+<p>At it's core, any directory can be a "project", but most projects would have a <code>pyproject.toml</code> or <code>slap.toml</code>
 configuration file. Most commonly, it will have a <code>pyproject.toml</code> file that contains the Slap configuration
 under the <code>[tool.slap]</code> namespace. Many concepts in Slap are attached directly to a project. For example if
 the project has a <code>pyproject.toml</code>, it is considered a Python project, and Python projects can have packages
@@ -841,7 +841,7 @@ with a default implementation that supports Poetry and Flit Python projects.</p>
 <h2 id="repository">Repository</h2>
 <p>A repository is a directory that contains one or more projects. For singular projects, the repository directory
 is the same as the project directory. For a mono-repository configuration, any directory that contains multiple
-projects is considered the repository directory (it usually contains a <code>shut.toml</code> configuration file).</p>
+projects is considered the repository directory (it usually contains a <code>slap.toml</code> configuration file).</p>
 <p>Note that the repository directory is <em>also</em> considered a project directory, but if it isn't also a Python
 project (i.e. if it has a <code>pyproject.toml</code> instead of a <code>slap.toml</code>) it will be ignored for most Slap commands.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Single project</label><label for="__tabbed_1_2">Mono repository</label></div>
@@ -866,7 +866,7 @@ project (i.e. if it has a <code>pyproject.toml</code> instead of a <code>slap.to
     readme.md
     src/
     tests/
-  shut.toml
+  slap.toml
 </code></pre></div>
 </div>
 </div>
