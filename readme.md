@@ -84,9 +84,9 @@ The most notable differences to Poetry are
 * Slap's version bump command (`slap release`) updates the version not just in your `pyproject.toml` but also the
   `__version__` in your source code as well as in related projects (see mono-repositories above) and any additional
   references you can configure via Regex patterns
-* Does not auto-magically create a virtual environment for you when instal your project(s); instead it errors when
+* Does not automagically create a virtual environment for you when instal your project(s); instead, it errors when
   you try to install into a non-virtual Python environment and gives you an easy-to-use tool to create and activate
   virtual environments (and allowing multiple environments per project as well as global environments)
-* Uses Pip to install your project(s), unlike Poetry which comes with it's own dependency resolver and package
+* Uses Pip to install your project(s), unlike Poetry which comes with its own dependency resolver and package
   installer (which I personally have been having a lot of issues with in the past).
 * Does not have a concept of lock files
