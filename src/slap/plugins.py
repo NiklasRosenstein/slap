@@ -112,7 +112,7 @@ class ProjectHandlerPlugin(abc.ABC):
 
 
 class CheckPlugin(abc.ABC):
-  """ This plugin type can be implemented to add custom checks to the `shut check` command. Note that checks will
+  """ This plugin type can be implemented to add custom checks to the `slap check` command. Note that checks will
   be grouped and their names prefixed with the plugin name, so that name does not need to be included in the name
   of the returned checks. """
 
