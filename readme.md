@@ -1,8 +1,8 @@
 # Slap
 
-<img src="docs/img/logo.svg" height="200px">
+<img src="docs/content/img/logo.svg" style="height: 200px !important">
 
-*This slaps!*
+> *It slaps.*
 
   [PEP 517]: https://peps.python.org/pep-0517/
 
