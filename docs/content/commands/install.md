@@ -1,6 +1,6 @@
 # `slap install`
 
-Install the current project or all projects in a monorepository into the current Python environment, including
+Install the current project or all projects in a mono-repository into the current Python environment, including
 development dependencies and extras. After cloning a new repository, this is often the first command you run
 after creating a virtual environment (for that, see [`slap venv`](venv.md)).
 

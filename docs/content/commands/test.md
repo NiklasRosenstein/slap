@@ -2,7 +2,7 @@
 
 Runs some or all of the tests from the Slap configuration. This is different from [`slap run`](run.md) in that by
 default it runs multiple commands, prefixes the output them with the test name (similar to `docker-compose logs`),
-works across multiple projects in a monorepository and prints a summary of the results at the end.
+works across multiple projects in a mono-repository and prints a summary of the results at the end.
 
 <details><summary>Synopsis</summary>
 ```
@@ -31,7 +31,7 @@ pytest = "pytest test/"
 
 <details><summary>Example from the <a href="https://github.com/NiklasRosenstein/python-databind">databind</a> project</summary>
 
-Databind is a monorepository of three Python projects, two of which have tests set up. Running `slap test` in the
+Databind is a mono-repository of three Python projects, two of which have tests set up. Running `slap test` in the
 project root folder runs all tests of all projects.
 
 ```
@@ -70,7 +70,7 @@ test summary:
 ## Test selection
 
 * If no `test` positional argument is specified, all tests in the project or projects of the repository will be run. (`$ slap test`)
-* To run the tests of only one project while in a monorepository folder, pass the project name as the `test` argument. (`$ slap test databind.core`)
+* To run the tests of only one project while in a mono-repository folder, pass the project name as the `test` argument. (`$ slap test databind.core`)
 * To run tests of the same name across all projects, pass the test name prefixed with a colon as the `test` argument. (`$ slap test :mypy`)
 * To run only one particular test from a given project, pass the project name and test name separated by a colon as the
   `test` argument. (`$ slap test databind.core:mypy`)

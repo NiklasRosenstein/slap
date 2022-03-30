@@ -4,10 +4,10 @@ The Slap configuration is read either from a `slap.toml` file or from the `[tool
 
 !!! note
 
-    A `slap.toml` configuration file is usually only used at the project root in case of monorepositories for multiple
+    A `slap.toml` configuration file is usually only used at the project root in case of mono-repositories for multiple
     Python projects. The file is often used to
     
-    * disable monorepository-level changelogs ([`slap changelog`](commands/changelog.md#configuration))
+    * disable mono-repository level changelogs ([`slap changelog`](commands/changelog.md#configuration))
     * configure global tests or commands ([`slap run`](commands/run.md#configuration), [`slap test`](commands/test.md#configuration))
     * global version references ([`slap release`](commands/release.md#configuration))
 

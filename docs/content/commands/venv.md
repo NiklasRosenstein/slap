@@ -2,7 +2,7 @@
 
 The `slap venv` command is a utility for managing virtual environments created using the standard library `venv`
 module in the current directory or globally (in `~/.local/venvs`).
-s across multiple projects in a monorepository and prints a summary of the results at the end.
+s across multiple projects in a mono-repository and prints a summary of the results at the end.
 
 <details><summary>Synopsis <code>venv</code></summary>
 ```

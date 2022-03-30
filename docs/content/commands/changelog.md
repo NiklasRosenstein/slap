@@ -9,7 +9,7 @@ Option scope: `[tool.slap.changelog]` or `[changelog]`
 
 | Option | Type | Default | Description |
 | ------ | ---- | ------- | ----------- |
-| `enabled` | `bool` | `True` | Whether the changelog feature is enabled for the directory in which the option is configured. This is useful to disable on the root of a monorepository that contains multiple Python projects if one wants to prevent accidentally add changelog entries to the root directory. |
+| `enabled` | `bool` | `True` | Whether the changelog feature is enabled for the directory in which the option is configured. This is useful to disable on the root of a mono-repository that contains multiple Python projects if one wants to prevent accidentally add changelog entries to the root directory. |
 | `directory` | `str` | `.changelog/` | The directory in which the changelogs are stored. |
 | `valid-types` | `list[str]` | `["breaking change", "docs", "feature", "fix", "hygiene", "improvement", "tests"]` | A list of strings that are accepted in changelog entries as types. |
 

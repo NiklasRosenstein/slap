@@ -157,8 +157,8 @@ def interdependencies_enabled(project: Project) -> bool:
 
 def get_pyproject_interdependency_version_refs(project: Project) -> list[VersionRef]:
   """ Identifies version references of another project in the set of projects loaded in the application. This is
-  relevant in case when Slap is used in a monorepository where all projects share the same version, and bumping
-  version numbers should also bump the version number of dependencies between projects in that monorepository. """
+  relevant in case when Slap is used in a mono-repository where all projects share the same version, and bumping
+  version numbers should also bump the version number of dependencies between projects in that mono-repository. """
 
   pyproject_file = project.pyproject_toml.path
   other_projects: list[str] = [

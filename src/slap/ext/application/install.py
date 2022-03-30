@@ -46,7 +46,7 @@ class InstallConfig:
   This configures the behaviour of the `slap install` command. """
 
   #: Additional extras that are installable with `--extras` or `--only-extras`. These are taken into account
-  #: for projects as well as the monorepository root. They may contain semantic version selector (same style
+  #: for projects as well as the mono-repository root. They may contain semantic version selector (same style
   #: as supported by Poetry).
   extras: dict[str, list[str]] = dataclasses.field(default_factory=dict)
 

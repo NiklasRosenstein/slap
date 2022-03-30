@@ -3,7 +3,7 @@
   [Flit]: https://flit.readthedocs.io/en/latest/
   [Poetry]: https://python-poetry.org/
 
-Symlink your project or all projects in a monorepository into the current Python environment. This works for [Poetry][]
+Symlink your project or all projects in a mono-repository into the current Python environment. This works for [Poetry][]
 projects as well.
 
 !!! warning

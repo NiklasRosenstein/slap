@@ -2,7 +2,7 @@
 
   [Twine]: https://twine.readthedocs.io/en/stable/
 
-This command builds an `sdist` and `wheel` distribution for your project or every project in your monorepository and
+This command builds an `sdist` and `wheel` distribution for your project or every project in your mono-repository and
 publishes it using [Twine][] (the command has pretty much all the same options). Often you will use this command
 immediately after running [`slap release`](release.md) or from a CI job when new tag/release was created.
 

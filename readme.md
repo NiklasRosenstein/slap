@@ -11,7 +11,7 @@ build backend being used, capable of managing single- and multi-project reposito
 
 ## Installation
 
-We recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
+I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
 
     $ pipx install slap-cli
 
@@ -25,7 +25,7 @@ We recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
 
 ## Documentation
 
-You can find the documentation for Slap here: https://niklasrosenstein.github.io/slap/
+You can find the documentation for Slap here: <https://niklasrosenstein.github.io/slap/>
 
 ## Feature Matrix
 
@@ -46,9 +46,22 @@ You can find the documentation for Slap here: https://niklasrosenstein.github.io
 | Bootstrap project files | | ✅ | | [slap init](https://niklasrosenstein.github.io/slap/commands/init/) |
 | Install projects using Pip | ✅ | ✅ | ✅ | [slap install](https://niklasrosenstein.github.io/slap/commands/install/) |
 | Symlink projects (editable installs) | ✅ | ✅ | ✅ | [slap link](https://niklasrosenstein.github.io/slap/commands/link/) |
-| Bump interdependencies in monorepository | ✅ (not tested regularly) | ✅ | ✅ (partial) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
+| Bump interdependencies in mono-repository | ✅ (not tested regularly) | ✅ | ✅ (partial) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
 
-> __Legend__: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or curerntly not supported
+> __Legend__: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or currently not supported
+
+## Issues / Suggestions / Contributions
+
+  [GitHub Issues]: https://github.com/NiklasRosenstein/slap/issues
+  [GitHub Discussions]: https://github.com/NiklasRosenstein/slap/discussions
+  [GitHub Repository]: https://github.com/NiklasRosenstein/slap
+
+Slap is currently very opinionated by the fact that I built it as my personal workflow tool, but I welcome
+suggestions and contributions, and I am hopeful it will be useful to a wider audience than myself.
+
+Please report any issues you encounter via [GitHub Issues][]. Feel free to use the [GitHub Discussions][] forum
+to ask questions or make suggestions on new features (e.g. if you would like a new build backend to be supported?).
+Lastly, feel free to submit pull requests to the [GitHub Repository][].
 
 ## FAQ
 
@@ -58,9 +71,22 @@ Finding a good, catchy name that also types easily in the terminal and is not al
 
 ### What makes this different to the Poetry CLI?
 
-Poetry has it's own dependencies resolver and installer, but Slap just uses Pip. Slap also does not create or respect
-lock files, so it may be more suitable to the development of reusable code than applications. Unlike Poetry, Slap
-supports handling multiple Python projects under one repository (such as installing, symlinking, running tests,
-publishing). While Poetry will create a virtual environment for you, Slap gives you an easy way to manage virtual
-environments (backed by the `venv` stdlib module) and protects you from accidentally installing your project(s)
-without a virtual environment enabled.
+Some people might find this similar to tools like Poetry, and while there is some overlap in functionality, Slap is
+**not a build backend** and is more targeted towards library development. In fact, most of my projects use Poetry as
+the build backend but I never even once interact with the Poetry CLI throughout the lifetime of the project.
+
+The most notable differences to Poetry are
+
+* Supports mono-repositories (i.e. multiple related Python projects in the same repository), to the extent that it
+  bumps version numbers of project inter-dependencies and installs your projects in topological order
+* Supports development installs independent of the build backend (yes; this means you can install Poetry packages
+  in editable mode even though the Poetry backend right now does not support editable installs)
+* Slap's version bump command (`slap release`) updates the version not just in your `pyproject.toml` but also the
+  `__version__` in your source code as well as in related projects (see mono-repositories above) and any additional
+  references you can configure via Regex patterns
+* Does not auto-magically create a virtual environment for you when instal your project(s); instead it errors when
+  you try to install into a non-virtual Python environment and gives you an easy-to-use tool to create and activate
+  virtual environments (and allowing multiple environments per project as well as global environments)
+* Uses Pip to install your project(s), unlike Poetry which comes with it's own dependency resolver and package
+  installer (which I personally have been having a lot of issues with in the past).
+* Does not have a concept of lock files

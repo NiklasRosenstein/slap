@@ -14,7 +14,7 @@ This command updates the version numbers in your project(s).
 | ------- | ------ | ---- |
 | Check for consistent version numbers across files in your repository | ❌ | ✅ |
 | Update version number in `pyproject.toml` | ✅ | ✅ |
-| Update dependencies of another project within the same monorepository (interdependencies) | | ✅ |
+| Update dependencies of another project within the same mono-repository (interdependencies) | | ✅ |
 | Update `__version__` in source code | ❌ | ✅ |
 | Update and rename Slap structure changelog files | | ✅ |
 | Commit changes, create a tag and push to Git remote | ❌ | ✅ |

@@ -1,7 +1,7 @@
 # Usage examples
 
 Slap provides a variety of features to increase productivity for Python developers. It supports dealing with
-multiple Python projects managed from a monorepository, in which case most operations are homogenously applied
+multiple Python projects managed from a mono-repository, in which case most operations are homogenously applied
 across all projects.
 
 All features are implemented as {@pylink slap.plugins.ApplicationPlugin} and most features provide additional
@@ -63,7 +63,7 @@ pytest = "pytest test/"
 The [`slap release`](commands/release.md) command updates version numbers in your code base and can create a Git commit
 and tag, and push it to the `origin` remote. It can also be used to validate if all version references that can be
 found match. Without further configuration, the command will find the version in your `pyproject.toml` as well as the
-version numbers of dependencies to projects in the same monorepository (if applicable) and the `__version__` in your
+version numbers of dependencies to projects in the same mono-repository (if applicable) and the `__version__` in your
 source code.
 
 ``` title="$ slap release --validate"

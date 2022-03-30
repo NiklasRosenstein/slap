@@ -30,7 +30,7 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
 
   * A VCS can be detected (and projects are loaded from the VCS root).
   * If a README file, LICENSE file, or a Pyproject or Slap configuration file exists. This is to avoid mistakenly
-    considering a directory that contains independent Python projects as a monorepository.
+    considering a directory that contains independent Python projects as a mono-repository.
 
   !!! note
 
