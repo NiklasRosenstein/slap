@@ -20,6 +20,8 @@ All options described below must be placed in the `[tool.slap.changelog]` (for `
 
 </details>
 
+---
+
 ## Subcommands
 
 ### `slap changelog add`
@@ -68,6 +70,8 @@ DEFAULT_VALID_TYPES = [
 ```
 </details>
 
+---
+
 ### `slap changelog convert`
 
 This command converts changelogs from the previous YAML-based format used by Shut (a predecessor to Slap) to the
@@ -78,6 +82,8 @@ TOML format.
 @shell slap changelog convert --help
 ```
 </details>
+
+---
 
 ### `slap changelog format`
 
@@ -96,6 +102,8 @@ This is actually used in this very documentation: Check out the [Changelog](../c
 @shell slap changelog format --help
 ```
 </details>
+
+---
 
 ### `slap changelog update-pr`
 

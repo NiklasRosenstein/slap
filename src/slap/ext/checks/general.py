@@ -7,6 +7,9 @@ from slap.project import Project
 
 
 class GeneralChecksPlugin(CheckPlugin):
+  """ This plugin provides general checks applicable to all types of projects managed with Slap.
+
+  Plugin ID: `general`. """
 
   # TODO (@NiklasRosenstein): Check if VCS remote is configured?
 
@@ -15,6 +18,9 @@ class GeneralChecksPlugin(CheckPlugin):
 
   @check('packages')
   def _check_detect_packages(self, project: Project) -> tuple[CheckResult, str | None]:
+    """ Checks if the project handler employed by Slap for your project is detecting any Python packages. If no
+    Python packages can be detected, it might hint at a configuration issue. """
+
     packages = project.packages()
     result = Check.Result.SKIPPED if packages is None else Check.Result.OK if packages else Check.Result.ERROR
     message = 'Detected ' + ", ".join(f'<b>{p.root}/{p.name}</b>' for p in packages) if packages else None

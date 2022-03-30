@@ -12,6 +12,7 @@ from slap.project import Project
 
 
 class ReleaseChecksPlugin(CheckPlugin):
+  """ Performs some checks relevant for the `slap release` command. """
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
     return get_checks(self, project)
@@ -20,7 +21,9 @@ class ReleaseChecksPlugin(CheckPlugin):
     return get_checks(self, app)
 
   @check('source-code-version')
-  def _check_packages_have_source_code_version(self, project: Project) -> tuple[CheckResult, str]:
+  def check_packages_have_source_code_version(self, project: Project) -> tuple[CheckResult, str]:
+    """ Checks if all Python packages in the project have a version defined in the source code. """
+
     if not project.packages():
       return Check.WARNING, 'No packages detected'
 
@@ -42,7 +45,10 @@ class ReleaseChecksPlugin(CheckPlugin):
     )
 
   @check('consistent-versions')
-  def _check_version_number_consistency(self, app: Application) -> tuple[CheckResult, str]:
+  def check_version_number_consistency(self, app: Application) -> tuple[CheckResult, str]:
+    """ Checks if the version numbers in the project source code, project configuration and any other instances
+    that are detected by release plugins or in the `[tool.slap.release].references` option are consistent. """
+
     releaser = ReleaseCommandPlugin()
     releaser.load_configuration(app)
 

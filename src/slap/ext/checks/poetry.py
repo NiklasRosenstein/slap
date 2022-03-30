@@ -28,7 +28,9 @@ def get_readme_path(project: Project) -> Path | None:
 
 
 class PoetryChecksPlugin(CheckPlugin):
-  """ Check plugin to validate the Poetry configuration and compare it with Slap's expectations. """
+  """ Check plugin to validate the Poetry configuration and compare it with Slap's expectations.
+
+  Plugin ID: `poetry` """
 
   def get_project_checks(self, project: Project) -> t.Iterable[Check]:
     self.project = project
@@ -42,6 +44,8 @@ class PoetryChecksPlugin(CheckPlugin):
 
   @check('readme')
   def get_readme_check(self, project: Project) -> tuple[CheckResult, str]:
+    """ Checks if Poetry will be able to pick up the right readme file. """
+
     default_readmes = ['README.md', 'README.rst']
     detected_readme = Optional(get_readme_path(self.project))\
       .map(lambda p: str(p.resolve().relative_to(Path.cwd()))).or_else(None)
@@ -54,6 +58,9 @@ class PoetryChecksPlugin(CheckPlugin):
 
   @check('urls')
   def get_urls_check(self, project: Project) -> tuple[CheckResult, str]:
+    """ Checks if URLs are configured in the Poetry configuration and recommends to configure the `Homepage`,
+    `Repository`, `Documentation` and `Bug Tracker` URLs under `[tool.poetry.urls]`. """
+
     has_homepage = 'homepage' in self.poetry or 'homepage' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
     has_repository = 'repository' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
     has_documentation = 'documentation' in {x.lower() for x in self.poetry.get('urls', {}).keys()}
@@ -74,6 +81,8 @@ class PoetryChecksPlugin(CheckPlugin):
 
   @check('classifiers')
   def get_classifiers_check(self, project: Project) -> tuple[CheckResult, str]:
+    """ Checks if all Python package classifiers are valid and recommends to configure them if none are set. """
+
     # TODO: Check for recommended classifier topics (Development State, Environment, Programming Language, Topic, Typing, etc.)
     classifiers = self.poetry.get('classifiers')  # TODO: Support classifiers in [project]
     if not classifiers:
@@ -92,6 +101,9 @@ class PoetryChecksPlugin(CheckPlugin):
 
   @check('license')
   def get_license_check(self, project: Project) -> tuple[CheckResult, str]:
+    """ Checks if package license is a valid SPDX license identifier and recommends to configure a license if
+    none is set. """
+
     from slap.util.external.licenses import get_spdx_licenses
     license = self.poetry.get('license')
     if not license:
