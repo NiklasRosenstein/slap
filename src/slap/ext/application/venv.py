@@ -281,7 +281,9 @@ class VenvCommand(Command):
         self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         return 1
 
-      if not self._is_called_from_shadow():
+      if self._is_called_from_shadow():
+        self.line_error(f'activating {location} environment <s>"{venv.name}"</s>', 'info')
+      else:
         self.line_error('warning: the <opt>-a,--activate</opt> option only works when shadowed by a shell function', 'warning')
 
       # TODO (@NiklasRosenstein): Adjust output based on the shell that this is called from?

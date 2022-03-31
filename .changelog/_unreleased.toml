@@ -21,3 +21,9 @@ id = "790ff132-9782-43fa-99f1-f2866f01cf17"
 type = "improvement"
 description = "Improve changelog checks plugin to catch more types of errors to return in the check details"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "acad8c34-9c3b-4ed7-a198-3ba0f2ef9b4e"
+type = "improvement"
+description = "improve output produces by `slap venv -a`, `slap publish` and `slap release`"
+author = "@NiklasRosenstein"

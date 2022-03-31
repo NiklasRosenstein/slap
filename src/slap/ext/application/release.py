@@ -455,7 +455,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
       if self.option("tag") and not self._check_clean_worktree([x.file for x in version_refs]):
         return 1
       if self.option("dry"):
-        self.line('dry mode enabled, no changes will be committed to disk', 'comment')
+        self.line_error('dry mode enabled, no changes will be committed to disk', 'comment')
       target_version = self._get_new_version(version_refs, version)
       changed_files = self._bump_version(version_refs, target_version, self.option("dry"))
       if self.option("tag"):

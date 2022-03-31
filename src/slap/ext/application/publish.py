@@ -80,6 +80,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
         distributions += [sdist, wheel]
 
       if not self.option("dry"):
+        self.line(f'Publishing')
         kwargs = {option.name.replace('-', '_'): self.option(option.name) for option in self.options}
         kwargs['repository_name'] = kwargs.pop('repository')
         settings = Settings(**kwargs)
