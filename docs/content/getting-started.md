@@ -58,16 +58,21 @@ command will use Pip to install your package and all of its dependencies.
 
 > You are not required to use Slap's `venv` command for this step, you can be in any kind of Python virtual environment.
 
-Using the `--link` option will instead symlink your package into the Python environment instead of installing it with
-Pip (all dependencies will be installed with Pip as usually), and this even works for Poetry packages (the Poetry build
-backend does not currently support editable installs).
+!!! note
 
-    (3.10) $ slap install --link
-    [ ... pip install output here ... ]
-    symlinking my_package
+    Using the `--link` option will symlink your package into the Python environment instead of installing it with
+    Pip, allowing you to make edits to your source code without needing to re-install it after every change. If all
+    your dependencies are already installed, you can also use the [`slap link`](commands/link.md) command to only do
+    the linking step (this is also convenient if only your project's entry points have changed).
 
-If you are not currently in a virtual environment, Slap will refuse to install unless you pass the `--no-venv-check`.
-This is to protect you from accidentally installing into a global Python installation.
+```
+(3.10) $ slap install --link
+... pip install output here ...
+symlinking my_package
+```
+
+If you are not currently in a virtual environment, Slap will refuse to install unless you pass the `--no-venv-check`
+option. This is to protect you from accidentally installing into a global Python installation.
 
     (3.10) $ deactivate
     $ slap install
