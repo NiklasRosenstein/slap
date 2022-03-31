@@ -960,15 +960,19 @@ command will use Pip to install your package and all of its dependencies.</p>
 <blockquote>
 <p>You are not required to use Slap's <code>venv</code> command for this step, you can be in any kind of Python virtual environment.</p>
 </blockquote>
-<p>Using the <code>--link</code> option will instead symlink your package into the Python environment instead of installing it with
-Pip (all dependencies will be installed with Pip as usually), and this even works for Poetry packages (the Poetry build
-backend does not currently support editable installs).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using the <code>--link</code> option will symlink your package into the Python environment instead of installing it with
+Pip, allowing you to make edits to your source code without needing to re-install it after every change. If all
+your dependencies are already installed, you can also use the <a href="../commands/link/"><code>slap link</code></a> command to only do
+the linking step (this is also convenient if only your project's entry points have changed).</p>
+</div>
 <div class="highlight"><pre><span></span><code>(3.10) $ slap install --link
-[ ... pip install output here ... ]
+... pip install output here ...
 symlinking my_package
 </code></pre></div>
-<p>If you are not currently in a virtual environment, Slap will refuse to install unless you pass the <code>--no-venv-check</code>.
-This is to protect you from accidentally installing into a global Python installation.</p>
+<p>If you are not currently in a virtual environment, Slap will refuse to install unless you pass the <code>--no-venv-check</code>
+option. This is to protect you from accidentally installing into a global Python installation.</p>
 <div class="highlight"><pre><span></span><code>(3.10) $ deactivate
 $ slap install
 error: refusing to install because you are not in a virtual environment
