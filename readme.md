@@ -27,7 +27,7 @@ I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
 
 You can find the documentation for Slap here: <https://niklasrosenstein.github.io/slap/>
 
-Check out the [Getting started]() guide.
+Check out the [Getting started](https://niklasrosenstein.github.io/slap/getting-started/) guide.
 
 ## Feature Matrix
 
