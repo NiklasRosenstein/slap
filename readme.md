@@ -27,6 +27,8 @@ I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
 
 You can find the documentation for Slap here: <https://niklasrosenstein.github.io/slap/>
 
+Check out the [Getting started]() guide.
+
 ## Feature Matrix
 
 | Feature | Documentation |
@@ -45,10 +47,13 @@ You can find the documentation for Slap here: <https://niklasrosenstein.github.i
 | Sanity check project configuration | | ✅ | | [slap check](https://niklasrosenstein.github.io/slap/commands/check/) |
 | Bootstrap project files | | ✅ | | [slap init](https://niklasrosenstein.github.io/slap/commands/init/) |
 | Install projects using Pip | ✅ | ✅ | ✅ | [slap install](https://niklasrosenstein.github.io/slap/commands/install/) |
-| Symlink projects (editable installs) | ✅ | ✅ | ✅ | [slap link](https://niklasrosenstein.github.io/slap/commands/link/) |
+| Symlink projects (editable installs) | ✅ | ✅ <sup>1</sup> | ✅ | [slap link](https://niklasrosenstein.github.io/slap/commands/link/) |
 | Bump interdependencies in mono-repository | ✅ (not tested regularly) | ✅ | ✅ (partial) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
 
 > __Legend__: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or currently not supported
+>
+> <sup>1</sup> Poetry supports the configuration of multiple packages per project, but Slap currently does not support linking more than
+> one package. This does not impact the ability to symlink all projects in a mono-repository, which functions as expected.
 
 ## Issues / Suggestions / Contributions
 

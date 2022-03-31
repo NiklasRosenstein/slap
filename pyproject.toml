@@ -44,7 +44,7 @@ types-pygments = "^2.9.16"
 mypy = "^0.931"
 
 [tool.poetry.extras]
-docs = ["mkdocs", "mkdocs-material", "novella==0.2.1", "pydoc-markdown==4.6.0"]
+docs = ["mkdocs", "mkdocs-material", "novella==0.2.3", "pydoc-markdown==4.6.0"]
 
 [tool.poetry.scripts]
 slap = "slap.__main__:main"
