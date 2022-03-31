@@ -1,0 +1,5 @@
+[[entries]]
+id = "f4aa3bdc-3561-4576-af81-5571b5cef395"
+type = "fix"
+description = "adjust for breaking changes in databind 2.0.0 (no more databind.json.settings module)"
+author = "@NiklasRosenstein"

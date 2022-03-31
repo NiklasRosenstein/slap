@@ -88,7 +88,7 @@ class Project(Configuration):
     """ Loads the project-level configuration. """
 
     from databind.json import load
-    from databind.json.settings import ExtraKeys
+    from databind.core.settings import ExtraKeys
     return load(self.raw_config(), ProjectConfig, settings=[ExtraKeys(True)])
 
   def _get_project_handler(self) -> ProjectHandlerPlugin:

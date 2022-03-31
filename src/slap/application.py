@@ -198,7 +198,7 @@ class Application:
     """ Loads the application-level configuration. """
 
     from databind.json import load
-    from databind.json.settings import ExtraKeys
+    from databind.core.settings import ExtraKeys
 
     raw_config = self.repository.raw_config().get('application', {})
     return load(raw_config, ApplicationConfig, settings=[ExtraKeys(True)])
