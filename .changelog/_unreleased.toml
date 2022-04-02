@@ -1,0 +1,5 @@
+[[entries]]
+id = "4f20c613-8319-4794-bd81-ecb08a919491"
+type = "fix"
+description = "Add missing `tomlkit` dependency (needed by the `slap add` command)"
+author = "@NiklasRosenstein"
