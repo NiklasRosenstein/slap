@@ -1013,6 +1013,7 @@ Project &quot;.&quot; (id: slap-cli)
       - PyYAML (&gt;=4.0)
       - requests (&gt;=2.27.1,&lt;3.0.0)
       - tomli (&gt;=2.0.0,&lt;3.0.0)
+      - tomlkit (&gt;=0.10.1,&lt;0.11.0)
       - twine (&gt;=3.7.0,&lt;4.0.0)
     dev:
       - mypy (&gt;=0.931,&lt;0.932)
@@ -1048,7 +1049,7 @@ below example is the check output for Slap's own project.</p>
 
 Checks for project slap-cli
 
-  changelog:validate           OK             — All 83 changelogs are valid.
+  changelog:validate           OK             — All 84 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1088,7 +1089,7 @@ test commands like the below example to your project configuration.</p>
     check| 
     check| Checks for project slap-cli
     check| 
-    check|   changelog:validate           OK             — All 83 changelogs are valid.
+    check|   changelog:validate           OK             — All 84 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1185,6 +1186,8 @@ To create a new release, pass the version number or a rule name instead.
                         1.4.2 → 1.4.3 # &#39;install_requires =\n    slap-cli == 1.4.2&#39;
   src/slap/__init__.py: 1.4.2 → 1.4.3 # &quot;__version__ = &#39;1.4.2&#39;&quot;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.4.3.toml
 
 tagging 1.4.3
 
