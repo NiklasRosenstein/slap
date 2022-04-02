@@ -17,7 +17,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with: { python-version: "${{ matrix.python-version }}" }
-    - run: python -m pip install poetry==1.2.0a2 .
     - run: pip install . && slap install --no-venv-check
     - run: slap info && slap test
 
