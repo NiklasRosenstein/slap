@@ -892,7 +892,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -995,7 +995,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;, &#39;slam-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.4.1
+  version: 1.4.2
   dist-name: slap-cli
   packages: slap (src)
   readme: readme.md
@@ -1004,7 +1004,7 @@ Project &quot;.&quot; (id: slap-cli)
     run:
       - beautifulsoup4 (&gt;=4.10.0,&lt;5.0.0)
       - cleo (&gt;=1.0.0a4)
-      - databind (&gt;=2.0.0a2,&lt;3.0.0)
+      - databind (&gt;=2.0.0,&lt;3.0.0)
       - flit (&gt;=3.6.0,&lt;4.0.0)
       - nr.util (&gt;=0.8.4,&lt;1.0.0)
       - poetry-core (&gt;=1.1.0a6,&lt;2.0.0)
@@ -1026,7 +1026,7 @@ Project &quot;.&quot; (id: slap-cli)
       - novella (==0.2.3)
       - pydoc-markdown (==4.6.0)
 Project &quot;slam-cli&quot; (id: slam-cli)
-  version: 1.4.1
+  version: 1.4.2
   dist-name: slam-cli
   packages: none
   readme: readme.md
@@ -1034,7 +1034,7 @@ Project &quot;slam-cli&quot; (id: slam-cli)
   depends on: slap-cli
   dependencies:
     run:
-      - slap-cli == 1.4.1
+      - slap-cli == 1.4.2
     dev: none
 </code></pre></div>
 
@@ -1048,7 +1048,7 @@ below example is the check output for Slap's own project.</p>
 
 Checks for project slap-cli
 
-  changelog:validate           OK             — All 82 changelogs are valid.
+  changelog:validate           OK             — All 83 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1088,7 +1088,7 @@ test commands like the below example to your project configuration.</p>
     check| 
     check| Checks for project slap-cli
     check| 
-    check|   changelog:validate           OK             — All 82 changelogs are valid.
+    check|   changelog:validate           OK             — All 83 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1179,15 +1179,16 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>    $ cd .. &amp;&amp; slap release --dry --tag --push patch --no-branch-check --no-worktree-check 2&gt;/dev/null  # exited with return code 1
-    bumping 4 version references to 1.4.2
-      pyproject.toml:       1.4.1 → 1.4.2 # &#39;version = &quot;1.4.1&quot;&#39;
-      slam-cli/setup.cfg:   1.4.1 → 1.4.2 # &#39;version = 1.4.1&#39;
-                            1.4.1 → 1.4.2 # &#39;install_requires =\n    slap-cli == 1.4.1&#39;
-      src/slap/__init__.py: 1.4.1 → 1.4.2 # &quot;__version__ = &#39;1.4.1&#39;&quot;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 4 version references to 1.4.3
+  pyproject.toml:       1.4.2 → 1.4.3 # &#39;version = &quot;1.4.2&quot;&#39;
+  slam-cli/setup.cfg:   1.4.2 → 1.4.3 # &#39;version = 1.4.2&#39;
+                        1.4.2 → 1.4.3 # &#39;install_requires =\n    slap-cli == 1.4.2&#39;
+  src/slap/__init__.py: 1.4.2 → 1.4.3 # &quot;__version__ = &#39;1.4.2&#39;&quot;
 
 
-    tagging 1.4.2
+tagging 1.4.3
+
+pushing develop, 1.4.3 to origin
 </code></pre></div>
 
 </details>
@@ -1196,10 +1197,10 @@ To create a new release, pass the version number or a rule name instead.
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.4.1 # &#39;version = &quot;1.4.1&quot;&#39;
-  slam-cli/setup.cfg:   1.4.1 # &#39;version = 1.4.1&#39;
-                        1.4.1 # &#39;install_requires =\n    slap-cli == 1.4.1&#39;
-  src/slap/__init__.py: 1.4.1 # &quot;__version__ = &#39;1.4.1&#39;&quot;
+  pyproject.toml:       1.4.2 # &#39;version = &quot;1.4.2&quot;&#39;
+  slam-cli/setup.cfg:   1.4.2 # &#39;version = 1.4.2&#39;
+                        1.4.2 # &#39;install_requires =\n    slap-cli == 1.4.2&#39;
+  src/slap/__init__.py: 1.4.2 # &quot;__version__ = &#39;1.4.2&#39;&quot;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
