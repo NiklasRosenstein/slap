@@ -221,10 +221,9 @@ class Git(Vcs):
 def get_git_author(path: Path | None = None) -> Author:
   import subprocess as sp
   git = _Git(path)
-  global_ = git.get_toplevel() is not None
   try:
-    name = git.get_config('user.name', global_=global_)
-    email = git.get_config('user.email', global_=global_)
+    name = git.get_config('user.name') or git.get_config('user.name', global_=True)
+    email = git.get_config('user.email') or git.get_config('user.email', global_=True)
   except sp.CalledProcessError as exc:
     if exc.returncode != 1:
       raise

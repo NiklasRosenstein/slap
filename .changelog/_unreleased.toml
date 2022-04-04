@@ -3,3 +3,9 @@ id = "51f83ee8-150b-4c64-8a20-871cc75638e0"
 type = "improvement"
 description = "add `-g,--global` option to `slap venv link` command"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "0dc4307b-8937-475f-943a-df43b6cb03f6"
+type = "improvement"
+description = "read Git `user.name` and `user.email` from local repository first and then globally"
+author = "@NiklasRosenstein"
