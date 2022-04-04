@@ -1,0 +1,5 @@
+[[entries]]
+id = "3160e954-c7ff-4c2f-af02-658003c18fcc"
+type = "improvement"
+description = "No longer error when running Slap in a Python project directory using Poetry where some dependencies are declared using the table format in TOML, but log that the type of dependency is currently unsupported"
+author = "@NiklasRosenstein"

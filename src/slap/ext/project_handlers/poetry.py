@@ -2,6 +2,7 @@
 """ Project handler for projects using the Poetry build system. """
 
 from __future__ import annotations
+import logging
 import typing as t
 
 from slap.ext.project_handlers.base import PyprojectHandler
@@ -10,6 +11,8 @@ from slap.util.semver import parse_dependency
 
 if t.TYPE_CHECKING:
   from poetry.core.packages.dependency import Dependency  # type: ignore[import]
+
+logger = logging.getLogger(__name__)
 
 
 class PoetryProjectHandler(PyprojectHandler):
@@ -77,6 +80,10 @@ def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> lis
   elif isinstance(dependencies, dict):
     result = []
     for key, version in dependencies.items():
+      if not isinstance(version, str):
+        # TODO (@NiklasRosenstein): Support dependencies formatted as tables in the Poetry config
+        logger.warning('Unsupported Poetry version table in project: <val>%s = %s</val>', key, version)
+        continue
       if key == 'python': continue
       result.append(Dependency(key, version).to_pep_508())
     return result
