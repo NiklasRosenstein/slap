@@ -1,0 +1,5 @@
+[[entries]]
+id = "a0847448-c31f-4fe4-97d5-ec706c999a81"
+type = "fix"
+description = "Fix `slap venv link` linking to an absolute path (correct) instead of a relartive path (wrong) when linking from a local environment"
+author = "@NiklasRosenstein"

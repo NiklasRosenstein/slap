@@ -343,13 +343,14 @@ class VenvLinkCommand(Command):
       return 1
 
     target = GLOBAL_BIN_DIRECTORY / program.name
-    if target.exists() or target.is_symlink() and not self.option("force"):
+    exists = target.exists() or target.is_symlink()
+    if exists and not self.option("force"):
       self.line_error(f'error: target <s>"{target}"</s> already exists', 'error')
       return 1
 
-    if target.exists():
+    if exists:
       target.unlink()
-    target.symlink_to(program)
+    target.symlink_to(program.absolute())
     self.line(f'symlinked <s>"{target}"</s> to <s>"{program}"</s>', 'info')
 
     return 0
