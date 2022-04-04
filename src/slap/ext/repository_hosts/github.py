@@ -12,6 +12,7 @@ from slap.repository import Issue, PullRequest, Repository, RepositoryHost
 
 @functools.lru_cache()
 def github_get_username_from_email(api_base_url: str, email: str) -> str:
+  assert email, 'no email address'
   response = requests.get(f'{api_base_url}/search/users', params={'q': email})
   response.raise_for_status()
   results = response.json()
