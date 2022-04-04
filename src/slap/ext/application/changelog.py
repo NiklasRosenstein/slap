@@ -6,7 +6,7 @@ import re
 import typing as t
 from pathlib import Path
 
-from databind.core.settings import Alias
+from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
@@ -40,6 +40,7 @@ def get_default_author(app: Application) -> str | None:
     None)
 
 
+@ExtraKeys(True)
 @dataclasses.dataclass
 class ChangelogConfig:
   #: Whether the changelog feature is enabled. This acts locally for the current project and not globally.
