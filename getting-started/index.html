@@ -995,7 +995,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;, &#39;slam-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.4.4
+  version: 1.4.5
   dist-name: slap-cli
   packages: slap (src)
   readme: readme.md
@@ -1027,7 +1027,7 @@ Project &quot;.&quot; (id: slap-cli)
       - novella (==0.2.3)
       - pydoc-markdown (==4.6.0)
 Project &quot;slam-cli&quot; (id: slam-cli)
-  version: 1.4.4
+  version: 1.4.5
   dist-name: slam-cli
   packages: none
   readme: readme.md
@@ -1035,7 +1035,7 @@ Project &quot;slam-cli&quot; (id: slam-cli)
   depends on: slap-cli
   dependencies:
     run:
-      - slap-cli == 1.4.4
+      - slap-cli == 1.4.5
     dev: none
 </code></pre></div>
 
@@ -1049,7 +1049,7 @@ below example is the check output for Slap's own project.</p>
 
 Checks for project slap-cli
 
-  changelog:validate           OK             — All 85 changelogs are valid.
+  changelog:validate           OK             — All 86 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1089,7 +1089,7 @@ test commands like the below example to your project configuration.</p>
     check| 
     check| Checks for project slap-cli
     check| 
-    check|   changelog:validate           OK             — All 85 changelogs are valid.
+    check|   changelog:validate           OK             — All 86 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1180,16 +1180,16 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 4 version references to 1.4.5
-  pyproject.toml:       1.4.4 → 1.4.5 # &#39;version = &quot;1.4.4&quot;&#39;
-  slam-cli/setup.cfg:   1.4.4 → 1.4.5 # &#39;version = 1.4.4&#39;
-                        1.4.4 → 1.4.5 # &#39;install_requires =\n    slap-cli == 1.4.4&#39;
-  src/slap/__init__.py: 1.4.4 → 1.4.5 # &quot;__version__ = &#39;1.4.4&#39;&quot;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 4 version references to 1.4.6
+  pyproject.toml:       1.4.5 → 1.4.6 # &#39;version = &quot;1.4.5&quot;&#39;
+  slam-cli/setup.cfg:   1.4.5 → 1.4.6 # &#39;version = 1.4.5&#39;
+                        1.4.5 → 1.4.6 # &#39;install_requires =\n    slap-cli == 1.4.5&#39;
+  src/slap/__init__.py: 1.4.5 → 1.4.6 # &quot;__version__ = &#39;1.4.5&#39;&quot;
 
 
-tagging 1.4.5
+tagging 1.4.6
 
-pushing develop, 1.4.5 to origin
+pushing develop, 1.4.6 to origin
 </code></pre></div>
 
 </details>
@@ -1198,10 +1198,10 @@ pushing develop, 1.4.5 to origin
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.4.4 # &#39;version = &quot;1.4.4&quot;&#39;
-  slam-cli/setup.cfg:   1.4.4 # &#39;version = 1.4.4&#39;
-                        1.4.4 # &#39;install_requires =\n    slap-cli == 1.4.4&#39;
-  src/slap/__init__.py: 1.4.4 # &quot;__version__ = &#39;1.4.4&#39;&quot;
+  pyproject.toml:       1.4.5 # &#39;version = &quot;1.4.5&quot;&#39;
+  slam-cli/setup.cfg:   1.4.5 # &#39;version = 1.4.5&#39;
+                        1.4.5 # &#39;install_requires =\n    slap-cli == 1.4.5&#39;
+  src/slap/__init__.py: 1.4.5 # &quot;__version__ = &#39;1.4.5&#39;&quot;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
