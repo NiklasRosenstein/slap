@@ -1,0 +1,5 @@
+[[entries]]
+id = "51f83ee8-150b-4c64-8a20-871cc75638e0"
+type = "improvement"
+description = "add `-g,--global` option to `slap venv link` command"
+author = "@NiklasRosenstein"

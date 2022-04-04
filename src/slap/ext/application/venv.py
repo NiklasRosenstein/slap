@@ -320,25 +320,30 @@ class VenvLinkCommand(Command):
   ]
   options = [
     option(
+      "global", "g",
+      description="Manage virtual environments in the global scope instead of the local directory."
+    ),
+    option(
       "force", "f",
       description="Overwrite the link target if it already exists.",
     )
   ]
 
   def handle(self) -> int:
-    manager = VenvManager(GLOBAL_VENVS_DIRECTORY)
+    location = "global" if self.option("global") else "local"
+    manager = VenvManager(GLOBAL_VENVS_DIRECTORY if self.option("global") else Path(".venvs"))
     venv = manager.get(self.argument("name"))
     if not venv.exists():
-      self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
+      self.line_error(f'error: {location} environment <s>"{venv.name}"</s> does not exist', 'error')
       return 1
 
     program = venv.get_bin(self.argument("program"))
     if not program.is_file():
-      self.line_error(f'error: program <s>"{program.name}"</s> does not exist in environment <s>"{venv.name}"</s>', 'error')
+      self.line_error(f'error: program <s>"{program.name}"</s> does not exist in {location} environment <s>"{venv.name}"</s>', 'error')
       return 1
 
     target = GLOBAL_BIN_DIRECTORY / program.name
-    if target.exists() and not self.option("force"):
+    if target.exists() or target.is_symlink() and not self.option("force"):
       self.line_error(f'error: target <s>"{target}"</s> already exists', 'error')
       return 1
 
