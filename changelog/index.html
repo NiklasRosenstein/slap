@@ -688,6 +688,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#145-2022-04-04" class="md-nav__link">
     1.4.5 (2022-04-04)
   </a>
@@ -1331,6 +1338,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#145-2022-04-04" class="md-nav__link">
     1.4.5 (2022-04-04)
   </a>
@@ -1944,13 +1958,26 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/changelog.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/changelog.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="unreleased">Unreleased</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Improvement</td><td>
+
+No longer error when running Slap in a Python project directory using Poetry where some dependencies are declared using the table format in TOML, but log that the type of dependency is currently unsupported</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+Allow unrecognized keys in `ChangelogConfig`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+Add a separate API to retrieve the projects in a repository in topological order such that most Slap commands that do not care about the order do not have the overhead of inspecting the project dependencies and sorting the projects.</td><td></td><td><a href="https://github.com/NiklasRosenstein/slam/issues/50">NiklasRosenstein/slam#50</a></td><td>@NiklasRosenstein</td></tr>
+</table>
+
 <h2 id="145-2022-04-04">1.4.5 (2022-04-04)</h2>
 <table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
   <tr><td>Fix</td><td>

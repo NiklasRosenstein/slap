@@ -892,7 +892,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
@@ -1047,9 +1047,14 @@ below example is the check output for Slap's own project.</p>
 <div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>Global checks:
   release:consistent-versions  OK             — All version references are equal
 
+Checks for project slam-cli
+
+  general:typed                WARNING        — tool.slap.typed is not set
+  release:source-code-version  WARNING        — No packages detected
+
 Checks for project slap-cli
 
-  changelog:validate           OK             — All 86 changelogs are valid.
+  changelog:validate           OK             — All 87 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1057,11 +1062,6 @@ Checks for project slap-cli
   poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
   release:source-code-version  OK             — Found __version__ in slap
-
-Checks for project slam-cli
-
-  general:typed                WARNING        — tool.slap.typed is not set
-  release:source-code-version  WARNING        — No packages detected
 
 Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
 </code></pre></div>
@@ -1087,9 +1087,14 @@ test commands like the below example to your project configuration.</p>
     check| Global checks:
     check|   release:consistent-versions  OK             — All version references are equal
     check| 
+    check| Checks for project slam-cli
+    check| 
+    check|   general:typed                WARNING        — tool.slap.typed is not set
+    check|   release:source-code-version  WARNING        — No packages detected
+    check| 
     check| Checks for project slap-cli
     check| 
-    check|   changelog:validate           OK             — All 86 changelogs are valid.
+    check|   changelog:validate           OK             — All 87 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1097,11 +1102,6 @@ test commands like the below example to your project configuration.</p>
     check|   poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
     check|   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
     check|   release:source-code-version  OK             — Found __version__ in slap
-    check| 
-    check| Checks for project slam-cli
-    check| 
-    check|   general:typed                WARNING        — tool.slap.typed is not set
-    check|   release:source-code-version  WARNING        — No packages detected
     check| 
     check| Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
     mypy| bash: mypy: command not found
@@ -1180,15 +1180,18 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>    $ cd .. &amp;&amp; slap release --dry --tag --push patch --no-branch-check --no-worktree-check 2&gt;/dev/null  # exited with return code 1
-    bumping 4 version references to 1.4.6
-      pyproject.toml:       1.4.5 → 1.4.6 # &#39;version = &quot;1.4.5&quot;&#39;
-      slam-cli/setup.cfg:   1.4.5 → 1.4.6 # &#39;version = 1.4.5&#39;
-                            1.4.5 → 1.4.6 # &#39;install_requires =\n    slap-cli == 1.4.5&#39;
-      src/slap/__init__.py: 1.4.5 → 1.4.6 # &quot;__version__ = &#39;1.4.5&#39;&quot;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 4 version references to 1.4.6
+  pyproject.toml:       1.4.5 → 1.4.6 # &#39;version = &quot;1.4.5&quot;&#39;
+  slam-cli/setup.cfg:   1.4.5 → 1.4.6 # &#39;version = 1.4.5&#39;
+                        1.4.5 → 1.4.6 # &#39;install_requires =\n    slap-cli == 1.4.5&#39;
+  src/slap/__init__.py: 1.4.5 → 1.4.6 # &quot;__version__ = &#39;1.4.5&#39;&quot;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.4.6.toml
 
-    tagging 1.4.6
+tagging 1.4.6
+
+pushing develop, 1.4.6 to origin
 </code></pre></div>
 
 </details>
