@@ -66,7 +66,7 @@ class PoetryProjectHandler(PyprojectHandler):
     return ['tool', 'poetry'] + locator, value
 
 
-def convert_poetry_dependencies(dependencies: dict[str, str] | list[str]) -> list[str]:
+def convert_poetry_dependencies(dependencies: dict[str, str | t.Any] | list[str]) -> list[str]:
   from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 
   if isinstance(dependencies, list):

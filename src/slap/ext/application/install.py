@@ -124,7 +124,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       assert len(projects) == 1, projects
       project_dependencies = self._get_project_dependencies(projects[0])
     else:
-      projects = self.app.repository.projects()
+      projects = self.app.repository.get_projects_ordered()
       project_dependencies = []
 
     extras = {x.strip() for x in (self.option("extras") or self.option("only-extras") or '').split(',') if x.strip()}

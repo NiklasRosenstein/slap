@@ -9,3 +9,12 @@ id = "bd6e203d-1a23-4f59-a521-ba83866e9eb7"
 type = "improvement"
 description = "Allow unrecognized keys in `ChangelogConfig`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "bec1a134-1576-46c8-8159-f52090d42c35"
+type = "improvement"
+description = "Add a separate API to retrieve the projects in a repository in topological order such that most Slap commands that do not care about the order do not have the overhead of inspecting the project dependencies and sorting the projects."
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/slam/issues/50",
+]

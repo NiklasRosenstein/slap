@@ -119,7 +119,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
     num_projects = 0
     num_skipped = 0
 
-    for project in self.app.repository.projects():
+    for project in self.app.repository.get_projects_ordered():
       if not project.is_python_project:
         continue
 

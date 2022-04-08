@@ -103,16 +103,23 @@ class Repository(Configuration):
   def _get_projects(self) -> list[Project]:
     """ Returns the projects provided by the project handler, but sorted in topological order. """
 
-    from nr.util.digraph import DiGraph
-    from nr.util.digraph.algorithm.topological_sort import topological_sort
-
     handler = self._handler()
     if not handler:
       return []
 
-    projects = sorted(handler.get_projects(self), key=lambda p: p.id)
+    return sorted(handler.get_projects(self), key=lambda p: p.id)
+
+  def get_projects_ordered(self) -> list[Project]:
+    """ Return a topological ordering of the projects. """
+
+    from nr.util.digraph import DiGraph
+    from nr.util.digraph.algorithm.topological_sort import topological_sort
+    from slap.project import Project
+
     graph: DiGraph[Project, None, None] = DiGraph()
+    projects = self.projects()
     for project in projects:
+      assert isinstance(project, Project)
       graph.add_node(project, None)
       for dep in project.get_interdependencies(projects):
         graph.add_node(dep, None)

@@ -19,12 +19,14 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
+    projects = self.app.repository.get_projects_ordered()
+
     self.line(f'Repository <s>"{self.app.repository.directory}"</s>')
     self.line(f'  vcs: <opt>{self.app.repository.vcs()}</opt>')
     self.line(f'  host: <opt>{self.app.repository.host()}</opt>')
-    self.line(f'  projects: <opt>{[p.id for p in self.app.repository.projects()]}</opt>')
+    self.line(f'  projects: <opt>{[p.id for p in projects]}</opt>')
 
-    for project in self.app.repository.projects():
+    for project in projects:
       if not project.is_python_project: continue
       packages_list = project.packages()
       packages = (
@@ -39,10 +41,10 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
       self.line(f'  readme: <opt>{project.handler().get_readme(project)}</opt>')
       self.line(f'  handler: <opt>{project.handler()}</opt>')
 
-      inter_deps = project.get_interdependencies(self.app.repository.projects())
+      inter_deps = project.get_interdependencies(projects)
       if inter_deps:
-        projects = ", ".join(f"<opt>{p.dist_name()}</opt>" for p in inter_deps)
-        self.line(f'  depends on: {projects}')
+        project_names = ", ".join(f"<opt>{p.dist_name()}</opt>" for p in inter_deps)
+        self.line(f'  depends on: {project_names}')
 
       deps = project.dependencies()
       self.line(f'  dependencies:')
