@@ -380,15 +380,7 @@ def convert_dependencies_config(dependencies: list[str] | dict[str, DependencyCo
   """
 
   if isinstance(dependencies, list):
-
-    result: list[Dependency] = []
-    for dep in dependencies:
-      if not dep.startswith('git+'):
-        result.append(PypiDependency.parse(dep))
-      else:
-        # TODO (@NiklasRosenstein): Parse Git URL fragments to extract git branch/rev/tag.
-        result.append(GitDependency('', dep))
-    return result
+    return [parse_dependency_specification(dep) for dep in dependencies]
 
   elif isinstance(dependencies, dict):
     return [convert_dependency_config(key, value) for key, value in dependencies.items()]
