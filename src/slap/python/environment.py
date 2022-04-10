@@ -91,3 +91,30 @@ class PythonEnvironment:
     keys = list(distributions)
     result = pickle.loads(sp.check_output([self.executable, '-c', code] + keys))
     return dict(zip(keys, result))
+
+
+@dataclasses.dataclass
+class DistributionMetadata:
+  """ Additional metadata for a distribution. """
+
+  license_name: str | None
+  platform: str
+  requires_python: str | None
+  requires_dists: list[str]
+  provides_extras: set[str]
+
+
+def get_distribution_metadata(dist: pkg_resources.Distribution) -> DistributionMetadata:
+  """ Parses the distribution metadata. """
+
+  from email.parser import Parser
+
+  data = Parser().parsestr(dist.get_metadata(dist.PKG_INFO))
+
+  return DistributionMetadata(
+    license_name=data.get('License'),
+    platform=data.get('Platform'),
+    requires_python=data.get('Requires-Python'),
+    requires_dists=data.get_all('Requires-Dist'),
+    provides_extras=data.get_all('Provides-Extra'),
+  )
