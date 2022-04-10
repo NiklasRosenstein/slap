@@ -115,5 +115,7 @@ def test__VersionSpec__throws_on_invalid_pep_508_spec():
 def test__PypiDependency__parse():
   assert PypiDependency.parse('foo') == PypiDependency('foo', VersionSpec(''))
   assert PypiDependency.parse('foo ^1.0.0') == PypiDependency('foo', VersionSpec('^1.0.0'))
-  assert PypiDependency.parse('foo ^1.0.0; platform_system="Linux"') == PypiDependency(
-    'foo', VersionSpec('^1.0.0'), markers='platform_system="Linux"')
+  assert PypiDependency.parse('foo ^1.0.0; platform_system="Linux"') == \
+    PypiDependency('foo', VersionSpec('^1.0.0'), markers='platform_system="Linux"')
+  assert PypiDependency.parse("PySocks (!=1.5.7,<2.0,>=1.5.6) ; extra == 'socks'") == \
+    PypiDependency('PySocks', VersionSpec('(!=1.5.7,<2.0,>=1.5.6)'), markers="extra == 'socks'")
