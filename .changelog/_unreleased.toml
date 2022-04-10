@@ -24,3 +24,9 @@ id = "9f018ae5-04d8-468f-b2b6-ca993476da47"
 type = "feature"
 description = "Add `slap.dependency` module"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "978c013e-3c79-427a-8c1f-ce56d34d5bc9"
+type = "feature"
+description = "Add `slap report dependencies` command"
+author = "@NiklasRosenstein"

@@ -98,10 +98,10 @@ class DistributionMetadata:
   """ Additional metadata for a distribution. """
 
   license_name: str | None
-  platform: str
+  platform: str | None
   requires_python: str | None
-  requires_dists: list[str]
-  provides_extras: set[str]
+  requirements: list[str]
+  extras: set[str]
 
 
 def get_distribution_metadata(dist: pkg_resources.Distribution) -> DistributionMetadata:
@@ -115,6 +115,6 @@ def get_distribution_metadata(dist: pkg_resources.Distribution) -> DistributionM
     license_name=data.get('License'),
     platform=data.get('Platform'),
     requires_python=data.get('Requires-Python'),
-    requires_dists=data.get_all('Requires-Dist'),
-    provides_extras=data.get_all('Provides-Extra'),
+    requirements=data.get_all('Requires-Dist') or [],
+    extras=set(data.get_all('Provides-Extra') or []),
   )
