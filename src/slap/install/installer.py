@@ -102,7 +102,7 @@ class PipInstaller(Installer):
         if dependency.develop:
           pip_arguments += ['-e']
         prefix = '' if dependency.path.is_absolute() else './'
-        pip_arguments += [f'{dependency.name}{extras} @ {prefix}{dependency.path}']
+        pip_arguments += [f'{prefix}{dependency.path}{extras}']
 
       elif isinstance(dependency, PypiDependency):
         if dependency.source:
