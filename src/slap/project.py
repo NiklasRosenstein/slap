@@ -9,10 +9,11 @@ from pathlib import Path
 from databind.core.settings import Alias
 
 from slap.configuration import Configuration
+from slap.python.dependency import Dependency
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
-  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
+  from slap.python.dependency import VersionSpec
   from slap.repository import Repository
   from slap.plugins import ProjectHandlerPlugin
   from slap.release import VersionRef
@@ -23,9 +24,10 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class Dependencies:
-  run: list[str]
-  dev: list[str]
-  extra: dict[str, list[str]]
+  python: VersionSpec | None
+  run: t.Sequence[Dependency]
+  dev: t.Sequence[Dependency]
+  extra: t.Mapping[str, t.Sequence[Dependency]]
 
 
 @dataclasses.dataclass
@@ -45,7 +47,7 @@ class ProjectConfig:
   #: handler will search in `"src/"`` and then `"./"``.
   source_directory: t.Annotated[str | None, Alias('source-directory')] = None
 
-  #: Whether the project source code is inteded to be typed.
+  #: Whether the project source code is intended to be typed.
   typed: bool | None = None
 
 
@@ -145,26 +147,24 @@ class Project(Configuration):
   def get_version_refs(self) -> list[VersionRef]:
     return self.handler().get_version_refs(self)
 
-  def get_interdependencies(self, projects: t.Sequence[Project]) -> list[Project]:
+  def get_interdependencies(self, projects: t.Sequence[Project], recursive: bool = False) -> list[Project]:
     """ Returns the dependencies of this project in the list of other projects. The returned dictionary maps
     to the project and the dependency constraint. This will only take run dependencies into account. """
 
-    import re
-
     dependency_names = set()
     for dep in self.dependencies().run:
-      match = re.match(r'[\w\d\_\-\.]+\b', dep)
-      if not match: continue
-      dependency_names.add(match.group(0))
+      dependency_names.add(dep.name)
 
     result = []
     for project in projects:
       if project.dist_name() in dependency_names:
         result.append(project)
+        if recursive:
+          result += project.get_interdependencies(projects, True)
 
     return result
 
-  def add_dependency(self, dependency: Dependency, where: str) -> None:
+  def add_dependency(self, package: str, version_spec: VersionSpec, where: str) -> None:
     """ Add a dependency to the project configuration.
 
     Arguments:
@@ -175,9 +175,10 @@ class Project(Configuration):
       NotImplementedError: If the operation is not supported on the project.
     """
 
-    from poetry.core.packages.dependency import Dependency  # type: ignore[import]
-    assert isinstance(dependency, Dependency), type(dependency)
-    self.handler().add_dependency(self, dependency, where)
+    from slap.python.dependency import VersionSpec
+    assert isinstance(package, str), type(package)
+    assert isinstance(version_spec, VersionSpec), type(version_spec)
+    self.handler().add_dependency(self, package, version_spec, where)
     # TODO(@NiklasRosenstein): Use a method to flush the cache of Once when it is available in `nr.utils`.
     self.raw_config.get(True)
     self.dependencies.get(True)

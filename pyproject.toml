@@ -33,6 +33,7 @@ ptyprocess = "^0.7.0"
 pygments = "^2.11.2"
 PyYAML = ">=4.0"
 requests = "^2.27.1"
+setuptools = ">=39.1.0"  # Needed for pkg_resources
 tomli = "^2.0.0"
 tomlkit = "^0.10.1"
 twine = "^3.7.0"
@@ -102,6 +103,7 @@ typed = true
 
 [tool.slap.test]
 mypy = "mypy src --namespace-packages"
+pytest = "pytest tests/ -vv"
 check = "slap check"
 
 [tool.slap.run]

@@ -1,7 +1,9 @@
 
 import os
+import typing as t
 from pathlib import Path
-from slap.application import Application, Command, option
+from slap.application import Application, Command
+from slap.python.dependency import Dependency
 from slap.plugins import ApplicationPlugin
 
 
@@ -55,10 +57,10 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
 
     return 0
 
-  def _print_deps(self, prefix: str, deps: list[str]) -> None:
+  def _print_deps(self, prefix: str, deps: t.Sequence[Dependency]) -> None:
     if deps:
       self.line(f'    {prefix}:')
-      for dep in sorted(deps, key=lambda s: s.lower()):
+      for dep in sorted(deps, key=lambda s: s.name.lower()):
         self.line(f'      - <opt>{dep}</opt>')
     else:
       self.line(f'    {prefix}: <i>none</i>')

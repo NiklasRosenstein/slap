@@ -5,7 +5,7 @@ from pathlib import Path
 
 from slap.application import Application, Command, option
 from slap.plugins import ApplicationPlugin
-from slap.util.python import Pep517BuildBackend
+from slap.python.pep517 import BuildBackend
 
 
 class PublishCommandPlugin(Command, ApplicationPlugin):
@@ -66,11 +66,11 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
         if not project.is_python_project: continue
 
         self.line(f'Build <info>{project.dist_name()}</info>')
-        backend = Pep517BuildBackend(
+        backend = BuildBackend(
           project.pyproject_toml.value()['build-system']['build-backend'],
           project.directory,
           Path(build_dir)
-        )
+      )
 
         sdist = backend.build_sdist()
         self.line(f'  <comment>{sdist.name}</comment>')

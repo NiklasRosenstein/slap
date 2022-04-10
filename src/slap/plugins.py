@@ -8,9 +8,9 @@ from nr.util.generic import T
 
 if t.TYPE_CHECKING:
   from pathlib import Path
-  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
   from poetry.core.semver.version import Version  # type: ignore[import]
   from slap.application import Application, IO
+  from slap.python.dependency import VersionSpec
   from slap.check import Check
   from slap.project import Dependencies, Package, Project
   from slap.release import VersionRef
@@ -97,7 +97,7 @@ class ProjectHandlerPlugin(abc.ABC):
 
     return []
 
-  def add_dependency(self, project: Project, selector: Dependency, where: str) -> None:
+  def add_dependency(self, project: Project, package: str, version_spec: VersionSpec, where: str) -> None:
     """ Add a dependency to the project configuration.
 
     Arguments:

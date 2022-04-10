@@ -14,6 +14,7 @@ References:
 """
 
 from __future__ import annotations
+from pathlib import Path
 import dataclasses
 import re
 import typing as t
@@ -113,7 +114,7 @@ class _PathDependency:
   name: str
 
   #: The path from which to install the Python package from.
-  path: str
+  path: Path
 
   #: Whether the package should be installed in development mode.
   develop: bool = False
@@ -194,6 +195,12 @@ class MultiDependency(Dependency, _MultiDependency):
   """ Express multiple possible ways to install a Python package. """
 
 
+#: Represents a dependency configuration that does not contain the dependency name, such as is used for example
+#: by Poetry. A plain string is parsed like a dependency string (see #parse_dependency_string()), while a dictionary
+#: represents a more complex dependency configuration that can be parsed into other types of dependencies as well.
+DependencyConfig = str | dict[str, t.Any] | list[dict[str, t.Any]]
+
+
 def split_package_name_with_extras(value: str) -> tuple[str, list[str] | None]:
   """ Splits *value* as a string that contains a package name and optionally its extras into components. """
 
@@ -208,7 +215,7 @@ def split_package_name_with_extras(value: str) -> tuple[str, list[str] | None]:
   return match.group(1), extras
 
 
-def parse_dependency_specification(value: str) -> Dependency:
+def parse_dependency_string(value: str) -> Dependency:
   """
   Convert *value* to a representation as a #Dependency subclass.
 
@@ -242,6 +249,7 @@ def parse_dependency_specification(value: str) -> Dependency:
 
   # Check if it's a dependency of the form `<name> @ <package>`. This can be either a #UrlDependency or #GitDependency.
   if '@' in value:
+    markers: str | None
     name, url = value.partition('@')[::2]
     name, extras = split_package_name_with_extras(name)
     url, markers = url.partition(';')[::2]
@@ -274,7 +282,7 @@ def parse_dependency_specification(value: str) -> Dependency:
       options = parse_qs(urlparts.fragment)
       return PathDependency(
         name=name,
-        path=url,
+        path=Path(url),
         develop='develop' in options,
         link='link' in options,
         extras=extras,
@@ -303,21 +311,28 @@ def parse_dependency_specification(value: str) -> Dependency:
   return dependency
 
 
-DependencyConfig = str | dict[str, t.Any] | list[dict[str, t.Any]]
-
-
-def _convert_single_dependency_config(name: str, dep: str | dict[str, t.Any]) -> Dependency:
+def _parse_single_dependency_config(name: str, dep: str | dict[str, t.Any]) -> Dependency:
   """ Convert a single dependency expressed as a table or dictionary to a Slap dependency specification.
 
   Examples:
 
-      >>> _convert_single_dependency('foo', {'version': '1.2.3'}) == PypiDependency('foo', VersionSpec('1.2.3'))
-      >>> _convert_single_dependency('foo', {'git': 'https://...'}) == GitDependency('foo', 'https://...')
+      >>> _parse_single_dependency_config('foo', 'git+https://github.com/foo/foo.git') == GitDependency('foo', 'https://github.com/foo/foo.git')
+      >>> _parse_single_dependency_config('foo', {'version': '1.2.3'}) == PypiDependency('foo', VersionSpec('1.2.3'))
+      >>> _parse_single_dependency_config('foo', {'git': 'https://...'}) == GitDependency('foo', 'https://...')
   """
 
   dependency: Dependency
+
   if isinstance(dep, str):
-    dependency = PypiDependency(name, VersionSpec(dep))
+    dep = dep.strip()
+
+    # Check if the dependency specification appears to be in URL format.
+    if (dep.startswith('git+') or dep.startswith('http://') or dep.startswith('https://') or dep.startswith('../')
+        or dep.startswith('./') or dep.startswith('/')):
+      dependency = parse_dependency_string(f'{name} @ {dep}')
+    else:
+      dependency = parse_dependency_string(f'{name} {dep}')
+
   elif 'git' in dep:
     dependency = GitDependency(
       name=name,
@@ -326,26 +341,30 @@ def _convert_single_dependency_config(name: str, dep: str | dict[str, t.Any]) ->
       branch=dep.get('branch'),
       tag=dep.get('tag')
     )
+
   elif 'path' in dep:
     # NOTE (@NiklasRosenstein): The "link" key is actually not a Poetry feature, but it won't complain if
     #   you are just using Slap anyway.
     dependency = PathDependency(
       name=name,
-      path=dep['path'],
+      path=Path(dep['path']),
       develop=dep.get('develop', False),
       link=dep.get('link', False)
     )
+
   elif 'url' in dep:
     dependency = UrlDependency(
       name=name,
       url=dep['url']
     )
+
   elif 'version' in dep:
     dependency = PypiDependency(
       name=name,
       version=VersionSpec(dep['version']),
       source=dep.get('source'),
     )
+
   else:
     raise ValueError(f'Cannot interpret dependency: {name} = {dep!r}')
 
@@ -356,20 +375,20 @@ def _convert_single_dependency_config(name: str, dep: str | dict[str, t.Any]) ->
   return dependency
 
 
-def convert_dependency_config(name: str, dep: DependencyConfig) -> Dependency:
+def parse_dependency_config(name: str, dep: DependencyConfig) -> Dependency:
   """ Converts a dependency configuration. This "happens" to be compatible with the Poetry configuration format. """
 
   if isinstance(dep, dict | str):
-    dependency = _convert_single_dependency_config(name, dep)
+    dependency = _parse_single_dependency_config(name, dep)
   elif isinstance(dep, list):
-    dependency = MultiDependency(name, [_convert_single_dependency_config(name, x) for x in dep])
+    dependency = MultiDependency(name, [_parse_single_dependency_config(name, x) for x in dep])
   else:
     raise ValueError(f'Cannot interpret dependency: {name} = {dep!r}')
 
   return dependency
 
 
-def convert_dependencies_config(dependencies: list[str] | dict[str, DependencyConfig]) -> list[Dependency]:
+def parse_dependencies(dependencies: list[str] | dict[str, DependencyConfig]) -> list[Dependency]:
   """ Converts Poetry dependencies to Slap dependencies.
 
   Args:
@@ -380,10 +399,10 @@ def convert_dependencies_config(dependencies: list[str] | dict[str, DependencyCo
   """
 
   if isinstance(dependencies, list):
-    return [parse_dependency_specification(dep) for dep in dependencies]
+    return [parse_dependency_string(dep) for dep in dependencies]
 
   elif isinstance(dependencies, dict):
-    return [convert_dependency_config(key, value) for key, value in dependencies.items()]
+    return [parse_dependency_config(key, value) for key, value in dependencies.items()]
 
   else:
     raise TypeError(type(dependencies))

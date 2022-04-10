@@ -4,13 +4,12 @@
 from __future__ import annotations
 import re
 import typing as t
-
 from slap.ext.project_handlers.base import BaseProjectHandler, interdependencies_enabled
 from slap.project import Dependencies, Package, Project
 from slap.release import VersionRef, match_version_ref_pattern, match_version_ref_pattern_on_lines
 
 if t.TYPE_CHECKING:
-  from poetry.core.packages.dependency import Dependency  # type: ignore[import]
+  from slap.python.dependency import VersionSpec
 
 
 class SetuptoolsProjectHandler(BaseProjectHandler):
@@ -66,11 +65,20 @@ class SetuptoolsProjectHandler(BaseProjectHandler):
     ]
 
   def get_dependencies(self, project: Project) -> Dependencies:
+    from slap.python.dependency import PypiDependency, VersionSpec
+
     options = self._get_setup_cfg(project).get('options', {})
     return Dependencies(
-      parse_list_semi(options.get('install_requires', '')),
-      parse_list_semi(options.get('setup_requires', '')) + parse_list_semi(options.get('tests_require', '')),
-      {extra: parse_list_semi(value) for extra, value in options.get('extras_require', {}).items()}
+      VersionSpec(options['python_requires']) if 'python_requires' in options else None,
+      PypiDependency.parse_list(parse_list_semi(options.get('install_requires', ''))),
+      PypiDependency.parse_list(
+        parse_list_semi(options.get('setup_requires', '')) +
+        parse_list_semi(options.get('tests_require', ''))
+      ),
+      {
+        extra: PypiDependency.parse_list(parse_list_semi(value))
+        for extra, value in options.get('extras_require', {}).items()
+      }
     )
 
   def get_version_refs(self, project: Project) -> list[VersionRef]:
@@ -86,10 +94,12 @@ class SetuptoolsProjectHandler(BaseProjectHandler):
   def get_dependency_location_key_sequence(
     self,
     project: Project,
-    selector: Dependency,
+    package: str,
+    version_spec: VersionSpec,
     where: str,
   ) -> tuple[list[str], list | dict]:
     raise NotImplementedError
+
 
 def parse_list_semi(val: str) -> list[str]:
   """ Parses a string to a list of strinsg according to the `list-semi` specification in the [setuptools docs][1].

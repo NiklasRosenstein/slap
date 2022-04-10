@@ -6,8 +6,7 @@ import subprocess as sp
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
 from slap.ext.application.install import python_option, venv_check, venv_check_option
-from slap.util.python import Environment
-from slap.util.semver import parse_dependency
+from slap.python.dependency import PypiDependency, VersionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +52,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
-    from poetry.core.packages.dependency import Dependency  # type: ignore[import]
+    from slap.python.environment import PythonEnvironment
 
     if not self._validate_options():
       return 1
@@ -63,19 +62,19 @@ class AddCommandPlugin(Command, ApplicationPlugin):
       self.line_error(f'error: not situated in a Python project', 'error')
       return 1
 
-    dependencies: dict[str, Dependency] = {}
+    dependencies: dict[str, PypiDependency] = {}
     for package in self.argument("packages"):
-      dep = parse_dependency(package)
-      if dep.name in dependencies:
-        self.line_error(f'error: package specified more than once: <b>{dep.name}</b>', 'error')
+      dependency = PypiDependency.parse(package)
+      if dependency.name in dependencies:
+        self.line_error(f'error: package specified more than once: <b>{dependency.name}</b>', 'error')
         return 1
-      dependencies[dep.name] = dep
+      dependencies[dependency.name] = dependency
 
-    python = Environment.of(self.option("python"))
+    python = PythonEnvironment.of(self.option("python"))
     distributions = python.get_distributions(dependencies.keys())
     where = 'dev' if self.option("dev") else (self.option("extra") or "run")
 
-    to_install = [d.to_pep_508() for d in dependencies.values() if distributions[d.name] is None]
+    to_install = [d.version.to_pep_508() for d in dependencies.values() if distributions[d.name] is None]
     if to_install:
       self.line('Installing ' + ' '.join(f'<fg=cyan>{p}</fg>' for p in to_install))
       pip_install = [python.executable, "-m", "pip"] + ["install", "-q"] + to_install
@@ -83,18 +82,18 @@ class AddCommandPlugin(Command, ApplicationPlugin):
       sp.check_call(pip_install)
 
     distributions.update(python.get_distributions({k for k in distributions if distributions[k] is None}))
-    for package_name, dep in dependencies.items():
-      if package_name == dep.name:
-        dist = distributions[dep.name]
-        if not dist:
-          self.line_error(
-            f'error: unable to find distribution <fg=cyan>{package_name!r}</fg> in <s>{python.executable}</s>',
-            'error'
-          )
-          return 1
-        dep = Dependency(package_name, '^' + dist.version)
-      self.line(f'Adding <fg=cyan>{dep.name} {dep.pretty_constraint}</fg>')
-      project.add_dependency(dep, where)
+    for dep_name, dependency in dependencies.items():
+      dist = distributions[dep_name]
+      if not dist:
+        self.line_error(
+          f'error: unable to find distribution <fg=cyan>{dep_name!r}</fg> in <s>{python.executable}</s>',
+          'error'
+        )
+        return 1
+      if not dependency.version:
+        dependency.version = VersionSpec('^' + dist.version)
+      self.line(f'Adding <fg=cyan>{dependency}</fg>')
+      project.add_dependency(dependency.name, dependency.version, where)
 
     return 0
 

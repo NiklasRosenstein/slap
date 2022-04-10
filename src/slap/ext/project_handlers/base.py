@@ -8,8 +8,8 @@ from pathlib import Path
 
 from nr.util.algorithm.longest_common_substring import longest_common_substring
 from nr.util.fs import get_file_in_directory
-from poetry.core.packages.dependency import Dependency  # type: ignore[import]
 from setuptools import find_namespace_packages, find_packages
+from slap.python.dependency import VersionSpec
 
 from slap.plugins import ProjectHandlerPlugin
 from slap.project import Package, Project
@@ -103,12 +103,12 @@ class PyprojectHandler(BaseProjectHandler):
       refs += get_pyproject_interdependency_version_refs(project)
     return refs
 
-  def add_dependency(self, project: Project, selector: Dependency, where: str) -> None:
+  def add_dependency(self, project: Project, package: str, version_spec: VersionSpec, where: str) -> None:
     """ Adds a dependency to the respective location in the `pyproject.toml` file. """
 
     import tomlkit, tomlkit.items, tomlkit.container
     root = tomlkit.parse(project.pyproject_toml.path.read_text())
-    keys, value = self.get_dependency_location_key_sequence(project, selector, where)
+    keys, value = self.get_dependency_location_key_sequence(project, package, version_spec, where)
     assert isinstance(value, list | dict), type(value)
     current: tomlkit.items.Item | tomlkit.container.Container = root
     for idx, key in enumerate(keys):
@@ -139,10 +139,11 @@ class PyprojectHandler(BaseProjectHandler):
   def get_dependency_location_key_sequence(
     self,
     project: Project,
-    selector: Dependency,
+    package: str,
+    version_spec: VersionSpec,
     where: str,
   ) -> tuple[list[str], list | dict]:
-    """ Return the sequencce of keys where the dependencies of the project are listed given the *where* string.
+    """ Return the sequence of keys where the dependencies of the project are listed given the *where* string.
     Refer to the #ProjectHandler.add_dependency() documentation for information on the meaning of the parameter.
 
     Returns:
