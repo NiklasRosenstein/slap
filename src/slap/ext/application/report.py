@@ -1,10 +1,11 @@
 
 """ Commands that produce reports. """
 
-import logging
 import json
+import logging
 import typing as t
 
+import pkg_resources
 from slap.plugins import ApplicationPlugin
 from slap.application import Application, Command, option
 
@@ -24,6 +25,10 @@ class ReportDependenciesCommand(Command):
       description="A comma-separated list of extra dependencies to include.",
       flag=False,
     ),
+    option(
+      'with-license-text',
+      description="Include license text in the output."
+    )
   ]
 
   def __init__(self, app: Application) -> None:
@@ -46,42 +51,34 @@ class ReportDependenciesCommand(Command):
       for extra in extras:
         requirements += project.dependencies().extra.get(extra, [])
 
+    dists_cache: dict[str, pkg_resources.Distribution | None] = {}
     python_environment = PythonEnvironment.of("python")
     requirements = filter_dependencies(requirements, python_environment.pep508, extras)
     with tqdm.tqdm(desc='Resolving requirements graph') as progress:
-      graph = build_distribution_graph(python_environment, requirements, lambda d: progress.update(len(d)))
+      graph = build_distribution_graph(
+        env=python_environment,
+        dependencies=requirements,
+        resolved_callback=lambda d: progress.update(len(d)),
+        dists_cache=dists_cache
+      )
 
     graph.sort()
-    print(databind.json.dumps(graph, DistributionGraph, indent=2, sort_keys=True))
-    # missing_distributions: set[str] = set()
-    # metadata: dict[str, dict[str, t.Any] | None] = {}
+    output = databind.json.dump(graph, DistributionGraph)
 
-    # # TODO (@NiklasRosenstein): Resolve dependency markers, including required extras.
-    #   while requirements:
-    #     logger.info('Fetching requirements: <val>%s</val>', requirements)
-    #     distributions = python_environment.get_distributions([d.name for d in requirements])
-    #     progress.update(len(requirements))
-    #     requirements = []
-    #     for dist_name, dist in distributions.items():
-    #       if dist is None:
-    #         missing_distributions.add(dist_name)
-    #         metadata[dist_name] = None
-    #       else:
-    #         dist_meta = get_distribution_metadata(dist)
-    #         metadata[dist_name] = t.cast(dict[str, t.Any], dump(dist_meta, DistributionMetadata))
-    #         requirements += [
-    #           dependency
-    #           for dependency in parse_dependencies(dist_meta.requirements)
-    #           if not dependency.markers or
-    #             python_environment.pep508.evaluate_markers(dependency.markers, set(dependency.extras or []))
-    #         ]
-    #     # requirements -= metadata.keys()
-    #     # requirements -= missing_distributions
+    # Retrieve the license text from the distributions.
+    if self.option('with-license-text'):
+      for dist_name, dist_data in output['metadata'].items():
+        dist = dists_cache[dist_name]
+        dist_data['license_text'] = None
+        if dist is not None:
+          for filename in ('LICENSE', 'LICENSE.txt', 'LICENSE.text', 'LICENSE.rst'):
+            try:
+              dist_data['license_text'] = dist.get_metadata(filename)
+              break
+            except FileNotFoundError:
+              pass
 
-    # print(json.dumps(metadata, indent=2))
-
-    # if missing_distributions:
-    #   logger.warning('Unable to find the following required distributions: <val>%s</val>', missing_distributions)
+    print(json.dumps(output, indent=2, sort_keys=True))
 
 
 class ReportPlugin(ApplicationPlugin):
