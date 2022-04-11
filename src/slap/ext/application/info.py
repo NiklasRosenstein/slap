@@ -1,10 +1,13 @@
 
 import os
+import shlex
 import typing as t
 from pathlib import Path
 from slap.application import Application, Command
-from slap.python.dependency import Dependency
 from slap.plugins import ApplicationPlugin
+
+if t.TYPE_CHECKING:
+  from slap.python.dependency import Dependency
 
 
 class InfoCommandPlugin(Command, ApplicationPlugin):
@@ -58,9 +61,10 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
     return 0
 
   def _print_deps(self, prefix: str, deps: t.Sequence[Dependency]) -> None:
+    from slap.install.installer import PipInstaller
     if deps:
       self.line(f'    {prefix}:')
       for dep in sorted(deps, key=lambda s: s.name.lower()):
-        self.line(f'      - <opt>{dep}</opt>')
+        self.line(f'      - <opt>{" ".join(map(shlex.quote, PipInstaller.dependency_to_pip_arguments(dep)))}</opt>')
     else:
       self.line(f'    {prefix}: <i>none</i>')

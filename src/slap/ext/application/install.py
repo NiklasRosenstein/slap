@@ -16,7 +16,7 @@ from slap.plugins import ApplicationPlugin
 from slap.project import Project
 
 if t.TYPE_CHECKING:
-  from slap.python.dependency import Dependency, PathDependency
+  from slap.python.dependency import Dependency
   from slap.python.environment import PythonEnvironment
 
 
