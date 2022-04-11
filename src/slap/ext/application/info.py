@@ -1,8 +1,11 @@
 
+from __future__ import annotations
+
 import os
 import shlex
 import typing as t
 from pathlib import Path
+
 from slap.application import Application, Command
 from slap.plugins import ApplicationPlugin
 
