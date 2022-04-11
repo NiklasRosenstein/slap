@@ -20,7 +20,7 @@ class ReportDependenciesCommand(Command):
     super().__init__()
     self.app = app
 
-  def handle(self) -> int:
+  def handle(self) -> None:
     from databind.json import dump
     from slap.python.dependency import parse_dependencies
     from slap.python.environment import PythonEnvironment, DistributionMetadata, get_distribution_metadata
@@ -45,7 +45,7 @@ class ReportDependenciesCommand(Command):
           metadata[dist_name] = None
         else:
           dist_meta = get_distribution_metadata(dist)
-          metadata[dist_name] = dump(dist_meta, DistributionMetadata)
+          metadata[dist_name] = t.cast(dict[str, t.Any], dump(dist_meta, DistributionMetadata))
           requirements |= {dependency.name for dependency in parse_dependencies(dist_meta.requirements)}
       requirements -= metadata.keys()
       requirements -= missing_distributions
