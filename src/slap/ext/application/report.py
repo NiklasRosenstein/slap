@@ -21,7 +21,7 @@ class ReportDependenciesCommand(Command):
     self.app = app
 
   def handle(self) -> None:
-    import tqdm
+    import tqdm  # type: ignore[import]
     from databind.json import dump
     from slap.python.dependency import parse_dependencies
     from slap.python.environment import PythonEnvironment, DistributionMetadata, get_distribution_metadata
