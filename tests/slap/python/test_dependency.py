@@ -62,6 +62,7 @@ def test__parse_dependency_string__can_parse_path_dependency():
 
 def test__parse_dependency_config__various_configurations():
   assert parse_dependency_config('kek', '') == PypiDependency('kek', VersionSpec(''))
+  assert parse_dependency_config('kek', '1.0.0') == PypiDependency('kek', VersionSpec('1.0.0'))
   assert parse_dependency_config('kek', {'url': 'https://blob.org/kek-1.2.1.tar.gz'}) == \
     UrlDependency('kek', 'https://blob.org/kek-1.2.1.tar.gz')
   assert parse_dependency_config('kek', {'git': 'https://github.com/kek/kek', 'branch': 'develop'}) == \
@@ -119,3 +120,6 @@ def test__PypiDependency__parse():
     PypiDependency('foo', VersionSpec('^1.0.0'), markers='platform_system="Linux"')
   assert PypiDependency.parse("PySocks (!=1.5.7,<2.0,>=1.5.6) ; extra == 'socks'") == \
     PypiDependency('PySocks', VersionSpec('(!=1.5.7,<2.0,>=1.5.6)'), markers="extra == 'socks'")
+
+  # TODO (@NiklasRosenstein): This is actually a bad example and we should start raising an error for it.
+  assert PypiDependency.parse('foo 1.0.0') == PypiDependency('foo 1.0.0', VersionSpec(''))

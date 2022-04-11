@@ -333,6 +333,10 @@ def _parse_single_dependency_config(name: str, dep: str | dict[str, t.Any]) -> D
         or dep.startswith('./') or dep.startswith('/')):
       dependency = parse_dependency_string(f'{name} @ {dep}')
     else:
+      # If dep is _just_ a version number, we need to prefix it with a = to ensure the PypiDependency is parsed correctly.
+      dep = dep.strip()
+      if dep and dep[0].isnumeric():
+        dep = f'={dep}'
       dependency = parse_dependency_string(f'{name} {dep}')
 
   elif 'git' in dep:
