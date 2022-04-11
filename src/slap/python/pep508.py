@@ -7,6 +7,8 @@ import functools
 import operator
 import typing as t
 
+from slap.python.dependency import Dependency
+
 
 @dataclasses.dataclass
 class Pep508Environment:
@@ -131,3 +133,18 @@ def _eval_environment_markers_ast_value(node: ast.expr, scope: dict[str, t.Any])
     return node.value
 
   raise ValueError(f'Node of type {type(node).__name__!r} not supported in environment markers')
+
+
+def filter_dependencies(
+  dependencies: t.Iterable[Dependency],
+  env: Pep508Environment,
+  extras: set[str] | None
+) -> list[Dependency]:
+  """ Filters a collection of dependencies according to their environment markers and Python requirements. """
+
+  # TODO (@NiklasRosenstein): Filter by #Dependency.python
+
+  return [
+    dependency for dependency in dependencies
+    if not dependency.markers or env.evaluate_markers(dependency.markers, extras)
+  ]

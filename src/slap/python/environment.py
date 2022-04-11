@@ -4,6 +4,7 @@ from __future__ import annotations
 import dataclasses
 import functools
 import json
+import logging
 import pickle
 import subprocess as sp
 import textwrap
@@ -14,6 +15,9 @@ from slap.python import pep508
 
 if t.TYPE_CHECKING:
   import pkg_resources
+  from slap.python.dependency import Dependency
+
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -109,6 +113,7 @@ class PythonEnvironment:
 class DistributionMetadata:
   """ Additional metadata for a distribution. """
 
+  version: str
   license_name: str | None
   platform: str | None
   requires_python: str | None
@@ -124,9 +129,112 @@ def get_distribution_metadata(dist: pkg_resources.Distribution) -> DistributionM
   data = Parser().parsestr(dist.get_metadata(dist.PKG_INFO))
 
   return DistributionMetadata(
+    version=data.get('Version'),
     license_name=data.get('License'),
     platform=data.get('Platform'),
     requires_python=data.get('Requires-Python'),
     requirements=data.get_all('Requires-Dist') or [],
     extras=set(data.get_all('Provides-Extra') or []),
   )
+
+
+@dataclasses.dataclass
+class DistributionGraph:
+  """ Represents a resolved graph of distributions, their metadata and dependencies in a Python environment. """
+
+  #: Maps a distribution name to it's metadata.
+  metadata: dict[str, DistributionMetadata]
+
+  #: Maps out the dependencies between distributions.
+  dependencies: dict[str, t.MutableSet[str]]
+
+  #: A set of the distributions that have been found to be required but could not be resolved.
+  missing: set[str]
+
+  def sort(self) -> None:
+    from nr.util.orderedset import OrderedSet
+    for dist_name, dependencies in self.dependencies.items():
+      self.dependencies[dist_name] = OrderedSet(sorted(dependencies))
+
+  def update(self, other: DistributionGraph) -> None:
+    self.metadata.update(other.metadata)
+    self.dependencies.update(other.dependencies)
+    self.missing.update(other.missing)
+
+
+def build_distribution_graph(
+  env: PythonEnvironment,
+  dependencies: list[Dependency],
+  resolved_callback: t.Callable[[dict[str, pkg_resources.Distribution | None]], t.Any] | None = None,
+  dists_cache: dict[str, pkg_resources.Distribution | None] | None = None,
+) -> DistributionGraph:
+  """ Builds a #DistributionGraph in the given #PythonEnvironment using the given dependencies.
+
+  Args:
+    env: The Python environment in which to resolve the dependencies.
+    dependencies: The dependencies to resolve. Note that this list should already be filtered by its markers.
+    resolved_callback: A callback that is invoked with the list of dependencies that have been successfully
+      resolved. This is useful for progress reporting.
+  """
+
+  from slap.python.dependency import parse_dependencies
+  from slap.python.pep508 import filter_dependencies
+
+  graph = DistributionGraph({}, {}, set())
+
+  if dists_cache is None:
+    dists_cache = {}
+
+  logger.info('Fetching requirements: <val>%s</val>', dependencies)
+
+  # TODO (@NiklasRosenstein): Should we warn here if the dependencies map is smaller than the dependencies list?
+  dependencies_map = {dependency.name: dependency for dependency in dependencies}
+
+  # Resolve the distributions available in the Python environment.
+  distributions = {dist_name: dists_cache[dist_name] for dist_name in dependencies_map if dist_name in dists_cache}
+  fetch_distributions = dependencies_map.keys() - distributions.keys()
+  if fetch_distributions:
+    fetched_distributions = env.get_distributions(fetch_distributions)
+    distributions.update(fetched_distributions)
+    dists_cache.update(fetched_distributions)
+
+  resolved_callback(distributions)
+
+  # Parse the dependencies of the distributions.
+  prefetch_distributions: set[str] = set()
+  metadata: dict[str, tuple[DistributionMetadata, list[Dependency]]] = {}
+  for dist_name, dist in distributions.items():
+    if dist is None:
+      graph.missing.add(dist_name)
+    else:
+      dist_meta = get_distribution_metadata(dist)
+      dist_extras = set(dependencies_map[dist_name].extras or [])
+      parsed_dependencies = filter_dependencies(parse_dependencies(dist_meta.requirements), env.pep508, dist_extras)
+      metadata[dist_name] = (dist_meta, parsed_dependencies)
+      prefetch_distributions |= {dependency.name for dependency in parsed_dependencies}
+
+  # Prefetch distributions.
+  prefetch_distributions -= dists_cache.keys()
+  if prefetch_distributions:
+    dists_cache.update(env.get_distributions(prefetch_distributions))
+
+  # Continue building the graph recursively.
+  for dist_name, (dist_meta, parsed_dependencies) in metadata.items():
+      graph.metadata[dist_name] = dist_meta
+
+      for dependency in parsed_dependencies:
+        graph.dependencies.setdefault(dist_name, set()).add(dependency.name)
+
+      # TODO (@NiklasRosenstein): Potential optimization here is to cache which distributions have already been
+      #   resolved; and to pre-fetch all distributions needed in the recursive call in the parent collectively
+      #   across all the dependencies of the current set of distributions.
+      new_graph = build_distribution_graph(
+        env=env,
+        dependencies=parsed_dependencies,
+        resolved_callback=resolved_callback,
+        dists_cache=dists_cache,
+      )
+
+      graph.update(new_graph)
+
+  return graph
