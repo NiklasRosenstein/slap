@@ -1,7 +1,5 @@
 
 import logging
-import shlex
-import subprocess as sp
 
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
@@ -41,7 +39,9 @@ class AddCommandPlugin(Command, ApplicationPlugin):
         "version range (`*`).",
     ),
     option(
-      "--source"
+      "--source",
+      description="Specify the source from which the package should be installed.",
+      flag=False,
     ),
     venv_check_option,
     python_option,
@@ -56,7 +56,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
 
   def handle(self) -> int:
     from nr.util.stream import Stream
-    from slap.install.installer import PipInstaller
+    from slap.install.installer import InstallOptions, PipInstaller, get_indexes_for_projects
     from slap.python.environment import PythonEnvironment
 
     if not self._validate_options():
@@ -73,6 +73,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
       if dependency.name in dependencies:
         self.line_error(f'error: package specified more than once: <b>{dependency.name}</b>', 'error')
         return 1
+      dependency.source = self.option("source")
       dependencies[dependency.name] = dependency
 
     python = PythonEnvironment.of(self.option("python"))
@@ -82,15 +83,19 @@ class AddCommandPlugin(Command, ApplicationPlugin):
     to_install = (
       Stream(dependencies.values())
       .filter(lambda d: distributions[d.name] is None)
-      .flatmap(PipInstaller.dependency_to_pip_arguments)
       .collect()
     )
 
     if to_install:
+      indexes = get_indexes_for_projects([project])
+      config = InstallOptions(True, indexes)
+      installer = PipInstaller(symlink_helper=None)
+
       self.line('Installing ' + ' '.join(f'<fg=cyan>{p}</fg>' for p in to_install))
-      pip_install = [python.executable, "-m", "pip"] + ["install", "-q"] + to_install
-      logger.info('Running <subj>$ %s</subj>', ' '.join(map(shlex.quote, pip_install)))
-      sp.check_call(pip_install)
+
+      status_code = installer.install(to_install, python, config)
+      if status_code != 0:
+        return status_code
 
     distributions.update(python.get_distributions({k for k in distributions if distributions[k] is None}))
     for dep_name, dependency in dependencies.items():

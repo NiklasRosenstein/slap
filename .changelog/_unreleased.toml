@@ -42,3 +42,9 @@ id = "5407fdd7-2700-45cf-a837-cfbed82525fb"
 type = "fix"
 description = "Fix a potential issue in `slap add` when `tomlkit` returns an `OutOfOrderTableProxy` instead of a `Table` container in which case we did not mutate the actual TOML document"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "f3fbf0e6-9b6a-4698-bb2a-e0a2b894ca21"
+type = "feature"
+description = "Add `--source` option to `slap add` command"
+author = "@NiklasRosenstein"

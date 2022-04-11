@@ -59,7 +59,7 @@ class PoetryProjectHandler(PyprojectHandler):
     # Collect the package indexes from the Poetry config.
     indexes = Indexes()
     for source in poetry.get('source', []):
-      if source.get('default', True):
+      if source.get('default', False):
         indexes.default = source['name']
       indexes.urls[source['name']] = source['url']
 

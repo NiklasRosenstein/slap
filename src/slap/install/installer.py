@@ -189,13 +189,6 @@ class PipInstaller(Installer):
       pip_arguments += [f'{prefix}{dependency.path}{extras}']
 
     elif isinstance(dependency, PypiDependency):
-      if dependency.source:
-      # TODO (@NiklasRosenstein): Make sure the dependency gets installed from the respective source.
-        logger.warning(
-          'PipInstaller does not currently support installing PyPI packages from a different source, '
-          'dependency <val>%s</val> will be installed like a normal PyPI dependency.',
-          dependency
-        )
       pip_arguments += [f'{dependency.name}{extras} {dependency.version.to_pep_508()} {hashes}'.rstrip()]
 
     elif isinstance(dependency, UrlDependency):
