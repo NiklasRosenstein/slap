@@ -63,7 +63,7 @@ class ReportDependenciesCommand(Command):
       )
 
     graph.sort()
-    output = databind.json.dump(graph, DistributionGraph)
+    output = t.cast(dict[str, t.Any], databind.json.dump(graph, DistributionGraph))
 
     # Retrieve the license text from the distributions.
     if self.option('with-license-text'):

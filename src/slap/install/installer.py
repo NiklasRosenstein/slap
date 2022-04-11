@@ -98,7 +98,7 @@ class PipInstaller(Installer):
       dependency = dependencies.pop()
 
       # TODO (@NiklasRosenstein): Pass extras from PipInstaller caller.
-      if not test_dependency(dependency, target.pep508, {}):
+      if not test_dependency(dependency, target.pep508, set()):
         continue
 
       # Collect dependencies for which hashes are not supported so we can report it later.
@@ -116,9 +116,9 @@ class PipInstaller(Installer):
         continue
 
       if isinstance(dependency, MultiDependency):
-        for sub_dependency in dependency:
+        for sub_dependency in dependency.dependencies:
           # TODO (@NiklasRosenstein): Pass extras from the caller so we can evaluate them here
-          if test_dependency(sub_dependency, target.pep508, {}):
+          if test_dependency(sub_dependency, target.pep508, set()):
             dependencies.insert(0, sub_dependency)
 
       else:

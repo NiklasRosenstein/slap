@@ -58,7 +58,7 @@ class VersionSpec:
   def accepts(self, version: str) -> bool:
     """ Tests if the version spec accepts the given version string. """
 
-    from poetry.core.semver.version import Version
+    from poetry.core.semver.version import Version  # type: ignore[import]
     return self.__dependency.constraint.allows(Version.parse(version))
 
 

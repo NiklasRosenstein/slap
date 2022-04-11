@@ -198,7 +198,8 @@ def build_distribution_graph(
     distributions.update(fetched_distributions)
     dists_cache.update(fetched_distributions)
 
-  resolved_callback(distributions)
+  if resolved_callback:
+    resolved_callback(distributions)
 
   # Parse the dependencies of the distributions.
   prefetch_distributions: set[str] = set()

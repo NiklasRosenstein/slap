@@ -34,7 +34,7 @@ class Dependencies:
   def __post_init__(self) -> None:
     from slap.install.installer import Indexes
     if self.indexes is None:
-      self.indexes = Indexes()
+      self.indexes = Indexes()  # type: ignore[unreachable]
 
 
 @dataclasses.dataclass
