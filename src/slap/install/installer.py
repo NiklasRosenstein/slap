@@ -69,8 +69,9 @@ class PipInstaller(Installer):
       dependency = dependencies.pop()
 
       if dependency.markers or dependency.python:
+        # TODO (@NiklasRosenstein): Evaluate environment markers and Python requirement.
         logger.warning(
-          'PipInstaller does not currently support testing environment markers or Python requirements, '
+          'PipInstaller does not currently support testing environment markers or Python requirement, '
           'dependency <val>%s</val> will always be installed.',
           dependency
         )
@@ -79,43 +80,11 @@ class PipInstaller(Installer):
       if dependency.hashes and type(dependency) not in supports_hashes:
         unsupported_hashes.setdefault(type(dependency), []).append(dependency)
 
-      extras = '' if not dependency.extras else f'[{",".join(dependency.extras)}]'
-      hashes = ' '.join(f'--hash={h}' for h in dependency.hashes or [])
-
       if isinstance(dependency, PathDependency) and dependency.link:
         logger.info('Collecting recursive dependencies for project <val>%s</val>', dependency.path)
         dependencies += self.symlink_helper.get_dependencies_for_project(dependency.path)
         link_projects.append(dependency.path)
         continue
-
-      if isinstance(dependency, GitDependency):
-        # TODO (@NiklasRosenstein): Add Git branch/rev/tag to the URL.
-        if dependency.branch or dependency.rev or dependency.tag:
-          logger.warning(
-            'PipInstaller does not currently support Git branch/rev/tag, dependency will be installed '
-            'from main branch: <val>%s</val>', dependency,
-          )
-        pip_arguments += [f'{dependency.name}{extras} @ git+{dependency.url}']
-
-      elif isinstance(dependency, PathDependency):
-        assert not dependency.link  # We caught that case before
-        if dependency.develop:
-          pip_arguments += ['-e']
-        prefix = '' if dependency.path.is_absolute() else './'
-        pip_arguments += [f'{prefix}{dependency.path}{extras}']
-
-      elif isinstance(dependency, PypiDependency):
-        if dependency.source:
-        # TODO (@NiklasRosenstein): Make sure the dependency gets installed from the respective source.
-          logger.warning(
-            'PipInstaller does not currently support installing PyPI packages from a different source, '
-            'dependency <val>%s</val> will be installed like a normal PyPI dependency.',
-            dependency
-          )
-        pip_arguments += [f'{dependency.name}{extras} {dependency.version.to_pep_508()} {hashes}'.rstrip()]
-
-      elif isinstance(dependency, UrlDependency):
-        pip_arguments += [f'{dependency.name}{extras} @ {dependency.url} {hashes}'.rstrip()]
 
       elif isinstance(dependency, MultiDependency):
         # TODO (@NiklasRosenstein): Evaluate which dependency to install.
@@ -128,7 +97,7 @@ class PipInstaller(Installer):
           dependencies.insert(0, dependency.dependencies[0])
 
       else:
-        raise Exception(f'Unexpected dependency type: {dependency}')
+        pip_arguments += self.dependency_to_pip_arguments(dependency)
 
     # Construct the Pip command to run.
     pip_command = [target.executable, "-m", "pip", "install"] + pip_arguments
@@ -144,3 +113,55 @@ class PipInstaller(Installer):
       self.symlink_helper.link_project(project_path)
 
     return 0
+
+  @staticmethod
+  def dependency_to_pip_arguments(dependency: Dependency) -> list[str]:
+    """ Converts a dependency to a list of arguments for Pip.
+
+    Args:
+      dependency: The dependency to convert. Must be one of #GitDependency, #PathDependency,
+        #PypiDependency or #UrlDependency. A #MultiDependency is not supported by this function.
+    Raises:
+      Exception: If an unexpected kind of dependency was encountered.
+    """
+
+    from slap.python.dependency import GitDependency, PathDependency, PypiDependency, UrlDependency
+
+    extras = '' if not dependency.extras else f'[{",".join(dependency.extras)}]'
+    hashes = ' '.join(f'--hash={h}' for h in dependency.hashes or [])
+    pip_arguments = []
+
+    if isinstance(dependency, GitDependency):
+      # TODO (@NiklasRosenstein): Add Git branch/rev/tag to the URL.
+      if dependency.branch or dependency.rev or dependency.tag:
+        logger.warning(
+          'PipInstaller does not currently support Git branch/rev/tag, dependency will be installed '
+          'from main branch: <val>%s</val>', dependency,
+        )
+      pip_arguments += [f'{dependency.name}{extras} @ git+{dependency.url}']
+
+    elif isinstance(dependency, PathDependency):
+      assert not dependency.link  # We caught that case before
+      if dependency.develop:
+        pip_arguments += ['-e']
+      prefix = '' if dependency.path.is_absolute() else './'
+      pip_arguments += [f'{prefix}{dependency.path}{extras}']
+
+    elif isinstance(dependency, PypiDependency):
+      if dependency.source:
+      # TODO (@NiklasRosenstein): Make sure the dependency gets installed from the respective source.
+        logger.warning(
+          'PipInstaller does not currently support installing PyPI packages from a different source, '
+          'dependency <val>%s</val> will be installed like a normal PyPI dependency.',
+          dependency
+        )
+      pip_arguments += [f'{dependency.name}{extras} {dependency.version.to_pep_508()} {hashes}'.rstrip()]
+
+    elif isinstance(dependency, UrlDependency):
+      pip_arguments += [f'{dependency.name}{extras} @ {dependency.url} {hashes}'.rstrip()]
+
+    else:
+      raise Exception(f'Unexpected dependency type: {dependency}')
+
+    assert pip_arguments, dependency
+    return pip_arguments

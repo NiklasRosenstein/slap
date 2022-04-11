@@ -52,6 +52,8 @@ class AddCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
+    from nr.util.stream import Stream
+    from slap.install.installer import PipInstaller
     from slap.python.environment import PythonEnvironment
 
     if not self._validate_options():
@@ -74,7 +76,13 @@ class AddCommandPlugin(Command, ApplicationPlugin):
     distributions = python.get_distributions(dependencies.keys())
     where = 'dev' if self.option("dev") else (self.option("extra") or "run")
 
-    to_install = [d.version.to_pep_508() for d in dependencies.values() if distributions[d.name] is None]
+    to_install = (
+      Stream(dependencies.values())
+      .filter(lambda d: distributions[d.name] is None)
+      .flatmap(PipInstaller.dependency_to_pip_arguments)
+      .collect()
+    )
+
     if to_install:
       self.line('Installing ' + ' '.join(f'<fg=cyan>{p}</fg>' for p in to_install))
       pip_install = [python.executable, "-m", "pip"] + ["install", "-q"] + to_install
