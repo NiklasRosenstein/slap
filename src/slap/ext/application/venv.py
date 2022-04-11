@@ -138,35 +138,35 @@ class VenvCommand(Command):
   ]
   options = [
     option(
-      "global", "g",
+      "--global", "-g",
       description="Manage virtual environments in the global scope instead of the local directory."
     ),
     option(
-      "activate", "a",
+      "--activate", "-a",
       description="Activate the environment given by the environment name. Note that using this option if used "
         "directly with the Slap CLI will cause an error because it needs to be shadowed by a function of your shell.",
     ),
     option(
-      "create", "c",
+      "--create", "-c",
       description="Create the environment with the given environment name.",
     ),
     option(
-      "delete", "d",
+      "--delete", "-d",
       description="Delete the environment with the given environment name.",
     ),
     option(
-      "list", "l",
+      "--list", "-l",
       description="List the available environments.",
     ),
     option(
-      "init-code", "i",
+      "--init-code", "i",
       description="Print the code snippet that can be placed in your shells init scripts to shadow this command "
         "in order to properly make use of the <opt>-a,--activate</opt> option. Currently supported shells are: "
         + ", ".join(USER_INIT_SCRIPTS),
       flag=False,
     ),
     option(
-      "python", "p",
+      "--python", "-p",
       description="The Python executable to use to create the virtual environment. If this is not specified, "
         "it defaults to <code>python</code> + the environment name if the environment name looks like a version "
         "number (contains numbers and dots). Otehrwise, it defaults to <code>python3</code>.",
@@ -320,11 +320,11 @@ class VenvLinkCommand(Command):
   ]
   options = [
     option(
-      "global", "g",
+      "--global", "-g",
       description="Manage virtual environments in the global scope instead of the local directory."
     ),
     option(
-      "force", "f",
+      "--force", "-f",
       description="Overwrite the link target if it already exists.",
     )
   ]

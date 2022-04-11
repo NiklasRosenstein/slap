@@ -40,6 +40,9 @@ class AddCommandPlugin(Command, ApplicationPlugin):
         "installed and no version selector is specified with the package name, it will fall back to a match-all "
         "version range (`*`).",
     ),
+    option(
+      "--source"
+    ),
     venv_check_option,
     python_option,
   ]

@@ -25,7 +25,7 @@ venv_check_option = option(
   description="Do not check if the target Python environment is a virtual environment.",
 )
 python_option = option(
-  "python", "p",
+  "--python", "-p",
   description="The Python executable to install to.",
   flag=False,
   default=os.getenv('PYTHON', 'python'),
@@ -66,30 +66,30 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
   name = "install"
   options = [
     option(
-      "only",
+      "--only",
       description="Path to the subproject to install only. May still cause other projects to be installed if "
         "required by the selected project via inter dependencies, but only their run dependencies will be installed.",
       flag=False,
     ),
     option(
-      "link",
+      "--link",
       description="Symlink the root project using <opt>slap link</opt> instead of installing it directly.",
     ),
     option(
-      "no-dev",
+      "--no-dev",
       description="Do not install development dependencies.",
     ),
     option(
-      "no-root",
+      "--no-root",
       description="Do not install the package itself, but only its dependencies.",
     ),
     option(
-      "extras",
+      "--extras",
       description="A comma-separated list of extras to install. Note that <s>\"dev\"</s> is a valid extras.",
       flag=False,
     ),
     option(
-      "only-extras",
+      "--only-extras",
       description="Install only the specified extras. Note that <s>\"dev\"</s> is a valid extras.",
       flag=False,
     ),

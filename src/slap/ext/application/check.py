@@ -37,11 +37,11 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
   name = "check"
   options = [
     option(
-      "show-skipped",
+      "--show-skipped",
       description="Show skipped checks.",
     ),
     option(
-      "warnings-as-errors", "w",
+      "--warnings-as-errors", "w",
       description="Treat warnings as errors.",
     )
   ]

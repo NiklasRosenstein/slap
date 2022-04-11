@@ -107,12 +107,12 @@ class TestCommandPlugin(Command, ApplicationPlugin):
   ]
   options = [
     option(
-      "no-line-prefix", "s",
+      "--no-line-prefix", "s",
       description="Do not prefix output from the test commands with the test name (default if a single argument "
         "for <info>test</info> is specified).",
     ),
     option(
-      "list", "l",
+      "--list", "-l",
       description="List all available tests",
     ),
   ]

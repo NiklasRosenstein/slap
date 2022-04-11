@@ -63,7 +63,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
   options = [
     python_option,
     option(
-      "dump-pyproject",
+      "--dump-pyproject",
       description="Dump the updated pyproject.toml and do not actually do the linking.",
     ),
     venv_check_option

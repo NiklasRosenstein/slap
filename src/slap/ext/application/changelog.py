@@ -106,22 +106,22 @@ class ChangelogAddCommand(BaseChangelogCommand):
 
   options = [
     option(
-      "type", "t",
+      "--type", "-t",
       description=f"The type of the changelog. Unless configured differently, one of {', '.join(DEFAULT_VALID_TYPES)}",
       flag=False,
     ),
     option(
-      "description", "d",
+      "--description", "-d",
       description="A Markdown formatted description of the changelog entry.",
       flag=False,
     ),
     option(
-      "author", "a",
+      "--author", "-a",
       description="Your username or email address. By default, this will be your configured Git name and email address.",
       flag=False,
     ),
     option(
-      "pr", None,
+      "--pr", None,
       description="The pull request that the change is introduced to the main branch with. This is not usually "
         "known at the time the changelog entry is created, so this option is not often used. If the remote "
         "repository is well supported by Slap, a pull request number may be specified and converted to a full "
@@ -129,14 +129,14 @@ class ChangelogAddCommand(BaseChangelogCommand):
       flag=False,
     ),
     option(
-      "issue", "i",
+      "--issue", "-i",
       description="An issue related to this changelog. If the remote repository is well supported by Slap, an issue "
         "number may be specified and converted to a full URL by Slap, otherwise a full URL must be specified.",
       flag=False,
       multiple=True,
     ),
     option(
-      "commit", "c",
+      "--commit", "-c",
       description="Commit the currently staged changes in the VCS as well as the updated changelog file to disk. The "
         "commit message is a concatenation of the <opt>--type, -t</opt> and <opt>--description, -d</opt>, as well as "
         "the directory relative to the VCS toplevel if the changelog is created not in the toplevel directory of the "
@@ -215,39 +215,39 @@ class ChangelogUpdatePrCommand(Command):
   ]
   options = [
     option(
-      "dry", "d",
+      "--dry", "-d",
       description="Do not actually make changes on disk.",
     ),
     option(
-      "overwrite",
+      "--overwrite",
       description="Update PR references even if an entry's reference is already set but different.",
     ),
     option(
-      "commit", "c",
+      "--commit", "-c",
       description="Commit the changes, if any.",
     ),
     option(
-      "push", "p",
+      "--push", "-p",
       description="Push the changes, if any.",
     ),
     option(
-      "name",
+      "--name",
       description="Override the <code>user.name</code> Git option (only with <opt>--commit, -c</opt>)",
       flag=False,
     ),
     option(
-      "email",
+      "--email",
       description="Override the <code>user.email</code> Git option (only with <opt>--commit, -c</opt>).",
       flag=False,
     ),
     option(
-      "use",
+      "--use",
       description="Use the specified plugin to publish the updated changelogs. Use this in supported CI environments "
         "instead of manually configuring the command-line settings.",
       flag=False,
     ),
     option(
-      "list", "l",
+      "--list", "-l",
       description="List the available plugins you can pass to the <opt>--use</opt> option.",
     )
   ]
@@ -405,11 +405,11 @@ class ChangelogFormatCommand(BaseChangelogCommand):
   name = "changelog format"
   options = [
     option(
-      "markdown", "m",
+      "--markdown", "-m",
       description="Render the changelog in Markdown format.",
     ),
     option(
-      "all", "a",
+      "--all", "-a",
       description="Render all changelogs in reverse chronological order.",
     ),
   ]
@@ -505,24 +505,24 @@ class ChangelogConvertCommand(BaseChangelogCommand):
   name = "changelog convert"
   options = [
     option(
-      "author", "a",
+      "--author", "-a",
       description="The author to fall back to. If not specified, the current VCS queried for the "
         "author name instead and their email will be used (depending on the normalization of the "
         "repository remote, this will be converted to a username, for example in the case of GitHub).",
       flag=False,
     ),
     option(
-      "directory", "d",
+      "--directory", "-d",
       description="The directory from which to load the old changelogs. Defaults to the same directory that the "
         "new changelogs will be written to.",
       flag=False,
     ),
     option(
-      "dry",
+      "--dry",
       description="Do not make changes on disk."
     ),
     option(
-      "fail-fast", "x",
+      "--fail-fast", "x",
       description="If this flag is enabled, exit as soon as an error is encountered with any file.",
     ),
   ]
