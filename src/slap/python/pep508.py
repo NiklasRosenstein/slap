@@ -152,6 +152,6 @@ def filter_dependencies(
 def test_dependency(dependency: Dependency, env: Pep508Environment, extras: set[str] | None) -> bool:
   """ Tests if the *dependency* should be included given the current environment and extras. """
 
-  # TODO (@NiklasRosenstein): Filter by #Dependency.python
-
+  if dependency.python and not dependency.python.accepts(env.python_version):
+    return False
   return not dependency.markers or env.evaluate_markers(dependency.markers, extras)

@@ -55,6 +55,12 @@ class VersionSpec:
     # NOTE (@NiklasRosenstein): Removes parentheses around the spec.
     return self.__dependency.to_pep_508().strip()[1:-1]
 
+  def accepts(self, version: str) -> bool:
+    """ Tests if the version spec accepts the given version string. """
+
+    from poetry.core.semver.version import Version
+    return self.__dependency.constraint.allows(Version.parse(version))
+
 
 @dataclasses.dataclass
 class Dependency:
