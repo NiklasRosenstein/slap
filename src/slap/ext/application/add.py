@@ -109,7 +109,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
       if not dependency.version:
         dependency.version = VersionSpec('^' + dist.version)
       self.line(f'Adding <fg=cyan>{dependency}</fg>')
-      project.add_dependency(dependency.name, dependency.version, where)
+      project.add_dependency(dependency, where)
 
     return 0
 

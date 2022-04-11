@@ -63,7 +63,7 @@ class FlitProjectHandler(PyprojectHandler):
       logger.warning('Unable to read dependencies for project <subj>%s</subj>', project)
       return Dependencies(None, [], [], {})
 
-  def get_dependency_location_key_sequence(
+  def get_add_dependency_toml_location_and_config(
     self,
     project: Project,
     package: str,

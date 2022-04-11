@@ -9,13 +9,12 @@ from pathlib import Path
 from databind.core.settings import Alias
 
 from slap.configuration import Configuration
-from slap.python.dependency import Dependency
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
   from slap.install.installer import Indexes
   from slap.plugins import ProjectHandlerPlugin
-  from slap.python.dependency import VersionSpec
+  from slap.python.dependency import Dependency, VersionSpec
   from slap.release import VersionRef
   from slap.repository import Repository
 
@@ -171,7 +170,7 @@ class Project(Configuration):
 
     return result
 
-  def add_dependency(self, package: str, version_spec: VersionSpec, where: str) -> None:
+  def add_dependency(self, dependency: Dependency, where: str) -> None:
     """ Add a dependency to the project configuration.
 
     Arguments:
@@ -182,10 +181,9 @@ class Project(Configuration):
       NotImplementedError: If the operation is not supported on the project.
     """
 
-    from slap.python.dependency import VersionSpec
-    assert isinstance(package, str), type(package)
-    assert isinstance(version_spec, VersionSpec), type(version_spec)
-    self.handler().add_dependency(self, package, version_spec, where)
+    from slap.python.dependency import Dependency
+    assert isinstance(dependency, Dependency), type(dependency)
+    self.handler().add_dependency(self, dependency, where)
     # TODO(@NiklasRosenstein): Use a method to flush the cache of Once when it is available in `nr.utils`.
     self.raw_config.get(True)
     self.dependencies.get(True)

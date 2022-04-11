@@ -91,7 +91,7 @@ class SetuptoolsProjectHandler(BaseProjectHandler):
       refs += get_setup_cfg_interdependency_version_refs(project)
     return refs
 
-  def get_dependency_location_key_sequence(
+  def get_add_dependency_toml_location_and_config(
     self,
     project: Project,
     package: str,

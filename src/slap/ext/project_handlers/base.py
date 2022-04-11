@@ -1,6 +1,8 @@
 
 """ Implements the default package detection plugin. """
 
+from __future__ import annotations
+
 import abc
 import re
 import typing as t
@@ -9,11 +11,13 @@ from pathlib import Path
 from nr.util.algorithm.longest_common_substring import longest_common_substring
 from nr.util.fs import get_file_in_directory
 from setuptools import find_namespace_packages, find_packages
-from slap.python.dependency import VersionSpec
 
 from slap.plugins import ProjectHandlerPlugin
 from slap.project import Package, Project
 from slap.release import VersionRef, match_version_ref_pattern, match_version_ref_pattern_on_lines
+
+if t.TYPE_CHECKING:
+  from slap.python.dependency import Dependency
 
 IGNORED_MODULES = ['test', 'tests', 'docs', 'build']
 
@@ -103,12 +107,12 @@ class PyprojectHandler(BaseProjectHandler):
       refs += get_pyproject_interdependency_version_refs(project)
     return refs
 
-  def add_dependency(self, project: Project, package: str, version_spec: VersionSpec, where: str) -> None:
+  def add_dependency(self, project: Project, dependency: Dependency, where: str) -> None:
     """ Adds a dependency to the respective location in the `pyproject.toml` file. """
 
     import tomlkit, tomlkit.items, tomlkit.container
     root = tomlkit.parse(project.pyproject_toml.path.read_text())
-    keys, value = self.get_dependency_location_key_sequence(project, package, version_spec, where)
+    keys, value = self.get_add_dependency_toml_location_and_config(project, dependency, where)
     assert isinstance(value, list | dict), type(value)
 
     current: tomlkit.items.Item | tomlkit.container.Container = root
@@ -144,15 +148,14 @@ class PyprojectHandler(BaseProjectHandler):
     project.pyproject_toml.path.write_text(tomlkit.dumps(root))
 
   @abc.abstractmethod
-  def get_dependency_location_key_sequence(
+  def get_add_dependency_toml_location_and_config(
     self,
     project: Project,
-    package: str,
-    version_spec: VersionSpec,
+    dependency: Dependency,
     where: str,
   ) -> tuple[list[str], list | dict]:
-    """ Return the sequence of keys where the dependencies of the project are listed given the *where* string.
-    Refer to the #ProjectHandler.add_dependency() documentation for information on the meaning of the parameter.
+    """ Return the location and configuration to inject/update the TOML project configuration with in order
+    to add the given *dependency* to the project.
 
     Returns:
       1. The sequence of keys that contains the dependencies based on the *where* argument.
