@@ -11,7 +11,6 @@ from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, option
 from slap.configuration import Configuration
-from slap.install.installer import InstallOptions
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
 
@@ -115,7 +114,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     """
 
     from nr.util.stream import Stream
-    from slap.install.installer import PipInstaller
+    from slap.install.installer import InstallOptions, PipInstaller, get_indexes_for_projects
     from slap.python.dependency import PathDependency, PypiDependency, parse_dependencies
     from slap.python.environment import PythonEnvironment
 
@@ -147,6 +146,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     # Collect the run dependencies to install.
     for project in projects_plus_dependencies:
       assert project.is_python_project, 'Project.is_python_project is deprecated and expected to always be true'
+      deps = project.dependencies()
 
       if not self.option("no-root") and not self.option("link") and not self.option("only-extras") and project.packages():
         # Install the project itself directory unless certain flags turn this behavior off.
@@ -154,14 +154,15 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
 
       elif not self.option("only-extras"):
         # Install the run dependencies of the project.
-        dependencies += project.dependencies().run
+        dependencies += deps.run
 
     # Collect dev dependencies and extras from the project.
     for project in projects:
+      deps = project.dependencies()
 
       if (not self.option("no-dev") and not self.option("only-extras")) or 'dev' in install_extras:
         # Install the development dependencies of the project.
-        dependencies += project.dependencies().dev
+        dependencies += deps.dev
 
       # Determine the extras to install for the current project. This changes on development installs because
       # we always consider the ones configured in #InstallConfig.dev_extras, or _all_ extras if the option is
@@ -170,7 +171,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       if not self.option("no-dev"):
         config = self.config[project]
         if config.dev_extras is None:
-          current_project_install_extras.update(project.dependencies().extra.keys())  # Use all extras defined in the project
+          current_project_install_extras.update(deps.extra.keys())  # Use all extras defined in the project
           current_project_install_extras.update(config.extras.keys())  # Use all extras defined in the #InstallConfig
         else:
           current_project_install_extras.update(config.dev_extras)  # Use only the extras explicitly defined in the #InstallConfig
@@ -178,7 +179,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       # Append the extra dependencies from the project. We ignore 'dev' here because we already took care of
       # deciding when to install dev dependencies.
       for extra in current_project_install_extras:
-        extra_deps = project.dependencies().extra.get(extra)
+        extra_deps = deps.extra.get(extra)
         if extra_deps is not None:
           discovered_extras.add(extra)
           dependencies += extra_deps
@@ -200,8 +201,12 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       if not (isinstance(dependency, PypiDependency) and dependency.name in project_names)
     ]
 
+    options = InstallOptions(
+      quiet=self.option("quiet"),
+      indexes=get_indexes_for_projects(projects),
+    )
     installer = PipInstaller(self)
-    status_code = installer.install(dependencies, python_environment, InstallOptions(quiet=self.option("quiet")))
+    status_code = installer.install(dependencies, python_environment, options)
     if status_code != 0:
       return status_code
 

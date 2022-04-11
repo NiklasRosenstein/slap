@@ -15,6 +15,8 @@ from slap.python.dependency import MultiDependency
 from slap.python.pep508 import filter_dependencies, test_dependency
 
 if t.TYPE_CHECKING:
+  from slap.repository import Repository
+  from slap.project import Project
   from slap.python.dependency import Dependency
   from slap.python.environment import PythonEnvironment
 
@@ -22,8 +24,32 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
+class Indexes:
+  """ Represents a configuration of PyPI indexes. """
+
+  #: The name of the default index in the #urls mapping.
+  default: str | None = None
+
+  #: A mapping that assigns each key (the name of the index) its index URL.
+  urls: dict[str, str] = dataclasses.field(default_factory=dict)
+
+  def combine_with(self, other: Indexes) -> None:
+    if other.default and self.default and other.default != self.default:
+      logger.warning(
+        'Conflicting default index between projects in repository: %r (current), %r',
+        self.default, other.default
+      )
+    if not self.default:
+      self.default = other.default
+
+    # TODO (@NiklasRosenstein): Warn about conflicting package indexes.
+    self.urls = {**other.urls, **self.urls}
+
+
+@dataclasses.dataclass
 class InstallOptions:
   quiet: bool
+  indexes: Indexes
 
 
 class Installer(abc.ABC):
@@ -58,14 +84,16 @@ class PipInstaller(Installer):
 
   def install(self, dependencies: t.Sequence[Dependency], target: PythonEnvironment, options: InstallOptions) -> int:
 
-    from slap.python.dependency import GitDependency, PathDependency, PypiDependency, UrlDependency
+    from slap.python.dependency import PathDependency, PypiDependency, UrlDependency
 
     # Collect the Pip arguments and the dependencies that need to be installed through other methods.
     supports_hashes = {PypiDependency, UrlDependency}
     unsupported_hashes: dict[type[Dependency], list[Dependency]] = {}
     link_projects: list[Path] = []
     pip_arguments: list[str] = []
+    used_indexes: set[str] = set()
     dependencies = list(dependencies)
+
     while dependencies:
       dependency = dependencies.pop()
 
@@ -87,7 +115,7 @@ class PipInstaller(Installer):
         link_projects.append(dependency.path)
         continue
 
-      elif isinstance(dependency, MultiDependency):
+      if isinstance(dependency, MultiDependency):
         for sub_dependency in dependency:
           # TODO (@NiklasRosenstein): Pass extras from the caller so we can evaluate them here
           if test_dependency(sub_dependency, target.pep508, {}):
@@ -95,6 +123,22 @@ class PipInstaller(Installer):
 
       else:
         pip_arguments += self.dependency_to_pip_arguments(dependency)
+
+      if isinstance(dependency, PypiDependency) and dependency.source:
+        used_indexes.add(dependency.source)
+
+    # Add the extra index URLs.
+    # TODO (@NiklasRosenstein): Inject credentials for index URLs.
+    # NOTE (@NiklasRosenstein): While the dependency configuration allows you to specify exactly for each
+    #   dependency where it should be fetched from, with the Pip CLI we cannot currently have that level
+    #   of control.
+    try:
+      if options.indexes.default is not None:
+        pip_arguments += ['--index-url', options.indexes.urls[options.indexes.default]]
+      for index_name in used_indexes - {options.indexes.default}:
+        pip_arguments += ['--extra-index-url', options.indexes.urls[index_name]]
+    except KeyError as exc:
+      raise Exception(f'PyPI index {exc} is not configured')
 
     # Construct the Pip command to run.
     pip_command = [target.executable, "-m", "pip", "install"] + pip_arguments
@@ -162,3 +206,12 @@ class PipInstaller(Installer):
 
     assert pip_arguments, dependency
     return pip_arguments
+
+
+def get_indexes_for_projects(projects: t.Sequence[Project]) -> Indexes:
+  """ Combines the indexes configuration from each project into one index. """
+
+  indexes = Indexes()
+  for project in projects:
+    indexes.combine_with(project.dependencies().indexes)
+  return indexes

@@ -13,10 +13,11 @@ from slap.python.dependency import Dependency
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
-  from slap.python.dependency import VersionSpec
-  from slap.repository import Repository
+  from slap.install.installer import Indexes
   from slap.plugins import ProjectHandlerPlugin
+  from slap.python.dependency import VersionSpec
   from slap.release import VersionRef
+  from slap.repository import Repository
 
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,12 @@ class Dependencies:
   run: t.Sequence[Dependency]
   dev: t.Sequence[Dependency]
   extra: t.Mapping[str, t.Sequence[Dependency]]
+  indexes: Indexes = None  # type: ignore  # To avoid having to import the Indexes class globally
+
+  def __post_init__(self) -> None:
+    from slap.install.installer import Indexes
+    if self.indexes is None:
+      self.indexes = Indexes()
 
 
 @dataclasses.dataclass

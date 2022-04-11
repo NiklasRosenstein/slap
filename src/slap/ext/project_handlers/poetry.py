@@ -48,17 +48,27 @@ class PoetryProjectHandler(PyprojectHandler):
 
   def get_dependencies(self, project: Project) -> Dependencies:
     from slap.python.dependency import PypiDependency, parse_dependencies
+    from slap.install.installer import Indexes
 
     poetry: dict[str, t.Any] = project.pyproject_toml.get('tool', {}).get('poetry', {})
     dependencies = parse_dependencies(poetry.get('dependencies', []))
     python = next((d for d in dependencies if d.name == 'python'), None)
     if python is not None:
       assert isinstance(python, PypiDependency), repr(python)
+
+    # Collect the package indexes from the Poetry config.
+    indexes = Indexes()
+    for source in poetry.get('source', []):
+      if source.get('default', True):
+        indexes.default = source['name']
+      indexes.urls[source['name']] = source['url']
+
     return Dependencies(
-      python.version if python else None,
-      [d for d in dependencies if d.name != 'python'],
-      parse_dependencies(poetry.get('dev-dependencies', [])),
-      {k: parse_dependencies(v) for k, v in poetry.get('extras', {}).items()},
+      python=python.version if python else None,
+      run=[d for d in dependencies if d.name != 'python'],
+      dev=parse_dependencies(poetry.get('dev-dependencies', [])),
+      extra={k: parse_dependencies(v) for k, v in poetry.get('extras', {}).items()},
+      indexes=indexes,
     )
 
   def get_dependency_location_key_sequence(
@@ -71,5 +81,3 @@ class PoetryProjectHandler(PyprojectHandler):
     locator = ['dependencies'] if where == 'run' else ['dev-dependencies'] if where == 'dev' else ['extras', where]
     value: list | dict = {package: str(version_spec)} if where in ('run', 'dev') else [f'{package} {version_spec}']
     return ['tool', 'poetry'] + locator, value
-
-
