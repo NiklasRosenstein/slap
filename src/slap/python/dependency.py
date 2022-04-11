@@ -14,10 +14,12 @@ References:
 """
 
 from __future__ import annotations
-from pathlib import Path
+
 import dataclasses
 import re
 import typing as t
+
+from pathlib import Path
 from urllib.parse import parse_qsl, urlparse, parse_qs, urlunparse
 
 from nr.util.generic import T
