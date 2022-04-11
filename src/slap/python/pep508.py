@@ -52,6 +52,9 @@ class Pep508Environment:
       implementation_version=format_full_version(sys.implementation.version),
     )
 
+  def as_json(self) -> dict[str, str]:
+    return {field.name: getattr(self, field.name) for field in dataclasses.fields(self)}
+
   def evaluate_markers(self, markers: str, extras: set[str] | None = None, source: str | None = None) -> bool:
     """ Evaluate a PEP 508 environment marker.
 
@@ -63,7 +66,7 @@ class Pep508Environment:
         is invalid, this value will be included in the error message. If not specified, falls back to `<string>`.
     """
 
-    scope = {field.name: getattr(self, field.name) for field in dataclasses.fields(self)}
+    scope = self.as_json()
 
     if extras is not None:
       class ExtrasEq:
@@ -71,9 +74,10 @@ class Pep508Environment:
           return f'ExtrasEq({extras!r})'
         def __eq__(self, other) -> bool:
           if isinstance(other, str):
+            assert extras is not None
             return other in extras
           return False
-      scope['extra'] = ExtrasEq()
+      scope['extra'] = t.cast(str, ExtrasEq())
 
     try:
       return _eval_environment_marker_ast(ast.parse(markers, filename=source or '<string>', mode='eval'), scope)

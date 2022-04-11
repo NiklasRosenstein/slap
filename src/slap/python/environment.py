@@ -8,6 +8,9 @@ import pickle
 import subprocess as sp
 import textwrap
 import typing as t
+from pathlib import Path
+
+from slap.python import pep508
 
 if t.TYPE_CHECKING:
   import pkg_resources
@@ -23,6 +26,7 @@ class PythonEnvironment:
   prefix: str
   base_prefix: str | None
   real_prefix: str | None
+  pep508: pep508.Pep508Environment
   _has_pkg_resources: bool | None = None
 
   def is_venv(self) -> bool:
@@ -50,22 +54,30 @@ class PythonEnvironment:
     if isinstance(python, str):
       python = [python]
 
-    code = textwrap.dedent('''
+    # We ensure that the Pep508 module is importable.
+    pep508_path = str(Path(pep508.__file__).parent)
+
+    code = textwrap.dedent(f'''
       import sys, platform, json
+      sys.path.append({pep508_path!r})
+      import pep508
       try: import pkg_resources
       except ImportError: pkg_resources = None
-      print(json.dumps({
+      print(json.dumps({{
         "executable": sys.executable,
         "version": sys.version,
         "platform": platform.platform(),
         "prefix": sys.prefix,
         "base_prefix": getattr(sys, 'base_prefix', None),
         "real_prefix": getattr(sys, 'real_prefix', None),
+        "pep508": pep508.Pep508Environment.current().as_json(),
         "_has_pkg_resources": pkg_resources is not None,
-      }))
+      }}))
     ''')
 
-    return PythonEnvironment(**json.loads(sp.check_output(list(python) + ['-c', code]).decode()))
+    payload = json.loads(sp.check_output(list(python) + ['-c', code]).decode())
+    payload['pep508'] = pep508.Pep508Environment(**payload['pep508'])
+    return PythonEnvironment(**payload)
 
   def get_distribution(self, distribution: str) -> pkg_resources.Distribution | None:
     """ Query the details for a single distribution in the Python environment. """
