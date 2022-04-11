@@ -145,8 +145,6 @@ class ChangelogAddCommand(BaseChangelogCommand):
   ]
 
   def handle(self) -> int:
-    import databind.json
-
     if self.manager.readonly:
       self.line_error(f'error: cannot add changelog because the feature must be enabled in the config', 'error')
       return 1
@@ -257,7 +255,10 @@ class ChangelogUpdatePrCommand(Command):
   def __init__(self, app: Application):
     super().__init__()
     self.app = app
-    self.managers = {project: get_changelog_manager(app.repository, project) for project in app.repository.projects()}
+    self.managers = {
+      config: get_changelog_manager(app.repository, config if isinstance(config, Project) else None)
+      for config in app.configurations()
+    }
 
   def handle(self) -> int:
     from nr.util.plugins import iter_entrypoints, load_entrypoint
@@ -567,7 +568,6 @@ class ChangelogConvertCommand(BaseChangelogCommand):
 
   def _convert_changelog(self, default_author: str, source: Path) -> None:
     import datetime
-    import databind.json
     import yaml
 
     data = yaml.safe_load(source.read_text())

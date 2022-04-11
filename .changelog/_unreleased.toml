@@ -30,3 +30,9 @@ id = "978c013e-3c79-427a-8c1f-ce56d34d5bc9"
 type = "feature"
 description = "Add `slap report dependencies` command"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "8550fb4f-e65f-4fe0-b270-f697476c8716"
+type = "fix"
+description = "Fix detection of added changelog entries in GitHub Actions for forked repositories; but that does not fix #49"
+author = "@NiklasRosenstein"
