@@ -37,6 +37,7 @@ setuptools = ">=39.1.0"  # Needed for pkg_resources
 tomli = "^2.0.0"
 tomlkit = "^0.10.1"
 twine = "^3.7.0"
+tqdm = "^4.64.0"
 
 [tool.poetry.dev-dependencies]
 types-beautifulsoup4 = "^4.10.0"

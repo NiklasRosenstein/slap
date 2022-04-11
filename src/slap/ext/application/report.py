@@ -21,6 +21,7 @@ class ReportDependenciesCommand(Command):
     self.app = app
 
   def handle(self) -> None:
+    import tqdm
     from databind.json import dump
     from slap.python.dependency import parse_dependencies
     from slap.python.environment import PythonEnvironment, DistributionMetadata, get_distribution_metadata
@@ -35,25 +36,27 @@ class ReportDependenciesCommand(Command):
     python_environment = PythonEnvironment.of("python")
 
     # TODO (@NiklasRosenstein): Resolve dependency markers, including required extras.
-    while requirements:
-      logger.info('Fetching requirements: <val>%s</val>', requirements)
-      distributions = python_environment.get_distributions(requirements)
-      requirements = set()
-      for dist_name, dist in distributions.items():
-        if dist is None:
-          missing_distributions.add(dist_name)
-          metadata[dist_name] = None
-        else:
-          dist_meta = get_distribution_metadata(dist)
-          metadata[dist_name] = t.cast(dict[str, t.Any], dump(dist_meta, DistributionMetadata))
-          requirements |= {dependency.name for dependency in parse_dependencies(dist_meta.requirements)}
-      requirements -= metadata.keys()
-      requirements -= missing_distributions
+    with tqdm.tqdm(desc='Resolving requirements graph') as progress:
+      while requirements:
+        logger.info('Fetching requirements: <val>%s</val>', requirements)
+        distributions = python_environment.get_distributions(requirements)
+        progress.update(len(requirements))
+        requirements = set()
+        for dist_name, dist in distributions.items():
+          if dist is None:
+            missing_distributions.add(dist_name)
+            metadata[dist_name] = None
+          else:
+            dist_meta = get_distribution_metadata(dist)
+            metadata[dist_name] = t.cast(dict[str, t.Any], dump(dist_meta, DistributionMetadata))
+            requirements |= {dependency.name for dependency in parse_dependencies(dist_meta.requirements)}
+        requirements -= metadata.keys()
+        requirements -= missing_distributions
+
+    print(json.dumps(metadata, indent=2))
 
     if missing_distributions:
       logger.warning('Unable to find the following required distributions: <val>%s</val>', missing_distributions)
-
-    print(json.dumps(metadata, indent=2))
 
 
 class ReportPlugin(ApplicationPlugin):
