@@ -110,15 +110,23 @@ class PyprojectHandler(BaseProjectHandler):
     root = tomlkit.parse(project.pyproject_toml.path.read_text())
     keys, value = self.get_dependency_location_key_sequence(project, package, version_spec, where)
     assert isinstance(value, list | dict), type(value)
+
     current: tomlkit.items.Item | tomlkit.container.Container = root
     for idx, key in enumerate(keys):
+      # NOTE (@NiklasRosenstein): I have no clue why this is needed, but if we don't access the internal
+      #   container of this "OutOfOrderTableProxy", it appears the mutation later on doesn't actually work.
+      if isinstance(current, tomlkit.container.OutOfOrderTableProxy):
+        current = current._internal_container
+
       if not isinstance(current, tomlkit.items.Table | tomlkit.container.Container):
         break  # Will triger an error below
+
       if key not in current:
         if idx == len(keys) - 1:
           current[key] = tomlkit.array() if isinstance(value, list) else tomlkit.table()
         else:
           current[key] = tomlkit.table()
+
       current = current[key]
 
     if isinstance(value, list):

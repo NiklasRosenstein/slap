@@ -36,3 +36,9 @@ id = "8550fb4f-e65f-4fe0-b270-f697476c8716"
 type = "fix"
 description = "Fix detection of added changelog entries in GitHub Actions for forked repositories; but that does not fix #49"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "5407fdd7-2700-45cf-a837-cfbed82525fb"
+type = "fix"
+description = "Fix a potential issue in `slap add` when `tomlkit` returns an `OutOfOrderTableProxy` instead of a `Table` container in which case we did not mutate the actual TOML document"
+author = "@NiklasRosenstein"
