@@ -7,7 +7,8 @@ import functools
 import operator
 import typing as t
 
-from slap.python.dependency import Dependency
+if t.TYPE_CHECKING:
+  from slap.python.dependency import Dependency
 
 
 @dataclasses.dataclass
@@ -142,9 +143,15 @@ def filter_dependencies(
 ) -> list[Dependency]:
   """ Filters a collection of dependencies according to their environment markers and Python requirements. """
 
-  # TODO (@NiklasRosenstein): Filter by #Dependency.python
-
   return [
     dependency for dependency in dependencies
-    if not dependency.markers or env.evaluate_markers(dependency.markers, extras)
+    if test_dependency(dependency, env, extras)
   ]
+
+
+def test_dependency(dependency: Dependency, env: Pep508Environment, extras: set[str] | None) -> bool:
+  """ Tests if the *dependency* should be included given the current environment and extras. """
+
+  # TODO (@NiklasRosenstein): Filter by #Dependency.python
+
+  return not dependency.markers or env.evaluate_markers(dependency.markers, extras)

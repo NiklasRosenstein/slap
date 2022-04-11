@@ -12,6 +12,7 @@ import typing as t
 from pathlib import Path
 
 from slap.python.dependency import MultiDependency
+from slap.python.pep508 import filter_dependencies, test_dependency
 
 if t.TYPE_CHECKING:
   from slap.python.dependency import Dependency
@@ -68,13 +69,9 @@ class PipInstaller(Installer):
     while dependencies:
       dependency = dependencies.pop()
 
-      if dependency.markers or dependency.python:
-        # TODO (@NiklasRosenstein): Evaluate environment markers and Python requirement.
-        logger.warning(
-          'PipInstaller does not currently support testing environment markers or Python requirement, '
-          'dependency <val>%s</val> will always be installed.',
-          dependency
-        )
+      # TODO (@NiklasRosenstein): Pass extras from PipInstaller caller.
+      if not test_dependency(dependency, target.pep508, {}):
+        continue
 
       # Collect dependencies for which hashes are not supported so we can report it later.
       if dependency.hashes and type(dependency) not in supports_hashes:
@@ -82,19 +79,19 @@ class PipInstaller(Installer):
 
       if isinstance(dependency, PathDependency) and dependency.link:
         logger.info('Collecting recursive dependencies for project <val>%s</val>', dependency.path)
-        dependencies += self.symlink_helper.get_dependencies_for_project(dependency.path)
+        dependencies += filter_dependencies(
+          dependencies=self.symlink_helper.get_dependencies_for_project(dependency.path),
+          env=target.pep508,
+          extras=set(dependency.extras or []),
+        )
         link_projects.append(dependency.path)
         continue
 
       elif isinstance(dependency, MultiDependency):
-        # TODO (@NiklasRosenstein): Evaluate which dependency to install.
-        logger.warning(
-          'PipInstaller does not currently support installing MultiDependencies. The dependency <val>%s</val> '
-          'will be installed as if the first one matched.',
-          dependency
-        )
-        if dependency.dependencies:
-          dependencies.insert(0, dependency.dependencies[0])
+        for sub_dependency in dependency:
+          # TODO (@NiklasRosenstein): Pass extras from the caller so we can evaluate them here
+          if test_dependency(sub_dependency, target.pep508, {}):
+            dependencies.insert(0, sub_dependency)
 
       else:
         pip_arguments += self.dependency_to_pip_arguments(dependency)
