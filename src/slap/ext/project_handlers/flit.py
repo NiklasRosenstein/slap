@@ -5,10 +5,11 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from slap.python.dependency import PypiDependency, VersionSpec
-from slap.project import Dependencies, Project
 from slap.ext.project_handlers.base import PyprojectHandler
 
+if t.TYPE_CHECKING:
+  from slap.project import Dependencies, Project
+  from slap.python.dependency import Dependency
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,9 @@ class FlitProjectHandler(PyprojectHandler):
     )
 
   def get_dependencies(self, project: Project) -> Dependencies:
+    from slap.python.dependency import PypiDependency, VersionSpec
+    from slap.project import Dependencies
+
     flit: dict[str, t.Any] | None = project.pyproject_toml.get('tool', {}).get('flit')
     project_conf: dict[str, t.Any] | None = project.pyproject_toml.get('project')
 
@@ -66,15 +70,18 @@ class FlitProjectHandler(PyprojectHandler):
   def get_add_dependency_toml_location_and_config(
     self,
     project: Project,
-    package: str,
-    version_spec: VersionSpec,
+    dependency: Dependency,
     where: str,
   ) -> tuple[list[str], list | dict]:
-    flit: dict[str, t.Any] | None = project.pyproject_toml.get('tool', {}).get('flit')
+    from slap.python.dependency import PypiDependency
 
+    if not isinstance(dependency, PypiDependency):
+      raise Exception(f'Flit project handler only supports PypiDependency, got {dependency!r}')
+
+    flit: dict[str, t.Any] | None = project.pyproject_toml.get('tool', {}).get('flit')
     if flit is not None:
       locator = ['requires'] if where == 'run' else ['requires-extras', where]
-      return ['tool', 'flit'] + locator, [version_spec.to_pep_508()]
+      return ['tool', 'flit'] + locator, [dependency.version.to_pep_508()]
     else:
       locator = ['dependencies'] if where == 'run' else ['optional-dependencies', where]
-      return ['project'] + locator, [version_spec.to_pep_508()]
+      return ['project'] + locator, [dependency.version.to_pep_508()]

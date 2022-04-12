@@ -74,10 +74,11 @@ class SymlinkHelper(t.Protocol):
 class PipInstaller(Installer):
   """ Installs dependencies via Pip. """
 
-  def __init__(self,symlink_helper: SymlinkHelper) -> None:
+  def __init__(self,symlink_helper: SymlinkHelper | None) -> None:
     """
     Args:
-      symlink_helper: A helper for implementing #PathDependency.link when it is encountered.
+      symlink_helper: A helper for implementing #PathDependency.link when it is encountered. If not specified,
+        an error will be raised when a #PathDependency is passed that needs to be linked.
     """
 
     self.symlink_helper = symlink_helper
@@ -107,6 +108,8 @@ class PipInstaller(Installer):
 
       if isinstance(dependency, PathDependency) and dependency.link:
         logger.info('Collecting recursive dependencies for project <val>%s</val>', dependency.path)
+        if self.symlink_helper is None:
+          raise Exception(f'Unable to install %r because no symlink helper is available in this context', dependency)
         dependencies += filter_dependencies(
           dependencies=self.symlink_helper.get_dependencies_for_project(dependency.path),
           env=target.pep508,
@@ -153,6 +156,7 @@ class PipInstaller(Installer):
 
     # Symlink all projects that need to be linked.
     for project_path in link_projects:
+      assert self.symlink_helper is not None
       self.symlink_helper.link_project(project_path)
 
     return 0

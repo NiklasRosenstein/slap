@@ -78,7 +78,11 @@ class PoetryProjectHandler(PyprojectHandler):
     dependency: Dependency,
     where: str,
   ) -> tuple[list[str], list | dict]:
-    # TODO (@NiklasRosenstein): This function doesn't cover all cases by any means.
+    from slap.python.dependency import PypiDependency
+
+    if not isinstance(dependency, PypiDependency):
+      raise Exception(f'Poetry project handler only supports PypiDependency, got {dependency!r}')
+
     locator = ['dependencies'] if where == 'run' else ['dev-dependencies'] if where == 'dev' else ['extras', where]
     value: list | dict = (
       {dependency.name: convert_dependency_to_poetry_config(dependency)}
