@@ -791,7 +791,8 @@ Options:
   -d, --dev             Add as development dependencies.
   -e, --extra=EXTRA     Add as extra dependencies for the specified extra name.
       --no-install      Do not actually install the dependencies with Pip. Note that if the dependency is not already installed and no version selector is specified with the package name, it will fall back to a match-all version range (`*`).
-      --source          
+      --source=SOURCE   Specify the source from which the package should be installed.
+      --upgrade         Upgrade dependencies that are already installed and declared in the project. If the dependency is already declared, the --source option can be skipped as it will be inherited from the declaration.
       --no-venv-check   Do not check if the target Python environment is a virtual environment.
   -p, --python=PYTHON   The Python executable to install to. [default: &quot;python&quot;]
   -h, --help            Display help for the given command. When no command is given display help for the help command.
