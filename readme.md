@@ -2,8 +2,6 @@
 
 <img src="docs/content/img/logo.svg" style="height: 200px !important">
 
-> *It slaps.*
-
   [PEP 517]: https://peps.python.org/pep-0517/
 
 Slap is an extensible command-line tool to assist in the development of Python projects independent of the [PEP 517][]

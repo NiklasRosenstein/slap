@@ -93,6 +93,11 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
       description="Install only the specified extras. Note that <s>\"dev\"</s> is a valid extras.",
       flag=False,
     ),
+    option(
+      "--upgrade",
+      description="Upgrade already installed packages.",
+      flag=False,
+    ),
     venv_check_option,
     python_option,
   ]
@@ -202,8 +207,9 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     ]
 
     options = InstallOptions(
-      quiet=self.option("quiet"),
       indexes=get_indexes_for_projects(projects),
+      quiet=self.option("quiet"),
+      upgrade=self.option("upgrade"),
     )
     installer = PipInstaller(self)
     status_code = installer.install(dependencies, python_environment, options)

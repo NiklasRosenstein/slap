@@ -43,6 +43,11 @@ class AddCommandPlugin(Command, ApplicationPlugin):
       description="Specify the source from which the package should be installed.",
       flag=False,
     ),
+    option(
+      "--upgrade",
+      description="Upgrade dependencies that are already installed and declared in the project. If the dependency "
+        "is already declared, the --source option can be skipped as it will be inherited from the declaration.",
+    ),
     venv_check_option,
     python_option,
   ]
@@ -82,13 +87,13 @@ class AddCommandPlugin(Command, ApplicationPlugin):
 
     to_install = (
       Stream(dependencies.values())
-      .filter(lambda d: distributions[d.name] is None)
+      .filter(lambda d: self.option("upgrade") or distributions[d.name] is None)
       .collect()
     )
 
     if to_install:
       indexes = get_indexes_for_projects([project])
-      config = InstallOptions(True, indexes)
+      config = InstallOptions(indexes, True, self.option("upgrade"))
       installer = PipInstaller(symlink_helper=None)
 
       self.line('Installing ' + ' '.join(f'<fg=cyan>{p}</fg>' for p in to_install))
@@ -115,6 +120,9 @@ class AddCommandPlugin(Command, ApplicationPlugin):
 
   def _validate_options(self) -> bool:
     if not self.option("no-install") and not venv_check(self):
+      return False
+    if self.option("no-install") and self.option("upgrade"):
+      self.line_error('error: cannot --no-install and --upgrade', 'error')
       return False
     if self.option("dev") and self.option("extra"):
       self.line_error('error: cannot combine --dev and --extra', 'error')

@@ -15,7 +15,6 @@ from slap.python.dependency import MultiDependency
 from slap.python.pep508 import filter_dependencies, test_dependency
 
 if t.TYPE_CHECKING:
-  from slap.repository import Repository
   from slap.project import Project
   from slap.python.dependency import Dependency
   from slap.python.environment import PythonEnvironment
@@ -48,8 +47,9 @@ class Indexes:
 
 @dataclasses.dataclass
 class InstallOptions:
-  quiet: bool
   indexes: Indexes
+  quiet: bool
+  upgrade: bool
 
 
 class Installer(abc.ABC):
@@ -144,6 +144,8 @@ class PipInstaller(Installer):
     pip_command = [target.executable, "-m", "pip", "install"] + pip_arguments
     if options.quiet:
       pip_command += ['-q']
+    if options.upgrade:
+      pip_command += ['--upgrade']
 
     logger.info('Installing with Pip using command <subj>$ %s</subj>', ' '.join(map(shlex.quote, pip_command)))
     if (res := sp.call(pip_command)) != 0:
