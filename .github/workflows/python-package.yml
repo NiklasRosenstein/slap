@@ -20,6 +20,17 @@ jobs:
     - run: pip install . && slap install --no-venv-check
     - run: slap info && slap test
 
+  test-pep508:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.x"]
+      steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with: { python-version: "${{ matrix.python-version }}" }
+    - run: python src/slap/python/pep508.py
+
   docs:
     runs-on: ubuntu-latest
     steps:

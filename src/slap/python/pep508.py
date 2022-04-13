@@ -1,5 +1,6 @@
 
-from __future__ import annotations
+# We want to be at least Python 3.6 compatible, so instead of __future__.annotations we use string
+# type hints and the typing module.
 
 import ast
 import dataclasses
@@ -27,7 +28,7 @@ class Pep508Environment:
   implementation_version: str
 
   @staticmethod
-  def current() -> Pep508Environment:
+  def current() -> 'Pep508Environment':
     """ Returns a #Pep508Environment for the current Python interpreter. """
 
     import os
@@ -58,7 +59,7 @@ class Pep508Environment:
   def as_json(self) -> dict[str, str]:
     return {field.name: getattr(self, field.name) for field in dataclasses.fields(self)}
 
-  def evaluate_markers(self, markers: str, extras: set[str] | None = None, source: str | None = None) -> bool:
+  def evaluate_markers(self, markers: str, extras: t.Optional[t.Set[str]] = None, source: t.Optional[str] = None) -> bool:
     """ Evaluate a PEP 508 environment marker.
 
     Args:
@@ -139,7 +140,7 @@ def _eval_environment_markers_ast_value(node: ast.expr, scope: dict[str, t.Any])
 def filter_dependencies(
   dependencies: t.Iterable[Dependency],
   env: Pep508Environment,
-  extras: set[str] | None
+  extras: t.Optional[t.Set[str]]
 ) -> list[Dependency]:
   """ Filters a collection of dependencies according to their environment markers and Python requirements. """
 
@@ -149,9 +150,13 @@ def filter_dependencies(
   ]
 
 
-def test_dependency(dependency: Dependency, env: Pep508Environment, extras: set[str] | None) -> bool:
+def test_dependency(dependency: Dependency, env: Pep508Environment, extras: t.Optional[t.Set[str]]) -> bool:
   """ Tests if the *dependency* should be included given the current environment and extras. """
 
   if dependency.python and not dependency.python.accepts(env.python_version):
     return False
   return not dependency.markers or env.evaluate_markers(dependency.markers, extras)
+
+
+if __name__ == '__main__':
+  print(Pep508Environment.current())
