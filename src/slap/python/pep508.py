@@ -138,10 +138,10 @@ def _eval_environment_markers_ast_value(node: ast.expr, scope: t.Dict[str, t.Any
 
 
 def filter_dependencies(
-  dependencies: t.Iterable[Dependency],
+  dependencies: t.Iterable['Dependency'],
   env: Pep508Environment,
   extras: t.Optional[t.Set[str]]
-) -> t.List[Dependency]:
+) -> t.List['Dependency']:
   """ Filters a collection of dependencies according to their environment markers and Python requirements. """
 
   return [
@@ -150,7 +150,7 @@ def filter_dependencies(
   ]
 
 
-def test_dependency(dependency: Dependency, env: Pep508Environment, extras: t.Optional[t.Set[str]]) -> bool:
+def test_dependency(dependency: 'Dependency', env: Pep508Environment, extras: t.Optional[t.Set[str]]) -> bool:
   """ Tests if the *dependency* should be included given the current environment and extras. """
 
   if dependency.python and not dependency.python.accepts(env.python_version):
