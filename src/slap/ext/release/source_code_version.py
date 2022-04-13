@@ -34,7 +34,11 @@ class SourceCodeVersionReferencesPlugin(ReleasePlugin):
     for package in packages:
       for path in [package.path] if package.path.is_file() else [package.path / f for f in self.FILENAMES]:
         if path.exists():
-          version_ref = match_version_ref_pattern(path, self.VERSION_REGEX)
+          try:
+            version_ref = match_version_ref_pattern(path, self.VERSION_REGEX)
+          except ValueError as exc:
+            logger.warning('%s', exc)
+            continue
           if version_ref:
             results.append(version_ref)
             break
