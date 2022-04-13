@@ -40,7 +40,7 @@ class Pep508Environment:
     self.implementation_version = implementation_version
 
   def __repr__(self) -> str:
-    args = ', '.join([f'{k}={v!r}' for k, v in self.as_json()])
+    args = ', '.join([f'{k}={v!r}' for k, v in self.as_json().items()])
     return f'{type(self).__name__}({args})'
 
   @staticmethod
