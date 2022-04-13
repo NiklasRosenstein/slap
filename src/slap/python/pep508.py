@@ -9,7 +9,8 @@ import operator
 import typing as t
 
 if t.TYPE_CHECKING:
-  from slap.python.dependency import Dependency
+  # NOTE (@NiklasRosenstein): For when we check the file individually
+  from slap.python.dependency import Dependency  # type: ignore[import]
 
 
 @dataclasses.dataclass
