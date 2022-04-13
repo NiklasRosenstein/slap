@@ -26,6 +26,7 @@ def test__split_package_name_with_extras__bad_input():
 
 def test__parse_dependency_string__can_parse_pypi_dependency():
   assert parse_dependency_string('kek') == PypiDependency('kek', VersionSpec(''))
+  assert parse_dependency_string('kek *') == PypiDependency('kek', VersionSpec('*'))
   assert parse_dependency_string('kek>=1.0.0,<2.0.0') == PypiDependency('kek', VersionSpec('>=1.0.0,<2.0.0'))
   assert parse_dependency_string('kek ^1.0.0') == PypiDependency('kek', VersionSpec('^1.0.0'))
   assert parse_dependency_string('kek [docs,  internal] ^1.0.0 --hash=sha1:123456') == \

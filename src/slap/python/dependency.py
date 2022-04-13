@@ -160,7 +160,7 @@ class PypiDependency(Dependency, _PypiDependency):
 
     value, markers = value.partition(';')[::2]
 
-    match = re.match(r'\s*[^<>=!~\^\(\)]+', value)
+    match = re.match(r'\s*[^<>=!~\^\(\)\*]+', value)
     if match:
       name = match.group(0)
       version_spec = VersionSpec(value[match.end():].strip())
