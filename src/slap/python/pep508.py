@@ -56,7 +56,7 @@ class Pep508Environment:
       implementation_version=format_full_version(sys.implementation.version),
     )
 
-  def as_json(self) -> dict[str, str]:
+  def as_json(self) -> t.Dict[str, str]:
     return {field.name: getattr(self, field.name) for field in dataclasses.fields(self)}
 
   def evaluate_markers(self, markers: str, extras: t.Optional[t.Set[str]] = None, source: t.Optional[str] = None) -> bool:
@@ -89,7 +89,7 @@ class Pep508Environment:
       raise ValueError(f'invalid environment marker string: {markers!r}\n  hint: {exc}')
 
 
-def _eval_environment_marker_ast(node: ast.AST, scope: dict[str, t.Any]) -> bool:
+def _eval_environment_marker_ast(node: ast.AST, scope: t.Dict[str, t.Any]) -> bool:
   """ Evaluates an environment marker AST using the given *scope*. This is safer than using #eval()
   to avoid arbitrary code execution. """
 
@@ -122,7 +122,7 @@ def _eval_environment_marker_ast(node: ast.AST, scope: dict[str, t.Any]) -> bool
   raise ValueError(f'Node of type {type(node).__name__!r} not supported in environment markers')
 
 
-def _eval_environment_markers_ast_value(node: ast.expr, scope: dict[str, t.Any]) -> t.Any:
+def _eval_environment_markers_ast_value(node: ast.expr, scope: t.Dict[str, t.Any]) -> t.Any:
   """ Resolve the value of an AST expression from the given *scope*. """
 
   if isinstance(node, ast.Name):
@@ -141,7 +141,7 @@ def filter_dependencies(
   dependencies: t.Iterable[Dependency],
   env: Pep508Environment,
   extras: t.Optional[t.Set[str]]
-) -> list[Dependency]:
+) -> t.List[Dependency]:
   """ Filters a collection of dependencies according to their environment markers and Python requirements. """
 
   return [
