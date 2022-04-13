@@ -3,7 +3,6 @@
 # type hints and the typing module.
 
 import ast
-import dataclasses
 import functools
 import operator
 import typing as t
@@ -13,20 +12,36 @@ if t.TYPE_CHECKING:
   from slap.python.dependency import Dependency  # type: ignore[import]
 
 
-@dataclasses.dataclass
 class Pep508Environment:
   """ Contains the variables for evaluating PEP 508 environment markers. """
 
-  python_version: str
-  python_full_version: str
-  os_name: str
-  sys_platform: str
-  platform_release: str
-  platform_system: str
-  platform_machine: str
-  platform_python_implementation: str
-  implementation_name: str
-  implementation_version: str
+  def __init__(
+    self,
+    python_version: str,
+    python_full_version: str,
+    os_name: str,
+    sys_platform: str,
+    platform_release: str,
+    platform_system: str,
+    platform_machine: str,
+    platform_python_implementation: str,
+    implementation_name: str,
+    implementation_version: str
+  ) -> None:
+    self.python_version = python_version
+    self.python_full_version = python_full_version
+    self.os_name = os_name
+    self.sys_platform = sys_platform
+    self.platform_release = platform_release
+    self.platform_system = platform_system
+    self.platform_machine = platform_machine
+    self.platform_python_implementation = platform_python_implementation
+    self.implementation_name = implementation_name
+    self.implementation_version = implementation_version
+
+  def __repr__(self) -> str:
+    args = ', '.join([f'{k}={v!r}' for k, v in self.as_json()])
+    return f'{type(self).__name__}({args})'
 
   @staticmethod
   def current() -> 'Pep508Environment':
@@ -58,7 +73,7 @@ class Pep508Environment:
     )
 
   def as_json(self) -> t.Dict[str, str]:
-    return {field.name: getattr(self, field.name) for field in dataclasses.fields(self)}
+    return dict(vars(self))
 
   def evaluate_markers(self, markers: str, extras: t.Optional[t.Set[str]] = None, source: t.Optional[str] = None) -> bool:
     """ Evaluate a PEP 508 environment marker.

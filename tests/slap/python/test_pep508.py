@@ -29,3 +29,7 @@ def test__Pep508Environment__sample_markers():
   assert env.evaluate_markers('(extra == "docs" or extra == "dev") and ((os_name=="posix") and python_version<="3.10")', {'docs'})
   assert env.evaluate_markers('(extra == "docs" or extra == "dev") and ((os_name=="posix") and python_version<="3.10")', {'dev'})
   assert not env.evaluate_markers('(extra == "docs" or extra == "dev") and ((os_name=="posix") and python_version<="3.10")', {'foobar'})
+
+  # All fields are supposed to be strings
+  for key, value in env.as_json().items():
+    assert isinstance(value, str)

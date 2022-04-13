@@ -1,0 +1,5 @@
+[[entries]]
+id = "98390028-20e1-405f-980d-ed715bb791c1"
+type = "fix"
+description = "`slap.python.pep508` no longer requires `dataclasses`"
+author = "@NiklasRosenstein"
