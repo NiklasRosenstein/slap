@@ -4,6 +4,7 @@ from __future__ import annotations
 import dataclasses
 import logging
 import os
+import shlex
 import typing as t
 from pathlib import Path
 
@@ -273,5 +274,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
   def link_project(self, project: Path) -> None:
     cwd = os.getcwd()
     os.chdir(project)
-    self.call("link", ["--no-venv-check"] if self.option("no-venv-check") else [])
+    command = ["--no-venv-check"] if self.option("no-venv-check") else []
+    command += ["--python", self.option("python")]
+    self.call("link", ' '.join(map(shlex.quote, command)))
     os.chdir(cwd)

@@ -1,0 +1,5 @@
+[[entries]]
+id = "8c72fd82-89db-4e4e-a983-4d50eb8c5623"
+type = "fix"
+description = "Fixed forwarding `--python` argument to `slap link` command when using `slap install --link`"
+author = "@NiklasRosenstein"
