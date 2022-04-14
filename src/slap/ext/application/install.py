@@ -35,28 +35,28 @@ python_option = option(
 def get_active_python_bin(cmd: Command) -> str:
   """ Returns the active Python installation. """
 
+  if hasattr(cmd, '_python_bin'):
+    return cmd._python_bin  # type: ignore
+
   from slap.ext.application.venv import VenvManager
 
-  option = cmd.option("python")
-  if option:
-    return option
+  python = cmd.option("python")
+  if not python:
+    python = os.getenv('PYTHON')
+    if not python:
+      manager = VenvManager()
+      env = manager.get_last_activated()
+      python = str(env.get_bin('python').absolute()) if env else None
 
-  envvar = os.getenv('PYTHON')
-  if envvar:
-    return envvar
-
-  manager = VenvManager()
-  env = manager.get_last_activated()
-  if env:
-    return str(env.get_bin('python'))
-
-  return 'python'
+  python = python or 'python'
+  cmd._python_bin = python
+  return python
 
 
 def venv_check(cmd: Command, message='refusing to install', env: PythonEnvironment | None = None) -> bool:
   from slap.python.environment import PythonEnvironment
   if not cmd.option("no-venv-check"):
-    env = env or PythonEnvironment.of(cmd.option("python"))
+    env = env or PythonEnvironment.of(get_active_python_bin(cmd))
     if not env.is_venv():
       cmd.line_error(f'error: {message} because you are not in a virtual environment', 'error')
       cmd.line_error('       enter a virtual environment or use <opt>--no-venv-check</opt>', 'error')

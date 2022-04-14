@@ -1,0 +1,5 @@
+[[entries]]
+id = "0170d749-9e2b-4827-872e-d5b06abf8238"
+type = "fix"
+description = "Fix issue with \"cannot install into global environment\" even if a Slap venv is active"
+author = "@NiklasRosenstein"
