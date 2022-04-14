@@ -892,7 +892,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
@@ -995,7 +995,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;, &#39;slam-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.5.2
+  version: 1.5.3
   dist-name: slap-cli
   packages: slap (src)
   readme: readme.md
@@ -1030,7 +1030,7 @@ Project &quot;.&quot; (id: slap-cli)
       - &#39;novella ==0.2.3&#39;
       - &#39;pydoc-markdown ==4.6.0&#39;
 Project &quot;slam-cli&quot; (id: slam-cli)
-  version: 1.5.2
+  version: 1.5.3
   dist-name: slam-cli
   packages: none
   readme: readme.md
@@ -1038,7 +1038,7 @@ Project &quot;slam-cli&quot; (id: slam-cli)
   depends on: slap-cli
   dependencies:
     run:
-      - &#39;slap-cli ==1.5.2&#39;
+      - &#39;slap-cli ==1.5.3&#39;
     dev: none
 </code></pre></div>
 
@@ -1185,18 +1185,15 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 4 version references to 1.5.3
-  pyproject.toml:       1.5.2 → 1.5.3 # &#39;version = &quot;1.5.2&quot;&#39;
-  slam-cli/setup.cfg:   1.5.2 → 1.5.3 # &#39;version = 1.5.2&#39;
-                        1.5.2 → 1.5.3 # &#39;install_requires =\n    slap-cli == 1.5.2&#39;
-  src/slap/__init__.py: 1.5.2 → 1.5.3 # &quot;__version__ = &#39;1.5.2&#39;&quot;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>    $ cd .. &amp;&amp; slap release --dry --tag --push patch --no-branch-check --no-worktree-check 2&gt;/dev/null  # exited with return code 1
+    bumping 4 version references to 1.5.4
+      pyproject.toml:       1.5.3 → 1.5.4 # &#39;version = &quot;1.5.3&quot;&#39;
+      slam-cli/setup.cfg:   1.5.3 → 1.5.4 # &#39;version = 1.5.3&#39;
+                            1.5.3 → 1.5.4 # &#39;install_requires =\n    slap-cli == 1.5.3&#39;
+      src/slap/__init__.py: 1.5.3 → 1.5.4 # &quot;__version__ = &#39;1.5.3&#39;&quot;
 
-releasing changelog
-  .changelog/_unreleased.toml → .changelog/1.5.3.toml
 
-tagging 1.5.3
-
-pushing develop, 1.5.3 to origin
+    tagging 1.5.4
 </code></pre></div>
 
 </details>
@@ -1205,10 +1202,10 @@ pushing develop, 1.5.3 to origin
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.5.2 # &#39;version = &quot;1.5.2&quot;&#39;
-  slam-cli/setup.cfg:   1.5.2 # &#39;version = 1.5.2&#39;
-                        1.5.2 # &#39;install_requires =\n    slap-cli == 1.5.2&#39;
-  src/slap/__init__.py: 1.5.2 # &quot;__version__ = &#39;1.5.2&#39;&quot;
+  pyproject.toml:       1.5.3 # &#39;version = &quot;1.5.3&quot;&#39;
+  slam-cli/setup.cfg:   1.5.3 # &#39;version = 1.5.3&#39;
+                        1.5.3 # &#39;install_requires =\n    slap-cli == 1.5.3&#39;
+  src/slap/__init__.py: 1.5.3 # &quot;__version__ = &#39;1.5.3&#39;&quot;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
