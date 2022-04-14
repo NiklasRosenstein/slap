@@ -7,7 +7,7 @@ from pathlib  import Path
 
 from slap.application import Application, Command, option
 from slap.plugins import ApplicationPlugin
-from .install import python_option, venv_check, venv_check_option
+from .install import get_active_python_bin, python_option, venv_check, venv_check_option
 
 
 class LinkCommandPlugin(Command, ApplicationPlugin):
@@ -149,7 +149,7 @@ class LinkCommandPlugin(Command, ApplicationPlugin):
         project.pyproject_toml.save()
         installer = Installer.from_ini_path(
           project.pyproject_toml.path,
-          python=shutil.which(self.option("python")),
+          python=shutil.which(get_active_python_bin(self)),
           symlink=True
         )
         self.line(f'symlinking <info>{dist_name}</info>')

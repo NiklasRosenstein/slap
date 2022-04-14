@@ -3,3 +3,12 @@ id = "8c72fd82-89db-4e4e-a983-4d50eb8c5623"
 type = "fix"
 description = "Fixed forwarding `--python` argument to `slap link` command when using `slap install --link`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "85ce1c45-b56a-4552-9a82-8a0768555003"
+type = "improvement"
+description = "For all Slap commands that operate on a Python environment (`install`, `link`, `add`), they will now look for the environment to target in the following order: 1) the `-p,--python` option, 2) the `PYTHON` environment variable, 3) the last local activated environment with `slap venv`, 4) just use `python`"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/slap/issues/58",
+]

@@ -29,8 +29,28 @@ python_option = option(
   "--python", "-p",
   description="The Python executable to install to.",
   flag=False,
-  default=os.getenv('PYTHON', 'python'),
 )
+
+
+def get_active_python_bin(cmd: Command) -> str:
+  """ Returns the active Python installation. """
+
+  from slap.ext.application.venv import VenvManager
+
+  option = cmd.option("python")
+  if option:
+    return option
+
+  envvar = os.getenv('PYTHON')
+  if envvar:
+    return envvar
+
+  manager = VenvManager()
+  env = manager.get_last_activated()
+  if env:
+    return str(env.get_bin('python'))
+
+  return 'python'
 
 
 def venv_check(cmd: Command, message='refusing to install', env: PythonEnvironment | None = None) -> bool:
@@ -127,7 +147,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     if not self._validate_args():
       return 1
 
-    python_environment = PythonEnvironment.of(self.option("python"))
+    python_environment = PythonEnvironment.of(get_active_python_bin(self))
     if not venv_check(self, env=python_environment):
       return False
 
@@ -275,6 +295,6 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     cwd = os.getcwd()
     os.chdir(project)
     command = ["--no-venv-check"] if self.option("no-venv-check") else []
-    command += ["--python", self.option("python")]
+    command += ["--python", get_active_python_bin(self)]
     self.call("link", ' '.join(map(shlex.quote, command)))
     os.chdir(cwd)

@@ -7,6 +7,7 @@ import typing as t
 from pathlib import Path
 
 from slap.application import Application, Command, argument, option
+from slap.ext.application.install import get_active_python_bin
 from slap.plugins import ApplicationPlugin
 
 GLOBAL_BIN_DIRECTORY = Path('~/.local/bin').expanduser()
@@ -196,7 +197,7 @@ class VenvCommand(Command):
     return True
 
   def _get_python_bin(self) -> str:
-    python = self.option("python")
+    python = get_active_python_bin(self)
     name = self.argument("name")
     if name and not python and set(name).issubset(string.digits + '.'):
       python = f'python{name}'

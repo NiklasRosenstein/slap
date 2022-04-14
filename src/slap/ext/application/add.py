@@ -3,7 +3,7 @@ import logging
 
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
-from slap.ext.application.install import python_option, venv_check, venv_check_option
+from slap.ext.application.install import get_active_python_bin, python_option, venv_check, venv_check_option
 from slap.python.dependency import PypiDependency, VersionSpec
 
 logger = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
       dependency.source = self.option("source")
       dependencies[dependency.name] = dependency
 
-    python = PythonEnvironment.of(self.option("python"))
+    python = PythonEnvironment.of(get_active_python_bin(self))
     distributions = python.get_distributions(dependencies.keys())
     where = 'dev' if self.option("dev") else (self.option("extra") or "run")
 
