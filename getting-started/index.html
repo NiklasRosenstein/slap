@@ -1009,7 +1009,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
 <div class="highlight"><span class="filename">$ slap info</span><pre><span></span><code>Repository &quot;/home/runner/work/slap/slap&quot;
   vcs: Git(&quot;/home/runner/work/slap/slap&quot;)
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
-  projects: [&#39;slap-cli&#39;, &#39;slam-cli&#39;]
+  projects: [&#39;slap-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
   version: 1.6.0
   dist-name: slap-cli
@@ -1047,17 +1047,6 @@ Project &quot;.&quot; (id: slap-cli)
       - mkdocs-material
       - &#39;novella ==0.2.3&#39;
       - &#39;pydoc-markdown ==4.6.0&#39;
-Project &quot;slam-cli&quot; (id: slam-cli)
-  version: 1.6.0
-  dist-name: slam-cli
-  packages: none
-  readme: readme.md
-  handler: SetuptoolsProjectHandler
-  depends on: slap-cli
-  dependencies:
-    run:
-      - &#39;slap-cli ==1.6.0&#39;
-    dev: none
 </code></pre></div>
 
 </details>
@@ -1065,17 +1054,7 @@ Project &quot;slam-cli&quot; (id: slam-cli)
 <h2 id="6-sanity-check-your-project-configuration">6. Sanity check your project configuration</h2>
 <p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration. The
 below example is the check output for Slap's own project.</p>
-<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>Global checks:
-  release:consistent-versions  OK             — All version references are equal
-
-Checks for project slam-cli
-
-  general:typed                WARNING        — tool.slap.typed is not set
-  release:source-code-version  WARNING        — No packages detected
-
-Checks for project slap-cli
-
-  changelog:validate           OK             — All 92 changelogs are valid.
+<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 92 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1083,8 +1062,9 @@ Checks for project slap-cli
   poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
   release:source-code-version  OK             — Found __version__ in slap
+  release:consistent-versions  OK             — All version references are equal
 
-Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
+Summary: 8 OK, 1 RECOMMENDATION, exit code: 0
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1106,16 +1086,6 @@ test commands like the below example to your project configuration.</p>
 
 <div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>black| All done! ✨ 🍰 ✨
 black| 51 files would be left unchanged.
-check| Global checks:
-check|   release:consistent-versions  OK             — All version references are equal
-check| 
-check| Checks for project slam-cli
-check| 
-check|   general:typed                WARNING        — tool.slap.typed is not set
-check|   release:source-code-version  WARNING        — No packages detected
-check| 
-check| Checks for project slap-cli
-check| 
 check|   changelog:validate           OK             — All 92 changelogs are valid.
 check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
 check|   general:typed                OK             — py.typed exists as expected
@@ -1124,8 +1094,9 @@ check|   poetry:license               OK             — License &quot;MIT&quot;
 check|   poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
 check|   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
 check|   release:source-code-version  OK             — Found __version__ in slap
+check|   release:consistent-versions  OK             — All version references are equal
 check| 
-check| Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
+check| Summary: 8 OK, 1 RECOMMENDATION, exit code: 0
 mypy| Success: no issues found in 48 source files
 pytest| ============================= test session starts ==============================
 pytest| platform linux -- Python 3.10.4, pytest-7.1.1, pluggy-1.0.0 -- /home/runner/work/slap/slap/.venvs/runtime/bin/python
@@ -1149,7 +1120,7 @@ pytest| tests/slap/python/test_dependency.py::test__PypiDependency__parse PASSED
 pytest| tests/slap/python/test_environment.py::test__PythonEnvironment__with_current_python_instance PASSED [ 93%]
 pytest| tests/slap/python/test_pep508.py::test__Pep508Environment__sample_markers PASSED [100%]
 pytest| 
-pytest| ======================== 14 passed, 1 skipped in 0.46s =========================
+pytest| ======================== 14 passed, 1 skipped in 0.56s =========================
 
 test summary:
   • black (exit code: 0)
@@ -1228,10 +1199,8 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 4 version references to 1.6.1
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.6.1
   pyproject.toml:       1.6.0 → 1.6.1 # &#39;version = &quot;1.6.0&quot;&#39;
-  slam-cli/setup.cfg:   1.6.0 → 1.6.1 # &#39;version = 1.6.0&#39;
-                        1.6.0 → 1.6.1 # &#39;install_requires =\n    slap-cli == 1.6.0&#39;
   src/slap/__init__.py: 1.6.0 → 1.6.1 # &#39;__version__ = &quot;1.6.0&quot;&#39;
 
 
@@ -1247,19 +1216,16 @@ pushing develop, 1.6.1 to origin
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
   pyproject.toml:       1.6.0 # &#39;version = &quot;1.6.0&quot;&#39;
-  slam-cli/setup.cfg:   1.6.0 # &#39;version = 1.6.0&#39;
-                        1.6.0 # &#39;install_requires =\n    slap-cli == 1.6.0&#39;
   src/slap/__init__.py: 1.6.0 # &#39;__version__ = &quot;1.6.0&quot;&#39;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
 <p>The <a href="../commands/publish/"><code>publish</code></a> command builds distributions using your configured build backend and publishes
-them to a Python package index using <a href="https://readthedocs.org/projects/twine/">Twine</a>.</p>
+them to a Python package index using <a href="https://readthedocs.org/projects/twine/">Twine</a>. For mono repositories, the command will build all projects before
+publishing them.</p>
 <div class="highlight"><span class="filename">$ slap publish</span><pre><span></span><code>Build slap-cli
   slap-cli-1.4.0.tar.gz
   slap_cli-1.4.0-py3-none-any.whl
-Build slam-cli
-  slam_cli-1.4.0-py3-none-any.whl
 Publishing
 </code></pre></div>
 <div class="admonition note">

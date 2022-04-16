@@ -754,7 +754,7 @@ Options:
 <div class="highlight"><span class="filename">$ slap info</span><pre><span></span><code>Repository &quot;/home/runner/work/slap/slap&quot;
   vcs: Git(&quot;/home/runner/work/slap/slap&quot;)
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
-  projects: [&#39;slap-cli&#39;, &#39;slam-cli&#39;]
+  projects: [&#39;slap-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
   version: 1.6.0
   dist-name: slap-cli
@@ -792,17 +792,6 @@ Project &quot;.&quot; (id: slap-cli)
       - mkdocs-material
       - &#39;novella ==0.2.3&#39;
       - &#39;pydoc-markdown ==4.6.0&#39;
-Project &quot;slam-cli&quot; (id: slam-cli)
-  version: 1.6.0
-  dist-name: slam-cli
-  packages: none
-  readme: readme.md
-  handler: SetuptoolsProjectHandler
-  depends on: slap-cli
-  dependencies:
-    run:
-      - &#39;slap-cli ==1.6.0&#39;
-    dev: none
 </code></pre></div>
 
               
