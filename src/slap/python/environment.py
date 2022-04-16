@@ -114,6 +114,7 @@ class PythonEnvironment:
 class DistributionMetadata:
   """ Additional metadata for a distribution. """
 
+  location: str
   version: str
   license_name: str | None
   platform: str | None
@@ -130,6 +131,7 @@ def get_distribution_metadata(dist: pkg_resources.Distribution) -> DistributionM
   data = Parser().parsestr(dist.get_metadata(dist.PKG_INFO))
 
   return DistributionMetadata(
+    location=dist.location,
     version=data.get('Version'),
     license_name=data.get('License'),
     platform=data.get('Platform'),

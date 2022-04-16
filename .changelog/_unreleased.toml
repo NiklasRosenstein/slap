@@ -27,3 +27,9 @@ id = "950fa9c2-f999-4a94-8050-4329035f21b8"
 type = "improvement"
 description = "Add `VenvAwareCommand` and use it in `add`, `install`, `link`, `report`, `run` and `test`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "1ca84add-be07-4226-af48-fbc97409efe0"
+type = "improvement"
+description = "Add `location` to `DistributionMetadata`, which propagates into the output of `slap report dependencies`"
+author = "@NiklasRosenstein"
