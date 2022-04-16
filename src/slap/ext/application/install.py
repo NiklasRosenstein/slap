@@ -140,6 +140,7 @@ class InstallCommandPlugin(Command, ApplicationPlugin):
     """
 
     from nr.util.stream import Stream
+
     from slap.install.installer import InstallOptions, PipInstaller, get_indexes_for_projects
     from slap.python.dependency import PathDependency, PypiDependency, parse_dependencies
     from slap.python.environment import PythonEnvironment

@@ -6,8 +6,9 @@ import logging
 import typing as t
 
 import pkg_resources
-from slap.plugins import ApplicationPlugin
+
 from slap.application import Application, Command, option
+from slap.plugins import ApplicationPlugin
 
 if t.TYPE_CHECKING:
   from slap.python.dependency import Dependency
@@ -38,6 +39,7 @@ class ReportDependenciesCommand(Command):
   def handle(self) -> None:
     import databind.json
     import tqdm  # type: ignore[import]
+
     from slap.python.environment import DistributionGraph, PythonEnvironment, build_distribution_graph
     from slap.python.pep508 import filter_dependencies
 

@@ -18,9 +18,8 @@ from __future__ import annotations
 import dataclasses
 import re
 import typing as t
-
 from pathlib import Path
-from urllib.parse import parse_qsl, urlparse, parse_qs, urlunparse
+from urllib.parse import parse_qs, parse_qsl, urlparse, urlunparse
 
 from nr.util.generic import T
 

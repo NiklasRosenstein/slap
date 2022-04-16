@@ -6,10 +6,10 @@ from pathlib import Path
 
 from nr.util.singleton import NotSet
 
-from slap.application import Application, Command, IO, argument, option
+from slap.application import IO, Application, Command, argument, option
+from slap.ext.application.venv import VenvManager
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
-from slap.ext.application.venv import VenvManager
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +28,10 @@ class TestRunner:
     self.line_prefixing = line_prefixing
 
   def run(self) -> int:
-    from codecs import getreader
     import subprocess as sp
     import sys
+    from codecs import getreader
+
     from cleo.io.io import OutputType  # type: ignore[import]
     from ptyprocess import PtyProcessUnicode  # type: ignore[import]
 

@@ -1,6 +1,6 @@
 
-import os
 import logging
+import os
 import shutil
 import string
 import subprocess as sp

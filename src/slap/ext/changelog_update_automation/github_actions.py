@@ -1,6 +1,6 @@
 
-import re
 import os
+import re
 import subprocess as sp
 from pathlib import Path
 

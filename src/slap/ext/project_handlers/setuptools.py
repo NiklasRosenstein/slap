@@ -2,8 +2,10 @@
 """ Project handler for projects using the Setuptools build system. """
 
 from __future__ import annotations
+
 import re
 import typing as t
+
 from slap.ext.project_handlers.base import BaseProjectHandler, interdependencies_enabled
 from slap.project import Dependencies, Package, Project
 from slap.release import VersionRef, match_version_ref_pattern, match_version_ref_pattern_on_lines

@@ -3,8 +3,10 @@ import typing as t
 
 
 def toml_highlight(toml_data: dict[str, t.Any] | str) -> str:
+  import pygments
+  import pygments.formatters
+  import pygments.lexers
   import tomli_w
-  import pygments, pygments.lexers, pygments.formatters
   if not isinstance(toml_data, str):
     toml_data = tomli_w.dumps(toml_data)
   return pygments.highlight(

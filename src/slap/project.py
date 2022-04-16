@@ -12,6 +12,7 @@ from slap.configuration import Configuration
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
+
   from slap.install.installer import Indexes
   from slap.plugins import ProjectHandlerPlugin
   from slap.python.dependency import Dependency, VersionSpec
@@ -80,6 +81,7 @@ class Project(Configuration):
   def __init__(self, repository: Repository, directory: Path) -> None:
     super().__init__(directory)
     from nr.util.functional import Once
+
     from slap.util.toml_file import TomlFile
 
     self.repository = repository
@@ -95,14 +97,15 @@ class Project(Configuration):
   def _get_project_configuration(self) -> ProjectConfig:
     """ Loads the project-level configuration. """
 
-    from databind.json import load
     from databind.core.settings import ExtraKeys
+    from databind.json import load
     return load(self.raw_config(), ProjectConfig, settings=[ExtraKeys(True)])
 
   def _get_project_handler(self) -> ProjectHandlerPlugin:
     """ Returns the handler for this project. """
 
     from nr.util.plugins import iter_entrypoints, load_entrypoint
+
     from slap.plugins import ProjectHandlerPlugin
 
     handler_name = self.config().handler

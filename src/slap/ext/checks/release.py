@@ -5,8 +5,8 @@ from cleo.io.null_io import NullIO  # type: ignore[import]
 
 from slap.application import Application
 from slap.check import Check, CheckResult, check, get_checks
-from slap.ext.release.source_code_version import SourceCodeVersionReferencesPlugin
 from slap.ext.application.release import ReleaseCommandPlugin
+from slap.ext.release.source_code_version import SourceCodeVersionReferencesPlugin
 from slap.plugins import CheckPlugin
 from slap.project import Project
 

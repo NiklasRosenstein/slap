@@ -7,12 +7,12 @@ Scraper for [DejaCode][1] and [SPDX][2].
 """
 
 import dataclasses
-import bs4
 import re
-import requests
 import textwrap
 import typing as t
 
+import bs4
+import requests
 from databind.core.settings import Alias
 
 BASE_URL = 'https://enterprise.dejacode.com/licenses/public/{}/'

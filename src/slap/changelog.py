@@ -12,9 +12,9 @@ from pathlib import Path
 from databind.core.settings import Alias
 from nr.util.weak import weak_property
 
-
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
+
   from slap.repository import RepositoryHost
 
 
@@ -71,15 +71,15 @@ class TomlChangelogDeser(ChangelogDeser):
 
   def dump(self, changelog: Changelog) -> str:
     import databind.json
-    from databind.core.settings import SerializeDefaults
     import tomli_w
+    from databind.core.settings import SerializeDefaults
     data = databind.json.dump(changelog, Changelog, settings=[SerializeDefaults(False)])
     return tomli_w.dumps(t.cast(dict, data))
 
   def dump_entry(self, entry: ChangelogEntry) -> str:
     import databind.json
-    from databind.core.settings import SerializeDefaults
     import tomli_w
+    from databind.core.settings import SerializeDefaults
     return tomli_w.dumps(t.cast(dict, databind.json.dump(entry, ChangelogEntry, settings=[SerializeDefaults(False)])))
 
 

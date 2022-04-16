@@ -8,8 +8,8 @@ from pathlib import Path
 
 import requests
 from nr.util.functional import Consumer
-from nr.util.git import Git as _Git, NoCurrentBranchError
 from nr.util.generic import T
+from nr.util.git import Git as _Git, NoCurrentBranchError
 
 from slap.changelog import is_url
 

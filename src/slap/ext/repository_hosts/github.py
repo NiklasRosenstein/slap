@@ -1,6 +1,6 @@
 
-import functools
 import dataclasses
+import functools
 import re
 from pathlib import Path
 

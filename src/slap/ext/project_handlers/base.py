@@ -110,7 +110,9 @@ class PyprojectHandler(BaseProjectHandler):
   def add_dependency(self, project: Project, dependency: Dependency, where: str) -> None:
     """ Adds a dependency to the respective location in the `pyproject.toml` file. """
 
-    import tomlkit, tomlkit.items, tomlkit.container
+    import tomlkit
+    import tomlkit.container
+    import tomlkit.items
     root = tomlkit.parse(project.pyproject_toml.path.read_text())
     keys, value = self.get_add_dependency_toml_location_and_config(project, dependency, where)
     assert isinstance(value, list | dict), type(value)

@@ -4,9 +4,9 @@ from __future__ import annotations
 import dataclasses
 import sys
 import typing as t
-import typing_extensions as te
 from pathlib import Path
 
+import typing_extensions as te
 from databind.core.settings import Alias, ExtraKeys, Remainder
 
 from slap.application import Application, Command, argument, option
@@ -15,6 +15,7 @@ from slap.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRu
 
 if t.TYPE_CHECKING:
   from poetry.core.semver.version import Version  # type: ignore[import]
+
   from slap.project import Project
   from slap.release import VersionRef
 
@@ -298,8 +299,8 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     """ Return the new version, based on *rule*. If *rule* is a version string, it is used as the new version.
     Otherwise, it is considered a rule and the applicable rule plugin is invoked to construct the new version. """
 
+    from nr.util.plugins import NoSuchEntrypointError, load_entrypoint
     from poetry.core.semver.version import Version
-    from nr.util.plugins import load_entrypoint, NoSuchEntrypointError
 
     try:
       return Version.parse(rule)

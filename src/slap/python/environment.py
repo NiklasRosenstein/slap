@@ -15,6 +15,7 @@ from slap.python import pep508
 
 if t.TYPE_CHECKING:
   import pkg_resources
+
   from slap.python.dependency import Dependency
 
 logger = logging.getLogger(__name__)

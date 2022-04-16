@@ -9,8 +9,8 @@ from pathlib import Path
 from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, argument, option
-from slap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
 from slap.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
+from slap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
 from slap.project import Project
 from slap.repository import Issue, PullRequest, Repository
 from slap.util.pygments import toml_highlight
@@ -568,6 +568,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
 
   def _convert_changelog(self, default_author: str, source: Path) -> None:
     import datetime
+
     import yaml
 
     data = yaml.safe_load(source.read_text())

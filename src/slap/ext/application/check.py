@@ -7,8 +7,8 @@ import typing as t
 from nr.util.plugins import load_entrypoint
 
 from slap.application import Application, Command, option
-from slap.plugins import ApplicationPlugin, CheckPlugin
 from slap.check import Check, CheckResult
+from slap.plugins import ApplicationPlugin, CheckPlugin
 from slap.project import Project
 
 logger = logging.getLogger(__name__)

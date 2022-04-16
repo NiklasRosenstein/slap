@@ -1,12 +1,13 @@
 
 from __future__ import annotations
+
 import shlex
 import subprocess as sp
 import typing as t
 
 from slap.application import Application, Command, argument
-from slap.plugins import ApplicationPlugin
 from slap.ext.application.venv import VenvManager
+from slap.plugins import ApplicationPlugin
 
 
 class RunCommandPlugin(Command, ApplicationPlugin):

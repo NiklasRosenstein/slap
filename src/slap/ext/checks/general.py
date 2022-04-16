@@ -1,8 +1,8 @@
 
 import typing as t
 
-from slap.plugins import CheckPlugin
 from slap.check import Check, CheckResult, check, get_checks
+from slap.plugins import CheckPlugin
 from slap.project import Project
 
 

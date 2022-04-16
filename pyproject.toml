@@ -46,6 +46,7 @@ types-PyYAML = "^6.0.3"
 types-pygments = "^2.9.16"
 mypy = "^0.931"
 pytest = "^7.1.1"
+isort = "^5.10.1"
 
 [tool.poetry.extras]
 docs = ["mkdocs", "mkdocs-material", "novella==0.2.3", "pydoc-markdown==4.6.0"]
@@ -108,10 +109,12 @@ typed = true
 mypy = "mypy src --namespace-packages"
 pytest = "pytest tests/ -vv"
 check = "slap check"
+isort = "isort src/ --check-only"
 
 [tool.slap.run]
 "docs:build" = "cd docs && novella --base-url slap/"
 "docs:dev" = "cd docs && novella --serve"
+isort = "isort src/"
 
 [tool.slap.install]
 dev-extras = []
@@ -124,3 +127,9 @@ warn_no_return = true
 warn_unreachable = true
 show_error_context = true
 show_error_codes = true
+
+[tool.isort]
+profile = "black"
+line_length = 120
+combine_as_imports = true
+indent = "  "

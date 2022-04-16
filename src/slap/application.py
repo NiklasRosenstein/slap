@@ -22,6 +22,7 @@ from slap import __version__
 
 if t.TYPE_CHECKING:
   from nr.util.functional import Once
+
   from slap.configuration import Configuration
   from slap.project import Project
   from slap.repository import Repository
@@ -55,9 +56,9 @@ class Command(_BaseCommand):
 
 class CleoApplication(BaseCleoApplication):
 
+  from cleo.formatters.style import Style  # type: ignore[import]
   from cleo.io.inputs.input import Input  # type: ignore[import]
   from cleo.io.outputs.output import Output  # type: ignore[import]
-  from cleo.formatters.style import Style  # type: ignore[import]
 
   _styles: dict[str, Style]
 
@@ -197,8 +198,8 @@ class Application:
   def _get_application_configuration(self) -> ApplicationConfig:
     """ Loads the application-level configuration. """
 
-    from databind.json import load
     from databind.core.settings import ExtraKeys
+    from databind.json import load
 
     raw_config = self.repository.raw_config().get('application', {})
     return load(raw_config, ApplicationConfig, settings=[ExtraKeys(True)])
@@ -234,6 +235,7 @@ class Application:
     option. """
 
     from nr.util.plugins import iter_entrypoints
+
     from slap.plugins import ApplicationPlugin
 
     assert not self._plugins_loaded

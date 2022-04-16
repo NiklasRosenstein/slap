@@ -1,7 +1,8 @@
 
 from __future__ import annotations
-import enum
+
 import dataclasses
+import enum
 import inspect
 import typing as t
 
@@ -66,6 +67,7 @@ def check(name: str) -> t.Callable[
   """
 
   import functools
+
   from slap.application import Application
   from slap.project import Project
 

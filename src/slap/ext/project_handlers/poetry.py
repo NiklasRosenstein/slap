@@ -2,6 +2,7 @@
 """ Project handler for projects using the Poetry build system. """
 
 from __future__ import annotations
+
 import logging
 import typing as t
 
@@ -48,8 +49,8 @@ class PoetryProjectHandler(PyprojectHandler):
     ]
 
   def get_dependencies(self, project: Project) -> Dependencies:
-    from slap.python.dependency import PypiDependency, parse_dependencies
     from slap.install.installer import Indexes
+    from slap.python.dependency import PypiDependency, parse_dependencies
 
     poetry: dict[str, t.Any] = project.pyproject_toml.get('tool', {}).get('poetry', {})
     dependencies = parse_dependencies(poetry.get('dependencies', []))
@@ -94,6 +95,7 @@ class PoetryProjectHandler(PyprojectHandler):
 
 def convert_dependency_to_poetry_config(dependency: Dependency) -> t.Mapping[str, t.Any] | str:
   import tomlkit.api
+
   from slap.python.dependency import PypiDependency
   if isinstance(dependency, PypiDependency):
     if not dependency.markers and not dependency.python and not dependency.source:

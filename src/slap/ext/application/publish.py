@@ -52,8 +52,8 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
     return app.cleo.add(self)
 
   def handle(self) -> int:
-    from twine.settings import Settings
     from twine.commands.upload import upload
+    from twine.settings import Settings
 
     distributions: list[Path] = []
 

@@ -2,6 +2,7 @@
 """ Project handler for projects using the Flit build system. """
 
 from __future__ import annotations
+
 import logging
 import typing as t
 
@@ -35,8 +36,8 @@ class FlitProjectHandler(PyprojectHandler):
     )
 
   def get_dependencies(self, project: Project) -> Dependencies:
-    from slap.python.dependency import PypiDependency, VersionSpec
     from slap.project import Dependencies
+    from slap.python.dependency import PypiDependency, VersionSpec
 
     flit: dict[str, t.Any] | None = project.pyproject_toml.get('tool', {}).get('flit')
     project_conf: dict[str, t.Any] | None = project.pyproject_toml.get('project')

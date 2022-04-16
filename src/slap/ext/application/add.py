@@ -2,8 +2,8 @@
 import logging
 
 from slap.application import Application, Command, argument, option
-from slap.plugins import ApplicationPlugin
 from slap.ext.application.install import get_active_python_bin, python_option, venv_check, venv_check_option
+from slap.plugins import ApplicationPlugin
 from slap.python.dependency import PypiDependency, VersionSpec
 
 logger = logging.getLogger(__name__)
@@ -61,6 +61,7 @@ class AddCommandPlugin(Command, ApplicationPlugin):
 
   def handle(self) -> int:
     from nr.util.stream import Stream
+
     from slap.install.installer import InstallOptions, PipInstaller, get_indexes_for_projects
     from slap.python.environment import PythonEnvironment
 

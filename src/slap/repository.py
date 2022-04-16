@@ -85,8 +85,9 @@ class Repository(Configuration):
     """ Returns the handler for this repository. """
 
     from nr.util.plugins import load_entrypoint
-    from slap.plugins import RepositoryHandlerPlugin
+
     from slap.ext.repository_handlers.default import DefaultRepositoryHandler
+    from slap.plugins import RepositoryHandlerPlugin
 
     handler: RepositoryHandlerPlugin
     handler_name = self.raw_config().get('repository', {}).get('handler')
@@ -114,6 +115,7 @@ class Repository(Configuration):
 
     from nr.util.digraph import DiGraph
     from nr.util.digraph.algorithm.topological_sort import topological_sort
+
     from slap.project import Project
 
     graph: DiGraph[Project, None, None] = DiGraph()
