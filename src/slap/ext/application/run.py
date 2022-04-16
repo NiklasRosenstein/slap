@@ -47,4 +47,4 @@ class RunCommandPlugin(Command, ApplicationPlugin):
     command: list[str] = self.argument("args")
     if command[0] in self.config:
       command = shlex.split(self.config[command[0]]) + command[1:]
-    return sp.call(command)
+    return sp.call(' '.join(map(shlex.quote, command)), shell=True)
