@@ -137,6 +137,9 @@ class VenvCommand(Command):
       <code>$ slap venv -ag craftr
       (craftr) $ </code>
 
+  Note that most Slap commands support using the active virtual environment it
+  to be active in your shell (such as `slap run`, `slap test`, `slap install`,
+  etc.).
   """
 
   name = "venv"
@@ -166,6 +169,11 @@ class VenvCommand(Command):
       description="Delete the environment with the given environment name.",
     ),
     option(
+      "--set", "-s",
+      description="Similar to <opt>-a,--activate</opt>, but it will not activate the environment in your active "
+        "shell even if you have the Slap shim installed (see <opt>-i,--init-code</opt>)."
+    ),
+    option(
       "--list", "-l",
       description="List the available environments.",
     ),
@@ -175,7 +183,7 @@ class VenvCommand(Command):
         "the environment does not exist or there is no current environment.",
     ),
     option(
-      "--init-code", "i",
+      "--init-code", "-i",
       description="Print the code snippet that can be placed in your shells init scripts to shadow this command "
         "in order to properly make use of the <opt>-a,--activate</opt> option. Currently supported shells are: "
         + ", ".join(USER_INIT_SCRIPTS),
@@ -191,27 +199,27 @@ class VenvCommand(Command):
   ]
 
   def _validate_args(self) -> bool:
-    for opt in ('activate', 'create', 'delete'):
+    for opt in ('activate', 'create', 'delete', 'set'):
       if self.option("init-code") and self.option(opt):
         self.line_error(f'error: <opt>-i,--init-code</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
         return False
       if self.option("list") and self.option(opt):
         self.line_error(f'error: <opt>-l,--list</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
         return False
-    for opt in ('create', 'delete'):
+    for opt in ('create', 'delete', 'set'):
       if self.option(opt) and not self.argument("name"):
         self.line_error('error: missing <opt>name</opt> argument', 'error')
         return False
-    for opt in ('activate', 'create'):
+    for opt in ('activate', 'create', 'set'):
       if self.option("delete") and self.option(opt):
         self.line_error('error: <opt>-d,--delete</opt> is not compatible with <opt>--{opt}</opt>', 'error')
         return False
     if self.option("path"):
-      for opt in ('activate', 'create', 'delete', 'list', 'init-code', 'python'):
+      for opt in ('activate', 'create', 'delete', 'set', 'list', 'init-code', 'python'):
         if self.option(opt):
           self.line_error('error: <opt>--path,-P</opt> is not compatible with <opt>--{opt}</opt>', 'error')
           return False
-    if not any(self.option(opt) for opt in ('activate', 'create', 'delete', 'list', 'init-code', 'path')):
+    if not any(self.option(opt) for opt in ('activate', 'create', 'delete', 'set', 'list', 'init-code', 'path')):
       self.line_error('error: no operation specified', 'error')
       return False
     return True
@@ -322,11 +330,18 @@ class VenvCommand(Command):
       venv.delete()
       self.line_error(f'deleted {location} environment <s>"{venv.name}"</s>', 'info')
 
+    if self.option("set"):
+      assert venv is not None
+      if not venv.exists():
+        self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
+        return 1
+      manager.set_last_activated(venv.name)
+
     if self.option("path"):
       venv = venv or manager.get_last_activated()
       if not venv or not venv.exists():
         if venv and self.argument("name"):
-          self.line_error(f'error: environment <b>{venv.name}</b> does not exist', 'error')
+          self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         else:
           self.line_error(f'error: no active environment', 'error')
         return 1

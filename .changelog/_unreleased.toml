@@ -9,3 +9,9 @@ id = "efa1e01f-ea4d-4e0c-b7b3-05c60617c629"
 type = "improvement"
 description = "`slap test` and `slap run` commands now activate the active virtual environment if any before running the commands"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "b3c70f28-839c-4da1-88e0-39194777ffc1"
+type = "feature"
+description = "Add `-s,--set` option to `slap venv`"
+author = "@NiklasRosenstein"
