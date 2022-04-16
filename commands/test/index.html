@@ -782,7 +782,7 @@ works across multiple projects in a mono-repository and prints a summary of the 
 before the test commands are run.</p>
 <details><summary>Synopsis</summary>
 <div class="highlight"><pre><span></span><code>Description:
-  Execute commands configured in [tool.slap.test].
+  Base class for commands that should be aware of the active local virtual environment. Before the
 
 Usage:
   test [options] [--] [&lt;test&gt;...]
@@ -802,21 +802,9 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
 
 Help:
-  Execute commands configured in [tool.slap.test].
-
-  Example configuration:
-
-    [tool.slap.test]
-    pytest = &quot;pytest --cov=my_package tests/&quot;
-    mypy = &quot;mypy src&quot;
-
-  Example usage:
-
-    $ slap test
-    mypy | Success: no issues found in 12 source files
-    pytest | ===================================== test session starts ======================================
-    pytest | platform linux -- Python 3.10.2, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
-    ...
+  Base class for commands that should be aware of the active local virtual environment. Before the
+  command is executed, it will check if we&#39;re currently in a virtual environment. If not, it will activate
+  the environment that is considered &quot;active&quot; by the Slap `venv` command.
 </code></pre></div>
 </details>
 
