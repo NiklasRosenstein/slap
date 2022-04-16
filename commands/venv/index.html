@@ -793,6 +793,7 @@ Options:
   -a, --activate             Activate the environment given by the environment name. Note that using this option if used directly with the Slap CLI will cause an error because it needs to be shadowed by a function of your shell.
   -c, --create               Create the environment with the given environment name.
   -d, --delete               Delete the environment with the given environment name.
+  -s, --set                  Similar to -a,--activate, but it will not activate the environment in your active shell even if you have the Slap shim installed (see -i,--init-code).
   -l, --list                 List the available environments.
   -p, --path                 Print the path of the specified or the current venv. Exit with status code 1 and no output if the environment does not exist or there is no current environment.
   -i, --init-code=INIT-CODE  Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash
@@ -826,6 +827,10 @@ Help:
       • craftr   3.10.2 (main, Jan 15 2022, 18:02:07) [GCC 9.3.0]
       $ slap venv -ag craftr
       (craftr) $ 
+
+  Note that most Slap commands support using the active virtual environment it
+  to be active in your shell (such as `slap run`, `slap test`, `slap install`,
+  etc.).
 </code></pre></div>
 </details>
 
