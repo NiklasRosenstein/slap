@@ -115,7 +115,7 @@ isort = "isort src/ tests/ --check-only"
 [tool.slap.run]
 "docs:build" = "cd docs && novella --base-url slap/"
 "docs:dev" = "cd docs && novella --serve"
-fmt = "isort src/ tests/ && black src/ tests"
+fmt = "isort src/ tests/" # && black src/ tests"
 
 [tool.slap.install]
 dev-extras = []

@@ -1,9 +1,19 @@
 
 from pathlib import Path
+
 import pytest
 
-from slap.python.dependency import GitDependency, MultiDependency, PathDependency, PypiDependency, UrlDependency, VersionSpec
-from slap.python.dependency import parse_dependency_config, parse_dependency_string, split_package_name_with_extras
+from slap.python.dependency import (
+  GitDependency,
+  MultiDependency,
+  PathDependency,
+  PypiDependency,
+  UrlDependency,
+  VersionSpec,
+  parse_dependency_config,
+  parse_dependency_string,
+  split_package_name_with_extras,
+)
 
 
 def test__split_package_name_with_extras__good_input():
