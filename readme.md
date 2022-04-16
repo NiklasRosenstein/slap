@@ -4,8 +4,9 @@
 
   [PEP 517]: https://peps.python.org/pep-0517/
 
-Slap is an extensible command-line tool to assist in the development of Python projects independent of the [PEP 517][]
-build backend being used, capable of managing single- and multi-project repositories.
+Slap is a command-line tool to simplify command workflows in the development of Python projects
+independent of the [PEP 517][] build backend being used, capable of managing single- and multi-project
+repositories.
 
 ## Installation
 
@@ -29,15 +30,16 @@ Check out the [Getting started](https://niklasrosenstein.github.io/slap/getting-
 
 ## Feature Matrix
 
-| Feature | Documentation |
-| ------- | ------------- |
-| Manage structured changelog entries | [slap changelog](https://niklasrosenstein.github.io/slap/commands/changelog/) |
-| Show project details | [slap info](https://niklasrosenstein.github.io/slap/commands/info/) |
-| Build and publish to PyPI using Twine | [slap publish](https://niklasrosenstein.github.io/slap/commands/publish/) |
-| Create a new release (bump version numbersr)| [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
-| Run a command configured in `pyproject.toml` | [slap run](https://niklasrosenstein.github.io/slap/commands/run/) |
-| Run tests configured in `pyproject.toml` | [slap test](https://niklasrosenstein.github.io/slap/commands/test/) |
-| Manage Python virtualenv's | [slap venv](https://niklasrosenstein.github.io/slap/commands/venv/) |
+| Feature | Poetry | Documentation |
+| ------- | ------ | ------------- |
+| Manage structured changelog entries | ❌ | [slap changelog](https://niklasrosenstein.github.io/slap/commands/changelog/) |
+| Show project details | ❌ | [slap info](https://niklasrosenstein.github.io/slap/commands/info/) |
+| Build and publish to PyPI using Twine | ✅ (single project only) | [slap publish](https://niklasrosenstein.github.io/slap/commands/publish/) |
+| Create a new release (bump version numbersr)| ❌ (sub-par support) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
+| Run a command configured in `pyproject.toml` | ❌ | [slap run](https://niklasrosenstein.github.io/slap/commands/run/) |
+| Run tests configured in `pyproject.toml` | ❌ | [slap test](https://niklasrosenstein.github.io/slap/commands/test/) |
+| Manage Python virtualenv's | ✅ (but out-of-worktree) | [slap venv](https://niklasrosenstein.github.io/slap/commands/venv/) |
+| Generate a dependencies report | ❌ | [slap report dependencies](https://niklasrosenstein.github.io/slap/commands/report/) |
 
 | Feature / Build backend | Flit  | Poetry  | Setuptools  | Documentation |
 | ----------------------- | ----- | ------- | ----------- | --------- |
