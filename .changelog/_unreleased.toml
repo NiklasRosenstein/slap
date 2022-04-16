@@ -1,0 +1,5 @@
+[[entries]]
+id = "6ac10f2d-25b1-4193-8007-c9c695fe54ab"
+type = "feature"
+description = "add `-p,--path` option to `slap venv` command, note that `-p` was repurposed from `--python` and the option no longer has a short form"
+author = "@NiklasRosenstein"

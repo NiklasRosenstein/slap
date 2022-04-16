@@ -97,7 +97,8 @@ class VenvManager:
 
   def get_last_activated(self) -> Venv | None:
     venv_name = self._get_state().get('last_active_environment')
-    return self.get(venv_name) if venv_name else None
+    venv = self.get(venv_name) if venv_name else None
+    return venv if venv and venv.exists() else None
 
   def set_last_activated(self, venv_name: str) -> None:
     state = self._get_state()
@@ -160,6 +161,11 @@ class VenvCommand(Command):
       description="List the available environments.",
     ),
     option(
+      "--path", "-p",
+      description="Print the path of the specified or the current venv. Exit with status code 1 and no output if "
+        "the environment does not exist or there is no current environment.",
+    ),
+    option(
       "--init-code", "i",
       description="Print the code snippet that can be placed in your shells init scripts to shadow this command "
         "in order to properly make use of the <opt>-a,--activate</opt> option. Currently supported shells are: "
@@ -167,7 +173,7 @@ class VenvCommand(Command):
       flag=False,
     ),
     option(
-      "--python", "-p",
+      "--python",
       description="The Python executable to use to create the virtual environment. If this is not specified, "
         "it defaults to <code>python</code> + the environment name if the environment name looks like a version "
         "number (contains numbers and dots). Otehrwise, it defaults to <code>python3</code>.",
@@ -189,10 +195,15 @@ class VenvCommand(Command):
         return False
     for opt in ('activate', 'create'):
       if self.option("delete") and self.option(opt):
-        self.line_error('error: <opt>-d,--delete</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>', 'error')
+        self.line_error('error: <opt>-d,--delete</opt> is not compatible with <opt>--{opt}</opt>', 'error')
         return False
-    if not any(self.option(opt) for opt in ('activate', 'create', 'delete', 'init-code', 'list')):
-      self.line_error('error: no options supplied', 'error')
+    if self.option("path"):
+      for opt in ('activate', 'create', 'delete', 'list', 'init-code', 'python'):
+        if self.option(opt):
+          self.line_error('error: <opt>--path,-P</opt> is not compatible with <opt>--{opt}</opt>', 'error')
+          return False
+    if not any(self.option(opt) for opt in ('activate', 'create', 'delete', 'list', 'init-code', 'path')):
+      self.line_error('error: no operation specified', 'error')
       return False
     return True
 
@@ -301,6 +312,16 @@ class VenvCommand(Command):
         return 1
       venv.delete()
       self.line_error(f'deleted {location} environment <s>"{venv.name}"</s>', 'info')
+
+    if self.option("path"):
+      venv = venv or manager.get_last_activated()
+      if not venv or not venv.exists():
+        if self.argument("name"):
+          self.line_error(f'error: environment <b>{venv.name}</b> does not exist', 'error')
+        else:
+          self.line_error(f'error: no active environment', 'error')
+        return 1
+      print(venv.directory)
 
     return 0
 
