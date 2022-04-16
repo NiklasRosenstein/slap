@@ -1,19 +1,33 @@
 
+from __future__ import annotations
+import shlex
 import subprocess as sp
+import typing as t
+
 from slap.application import Application, Command, argument
 from slap.plugins import ApplicationPlugin
 from slap.ext.application.venv import VenvManager
 
 
 class RunCommandPlugin(Command, ApplicationPlugin):
-  """ Run a command configured in <code>[tool.slap.run]</code>"""
+  """ Run a command in the current active environment. If the command name is an alias
+  configured in <code>[tool.slap.run]</code>, run it instead.
+
+  In order to pass command-line options and flags, you need to add an addition `--` to
+  ensure that arguments following it are parsed as positional arguments.
+
+  Example:
+
+      $ slap run pytest -- -vv
+  """
 
   name = "run"
   arguments = [
     argument(
-      "cmd",
-      description="The name of the command to run as it is defined under the <code>slap.run</code> section.",
-    ),
+      "args",
+      description="Command name and arguments.",
+      multiple=True,
+    )
   ]
 
   def load_configuration(self, app: Application) -> dict[str, str]:
@@ -29,8 +43,7 @@ class RunCommandPlugin(Command, ApplicationPlugin):
     venv = VenvManager().get_last_activated()
     if venv:
       venv.activate()
-    command = self.argument("cmd")
-    if command not in self.config:
-      self.line_error(f'error: command \"{command}\" does not exist', 'error')
-      return 1
-    return sp.call(self.config[command], shell=True)
+    command: list[str] = self.argument("args")
+    if command[0] in self.config:
+      command = shlex.split(self.config[command[0]]) + command[1:]
+    return sp.call(command)
