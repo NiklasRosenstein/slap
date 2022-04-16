@@ -75,7 +75,6 @@ class Venv:
   def activate(self) -> None:
     """ Activate the environment by updating the current `PATH` environment variable. """
 
-    logger.info('Activating virtual envrionment "%s"', self.directory)
     os.environ['PATH'] = str(self.get_bin_directory()) + os.pathsep + os.environ['PATH']
 
 
@@ -120,11 +119,16 @@ class VenvAwareCommand(Command):
   the environment that is considered "active" by the Slap `venv` command. """
 
   def execute(self, io: IO) -> int:
-    if not os.getenv('VIRTUAL_ENV'):
+    if os.getenv('VIRTUAL_ENV'):
+      io.error_output.write_line(f'<info>(venv-aware) a virtual environment is already activated (<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>')
+    else:
       manager = VenvManager()
       venv = manager.get_last_activated()
       if venv:
         venv.activate()
+        io.error_output.write_line(f'<info>(venv-aware) activating current environment <s>"{venv.name}"</s></info>')
+      else:
+        io.error_output.write_line(f'<info>(venv-aware) there is no current environment that can be activated</info>')
 
     return super().execute(io)
 
