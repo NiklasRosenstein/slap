@@ -6,7 +6,7 @@ from pathlib import Path
 
 from nr.util.singleton import NotSet
 
-from slap.application import IO, Application, Command, argument, option
+from slap.application import IO, Application, argument, option
 from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
@@ -81,7 +81,7 @@ class Test(t.NamedTuple):
     return f'{self.project.id}:{self.name}'
 
 
-class TestCommandPlugin(Command, ApplicationPlugin):
+class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
   """
   Execute commands configured in <code>[tool.slap.test]</code>.
 
