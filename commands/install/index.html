@@ -722,7 +722,7 @@ after creating a virtual environment (for that, see <a href="../venv/"><code>sla
 don't want Slap to protect you from accidentally installing the project(s) into a non-virtual Python environment.</p>
 <details><summary>Synopsis</summary>
 <div class="highlight"><pre><span></span><code>Description:
-  Install your project and its dependencies via Pip.
+  Base class for commands that should be aware of the active local virtual environment. Before the
 
 Usage:
   install [options]
@@ -744,6 +744,11 @@ Options:
       --no-ansi                  Disable ANSI output.
   -n, --no-interaction           Do not ask any interactive question.
   -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Base class for commands that should be aware of the active local virtual environment. Before the
+  command is executed, it will check if we&#39;re currently in a virtual environment. If not, it will activate
+  the environment that is considered &quot;active&quot; by the Slap `venv` command.
 </code></pre></div>
 </details>
 

@@ -2046,6 +2046,15 @@ add `-p,--path` option to `slap venv` command, note that `-p` was repurposed fro
   <tr><td>Feature</td><td>
 
 Add `-s,--set` option to `slap venv`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+The `slap run` command can now run arbitrary commands, but falls back to the ones aliased on the configuration on a match.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+Add `VenvAwareCommand` and use it in `add`, `install`, `link`, `report`, `run` and `test`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+Add `location` to `DistributionMetadata`, which propagates into the output of `slap report dependencies`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
 </table>
 
 <h2 id="154-2022-04-14">1.5.4 (2022-04-14)</h2>

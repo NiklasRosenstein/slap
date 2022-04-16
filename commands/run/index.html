@@ -761,16 +761,18 @@
 
 
 <h1 id="slap-run"><code>slap run</code></h1>
-<p>Runs one of the commands from the Slap configuration. This is similar to <code>npm run</code> and <code>yarn run</code> for JavaScript projects.</p>
+<p>Runs a command, using the commands configured under the <code>[tool.slap.run]</code> section as a source for aliases.</p>
+<p>If there is an active virtual environment and you are not already in a virtual environment, it will be activated
+before the command is run.</p>
 <details><summary>Synopsis</summary>
 <div class="highlight"><pre><span></span><code>Description:
-  Run a command configured in [tool.slap.run]
+  Base class for commands that should be aware of the active local virtual environment. Before the
 
 Usage:
-  run [options] [--] &lt;cmd&gt;
+  run [options] [--] &lt;args&gt;...
 
 Arguments:
-  cmd                   The name of the command to run as it is defined under the slap.run section.
+  args                  Command name and arguments.
 
 Options:
   -h, --help            Display help for the given command. When no command is given display help for the help command.
@@ -780,6 +782,11 @@ Options:
       --no-ansi         Disable ANSI output.
   -n, --no-interaction  Do not ask any interactive question.
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Base class for commands that should be aware of the active local virtual environment. Before the
+  command is executed, it will check if we&#39;re currently in a virtual environment. If not, it will activate
+  the environment that is considered &quot;active&quot; by the Slap `venv` command.
 </code></pre></div>
 </details>
 

@@ -779,7 +779,7 @@
 are not already installed, they will be installed into the current Python environment using Pip.</p>
 <details><summary>Synopsis</summary>
 <div class="highlight"><pre><span></span><code>Description:
-  Add one or more dependencies to a project.
+  Base class for commands that should be aware of the active local virtual environment. Before the
 
 Usage:
   add [options] [--] &lt;packages&gt;...
@@ -802,6 +802,11 @@ Options:
       --no-ansi         Disable ANSI output.
   -n, --no-interaction  Do not ask any interactive question.
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Base class for commands that should be aware of the active local virtual environment. Before the
+  command is executed, it will check if we&#39;re currently in a virtual environment. If not, it will activate
+  the environment that is considered &quot;active&quot; by the Slap `venv` command.
 </code></pre></div>
 </details>
 

@@ -1018,6 +1018,7 @@ Project &quot;.&quot; (id: slap-cli)
       - &#39;tqdm &gt;=4.64.0,&lt;5.0.0&#39;
       - &#39;twine &gt;=3.7.0,&lt;4.0.0&#39;
     dev:
+      - &#39;isort &gt;=5.10.1,&lt;6.0.0&#39;
       - &#39;mypy &gt;=0.931,&lt;0.932&#39;
       - &#39;pytest &gt;=7.1.1,&lt;8.0.0&#39;
       - &#39;types-beautifulsoup4 &gt;=4.10.0,&lt;5.0.0&#39;
@@ -1107,11 +1108,13 @@ test commands like the below example to your project configuration.</p>
     check|   release:source-code-version  OK             — Found __version__ in slap
     check| 
     check| Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
+    isort| bash: isort: command not found
     mypy| bash: mypy: command not found
     pytest| bash: pytest: command not found
 
     test summary:
       • check (exit code: 0)
+      • isort (exit code: 127)
       • mypy (exit code: 127)
       • pytest (exit code: 127)
 </code></pre></div>

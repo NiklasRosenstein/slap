@@ -778,6 +778,8 @@
 <p>Runs some or all of the tests from the Slap configuration. This is different from <a href="../run/"><code>slap run</code></a> in that by
 default it runs multiple commands, prefixes the output them with the test name (similar to <code>docker-compose logs</code>),
 works across multiple projects in a mono-repository and prints a summary of the results at the end.</p>
+<p>If there is an active virtual environment and you are not already in a virtual environment, it will be activated
+before the test commands are run.</p>
 <details><summary>Synopsis</summary>
 <div class="highlight"><pre><span></span><code>Description:
   Execute commands configured in [tool.slap.test].
