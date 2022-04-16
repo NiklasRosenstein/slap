@@ -1,4 +1,3 @@
-
 import datetime
 import textwrap
 from pathlib import Path
@@ -10,8 +9,8 @@ from slap.util.external.licenses import get_license_metadata, wrap_license_text
 from slap.util.vcs import get_git_author
 
 TEMPLATES = {
-  'poetry': {
-    'pyproject.toml': '''
+    "poetry": {
+        "pyproject.toml": """
       [build-system]
       requires = ["poetry-core"]
       build-backend = "poetry.core.masonry.api"
@@ -57,13 +56,13 @@ TEMPLATES = {
       warn_unreachable = true
       show_error_context = true
       show_error_codes = true
-    ''',
-    'LICENSE': '',
-    'readme.md': '''
+    """,
+        "LICENSE": "",
+        "readme.md": """
       # {name}
 
-    ''',
-    '.gitignore': '''
+    """,
+        ".gitignore": """
       /.vscode
       /dist
       /build
@@ -71,19 +70,19 @@ TEMPLATES = {
       *.egg-info/
       __pycache__/
       poetry.lock
-    ''',
-    'src/{path}/__init__.py': '''
+    """,
+        "src/{path}/__init__.py": """
 
       __version__ = '0.1.0'
-    ''',
-    'test/test_import.py': '''
+    """,
+        "test/test_import.py": """
       def test_import():
         exec('from {dotted_name} import *')
-    ''',
-    'src/{path}/py.typed': '',
-  },
-  'github': {
-    '.github/workflows/python-package.yml': '''
+    """,
+        "src/{path}/py.typed": "",
+    },
+    "github": {
+        ".github/workflows/python-package.yml": """
       name: Python application
 
       on:
@@ -111,127 +110,132 @@ TEMPLATES = {
           steps:
             - uses: actions/checkout@v2
             - uses: NiklasRosenstein/slap@gha/changelog/update/v1
-    ''',
-  }
+    """,
+    },
 }
 
 
 class InitCommandPlugin(ApplicationPlugin, Command):
-  """ Bootstrap some files for a Python project.
+    """Bootstrap some files for a Python project.
 
-  Currently available templates:
+    Currently available templates:
 
-  1. <info>poetry</info>
-  """
+    1. <info>poetry</info>
+    """
 
-  app: Application
+    app: Application
 
-  name = "init"
-  arguments = [
-    argument(
-      "directory",
-      description="The directory in which to create the generated files. If not specified, a new directory with "
-        "the name specified via the <opt>--name</opt> option is created.",
-      optional=True,
-    )
-  ]
-  options = [
-    option(
-      "--name",
-      description="The name of the Python package.",
-      flag=False,
-    ),
-    option(
-      "--license",
-      description="The package license.",
-      flag=False,
-      default="MIT",
-    ),
-    option(
-      "--template", "-t",
-      description="The template to use.",
-      flag=False,
-      default="poetry",
-    ),
-    option(
-      "--overwrite", "-f",
-      description="Overwrite files.",
-    ),
-    option(
-      "--dry", "-d",
-      description="Dont actually write files.",
-    ),
-    option(
-      "--as-markdown",
-      description="Render the content as Markdown (uses by the Slap docs)",
-    ),
-  ]
+    name = "init"
+    arguments = [
+        argument(
+            "directory",
+            description="The directory in which to create the generated files. If not specified, a new directory with "
+            "the name specified via the <opt>--name</opt> option is created.",
+            optional=True,
+        )
+    ]
+    options = [
+        option(
+            "--name",
+            description="The name of the Python package.",
+            flag=False,
+        ),
+        option(
+            "--license",
+            description="The package license.",
+            flag=False,
+            default="MIT",
+        ),
+        option(
+            "--template",
+            "-t",
+            description="The template to use.",
+            flag=False,
+            default="poetry",
+        ),
+        option(
+            "--overwrite",
+            "-f",
+            description="Overwrite files.",
+        ),
+        option(
+            "--dry",
+            "-d",
+            description="Dont actually write files.",
+        ),
+        option(
+            "--as-markdown",
+            description="Render the content as Markdown (uses by the Slap docs)",
+        ),
+    ]
 
-  def load_configuration(self, app: Application) -> None:
-    return None
+    def load_configuration(self, app: Application) -> None:
+        return None
 
-  def activate(self, app: Application, config: None) -> None:
-    self.app = app
-    app.cleo.add(self)
+    def activate(self, app: Application, config: None) -> None:
+        self.app = app
+        app.cleo.add(self)
 
-  def handle(self) -> int:
-    from nr.util.optional import Optional
+    def handle(self) -> int:
+        from nr.util.optional import Optional
 
-    template = self.option("template")
-    if template not in TEMPLATES:
-      self.line_error(f'error: template "{template}" does not exist', 'error')
-      return 1
+        template = self.option("template")
+        if template not in TEMPLATES:
+            self.line_error(f'error: template "{template}" does not exist', "error")
+            return 1
 
-    author = get_git_author()
-    name = self.option("name")
-    directory = (
-      Optional(self.argument("directory"))
-      .map(Path)
-      .map(lambda v: v or (name.replace('.', '-') if name else None))
-      .or_else_get(Path.cwd)
-    )
+        author = get_git_author()
+        name = self.option("name")
+        directory = (
+            Optional(self.argument("directory"))
+            .map(Path)
+            .map(lambda v: v or (name.replace(".", "-") if name else None))
+            .or_else_get(Path.cwd)
+        )
 
-    scope = {
-      'license': self.option("license"),
-      'year': datetime.date.today().year,
-      'author_name': author.name if author and author.name else 'Unknown',
-      'author_email': author.email if author and author.email else 'me@unknown.org',
-    }
-    if self.option("name"):
-      scope.update({
-        'name': self.option("name"),
-        'dotted_name': self.option("name").replace('-', '_'),
-        'path': self.option("name").replace('.', '/').replace('-', '_'),
-        'package': self.option("name").replace('.', '_').replace('-', '_'),
-      })
-    for filename, content in TEMPLATES[template].items():
-      if filename == 'LICENSE':
-        content = get_license_metadata(self.option("license")).license_text
-        content = wrap_license_text(content)
-        content = 'Copyright (c) {year} {author_name}\n\n'.format(**scope) + content
-        content = f'The {self.option("license")} License\n\n' + content
-      else:
-        filename = filename.format(**scope)
-        content = textwrap.dedent(content.format(**scope)).strip()
-        if content:
-          content += '\n'
+        scope = {
+            "license": self.option("license"),
+            "year": datetime.date.today().year,
+            "author_name": author.name if author and author.name else "Unknown",
+            "author_email": author.email if author and author.email else "me@unknown.org",
+        }
+        if self.option("name"):
+            scope.update(
+                {
+                    "name": self.option("name"),
+                    "dotted_name": self.option("name").replace("-", "_"),
+                    "path": self.option("name").replace(".", "/").replace("-", "_"),
+                    "package": self.option("name").replace(".", "_").replace("-", "_"),
+                }
+            )
+        for filename, content in TEMPLATES[template].items():
+            if filename == "LICENSE":
+                content = get_license_metadata(self.option("license")).license_text
+                content = wrap_license_text(content)
+                content = "Copyright (c) {year} {author_name}\n\n".format(**scope) + content
+                content = f'The {self.option("license")} License\n\n' + content
+            else:
+                filename = filename.format(**scope)
+                content = textwrap.dedent(content.format(**scope)).strip()
+                if content:
+                    content += "\n"
 
-      path = directory / filename
+            path = directory / filename
 
-      if self.option("as-markdown"):
-        print(f'```{path.suffix[1:]} title="{path}"')
-        print(content, '    ')
-        print(f'```\n\n')
-        continue
+            if self.option("as-markdown"):
+                print(f'```{path.suffix[1:]} title="{path}"')
+                print(content, "    ")
+                print(f"```\n\n")
+                continue
 
-      if path.exists() and not self.option("overwrite"):
-        self.line(f'skip <info>{path}</info> (already exists)')
-        continue
+            if path.exists() and not self.option("overwrite"):
+                self.line(f"skip <info>{path}</info> (already exists)")
+                continue
 
-      if not self.option("dry") and not self.option("as-markdown"):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content)
+            if not self.option("dry") and not self.option("as-markdown"):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(content)
 
-      self.line(f'write <info>{path}</info>')
+            self.line(f"write <info>{path}</info>")
 
-    return 0
+        return 0

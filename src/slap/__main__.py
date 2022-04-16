@@ -1,4 +1,4 @@
-
 def main():
-  from slap.application import Application
-  Application().run()
+    from slap.application import Application
+
+    Application().run()

@@ -1,4 +1,3 @@
-
 """ With the application object we manage the CLI commands and other types of plugins as well as access to the Slap
 user and project configuration. """
 
@@ -21,245 +20,244 @@ from databind.core.settings import Alias
 from slap import __version__
 
 if t.TYPE_CHECKING:
-  from nr.util.functional import Once
+    from nr.util.functional import Once
 
-  from slap.configuration import Configuration
-  from slap.project import Project
-  from slap.repository import Repository
-  from slap.util.vcs import Vcs
+    from slap.configuration import Configuration
+    from slap.project import Project
+    from slap.repository import Repository
+    from slap.util.vcs import Vcs
 
-__all__ = ['Command', 'argument', 'option', 'IO', 'Application', 'ApplicationPlugin']
+__all__ = ["Command", "argument", "option", "IO", "Application", "ApplicationPlugin"]
 logger = logging.getLogger(__name__)
 
 
 class Command(_BaseCommand):
+    def __init_subclass__(cls) -> None:
+        if not cls.help:
+            first_line, remainder = (cls.__doc__ or "").partition("\n")[::2]
+            cls.help = (first_line.strip() + "\n" + textwrap.dedent(remainder)).strip()
+        cls.description = cls.description or (cls.help.strip().splitlines()[0] if cls.help else None)
 
-  def __init_subclass__(cls) -> None:
-    if not cls.help:
-      first_line, remainder = (cls.__doc__ or '').partition('\n')[::2]
-      cls.help = (first_line.strip() + '\n' + textwrap.dedent(remainder)).strip()
-    cls.description = cls.description or (cls.help.strip().splitlines()[0] if cls.help else None)
+        # TODO (@NiklasRosenstein): Implement automatic wrapping of description text, but we
+        #   need to ignore HTML tags that are used to colour the output.
 
-    # TODO (@NiklasRosenstein): Implement automatic wrapping of description text, but we
-    #   need to ignore HTML tags that are used to colour the output.
+        # argument: Argument
+        # for argument in cls.arguments:
+        #   print(argument)
+        #   argument._description = '\n'.join(textwrap.wrap(argument._description or '', 70))
 
-    # argument: Argument
-    # for argument in cls.arguments:
-    #   print(argument)
-    #   argument._description = '\n'.join(textwrap.wrap(argument._description or '', 70))
-
-    # option: Option
-    # for option in cls.options:
-    #   print(option)
-    #   option._description = '\n'.join(textwrap.wrap(option._description or '', 70))
+        # option: Option
+        # for option in cls.options:
+        #   print(option)
+        #   option._description = '\n'.join(textwrap.wrap(option._description or '', 70))
 
 
 class CleoApplication(BaseCleoApplication):
 
-  from cleo.formatters.style import Style  # type: ignore[import]
-  from cleo.io.inputs.input import Input  # type: ignore[import]
-  from cleo.io.outputs.output import Output  # type: ignore[import]
+    from cleo.formatters.style import Style  # type: ignore[import]
+    from cleo.io.inputs.input import Input  # type: ignore[import]
+    from cleo.io.outputs.output import Output  # type: ignore[import]
 
-  _styles: dict[str, Style]
+    _styles: dict[str, Style]
 
-  def __init__(self, init: t.Callable[[IO], t.Any], name: str = "console", version: str = "") -> None:
-    super().__init__(name, version)
-    self._init_callback = init
-    self._styles = {}
+    def __init__(self, init: t.Callable[[IO], t.Any], name: str = "console", version: str = "") -> None:
+        super().__init__(name, version)
+        self._init_callback = init
+        self._styles = {}
 
-    self._initialized = True
-    from slap.util.cleo import HelpCommand
-    self.add(HelpCommand())
-    self._default_command = 'help'
+        self._initialized = True
+        from slap.util.cleo import HelpCommand
 
-    self.add_style('code', 'dark_gray')
-    self.add_style('warning', 'magenta')
-    self.add_style('u', options=['underline'])
-    self.add_style('i', options=['italic'])
-    self.add_style('s', 'yellow')
-    self.add_style('opt', 'cyan', options=['italic'])
+        self.add(HelpCommand())
+        self._default_command = "help"
 
-  def add_style(self, name, fg=None, bg=None, options=None):
-    self._styles[name] = self.Style(fg, bg, options)
+        self.add_style("code", "dark_gray")
+        self.add_style("warning", "magenta")
+        self.add_style("u", options=["underline"])
+        self.add_style("i", options=["italic"])
+        self.add_style("s", "yellow")
+        self.add_style("opt", "cyan", options=["italic"])
 
-  def create_io(
-    self,
-    input: Input | None = None,
-    output: Output | None = None,
-    error_output: Output | None = None
-  ) -> IO:
-    from slap.util.cleo import add_style
+    def add_style(self, name, fg=None, bg=None, options=None):
+        self._styles[name] = self.Style(fg, bg, options)
 
-    io = super().create_io(input, output, error_output)
-    for style_name, style in self._styles.items():
-      add_style(io, style_name, style)
-    return io
+    def create_io(
+        self, input: Input | None = None, output: Output | None = None, error_output: Output | None = None
+    ) -> IO:
+        from slap.util.cleo import add_style
 
-  def render_error(self, error: Exception, io: IO) -> None:
-    import subprocess as sp
+        io = super().create_io(input, output, error_output)
+        for style_name, style in self._styles.items():
+            add_style(io, style_name, style)
+        return io
 
-    if isinstance(error, sp.CalledProcessError):
-      msg = 'Uncaught CalledProcessError raised for command <subj>%s</subj> (exit code: <val>%s</val>).'
-      args: tuple[t.Any, ...] = (error.args[1], error.returncode)
-      stdout: str | None = error.stdout.decode() if error.stdout else None
-      stderr: str | None = error.stderr.decode() if error.stderr else None
-      if stdout:
-        msg += '\n  stdout:\n<fg=black;attr=bold>%s</fg>'
-        stdout = textwrap.indent(stdout, '    ')
-        args += (stdout,)
-      if stderr:
-        msg += '\n  stderr:\n<fg=black;attr=bold>%s</fg>'
-        stderr = textwrap.indent(stderr, '    ')
-        args += (stderr,)
+    def render_error(self, error: Exception, io: IO) -> None:
+        import subprocess as sp
 
-      logger.error(msg, *args)
+        if isinstance(error, sp.CalledProcessError):
+            msg = "Uncaught CalledProcessError raised for command <subj>%s</subj> (exit code: <val>%s</val>)."
+            args: tuple[t.Any, ...] = (error.args[1], error.returncode)
+            stdout: str | None = error.stdout.decode() if error.stdout else None
+            stderr: str | None = error.stderr.decode() if error.stderr else None
+            if stdout:
+                msg += "\n  stdout:\n<fg=black;attr=bold>%s</fg>"
+                stdout = textwrap.indent(stdout, "    ")
+                args += (stdout,)
+            if stderr:
+                msg += "\n  stderr:\n<fg=black;attr=bold>%s</fg>"
+                stderr = textwrap.indent(stderr, "    ")
+                args += (stderr,)
 
-    return super().render_error(error, io)
+            logger.error(msg, *args)
 
-  def _configure_io(self, io: IO) -> None:
-    import logging
+        return super().render_error(error, io)
 
-    from nr.util.logging.formatters.terminal_colors import TerminalColorFormatter
+    def _configure_io(self, io: IO) -> None:
+        import logging
 
-    fmt = '<fg=bright black>%(message)s</fg>'
-    if io.input.has_parameter_option("-vvv"):
-      fmt = '<fg=bright black>%(asctime)s | %(levelname)s | %(name)s | %(message)s</fg>'
-      level = logging.DEBUG
-    elif io.input.has_parameter_option("-vv"):
-      level = logging.DEBUG
-    elif io.input.has_parameter_option("-v"):
-      level = logging.INFO
-    elif io.input.has_parameter_option("-q"):
-      level = logging.ERROR
-    elif io.input.has_parameter_option("-qq"):
-      level = logging.CRITICAL
-    else:
-      level = logging.WARNING
+        from nr.util.logging.formatters.terminal_colors import TerminalColorFormatter
 
-    logging.basicConfig(level=level)
-    formatter = TerminalColorFormatter(fmt)
-    assert formatter.styles
-    formatter.styles.add_style('subj', 'blue')
-    formatter.styles.add_style('obj', 'yellow')
-    formatter.styles.add_style('val', 'cyan')
-    formatter.install('tty')
-    formatter.install('notty')  # Hack for now to enable it also in CI
+        fmt = "<fg=bright black>%(message)s</fg>"
+        if io.input.has_parameter_option("-vvv"):
+            fmt = "<fg=bright black>%(asctime)s | %(levelname)s | %(name)s | %(message)s</fg>"
+            level = logging.DEBUG
+        elif io.input.has_parameter_option("-vv"):
+            level = logging.DEBUG
+        elif io.input.has_parameter_option("-v"):
+            level = logging.INFO
+        elif io.input.has_parameter_option("-q"):
+            level = logging.ERROR
+        elif io.input.has_parameter_option("-qq"):
+            level = logging.CRITICAL
+        else:
+            level = logging.WARNING
 
-    super()._configure_io(io)
-    self._init_callback(io)
+        logging.basicConfig(level=level)
+        formatter = TerminalColorFormatter(fmt)
+        assert formatter.styles
+        formatter.styles.add_style("subj", "blue")
+        formatter.styles.add_style("obj", "yellow")
+        formatter.styles.add_style("val", "cyan")
+        formatter.install("tty")
+        formatter.install("notty")  # Hack for now to enable it also in CI
 
-  def _run_command(self, command: Command, io: IO) -> int:
-    return super()._run_command(command, io)
+        super()._configure_io(io)
+        self._init_callback(io)
+
+    def _run_command(self, command: Command, io: IO) -> int:
+        return super()._run_command(command, io)
 
 
 @dataclasses.dataclass
 class ApplicationConfig:
-  #: A list of application plugins to _not_ activate.
-  disable: list[str] = dataclasses.field(default_factory=list)
+    #: A list of application plugins to _not_ activate.
+    disable: list[str] = dataclasses.field(default_factory=list)
 
-  #: A list of plugins to enable only, causing the default plugins to not be loaded.
-  enable_only: t.Annotated[list[str] | None, Alias('enable-only')] = None
+    #: A list of plugins to enable only, causing the default plugins to not be loaded.
+    enable_only: t.Annotated[list[str] | None, Alias("enable-only")] = None
 
 
 class Application:
-  """ The application object is the main hub for command-line interactions. It is responsible for managing the project
-  that is the main subject of the command-line invokation (or multiple of such), provide the #cleo command-line
-  application that #ApplicationPlugin#s can register commands to, etc. """
+    """The application object is the main hub for command-line interactions. It is responsible for managing the project
+    that is the main subject of the command-line invokation (or multiple of such), provide the #cleo command-line
+    application that #ApplicationPlugin#s can register commands to, etc."""
 
-  main_project: Once[Project | None]
+    main_project: Once[Project | None]
 
-  #: The application configuration loaded once via #get_application_configuration().
-  config: Once[ApplicationConfig]
+    #: The application configuration loaded once via #get_application_configuration().
+    config: Once[ApplicationConfig]
 
-  #: The cleo application to which new commands can be registered via #ApplicationPlugin#s.
-  cleo: CleoApplication
+    #: The cleo application to which new commands can be registered via #ApplicationPlugin#s.
+    cleo: CleoApplication
 
-  def __init__(self, directory: Path | None = None, name: str = 'slap', version: str = __version__) -> None:
-    from nr.util.functional import Once
-    self._directory = directory or Path.cwd()
-    self._repository: t.Optional[Repository] = None
-    self._plugins_loaded = False
-    self.config = Once(self._get_application_configuration)
-    self.cleo = CleoApplication(self._cleo_init, name, version)
-    self.main_project = Once(self._get_main_project)
+    def __init__(self, directory: Path | None = None, name: str = "slap", version: str = __version__) -> None:
+        from nr.util.functional import Once
 
-  @property
-  def repository(self) -> Repository:
-    """ Return the Slap repository that is the subject of the current application. There may be command plugins
-    that do not require the repository to function, so this property creates the repository lazily. """
+        self._directory = directory or Path.cwd()
+        self._repository: t.Optional[Repository] = None
+        self._plugins_loaded = False
+        self.config = Once(self._get_application_configuration)
+        self.cleo = CleoApplication(self._cleo_init, name, version)
+        self.main_project = Once(self._get_main_project)
 
-    from slap.repository import Repository
+    @property
+    def repository(self) -> Repository:
+        """Return the Slap repository that is the subject of the current application. There may be command plugins
+        that do not require the repository to function, so this property creates the repository lazily."""
 
-    if self._repository is None:
-      self._repository = Repository(self._directory)
+        from slap.repository import Repository
 
-    return self._repository
+        if self._repository is None:
+            self._repository = Repository(self._directory)
 
-  def _get_application_configuration(self) -> ApplicationConfig:
-    """ Loads the application-level configuration. """
+        return self._repository
 
-    from databind.core.settings import ExtraKeys
-    from databind.json import load
+    def _get_application_configuration(self) -> ApplicationConfig:
+        """Loads the application-level configuration."""
 
-    raw_config = self.repository.raw_config().get('application', {})
-    return load(raw_config, ApplicationConfig, settings=[ExtraKeys(True)])
+        from databind.core.settings import ExtraKeys
+        from databind.json import load
 
-  def _get_main_project(self) -> Project | None:
-    """ Returns the main project, which is the one that the current working directory is pointing to. """
+        raw_config = self.repository.raw_config().get("application", {})
+        return load(raw_config, ApplicationConfig, settings=[ExtraKeys(True)])
 
-    cwd = Path.cwd()
+    def _get_main_project(self) -> Project | None:
+        """Returns the main project, which is the one that the current working directory is pointing to."""
 
-    for project in self.repository.projects():
-      path = project.directory.resolve()
-      if path == cwd:
-        return project
+        cwd = Path.cwd()
 
-    return None
+        for project in self.repository.projects():
+            path = project.directory.resolve()
+            if path == cwd:
+                return project
 
-  def configurations(self) -> list[Configuration]:
-    """ Return a list of all configuration objects, i.e. all projects and eventually the #Repository, unless one
-    project is from the same directory as the repository. """
+        return None
 
-    result: list[Configuration] = list(self.repository.projects())
-    if self.repository.directory not in tuple(p.directory for p in self.repository.projects()):
-      result.insert(0, self.repository)
-    return result
+    def configurations(self) -> list[Configuration]:
+        """Return a list of all configuration objects, i.e. all projects and eventually the #Repository, unless one
+        project is from the same directory as the repository."""
 
-  def load_plugins(self) -> None:
-    """ Loads all application plugins (see #ApplicationPlugin) and activates them.
+        result: list[Configuration] = list(self.repository.projects())
+        if self.repository.directory not in tuple(p.directory for p in self.repository.projects()):
+            result.insert(0, self.repository)
+        return result
 
-    By default, all plugins available in the `slap.application.ApplicationPlugin` entry point group are loaded. This
-    behaviour can be modified by setting either the `[tool.slap.plugins.disable]` or `[tool.slap.plugins.enable]`
-    configuration option (without the `tool.slap` prefix in case of a `slap.toml` configuration file). The default
-    plugins delivered immediately with Slap are enabled by default unless disabled explicitly with the `disable`
-    option. """
+    def load_plugins(self) -> None:
+        """Loads all application plugins (see #ApplicationPlugin) and activates them.
 
-    from nr.util.plugins import iter_entrypoints
+        By default, all plugins available in the `slap.application.ApplicationPlugin` entry point group are loaded. This
+        behaviour can be modified by setting either the `[tool.slap.plugins.disable]` or `[tool.slap.plugins.enable]`
+        configuration option (without the `tool.slap` prefix in case of a `slap.toml` configuration file). The default
+        plugins delivered immediately with Slap are enabled by default unless disabled explicitly with the `disable`
+        option."""
 
-    from slap.plugins import ApplicationPlugin
+        from nr.util.plugins import iter_entrypoints
 
-    assert not self._plugins_loaded
-    self._plugins_loaded = True
+        from slap.plugins import ApplicationPlugin
 
-    config = self.config()
-    disable = config.disable or []
+        assert not self._plugins_loaded
+        self._plugins_loaded = True
 
-    logger.debug('Loading application plugins')
+        config = self.config()
+        disable = config.disable or []
 
-    for plugin_name, loader in iter_entrypoints(ApplicationPlugin):  # type: ignore[misc]
-      if plugin_name in disable: continue
-      try:
-        plugin = loader()()
-      except Exception:
-        logger.exception('Could not load plugin <subj>%s</subj> due to an exception', plugin_name)
-      else:
-        plugin_config = plugin.load_configuration(self)
-        plugin.activate(self, plugin_config)
+        logger.debug("Loading application plugins")
 
-  def _cleo_init(self, io: IO) -> None:
-    self.load_plugins()
+        for plugin_name, loader in iter_entrypoints(ApplicationPlugin):  # type: ignore[misc]
+            if plugin_name in disable:
+                continue
+            try:
+                plugin = loader()()
+            except Exception:
+                logger.exception("Could not load plugin <subj>%s</subj> due to an exception", plugin_name)
+            else:
+                plugin_config = plugin.load_configuration(self)
+                plugin.activate(self, plugin_config)
 
-  def run(self) -> None:
-    """ Loads and activates application plugins and then invokes the CLI. """
+    def _cleo_init(self, io: IO) -> None:
+        self.load_plugins()
 
-    self.cleo.run()
+    def run(self) -> None:
+        """Loads and activates application plugins and then invokes the CLI."""
+
+        self.cleo.run()
