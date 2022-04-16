@@ -984,7 +984,7 @@
 <div class="highlight"><pre><span></span><code><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
 <span class="k">class</span> <span class="nc">ChangelogValidationCheckPlugin</span><span class="p">(</span><span class="n">CheckPlugin</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/changelog.py#L12">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/changelog.py#L11">[view_source]</a></p>
 <p>This check plugin validates the structured changelog files, if any.</p>
 <p>Plugin ID: <code>changelog</code></p>
 <p><a id="slap.ext.checks.general.GeneralChecksPlugin"></a></p>
@@ -992,7 +992,7 @@
 <h2 id="class-generalchecksplugin">Class GeneralChecksPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralChecksPlugin</span><span class="p">(</span><span class="n">CheckPlugin</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/general.py#L9">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/general.py#L8">[view_source]</a></p>
 <p>This plugin provides general checks applicable to all types of projects managed with Slap.</p>
 <p>Plugin ID: <code>general</code>.</p>
 <p><a id="slap.ext.checks.poetry.PoetryChecksPlugin"></a></p>
@@ -1000,41 +1000,41 @@
 <h2 id="class-poetrychecksplugin">Class PoetryChecksPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PoetryChecksPlugin</span><span class="p">(</span><span class="n">CheckPlugin</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L30">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L29">[view_source]</a></p>
 <p>Check plugin to validate the Poetry configuration and compare it with Slap's expectations.</p>
 <p>Plugin ID: <code>poetry</code></p>
 <p><a id="slap.ext.checks.poetry.PoetryChecksPlugin.get_readme_check"></a></p>
 <p><a id="pydoc:slap.ext.checks.poetry.PoetryChecksPlugin.get_readme_check"></a></p>
 <h4 id="get_readme_check">get_readme_check</h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s1">&#39;readme&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s2">&quot;readme&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_readme_check</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckResult</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L46">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L47">[view_source]</a></p>
 <p>Checks if Poetry will be able to pick up the right readme file.</p>
 <p><a id="slap.ext.checks.poetry.PoetryChecksPlugin.get_urls_check"></a></p>
 <p><a id="pydoc:slap.ext.checks.poetry.PoetryChecksPlugin.get_urls_check"></a></p>
 <h4 id="get_urls_check">get_urls_check</h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s1">&#39;urls&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s2">&quot;urls&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_urls_check</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckResult</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L60">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L67">[view_source]</a></p>
 <p>Checks if URLs are configured in the Poetry configuration and recommends to configure the <code>Homepage</code>,
 <code>Repository</code>, <code>Documentation</code> and <code>Bug Tracker</code> URLs under <code>[tool.poetry.urls]</code>.</p>
 <p><a id="slap.ext.checks.poetry.PoetryChecksPlugin.get_classifiers_check"></a></p>
 <p><a id="pydoc:slap.ext.checks.poetry.PoetryChecksPlugin.get_classifiers_check"></a></p>
 <h4 id="get_classifiers_check">get_classifiers_check</h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s1">&#39;classifiers&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s2">&quot;classifiers&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_classifiers_check</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckResult</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L83">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L96">[view_source]</a></p>
 <p>Checks if all Python package classifiers are valid and recommends to configure them if none are set.</p>
 <p><a id="slap.ext.checks.poetry.PoetryChecksPlugin.get_license_check"></a></p>
 <p><a id="pydoc:slap.ext.checks.poetry.PoetryChecksPlugin.get_license_check"></a></p>
 <h4 id="get_license_check">get_license_check</h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s1">&#39;license&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s2">&quot;license&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_license_check</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckResult</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L103">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/poetry.py#L116">[view_source]</a></p>
 <p>Checks if package license is a valid SPDX license identifier and recommends to configure a license if
 none is set.</p>
 <p><a id="slap.ext.checks.release.ReleaseChecksPlugin"></a></p>
@@ -1042,25 +1042,25 @@ none is set.</p>
 <h2 id="class-releasechecksplugin">Class ReleaseChecksPlugin</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReleaseChecksPlugin</span><span class="p">(</span><span class="n">CheckPlugin</span><span class="p">)</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/release.py#L14">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/release.py#L13">[view_source]</a></p>
 <p>Performs some checks relevant for the <code>slap release</code> command.</p>
 <p><a id="slap.ext.checks.release.ReleaseChecksPlugin.check_packages_have_source_code_version"></a></p>
 <p><a id="pydoc:slap.ext.checks.release.ReleaseChecksPlugin.check_packages_have_source_code_version"></a></p>
 <h4 id="check_packages_have_source_code_version">check_packages_have_source_code_version</h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s1">&#39;source-code-version&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s2">&quot;source-code-version&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">check_packages_have_source_code_version</span><span class="p">(</span>
         <span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckResult</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/release.py#L24">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/release.py#L23">[view_source]</a></p>
 <p>Checks if all Python packages in the project have a version defined in the source code.</p>
 <p><a id="slap.ext.checks.release.ReleaseChecksPlugin.check_version_number_consistency"></a></p>
 <p><a id="pydoc:slap.ext.checks.release.ReleaseChecksPlugin.check_version_number_consistency"></a></p>
 <h4 id="check_version_number_consistency">check_version_number_consistency</h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s1">&#39;consistent-versions&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@check</span><span class="p">(</span><span class="s2">&quot;consistent-versions&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">check_version_number_consistency</span><span class="p">(</span>
         <span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CheckResult</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/release.py#L48">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/checks/release.py#L47">[view_source]</a></p>
 <p>Checks if the version numbers in the project source code, project configuration and any other instances
 that are detected by release plugins or in the <code>[tool.slap.release].references</code> option are consistent.</p>
 

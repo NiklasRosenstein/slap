@@ -1034,6 +1034,7 @@ Project &quot;.&quot; (id: slap-cli)
       - &#39;tqdm &gt;=4.64.0,&lt;5.0.0&#39;
       - &#39;twine &gt;=3.7.0,&lt;4.0.0&#39;
     dev:
+      - &#39;black &gt;=22.3.0,&lt;23.0.0&#39;
       - &#39;isort &gt;=5.10.1,&lt;6.0.0&#39;
       - &#39;mypy &gt;=0.931,&lt;0.932&#39;
       - &#39;pytest &gt;=7.1.1,&lt;8.0.0&#39;
@@ -1103,7 +1104,9 @@ test commands like the below example to your project configuration.</p>
 </code></pre></div>
 <details><summary><code>slap test</code> for Slap's project</summary>
 
-<div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>check| Global checks:
+<div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>black| All done! ✨ 🍰 ✨
+black| 51 files would be left unchanged.
+check| Global checks:
 check|   release:consistent-versions  OK             — All version references are equal
 check| 
 check| Checks for project slam-cli
@@ -1146,9 +1149,10 @@ pytest| tests/slap/python/test_dependency.py::test__PypiDependency__parse PASSED
 pytest| tests/slap/python/test_environment.py::test__PythonEnvironment__with_current_python_instance PASSED [ 93%]
 pytest| tests/slap/python/test_pep508.py::test__Pep508Environment__sample_markers PASSED [100%]
 pytest| 
-pytest| ======================== 14 passed, 1 skipped in 0.58s =========================
+pytest| ======================== 14 passed, 1 skipped in 0.46s =========================
 
 test summary:
+  • black (exit code: 0)
   • check (exit code: 0)
   • isort (exit code: 0)
   • mypy (exit code: 0)
@@ -1228,7 +1232,7 @@ To create a new release, pass the version number or a rule name instead.
   pyproject.toml:       1.6.0 → 1.6.1 # &#39;version = &quot;1.6.0&quot;&#39;
   slam-cli/setup.cfg:   1.6.0 → 1.6.1 # &#39;version = 1.6.0&#39;
                         1.6.0 → 1.6.1 # &#39;install_requires =\n    slap-cli == 1.6.0&#39;
-  src/slap/__init__.py: 1.6.0 → 1.6.1 # &quot;__version__ = &#39;1.6.0&#39;&quot;
+  src/slap/__init__.py: 1.6.0 → 1.6.1 # &#39;__version__ = &quot;1.6.0&quot;&#39;
 
 
 tagging 1.6.1
@@ -1245,7 +1249,7 @@ pushing develop, 1.6.1 to origin
   pyproject.toml:       1.6.0 # &#39;version = &quot;1.6.0&quot;&#39;
   slam-cli/setup.cfg:   1.6.0 # &#39;version = 1.6.0&#39;
                         1.6.0 # &#39;install_requires =\n    slap-cli == 1.6.0&#39;
-  src/slap/__init__.py: 1.6.0 # &quot;__version__ = &#39;1.6.0&#39;&quot;
+  src/slap/__init__.py: 1.6.0 # &#39;__version__ = &quot;1.6.0&quot;&#39;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
