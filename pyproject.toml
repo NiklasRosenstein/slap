@@ -109,12 +109,13 @@ typed = true
 mypy = "mypy src --namespace-packages"
 pytest = "pytest tests/ -vv"
 check = "slap check"
-isort = "isort src/ --check-only"
+isort = "isort src/ tests/ --check-only"
+black = "black src/ tests/ --check"
 
 [tool.slap.run]
 "docs:build" = "cd docs && novella --base-url slap/"
 "docs:dev" = "cd docs && novella --serve"
-isort = "isort src/"
+fmt = "isort src/ tests/ && black src/ tests"
 
 [tool.slap.install]
 dev-extras = []
@@ -127,6 +128,9 @@ warn_no_return = true
 warn_unreachable = true
 show_error_context = true
 show_error_codes = true
+
+[tool.black]
+line-length = 120
 
 [tool.isort]
 profile = "black"
