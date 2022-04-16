@@ -366,7 +366,7 @@ class VenvCommand(Command):
         else:
           self.line_error(f'error: no active environment', 'error')
         return 1
-      print(venv.directory)
+      print(venv.directory.absolute())
 
     return 0
 
