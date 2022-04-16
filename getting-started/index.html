@@ -908,7 +908,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
@@ -1146,7 +1146,7 @@ pytest| tests/slap/python/test_dependency.py::test__PypiDependency__parse PASSED
 pytest| tests/slap/python/test_environment.py::test__PythonEnvironment__with_current_python_instance PASSED [ 93%]
 pytest| tests/slap/python/test_pep508.py::test__Pep508Environment__sample_markers PASSED [100%]
 pytest| 
-pytest| ======================== 14 passed, 1 skipped in 0.46s =========================
+pytest| ======================== 14 passed, 1 skipped in 0.58s =========================
 
 test summary:
   • check (exit code: 0)
@@ -1224,15 +1224,16 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>    $ cd .. &amp;&amp; slap release --dry --tag --push patch --no-branch-check --no-worktree-check 2&gt;/dev/null  # exited with return code 1
-    bumping 4 version references to 1.6.1
-      pyproject.toml:       1.6.0 → 1.6.1 # &#39;version = &quot;1.6.0&quot;&#39;
-      slam-cli/setup.cfg:   1.6.0 → 1.6.1 # &#39;version = 1.6.0&#39;
-                            1.6.0 → 1.6.1 # &#39;install_requires =\n    slap-cli == 1.6.0&#39;
-      src/slap/__init__.py: 1.6.0 → 1.6.1 # &quot;__version__ = &#39;1.6.0&#39;&quot;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 4 version references to 1.6.1
+  pyproject.toml:       1.6.0 → 1.6.1 # &#39;version = &quot;1.6.0&quot;&#39;
+  slam-cli/setup.cfg:   1.6.0 → 1.6.1 # &#39;version = 1.6.0&#39;
+                        1.6.0 → 1.6.1 # &#39;install_requires =\n    slap-cli == 1.6.0&#39;
+  src/slap/__init__.py: 1.6.0 → 1.6.1 # &quot;__version__ = &#39;1.6.0&#39;&quot;
 
 
-    tagging 1.6.1
+tagging 1.6.1
+
+pushing develop, 1.6.1 to origin
 </code></pre></div>
 
 </details>
