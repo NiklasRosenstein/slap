@@ -43,5 +43,11 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
   def handle(self) -> int:
     command: list[str] = self.argument("args")
     if command[0] in self.config:
-      command = shlex.split(self.config[command[0]]) + command[1:]
-    return sp.call(' '.join(map(shlex.quote, command)), shell=True)
+      command_string = self.config[command[0]] + ' ' + _join_args(command[1:])
+    else:
+      command_string = _join_args(command)
+    return sp.call(command_string, shell=True)
+
+
+def _join_args(args: list[str]) -> str:
+  return ' '.join(map(shlex.quote, args))
