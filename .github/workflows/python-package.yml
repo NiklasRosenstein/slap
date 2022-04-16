@@ -47,7 +47,12 @@ jobs:
     # are (or were at the time of writing this) incompatible.
     - run: slap venv -sc docs && slap install --only-extras docs
     - run: slap venv -sc runtime && slap install
-    - run: PATH="$PATH:$(slap venv -p docs)/bin" slap run docs:build
+    - run: |
+        export PATH="$PATH:$(slap venv -p docs)/bin"
+        echo
+        echo "current PATH: $PATH"
+        echo
+        slap run docs:build
     - uses: actions/upload-artifact@v2
       with: { name: docs, path: docs/_site }
 
