@@ -1,5 +1,6 @@
 
 import os
+import logging
 import shutil
 import string
 import subprocess as sp
@@ -9,6 +10,8 @@ from pathlib import Path
 from slap.application import Application, Command, argument, option
 from slap.ext.application.install import get_active_python_bin
 from slap.plugins import ApplicationPlugin
+
+logger = logging.getLogger(__name__)
 
 GLOBAL_BIN_DIRECTORY = Path('~/.local/bin').expanduser()
 GLOBAL_VENVS_DIRECTORY = Path('~/.local/venvs').expanduser()\
@@ -69,6 +72,12 @@ class Venv:
 
   def get_python_version(self) -> str:
     return sp.check_output([self.get_bin('python'), '-c', 'import sys; print(sys.version)']).decode().strip()
+
+  def activate(self) -> None:
+    """ Activate the environment by updating the current `PATH` environment variable. """
+
+    logger.info('Activating virtual envrionment "%s"', self.directory)
+    os.environ['PATH'] = str(self.get_bin_directory()) + os.pathsep + os.environ['PATH']
 
 
 class VenvManager:
@@ -316,7 +325,7 @@ class VenvCommand(Command):
     if self.option("path"):
       venv = venv or manager.get_last_activated()
       if not venv or not venv.exists():
-        if self.argument("name"):
+        if venv and self.argument("name"):
           self.line_error(f'error: environment <b>{venv.name}</b> does not exist', 'error')
         else:
           self.line_error(f'error: no active environment', 'error')

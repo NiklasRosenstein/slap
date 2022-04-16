@@ -2,6 +2,7 @@
 import subprocess as sp
 from slap.application import Application, Command, argument
 from slap.plugins import ApplicationPlugin
+from slap.ext.application.venv import VenvManager
 
 
 class RunCommandPlugin(Command, ApplicationPlugin):
@@ -25,6 +26,9 @@ class RunCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
+    venv = VenvManager().get_last_activated()
+    if venv:
+      venv.activate()
     command = self.argument("cmd")
     if command not in self.config:
       self.line_error(f'error: command \"{command}\" does not exist', 'error')

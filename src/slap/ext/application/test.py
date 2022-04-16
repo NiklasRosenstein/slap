@@ -9,6 +9,7 @@ from nr.util.singleton import NotSet
 from slap.application import Application, Command, IO, argument, option
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
+from slap.ext.application.venv import VenvManager
 
 logger = logging.getLogger(__name__)
 
@@ -148,6 +149,10 @@ class TestCommandPlugin(Command, ApplicationPlugin):
     return result
 
   def handle(self) -> int:
+    venv = VenvManager().get_last_activated()
+    if venv:
+      venv.activate()
+
     if self.option("list"):
       if self.argument("test"):
         self.line_error('error: incompatible arguments (<opt>test</opt> and <opt>-l,--list</opt>)', 'error')

@@ -3,3 +3,9 @@ id = "6ac10f2d-25b1-4193-8007-c9c695fe54ab"
 type = "feature"
 description = "add `-p,--path` option to `slap venv` command, note that `-p` was repurposed from `--python` and the option no longer has a short form"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "efa1e01f-ea4d-4e0c-b7b3-05c60617c629"
+type = "improvement"
+description = "`slap test` and `slap run` commands now activate the active virtual environment if any before running the commands"
+author = "@NiklasRosenstein"
