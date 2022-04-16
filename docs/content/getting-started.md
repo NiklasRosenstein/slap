@@ -235,7 +235,8 @@ To create a new release, pass the version number or a rule name instead.
 ## 11. Publish to PyPI
 
 The [`publish`](commands/publish.md) command builds distributions using your configured build backend and publishes
-them to a Python package index using [Twine][].
+them to a Python package index using [Twine][]. For mono repositories, the command will build all projects before
+publishing them.
 
   [Twine]: https://readthedocs.org/projects/twine/
 
@@ -243,8 +244,6 @@ them to a Python package index using [Twine][].
 Build slap-cli
   slap-cli-1.4.0.tar.gz
   slap_cli-1.4.0-py3-none-any.whl
-Build slam-cli
-  slam_cli-1.4.0-py3-none-any.whl
 Publishing
 ```
 
