@@ -352,6 +352,7 @@ class VenvCommand(Command):
         self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', 'error')
         return 1
       manager.set_last_activated(venv.name)
+      self.line_error(f'setting environment <s>"{venv.name}"</s> as active', 'info')
 
     if self.option("path"):
       venv = venv or manager.get_last_activated()
