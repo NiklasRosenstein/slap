@@ -794,8 +794,9 @@ Options:
   -c, --create               Create the environment with the given environment name.
   -d, --delete               Delete the environment with the given environment name.
   -l, --list                 List the available environments.
+  -p, --path                 Print the path of the specified or the current venv. Exit with status code 1 and no output if the environment does not exist or there is no current environment.
   -i, --init-code=INIT-CODE  Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash
-  -p, --python=PYTHON        The Python executable to use to create the virtual environment. If this is not specified, it defaults to python + the environment name if the environment name looks like a version number (contains numbers and dots). Otehrwise, it defaults to python3.
+      --python=PYTHON        The Python executable to use to create the virtual environment. If this is not specified, it defaults to python + the environment name if the environment name looks like a version number (contains numbers and dots). Otehrwise, it defaults to python3.
   -h, --help                 Display help for the given command. When no command is given display help for the help command.
   -q, --quiet                Do not output any message.
   -V, --version              Display this application version.

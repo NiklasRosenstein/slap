@@ -1057,7 +1057,7 @@ Checks for project slam-cli
 
 Checks for project slap-cli
 
-  changelog:validate           OK             — All 91 changelogs are valid.
+  changelog:validate           OK             — All 92 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1097,7 +1097,7 @@ test commands like the below example to your project configuration.</p>
     check| 
     check| Checks for project slap-cli
     check| 
-    check|   changelog:validate           OK             — All 91 changelogs are valid.
+    check|   changelog:validate           OK             — All 92 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1191,6 +1191,8 @@ To create a new release, pass the version number or a rule name instead.
                         1.5.4 → 1.5.5 # &#39;install_requires =\n    slap-cli == 1.5.4&#39;
   src/slap/__init__.py: 1.5.4 → 1.5.5 # &quot;__version__ = &#39;1.5.4&#39;&quot;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.5.5.toml
 
 tagging 1.5.5
 
