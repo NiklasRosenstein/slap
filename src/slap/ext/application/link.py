@@ -148,8 +148,11 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
                 fp.close()
                 project.pyproject_toml.value(config)
                 project.pyproject_toml.save()
+                python = shutil.which(get_active_python_bin(self))
+                if not python:
+                    raise Exception(f"Could not find Python executable from {get_active_python_bin(self)!r}")
                 installer = Installer.from_ini_path(
-                    project.pyproject_toml.path, python=shutil.which(get_active_python_bin(self)), symlink=True
+                    project.pyproject_toml.path, python=str(Path(python).absolute()), symlink=True
                 )
                 self.line(f"symlinking <info>{dist_name}</info>")
                 installer.install()

@@ -1,0 +1,5 @@
+[[entries]]
+id = "698d0f0d-272a-4f8e-a6e8-0803a0719e3d"
+type = "fix"
+description = "Fix `slap link` to produce absolute paths in the shebang for generated scripts by supplying an absolute path to the Python interpreter to the Flit installer"
+author = "@NiklasRosenstein"
