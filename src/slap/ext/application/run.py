@@ -6,11 +6,11 @@ import subprocess as sp
 import typing as t
 
 from slap.application import Application, Command, argument
-from slap.ext.application.venv import VenvManager
+from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 
 
-class RunCommandPlugin(Command, ApplicationPlugin):
+class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
   """ Run a command in the current active environment. If the command name is an alias
   configured in <code>[tool.slap.run]</code>, run it instead.
 
@@ -41,9 +41,6 @@ class RunCommandPlugin(Command, ApplicationPlugin):
     app.cleo.add(self)
 
   def handle(self) -> int:
-    venv = VenvManager().get_last_activated()
-    if venv:
-      venv.activate()
     command: list[str] = self.argument("args")
     if command[0] in self.config:
       command = shlex.split(self.config[command[0]]) + command[1:]

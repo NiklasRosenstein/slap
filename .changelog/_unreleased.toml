@@ -21,3 +21,9 @@ id = "dfdc1851-cc98-449c-86f1-c8ccf8884397"
 type = "improvement"
 description = "The `slap run` command can now run arbitrary commands, but falls back to the ones aliased on the configuration on a match."
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "950fa9c2-f999-4a94-8050-4329035f21b8"
+type = "improvement"
+description = "Add `VenvAwareCommand` and use it in `add`, `install`, `link`, `report`, `run` and `test`"
+author = "@NiklasRosenstein"

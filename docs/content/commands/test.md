@@ -4,6 +4,9 @@ Runs some or all of the tests from the Slap configuration. This is different fro
 default it runs multiple commands, prefixes the output them with the test name (similar to `docker-compose logs`),
 works across multiple projects in a mono-repository and prints a summary of the results at the end.
 
+If there is an active virtual environment and you are not already in a virtual environment, it will be activated
+before the test commands are run.
+
 <details><summary>Synopsis</summary>
 ```
 @shell slap test --help

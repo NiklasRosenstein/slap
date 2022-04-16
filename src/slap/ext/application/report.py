@@ -7,7 +7,8 @@ import typing as t
 
 import pkg_resources
 
-from slap.application import Application, Command, option
+from slap.application import Application, option
+from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 
 if t.TYPE_CHECKING:
@@ -16,7 +17,7 @@ if t.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class ReportDependenciesCommand(Command):
+class ReportDependenciesCommand(VenvAwareCommand):
   """ Reports the installed run dependencies of your current project(s) as JSON. """
 
   name = 'report dependencies'

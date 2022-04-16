@@ -12,6 +12,7 @@ from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, option
 from slap.configuration import Configuration
+from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
 
@@ -38,15 +39,9 @@ def get_active_python_bin(cmd: Command) -> str:
   if hasattr(cmd, '_python_bin'):
     return cmd._python_bin  # type: ignore
 
-  from slap.ext.application.venv import VenvManager
-
   python = cmd.option("python")
   if not python:
     python = os.getenv('PYTHON')
-    if not python:
-      manager = VenvManager()
-      env = manager.get_last_activated()
-      python = str(env.get_bin('python').absolute()) if env else None
 
   python = python or 'python'
   cmd._python_bin = python
@@ -80,7 +75,7 @@ class InstallConfig:
   dev_extras: t.Annotated[list[str] | None, Alias('dev-extras')] = None
 
 
-class InstallCommandPlugin(Command, ApplicationPlugin):
+class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
   """ Install your project and its dependencies via Pip. """
 
   app: Application

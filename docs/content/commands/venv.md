@@ -2,7 +2,11 @@
 
 The `slap venv` command is a utility for managing virtual environments created using the standard library `venv`
 module in the current directory or globally (in `~/.local/venvs`).
-s across multiple projects in a mono-repository and prints a summary of the results at the end.
+
+Slap keeps track of an "active" environment that is used activated by default by commands such as `slap install`,
+`slap link`, `slap run` and `slap test` before they perform their regular duties. This allows you to not have to
+actually activate a virtual environment while still operating within it while using Slap commands (similar to
+`poetry run`, etc.).
 
 <details><summary>Synopsis <code>venv</code></summary>
 ```

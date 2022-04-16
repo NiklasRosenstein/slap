@@ -7,7 +7,7 @@ from pathlib import Path
 from nr.util.singleton import NotSet
 
 from slap.application import IO, Application, Command, argument, option
-from slap.ext.application.venv import VenvManager
+from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
 
@@ -150,10 +150,6 @@ class TestCommandPlugin(Command, ApplicationPlugin):
     return result
 
   def handle(self) -> int:
-    venv = VenvManager().get_last_activated()
-    if venv:
-      venv.activate()
-
     if self.option("list"):
       if self.argument("test"):
         self.line_error('error: incompatible arguments (<opt>test</opt> and <opt>-l,--list</opt>)', 'error')

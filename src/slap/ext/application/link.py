@@ -5,13 +5,14 @@ import textwrap
 import typing as t
 from pathlib import Path
 
-from slap.application import Application, Command, option
+from slap.application import Application, option
+from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 
 from .install import get_active_python_bin, python_option, venv_check, venv_check_option
 
 
-class LinkCommandPlugin(Command, ApplicationPlugin):
+class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
   """
   Symlink your Python package with the help of Flit.
 

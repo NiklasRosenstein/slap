@@ -1,6 +1,9 @@
 # `slap run`
 
-Runs one of the commands from the Slap configuration. This is similar to `npm run` and `yarn run` for JavaScript projects.
+Runs a command, using the commands configured under the `[tool.slap.run]` section as a source for aliases.
+
+If there is an active virtual environment and you are not already in a virtual environment, it will be activated
+before the command is run.
 
 <details><summary>Synopsis</summary>
 ```

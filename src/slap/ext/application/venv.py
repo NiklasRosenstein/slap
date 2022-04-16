@@ -7,8 +7,7 @@ import subprocess as sp
 import typing as t
 from pathlib import Path
 
-from slap.application import Application, Command, argument, option
-from slap.ext.application.install import get_active_python_bin
+from slap.application import IO, Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
 
 logger = logging.getLogger(__name__)
@@ -113,6 +112,21 @@ class VenvManager:
     state = self._get_state()
     state['last_active_environment'] = venv_name
     self._set_state(state)
+
+
+class VenvAwareCommand(Command):
+  """ Base class for commands that should be aware of the active local virtual environment. Before the
+  command is executed, it will check if we're currently in a virtual environment. If not, it will activate
+  the environment that is considered "active" by the Slap `venv` command. """
+
+  def execute(self, io: IO) -> int:
+    if not os.getenv('VIRTUAL_ENV'):
+      manager = VenvManager()
+      venv = manager.get_last_activated()
+      if venv:
+        venv.activate()
+
+    return super().execute(io)
 
 
 class VenvCommand(Command):
@@ -225,6 +239,8 @@ class VenvCommand(Command):
     return True
 
   def _get_python_bin(self) -> str:
+    from slap.ext.application.install import get_active_python_bin
+
     python = get_active_python_bin(self)
     name = self.argument("name")
     if name and not python and set(name).issubset(string.digits + '.'):

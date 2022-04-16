@@ -1,15 +1,16 @@
 
 import logging
 
-from slap.application import Application, Command, argument, option
+from slap.application import Application, argument, option
 from slap.ext.application.install import get_active_python_bin, python_option, venv_check, venv_check_option
+from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.python.dependency import PypiDependency, VersionSpec
 
 logger = logging.getLogger(__name__)
 
 
-class AddCommandPlugin(Command, ApplicationPlugin):
+class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
   """ Add one or more dependencies to a project. """
 
   app: Application
