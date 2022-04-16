@@ -1,5 +1,7 @@
 # `slap add`
 
+> This command is venv aware.
+
 This command adds one or more Python packages to the dependencies defined in `pyproject.toml`. If the packages
 are not already installed, they will be installed into the current Python environment using Pip.
 

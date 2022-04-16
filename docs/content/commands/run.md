@@ -1,5 +1,7 @@
 # `slap run`
 
+> This command is venv aware.
+
 Runs a command, using the commands configured under the `[tool.slap.run]` section as a source for aliases.
 
 If there is an active virtual environment and you are not already in a virtual environment, it will be activated

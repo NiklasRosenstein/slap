@@ -3,6 +3,8 @@
   [Flit]: https://flit.readthedocs.io/en/latest/
   [Poetry]: https://python-poetry.org/
 
+> This command is venv aware.
+
 Symlink your project or all projects in a mono-repository into the current Python environment. This works for [Poetry][]
 projects as well.
 

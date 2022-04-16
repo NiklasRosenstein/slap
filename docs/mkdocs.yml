@@ -13,6 +13,7 @@ nav:
     - slap link: commands/link.md
     - slap publish: commands/publish.md
     - slap release: commands/release.md
+    - slap report: commands/report.md
     - slap run: commands/run.md
     - slap test: commands/test.md
     - slap venv: commands/venv.md

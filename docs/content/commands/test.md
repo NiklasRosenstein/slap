@@ -1,5 +1,7 @@
 # `slap test`
 
+> This command is venv aware.
+
 Runs some or all of the tests from the Slap configuration. This is different from [`slap run`](run.md) in that by
 default it runs multiple commands, prefixes the output them with the test name (similar to `docker-compose logs`),
 works across multiple projects in a mono-repository and prints a summary of the results at the end.
