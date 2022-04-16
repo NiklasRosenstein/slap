@@ -110,7 +110,7 @@ mypy = "mypy src --namespace-packages"
 pytest = "pytest tests/ -vv"
 check = "slap check"
 isort = "isort src/ tests/ --check-only"
-black = "black src/ tests/ --check"
+# black = "black src/ tests/ --check"
 
 [tool.slap.run]
 "docs:build" = "cd docs && novella --base-url slap/"

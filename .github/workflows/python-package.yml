@@ -42,8 +42,12 @@ jobs:
       if: github.event_name == 'pull_request'
     - uses: actions/setup-python@v2
       with: { python-version: "3.10" }
-    - run: python -m pip install pipx -q && pipx install . && slap install --extras docs --no-venv-check -vv
-    - run: slap run docs:build
+    - run: python -m pip install pipx -q && pipx install .
+    # We need to configure separate virtual environments for runtime and docs because they could
+    # are (or were at the time of writing this) incompatible.
+    - run: slap venv -sc docs && slap install --only-extras docs
+    - run: slap venv -sc runtime && slap install
+    - run: PATH="$PATH:$(slap venv -p docs/bin)" slap run docs:build
     - uses: actions/upload-artifact@v2
       with: { name: docs, path: docs/_site }
 
