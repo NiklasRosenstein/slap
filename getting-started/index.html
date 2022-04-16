@@ -1103,214 +1103,56 @@ test commands like the below example to your project configuration.</p>
 </code></pre></div>
 <details><summary><code>slap test</code> for Slap's project</summary>
 
-<div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>    $ cd .. &amp;&amp; slap test  # exited with return code 1
-    check| Global checks:
-    check|   release:consistent-versions  OK             — All version references are equal
-    check| 
-    check| Checks for project slam-cli
-    check| 
-    check|   general:typed                WARNING        — tool.slap.typed is not set
-    check|   release:source-code-version  WARNING        — No packages detected
-    check| 
-    check| Checks for project slap-cli
-    check| 
-    check|   changelog:validate           OK             — All 92 changelogs are valid.
-    check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
-    check|   general:typed                OK             — py.typed exists as expected
-    check|   poetry:classifiers           OK             — All classifiers are valid.
-    check|   poetry:license               OK             — License &quot;MIT&quot; is a valid SPDX identifier.
-    check|   poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
-    check|   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
-    check|   release:source-code-version  OK             — Found __version__ in slap
-    check| 
-    check| Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
-    mypy| src/slap/util/external/licenses.py:16: error: Cannot find implementation or
-    mypy| library stub for module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Alias
-    mypy|     ^
-    mypy| src/slap/util/external/licenses.py:90: error: Cannot find implementation or
-    mypy| library stub for module named &quot;databind.core.schema&quot;  [import]
-    mypy|       from databind.core.schema import convert_dataclass_to_schema
-    mypy|     ^
-    mypy| src/slap/changelog.py:12: error: Cannot find implementation or library stub for
-    mypy| module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Alias
-    mypy|     ^
-    mypy| src/slap/changelog.py: note: In member &quot;dump&quot; of class &quot;TomlChangelogDeser&quot;:
-    mypy| src/slap/changelog.py:76: error: Unexpected keyword argument &quot;settings&quot; for
-    mypy| &quot;dump&quot;  [call-arg]
-    mypy|         data = databind.json.dump(changelog, Changelog, settings=[Serializ...
-    mypy|                ^
-    mypy| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/databind/json/__init__.py:108: note: &quot;dump&quot; defined here
-    mypy| src/slap/changelog.py: note: In member &quot;dump_entry&quot; of class &quot;TomlChangelogDeser&quot;:
-    mypy| src/slap/changelog.py:83: error: Unexpected keyword argument &quot;settings&quot; for
-    mypy| &quot;dump&quot;  [call-arg]
-    mypy|         return tomli_w.dumps(t.cast(dict, databind.json.dump(entry, Change...
-    mypy|                                           ^
-    mypy| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/databind/json/__init__.py:108: note: &quot;dump&quot; defined here
-    mypy| src/slap/project.py:9: error: Cannot find implementation or library stub for
-    mypy| module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Alias
-    mypy|     ^
-    mypy| src/slap/project.py: note: In member &quot;_get_project_configuration&quot; of class &quot;Project&quot;:
-    mypy| src/slap/project.py:102: error: Unexpected keyword argument &quot;settings&quot; for
-    mypy| &quot;load&quot;  [call-arg]
-    mypy|         return load(self.raw_config(), ProjectConfig, settings=[ExtraKeys(...
-    mypy|                ^
-    mypy| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/databind/json/__init__.py:81: note: &quot;load&quot; defined here
-    mypy| src/slap/repository.py:9: error: Cannot find implementation or library stub for
-    mypy| module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Union
-    mypy|     ^
-    mypy| src/slap/ext/repository_handlers/default.py:5: error: Cannot find
-    mypy| implementation or library stub for module named &quot;databind.core.settings&quot;
-    mypy| [import]
-    mypy|     from databind.core.settings import Alias
-    mypy|     ^
-    mypy| src/slap/application.py:19: error: Cannot find implementation or library stub
-    mypy| for module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Alias
-    mypy|     ^
-    mypy| src/slap/application.py: note: In member &quot;_get_application_configuration&quot; of class &quot;Application&quot;:
-    mypy| src/slap/application.py:205: error: Unexpected keyword argument &quot;settings&quot; for
-    mypy| &quot;load&quot;  [call-arg]
-    mypy|         return load(raw_config, ApplicationConfig, settings=[ExtraKeys(Tru...
-    mypy|                ^
-    mypy| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/databind/json/__init__.py:81: note: &quot;load&quot; defined here
-    mypy| src/slap/ext/project_handlers/base.py:113: error: Cannot find implementation or
-    mypy| library stub for module named &quot;tomlkit&quot;  [import]
-    mypy|         import tomlkit
-    mypy|     ^
-    mypy| src/slap/ext/project_handlers/base.py:114: error: Cannot find implementation or
-    mypy| library stub for module named &quot;tomlkit.container&quot;  [import]
-    mypy|         import tomlkit.container
-    mypy|     ^
-    mypy| src/slap/ext/project_handlers/base.py:115: error: Cannot find implementation or
-    mypy| library stub for module named &quot;tomlkit.items&quot;  [import]
-    mypy|         import tomlkit.items
-    mypy|     ^
-    mypy| src/slap/ext/application/release.py:10: error: Cannot find implementation or
-    mypy| library stub for module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Alias, ExtraKeys, Remainder
-    mypy|     ^
-    mypy| src/slap/ext/application/publish.py:55: error: Cannot find implementation or
-    mypy| library stub for module named &quot;twine.commands.upload&quot;  [import]
-    mypy|         from twine.commands.upload import upload
-    mypy|     ^
-    mypy| src/slap/ext/application/publish.py:56: error: Cannot find implementation or
-    mypy| library stub for module named &quot;twine.settings&quot;  [import]
-    mypy|         from twine.settings import Settings
-    mypy|     ^
-    mypy| src/slap/ext/application/install.py:11: error: Cannot find implementation or
-    mypy| library stub for module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Alias, ExtraKeys
-    mypy|     ^
-    mypy| src/slap/ext/application/changelog.py:9: error: Cannot find implementation or
-    mypy| library stub for module named &quot;databind.core.settings&quot;  [import]
-    mypy|     from databind.core.settings import Alias, ExtraKeys
-    mypy|     ^
-    mypy| src/slap/ext/application/changelog.py:9: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
-    mypy| src/slap/ext/project_handlers/poetry.py:97: error: Cannot find implementation
-    mypy| or library stub for module named &quot;tomlkit.api&quot;  [import]
-    mypy|       import tomlkit.api
-    mypy|     ^
-    mypy| src/slap/ext/project_handlers/poetry.py:97: error: Cannot find implementation
-    mypy| or library stub for module named &quot;tomlkit&quot;  [import]
-    mypy|       import tomlkit.api
-    mypy|     ^
-    mypy| src/slap/ext/checks/changelog.py:23: error: Cannot find implementation or
-    mypy| library stub for module named &quot;databind.core.converter&quot;  [import]
-    mypy|         from databind.core.converter import ConversionError
-    mypy|     ^
-    mypy| Found 22 errors in 13 files (checked 48 source files)
-    pytest| ============================= test session starts ==============================
-    pytest| platform linux -- Python 3.10.4, pytest-7.1.1, pluggy-1.0.0 -- /opt/hostedtoolcache/Python/3.10.4/x64/bin/python
-    pytest| cachedir: .pytest_cache
-    pytest| rootdir: /home/runner/work/slap/slap
-    pytest| collecting ... collected 0 items / 3 errors
-    pytest| 
-    pytest| ==================================== ERRORS ====================================
-    pytest| ____________ ERROR collecting tests/slap/python/test_dependency.py _____________
-    pytest| ImportError while importing test module &#39;/home/runner/work/slap/slap/tests/slap/python/test_dependency.py&#39;.
-    pytest| Hint: make sure your test modules/packages have valid Python names.
-    pytest| Traceback:
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/python.py:608: in _importtestmodule
-    pytest|     mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/pathlib.py:533: in import_path
-    pytest|     importlib.import_module(module_name)
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/importlib/__init__.py:126: in import_module
-    pytest|     return _bootstrap._gcd_import(name[level:], package, level)
-    pytest| &lt;frozen importlib._bootstrap&gt;:1050: in _gcd_import
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:1027: in _find_and_load
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:1006: in _find_and_load_unlocked
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:688: in _load_unlocked
-    pytest|     ???
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:168: in exec_module
-    pytest|     exec(co, module.__dict__)
-    pytest| tests/slap/python/test_dependency.py:5: in &lt;module&gt;
-    pytest|     from slap.python.dependency import GitDependency, MultiDependency, PathDependency, PypiDependency, UrlDependency, VersionSpec
-    pytest| E   ModuleNotFoundError: No module named &#39;slap&#39;
-    pytest| ____________ ERROR collecting tests/slap/python/test_environment.py ____________
-    pytest| ImportError while importing test module &#39;/home/runner/work/slap/slap/tests/slap/python/test_environment.py&#39;.
-    pytest| Hint: make sure your test modules/packages have valid Python names.
-    pytest| Traceback:
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/python.py:608: in _importtestmodule
-    pytest|     mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/pathlib.py:533: in import_path
-    pytest|     importlib.import_module(module_name)
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/importlib/__init__.py:126: in import_module
-    pytest|     return _bootstrap._gcd_import(name[level:], package, level)
-    pytest| &lt;frozen importlib._bootstrap&gt;:1050: in _gcd_import
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:1027: in _find_and_load
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:1006: in _find_and_load_unlocked
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:688: in _load_unlocked
-    pytest|     ???
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:168: in exec_module
-    pytest|     exec(co, module.__dict__)
-    pytest| tests/slap/python/test_environment.py:5: in &lt;module&gt;
-    pytest|     from slap.python.environment import PythonEnvironment
-    pytest| E   ModuleNotFoundError: No module named &#39;slap&#39;
-    pytest| ______________ ERROR collecting tests/slap/python/test_pep508.py _______________
-    pytest| ImportError while importing test module &#39;/home/runner/work/slap/slap/tests/slap/python/test_pep508.py&#39;.
-    pytest| Hint: make sure your test modules/packages have valid Python names.
-    pytest| Traceback:
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/python.py:608: in _importtestmodule
-    pytest|     mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/pathlib.py:533: in import_path
-    pytest|     importlib.import_module(module_name)
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/importlib/__init__.py:126: in import_module
-    pytest|     return _bootstrap._gcd_import(name[level:], package, level)
-    pytest| &lt;frozen importlib._bootstrap&gt;:1050: in _gcd_import
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:1027: in _find_and_load
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:1006: in _find_and_load_unlocked
-    pytest|     ???
-    pytest| &lt;frozen importlib._bootstrap&gt;:688: in _load_unlocked
-    pytest|     ???
-    pytest| /opt/hostedtoolcache/Python/3.10.4/x64/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:168: in exec_module
-    pytest|     exec(co, module.__dict__)
-    pytest| tests/slap/python/test_pep508.py:2: in &lt;module&gt;
-    pytest|     from slap.python.pep508 import Pep508Environment
-    pytest| E   ModuleNotFoundError: No module named &#39;slap&#39;
-    pytest| =========================== short test summary info ============================
-    pytest| ERROR tests/slap/python/test_dependency.py
-    pytest| ERROR tests/slap/python/test_environment.py
-    pytest| ERROR tests/slap/python/test_pep508.py
-    pytest| !!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!!
-    pytest| ============================== 3 errors in 0.31s ===============================
+<div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>check| Global checks:
+check|   release:consistent-versions  OK             — All version references are equal
+check| 
+check| Checks for project slam-cli
+check| 
+check|   general:typed                WARNING        — tool.slap.typed is not set
+check|   release:source-code-version  WARNING        — No packages detected
+check| 
+check| Checks for project slap-cli
+check| 
+check|   changelog:validate           OK             — All 92 changelogs are valid.
+check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
+check|   general:typed                OK             — py.typed exists as expected
+check|   poetry:classifiers           OK             — All classifiers are valid.
+check|   poetry:license               OK             — License &quot;MIT&quot; is a valid SPDX identifier.
+check|   poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
+check|   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
+check|   release:source-code-version  OK             — Found __version__ in slap
+check| 
+check| Summary: 8 OK, 1 RECOMMENDATION, 2 WARNING, 2 SKIPPED, exit code: 0
+mypy| Success: no issues found in 48 source files
+pytest| ============================= test session starts ==============================
+pytest| platform linux -- Python 3.10.4, pytest-7.1.1, pluggy-1.0.0 -- /home/runner/work/slap/slap/.venvs/runtime/bin/python
+pytest| cachedir: .pytest_cache
+pytest| rootdir: /home/runner/work/slap/slap
+pytest| collecting ... collected 15 items
+pytest| 
+pytest| tests/slap/python/test_dependency.py::test__split_package_name_with_extras__good_input PASSED [  6%]
+pytest| tests/slap/python/test_dependency.py::test__split_package_name_with_extras__bad_input PASSED [ 13%]
+pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_pypi_dependency PASSED [ 20%]
+pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_git_dependency PASSED [ 26%]
+pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_url_dependency PASSED [ 33%]
+pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_path_dependency PASSED [ 40%]
+pytest| tests/slap/python/test_dependency.py::test__parse_dependency_config__various_configurations PASSED [ 46%]
+pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_empty_string PASSED [ 53%]
+pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_wildcard PASSED [ 60%]
+pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_pep_508_spec PASSED [ 66%]
+pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_semver_spec PASSED [ 73%]
+pytest| tests/slap/python/test_dependency.py::test__VersionSpec__throws_on_invalid_pep_508_spec SKIPPED (Detecting invalid PEP 508 selectors is currently not supported) [ 80%]
+pytest| tests/slap/python/test_dependency.py::test__PypiDependency__parse PASSED [ 86%]
+pytest| tests/slap/python/test_environment.py::test__PythonEnvironment__with_current_python_instance PASSED [ 93%]
+pytest| tests/slap/python/test_pep508.py::test__Pep508Environment__sample_markers PASSED [100%]
+pytest| 
+pytest| ======================== 14 passed, 1 skipped in 0.45s =========================
 
-    test summary:
-      • check (exit code: 0)
-      • isort (exit code: 0)
-      • mypy (exit code: 1)
-      • pytest (exit code: 2)
+test summary:
+  • check (exit code: 0)
+  • isort (exit code: 0)
+  • mypy (exit code: 0)
+  • pytest (exit code: 0)
 </code></pre></div>
 
 </details>
