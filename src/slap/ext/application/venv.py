@@ -74,6 +74,7 @@ class Venv:
         """Activate the environment by updating the current `PATH` environment variable."""
 
         os.environ["PATH"] = str(self.get_bin_directory().absolute()) + os.pathsep + os.environ["PATH"]
+        os.environ["VIRTUAL_ENV"] = str(self.directory.absolute())
 
 
 class VenvManager:
