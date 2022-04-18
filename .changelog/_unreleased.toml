@@ -1,0 +1,5 @@
+[[entries]]
+id = "73d18915-6178-4081-a192-e769fe3550dc"
+type = "improvement"
+description = "Add `PythonEnvironment.version_tuple`"
+author = "@NiklasRosenstein"

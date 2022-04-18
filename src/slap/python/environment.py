@@ -6,6 +6,7 @@ import json
 import logging
 import pickle
 import subprocess as sp
+import sys
 import textwrap
 import typing as t
 from pathlib import Path
@@ -26,6 +27,7 @@ class PythonEnvironment:
 
     executable: str
     version: str
+    version_tuple: tuple[int, int, int]
     platform: str
     prefix: str
     base_prefix: str | None
@@ -65,7 +67,7 @@ class PythonEnvironment:
 
         code = textwrap.dedent(
             f"""
-      import sys, platform, json
+      import sys, platform, json, pickle
       sys.path.append({pep508_path!r})
       import pep508
       try: import pkg_resources
@@ -73,6 +75,7 @@ class PythonEnvironment:
       print(json.dumps({{
         "executable": sys.executable,
         "version": sys.version,
+        "version_tuple": sys.version_info[:3],
         "platform": platform.platform(),
         "prefix": sys.prefix,
         "base_prefix": getattr(sys, 'base_prefix', None),
@@ -84,6 +87,7 @@ class PythonEnvironment:
         )
 
         payload = json.loads(sp.check_output(list(python) + ["-c", code]).decode())
+        payload["version_tuple"] = tuple(payload["version_tuple"])
         payload["pep508"] = pep508.Pep508Environment(**payload["pep508"])
         return PythonEnvironment(**payload)
 
