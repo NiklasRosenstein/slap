@@ -73,7 +73,7 @@ class Venv:
     def activate(self) -> None:
         """Activate the environment by updating the current `PATH` environment variable."""
 
-        os.environ["PATH"] = str(self.get_bin_directory()) + os.pathsep + os.environ["PATH"]
+        os.environ["PATH"] = str(self.get_bin_directory().absolute()) + os.pathsep + os.environ["PATH"]
 
 
 class VenvManager:

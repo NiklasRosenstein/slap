@@ -1,0 +1,5 @@
+[[entries]]
+id = "bf998b81-091c-4cfd-baa2-496391344f60"
+type = "fix"
+description = "Fix venv aware commands to add the absolute path to the `PATH` environment variable instead of a relative path"
+author = "@NiklasRosenstein"
