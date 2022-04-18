@@ -908,7 +908,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/getting-started.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
@@ -1011,7 +1011,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.6.1
+  version: 1.6.2
   dist-name: slap-cli
   packages: slap (src)
   readme: readme.md
@@ -1120,7 +1120,7 @@ pytest| tests/slap/python/test_dependency.py::test__PypiDependency__parse PASSED
 pytest| tests/slap/python/test_environment.py::test__PythonEnvironment__with_current_python_instance PASSED [ 93%]
 pytest| tests/slap/python/test_pep508.py::test__Pep508Environment__sample_markers PASSED [100%]
 pytest| 
-pytest| ======================== 14 passed, 1 skipped in 0.55s =========================
+pytest| ======================== 14 passed, 1 skipped in 0.57s =========================
 
 test summary:
   • black (exit code: 0)
@@ -1199,16 +1199,13 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.6.2
-  pyproject.toml:       1.6.1 → 1.6.2 # &#39;version = &quot;1.6.1&quot;&#39;
-  src/slap/__init__.py: 1.6.1 → 1.6.2 # &#39;__version__ = &quot;1.6.1&quot;&#39;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>    $ cd .. &amp;&amp; slap release --dry --tag --push patch --no-branch-check --no-worktree-check 2&gt;/dev/null  # exited with return code 1
+    bumping 2 version references to 1.6.3
+      pyproject.toml:       1.6.2 → 1.6.3 # &#39;version = &quot;1.6.2&quot;&#39;
+      src/slap/__init__.py: 1.6.2 → 1.6.3 # &#39;__version__ = &quot;1.6.2&quot;&#39;
 
-releasing changelog
-  .changelog/_unreleased.toml → .changelog/1.6.2.toml
 
-tagging 1.6.2
-
-pushing develop, 1.6.2 to origin
+    tagging 1.6.3
 </code></pre></div>
 
 </details>
@@ -1217,8 +1214,8 @@ pushing develop, 1.6.2 to origin
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.6.1 # &#39;version = &quot;1.6.1&quot;&#39;
-  src/slap/__init__.py: 1.6.1 # &#39;__version__ = &quot;1.6.1&quot;&#39;
+  pyproject.toml:       1.6.2 # &#39;version = &quot;1.6.2&quot;&#39;
+  src/slap/__init__.py: 1.6.2 # &#39;__version__ = &quot;1.6.2&quot;&#39;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
