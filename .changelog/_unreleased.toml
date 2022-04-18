@@ -9,3 +9,9 @@ id = "4040fbf2-9942-4b8b-9555-2c7234f2bdb4"
 type = "improvement"
 description = "The `slap venv` command now automatically picks an environment name if you do not specify one with the `-c,--create` flag"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "7e8d8257-aa01-4848-b83b-723c4b4009f9"
+type = "improvement"
+description = "Changed `slap install` to no longer install all extras defined in the project by default, now you need to explicitly specify them in `[tool.slap.install].dev-extras`"
+author = "@NiklasRosenstein"

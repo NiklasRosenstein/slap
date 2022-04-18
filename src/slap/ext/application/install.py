@@ -194,20 +194,12 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
                 dependencies += deps.dev
 
             # Determine the extras to install for the current project. This changes on development installs because
-            # we always consider the ones configured in #InstallConfig.dev_extras, or _all_ extras if the option is
-            # not set.
+            # we always consider the ones configured in #InstallConfig.dev_extras.
             current_project_install_extras = set(install_extras)
             if not self.option("no-dev"):
                 config = self.config[project]
-                if config.dev_extras is None:
-                    current_project_install_extras.update(deps.extra.keys())  # Use all extras defined in the project
-                    current_project_install_extras.update(
-                        config.extras.keys()
-                    )  # Use all extras defined in the #InstallConfig
-                else:
-                    current_project_install_extras.update(
-                        config.dev_extras
-                    )  # Use only the extras explicitly defined in the #InstallConfig
+                if config.dev_extras is not None:
+                    current_project_install_extras.update(config.dev_extras)
 
             # Append the extra dependencies from the project. We ignore 'dev' here because we already took care of
             # deciding when to install dev dependencies.

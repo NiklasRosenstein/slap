@@ -118,9 +118,6 @@ black = "black src/ tests/ --check"
 "docs:dev" = "cd docs && novella --serve"
 fmt = "isort src/ tests/ && black src/ tests"
 
-[tool.slap.install]
-dev-extras = []
-
 [tool.mypy]
 pretty = true
 warn_redundant_casts = true
