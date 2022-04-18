@@ -784,7 +784,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/NiklasRosenstein/slap/blob/None/docs/content/commands/venv.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/content/commands/venv.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
@@ -810,7 +810,7 @@ Arguments:
 Options:
   -g, --global               Manage virtual environments in the global scope instead of the local directory.
   -a, --activate             Activate the environment given by the environment name. Note that using this option if used directly with the Slap CLI will cause an error because it needs to be shadowed by a function of your shell.
-  -c, --create               Create the environment with the given environment name.
+  -c, --create               Create the environment with the given environment name. If no name is specified, the environment name will be the major.minor version of the current Python version.
   -d, --delete               Delete the environment with the given environment name.
   -s, --set                  Similar to -a,--activate, but it will not activate the environment in your active shell even if you have the Slap shim installed (see -i,--init-code).
   -l, --list                 List the available environments.
