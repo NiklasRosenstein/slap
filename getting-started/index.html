@@ -1054,7 +1054,7 @@ Project &quot;.&quot; (id: slap-cli)
 <h2 id="6-sanity-check-your-project-configuration">6. Sanity check your project configuration</h2>
 <p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration. The
 below example is the check output for Slap's own project.</p>
-<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 95 changelogs are valid.
+<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 96 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1086,7 +1086,7 @@ test commands like the below example to your project configuration.</p>
 
 <div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>black| All done! ✨ 🍰 ✨
 black| 51 files would be left unchanged.
-check|   changelog:validate           OK             — All 95 changelogs are valid.
+check|   changelog:validate           OK             — All 96 changelogs are valid.
 check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
 check|   general:typed                OK             — py.typed exists as expected
 check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1203,6 +1203,8 @@ To create a new release, pass the version number or a rule name instead.
   pyproject.toml:       1.6.3 → 1.6.4 # &#39;version = &quot;1.6.3&quot;&#39;
   src/slap/__init__.py: 1.6.3 → 1.6.4 # &#39;__version__ = &quot;1.6.3&quot;&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.6.4.toml
 
 tagging 1.6.4
 
