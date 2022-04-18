@@ -3,3 +3,9 @@ id = "73d18915-6178-4081-a192-e769fe3550dc"
 type = "improvement"
 description = "Add `PythonEnvironment.version_tuple`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "4040fbf2-9942-4b8b-9555-2c7234f2bdb4"
+type = "improvement"
+description = "The `slap venv` command now automatically picks an environment name if you do not specify one with the `-c,--create` flag"
+author = "@NiklasRosenstein"

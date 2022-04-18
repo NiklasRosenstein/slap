@@ -8,6 +8,7 @@ from pathlib import Path
 
 from slap.application import IO, Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
+from slap.python.environment import PythonEnvironment
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +188,8 @@ class VenvCommand(Command):
         option(
             "--create",
             "-c",
-            description="Create the environment with the given environment name.",
+            description="Create the environment with the given environment name. If no <opt>name</opt> is specified, "
+            "the environment name will be the major.minor version of the current Python version.",
         ),
         option(
             "--delete",
@@ -240,7 +242,7 @@ class VenvCommand(Command):
                     f"error: <opt>-l,--list</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>", "error"
                 )
                 return False
-        for opt in ("create", "delete", "set"):
+        for opt in ("delete", "set"):
             if self.option(opt) and not self.argument("name"):
                 self.line_error("error: missing <opt>name</opt> argument", "error")
                 return False
@@ -329,8 +331,7 @@ class VenvCommand(Command):
 
         if self.option("create"):
             if not venv:
-                self.line_error(f"error: missing environment name", "error")
-                return 1
+                venv = manager.get(".".join(map(str, PythonEnvironment.of(python).version_tuple[:2])))
             if venv.exists():
                 self.line_error(f'error: environment <s>"{venv.name}"</s> already exists', "error")
                 return 1
