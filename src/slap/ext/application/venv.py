@@ -133,7 +133,7 @@ class VenvAwareCommand(Command):
                 )
             else:
                 io.error_output.write_line(
-                    f"<info>(venv-aware) there is no current environment that can be activated</info>"
+                    f"<warning>(venv-aware) there is no current environment that can be activated</warning>"
                 )
 
         return super().execute(io)
