@@ -3,3 +3,9 @@ id = "45c763dc-5a21-4115-9b0f-1d31aac9e062"
 type = "improvement"
 description = "Set `VIRTUAL_ENV` when venv-aware command activates the environment"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "724c83cf-db53-4143-8681-7eb36625cf1a"
+type = "feature"
+description = "Add `--from` action to `slap install` command"
+author = "@NiklasRosenstein"

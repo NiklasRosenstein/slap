@@ -4,9 +4,10 @@ import textwrap
 import typing as t
 from pathlib import Path
 
-from slap.application import Application, option
+from slap.application import IO, Application, option
 from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
+from slap.repository import Repository
 
 from .install import get_active_python_bin, python_option, venv_check, venv_check_option
 
@@ -83,78 +84,83 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             directory = src_dir
         return directory
 
-    def _setup_flit_config(self, module: str, dist_name: str, data: dict[str, t.Any]) -> bool:
-        """Internal. Makes sure the configuration in *data* is compatible with Flit."""
-
-        poetry = data["tool"].get("poetry", {})
-        flit = data["tool"].setdefault("flit", {})
-        plugins = poetry.get("plugins", {})
-        scripts = poetry.get("scripts", {})
-        project = data.setdefault("project", {})
-
-        if plugins:
-            project["entry-points"] = plugins
-        if scripts:
-            project["scripts"] = scripts
-
-        # TODO (@NiklasRosenstein): Do we need to support gui-scripts as well?
-
-        project["name"] = dist_name
-        project["version"] = poetry["version"]
-        project["description"] = ""
-        flit["module"] = {"name": module}
-
-        return True
-
     def handle(self) -> int:
-        from flit.install import Installer  # type: ignore[import]
-        from nr.util.fs import atomic_swap
-
-        from slap.util.pygments import toml_highlight
-
         if not venv_check(self, "refusing to link"):
             return 1
 
-        # logging.basicConfig(level=logging.INFO, format='%(message)s')
+        return link_repository(self.io, self.app.repository, self.option("dump_pyproject"), get_active_python_bin(self))
 
-        num_projects = 0
-        num_skipped = 0
 
-        for project in self.app.repository.get_projects_ordered():
-            if not project.is_python_project:
-                continue
+def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False, python: str | None = None) -> int:
 
-            packages = project.packages()
-            if not packages:
-                continue
+    from flit.install import Installer  # type: ignore[import]
+    from nr.util.fs import atomic_swap
 
-            num_projects += 1
-            if len(packages) > 1:
-                self.line_error("warning: multiple packages can not currently be installed with <opt>slap link</opt>")
-                num_skipped += 1
-                continue
+    from slap.util.pygments import toml_highlight
 
-            config = project.pyproject_toml.value()
-            dist_name = project.dist_name() or project.directory.resolve().name
-            if not self._setup_flit_config(packages[0].name, dist_name, config):
-                return 1
+    # We need to pass an absolute path to Python to make sure the scripts have an absolute shebang.
+    python_bin = shutil.which(python or "python")
+    if not python_bin:
+        raise Exception(f"Could not find Python executable from {python_bin!r}")
 
-            if self.option("dump-pyproject"):
-                self.line(f"<fg=dark_gray># {project.pyproject_toml.path}</fg>")
-                self.line(toml_highlight(config))
-                continue
+    # logging.basicConfig(level=logging.INFO, format='%(message)s')
 
-            with atomic_swap(project.pyproject_toml.path, "w", always_revert=True) as fp:
-                fp.close()
-                project.pyproject_toml.value(config)
-                project.pyproject_toml.save()
-                python = shutil.which(get_active_python_bin(self))
-                if not python:
-                    raise Exception(f"Could not find Python executable from {get_active_python_bin(self)!r}")
-                installer = Installer.from_ini_path(
-                    project.pyproject_toml.path, python=str(Path(python).absolute()), symlink=True
-                )
-                self.line(f"symlinking <info>{dist_name}</info>")
-                installer.install()
+    num_projects = 0
+    num_skipped = 0
 
-        return 1 if num_skipped > 0 and num_projects == 1 else 0
+    for project in repository.get_projects_ordered():
+        if not project.is_python_project:
+            continue
+
+        packages = project.packages()
+        if not packages:
+            continue
+
+        num_projects += 1
+        if len(packages) > 1:
+            io.write_error_line("warning: multiple packages can not currently be installed with <opt>slap link</opt>")
+            num_skipped += 1
+            continue
+
+        config = project.pyproject_toml.value()
+        dist_name = project.dist_name() or project.directory.resolve().name
+        _setup_flit_config(packages[0].name, dist_name, config)
+
+        if dump_pyproject:
+            io.write_line(f"<fg=dark_gray># {project.pyproject_toml.path}</fg>")
+            io.write_line(toml_highlight(config))
+            continue
+
+        with atomic_swap(project.pyproject_toml.path, "w", always_revert=True) as fp:
+            fp.close()
+            project.pyproject_toml.value(config)
+            project.pyproject_toml.save()
+            installer = Installer.from_ini_path(
+                project.pyproject_toml.path, python=str(Path(python_bin).absolute()), symlink=True
+            )
+            io.write_line(f"symlinking <info>{dist_name}</info>")
+            installer.install()
+
+    return 1 if num_skipped > 0 and num_projects == 1 else 0
+
+
+def _setup_flit_config(module: str, dist_name: str, data: dict[str, t.Any]) -> None:
+    """Internal. Makes sure the configuration in *data* is compatible with Flit."""
+
+    poetry = data["tool"].get("poetry", {})
+    flit = data["tool"].setdefault("flit", {})
+    plugins = poetry.get("plugins", {})
+    scripts = poetry.get("scripts", {})
+    project = data.setdefault("project", {})
+
+    if plugins:
+        project["entry-points"] = plugins
+    if scripts:
+        project["scripts"] = scripts
+
+    # TODO (@NiklasRosenstein): Do we need to support gui-scripts as well?
+
+    project["name"] = dist_name
+    project["version"] = poetry["version"]
+    project["description"] = ""
+    flit["module"] = {"name": module}

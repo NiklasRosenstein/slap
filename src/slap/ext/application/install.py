@@ -115,6 +115,11 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             description="Upgrade already installed packages.",
             flag=False,
         ),
+        option(
+            "--from",
+            description="Install another Slap project from the given directory.",
+            flag=False,
+        ),
         venv_check_option,
         python_option,
     ]
@@ -144,6 +149,13 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         if not self._validate_args():
             return 1
+
+        if from_dir := self.option("from"):
+            # TODO (@NiklasRosenstein): This is pretty hacky, but it works so far. We basically modify the application
+            #       object as if it was running from the specified path all along.
+            self.app.__init__(Path(from_dir).absolute())  # type: ignore
+            self.app.load_plugins()
+            self.load_configuration(self.app)
 
         python_environment = PythonEnvironment.of(get_active_python_bin(self))
         if not venv_check(self, env=python_environment):
@@ -238,7 +250,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             return status_code
 
         if self.option("link"):
-            self.link_project(Path("."))
+            self.link_project(Path(self.option("from") or "."))
 
         return 0
 
@@ -292,9 +304,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         raise NotImplementedError
 
     def link_project(self, project: Path) -> None:
-        cwd = os.getcwd()
-        os.chdir(project)
-        command = ["--no-venv-check"] if self.option("no-venv-check") else []
-        command += ["--python", get_active_python_bin(self)]
-        self.call("link", " ".join(map(shlex.quote, command)))
-        os.chdir(cwd)
+        from slap.ext.application.link import link_repository
+
+        app = Application(project)
+        link_repository(self.io, app.repository, python=get_active_python_bin(self))
