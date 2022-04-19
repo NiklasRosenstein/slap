@@ -84,14 +84,15 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             directory = src_dir
         return directory
 
-    def handle(self) -> int:
+    def handle(self) -> int | None:
         if not venv_check(self, "refusing to link"):
             return 1
 
-        return link_repository(self.io, self.app.repository, self.option("dump_pyproject"), get_active_python_bin(self))
+        link_repository(self.io, self.app.repository, self.option("dump-pyproject"), get_active_python_bin(self))
+        return None
 
 
-def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False, python: str | None = None) -> int:
+def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False, python: str | None = None) -> None:
 
     from flit.install import Installer  # type: ignore[import]
     from nr.util.fs import atomic_swap
@@ -116,32 +117,25 @@ def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False
         if not packages:
             continue
 
-        num_projects += 1
-        if len(packages) > 1:
-            io.write_error_line("warning: multiple packages can not currently be installed with <opt>slap link</opt>")
-            num_skipped += 1
-            continue
+        for package in packages:
+            config = project.pyproject_toml.value()
+            dist_name = project.dist_name() or project.directory.resolve().name
+            _setup_flit_config(package.name, dist_name, config)
 
-        config = project.pyproject_toml.value()
-        dist_name = project.dist_name() or project.directory.resolve().name
-        _setup_flit_config(packages[0].name, dist_name, config)
+            if dump_pyproject:
+                io.write_line(f"<fg=dark_gray># {project.pyproject_toml.path}</fg>")
+                io.write_line(toml_highlight(config))
+                continue
 
-        if dump_pyproject:
-            io.write_line(f"<fg=dark_gray># {project.pyproject_toml.path}</fg>")
-            io.write_line(toml_highlight(config))
-            continue
-
-        with atomic_swap(project.pyproject_toml.path, "w", always_revert=True) as fp:
-            fp.close()
-            project.pyproject_toml.value(config)
-            project.pyproject_toml.save()
-            installer = Installer.from_ini_path(
-                project.pyproject_toml.path, python=str(Path(python_bin).absolute()), symlink=True
-            )
-            io.write_line(f"symlinking <info>{dist_name}</info>")
-            installer.install()
-
-    return 1 if num_skipped > 0 and num_projects == 1 else 0
+            with atomic_swap(project.pyproject_toml.path, "w", always_revert=True) as fp:
+                fp.close()
+                project.pyproject_toml.value(config)
+                project.pyproject_toml.save()
+                installer = Installer.from_ini_path(
+                    project.pyproject_toml.path, python=str(Path(python_bin).absolute()), symlink=True
+                )
+                io.write_line(f"symlinking <info>{dist_name}</info>")
+                installer.install()
 
 
 def _setup_flit_config(module: str, dist_name: str, data: dict[str, t.Any]) -> None:

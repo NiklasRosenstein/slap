@@ -15,11 +15,6 @@ projects as well.
     _can_ cause your code to be overwritten for example by Pip if you end up overwriting the symlinked installation
     of your package by installing another version of it into the same environment.
 
-!!! note
-
-    Currently, `slap install` does not support linking Python projects that contain more than one package. It _does_
-    support symlinking monorepositories that contain multiple Python projects (each with one package).
-
 <details><summary>Synopsis</summary>
 ```
 @shell slap link --help

@@ -9,3 +9,9 @@ id = "724c83cf-db53-4143-8681-7eb36625cf1a"
 type = "feature"
 description = "Add `--from` action to `slap install` command"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "12d46ef8-8342-4fd2-aefe-9032b83dc4db"
+type = "improvement"
+description = "The `slap link` command is no longer limited to symlinking only one package per project"
+author = "@NiklasRosenstein"
