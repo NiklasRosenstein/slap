@@ -743,11 +743,6 @@ this action. This actually symbolically links your source code into the Python s
 <em>can</em> cause your code to be overwritten for example by Pip if you end up overwriting the symlinked installation
 of your package by installing another version of it into the same environment.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Currently, <code>slap install</code> does not support linking Python projects that contain more than one package. It <em>does</em>
-support symlinking monorepositories that contain multiple Python projects (each with one package).</p>
-</div>
 <details><summary>Synopsis</summary>
 <div class="highlight"><pre><span></span><code>Description:
   Base class for commands that should be aware of the active local virtual environment. Before the
