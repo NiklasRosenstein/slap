@@ -1,0 +1,5 @@
+[[entries]]
+id = "a2211405-4841-4230-af3f-de805b4a0b31"
+type = "fix"
+description = "The `slap link` command no longer fails when run as root (due to Flit adding a check here; if we want to have the same check in Slap we need to do it ourselves in `slap install` as well)"
+author = "@NiklasRosenstein"

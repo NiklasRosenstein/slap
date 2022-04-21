@@ -104,10 +104,10 @@ def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False
     if not python_bin:
         raise Exception(f"Could not find Python executable from {python_bin!r}")
 
-    # logging.basicConfig(level=logging.INFO, format='%(message)s')
-
-    num_projects = 0
-    num_skipped = 0
+    # Without this set, the installer will complain about installing as the root user. If we want to
+    # have a similar check in Slap, we must do it in the install command as well, otherwise you end
+    # up installing as root but then just the linking step fails.
+    os.environ["FLIT_ROOT_INSTALL"] = "1"
 
     for project in repository.get_projects_ordered():
         if not project.is_python_project:
