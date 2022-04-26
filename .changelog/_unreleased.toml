@@ -1,0 +1,5 @@
+[[entries]]
+id = "6f24d702-905c-4986-a427-1dc0959a5e42"
+type = "fix"
+description = "Fix (workaround) to installing packages with `slap install` option without the `--link` option if it has runtime dependencies that require extra index URLs."
+author = "@NiklasRosenstein"

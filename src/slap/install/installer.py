@@ -94,7 +94,7 @@ class PipInstaller(Installer):
         unsupported_hashes: dict[type[Dependency], list[Dependency]] = {}
         link_projects: list[Path] = []
         pip_arguments: list[str] = []
-        used_indexes: set[str] = set()
+        # used_indexes: set[str] = set()
         dependencies = list(dependencies)
 
         while dependencies:
@@ -131,8 +131,8 @@ class PipInstaller(Installer):
             else:
                 pip_arguments += self.dependency_to_pip_arguments(dependency)
 
-            if isinstance(dependency, PypiDependency) and dependency.source:
-                used_indexes.add(dependency.source)
+            # if isinstance(dependency, PypiDependency) and dependency.source:
+            #     used_indexes.add(dependency.source)
 
         # Add the extra index URLs.
         # TODO (@NiklasRosenstein): Inject credentials for index URLs.
@@ -142,7 +142,11 @@ class PipInstaller(Installer):
         try:
             if options.indexes.default is not None:
                 pip_arguments += ["--index-url", options.indexes.urls[options.indexes.default]]
-            for index_name in used_indexes - {options.indexes.default}:
+            # for index_name in used_indexes - {options.indexes.default}:
+            # NOTE (@NiklasRosenstein): For now we just pass all indexes to Pip. When you run `slap install` without
+            #       the `--link` option, the package will be installed directly with Pip, thus the runtime dependencies
+            #       are not passed here and we would not recognize the extra indexes required for those dependencies.
+            for index_name in options.indexes.urls.keys() - {options.indexes.default}:
                 pip_arguments += ["--extra-index-url", options.indexes.urls[index_name]]
         except KeyError as exc:
             raise Exception(f"PyPI index {exc} is not configured")
