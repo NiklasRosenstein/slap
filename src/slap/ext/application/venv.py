@@ -264,7 +264,7 @@ class VenvCommand(Command):
     def _get_python_bin(self) -> str:
         from slap.ext.application.install import get_active_python_bin
 
-        python = get_active_python_bin(self)
+        python = get_active_python_bin(self, False)
         name = self.argument("name")
         if name and not python and set(name).issubset(string.digits + "."):
             python = f"python{name}"

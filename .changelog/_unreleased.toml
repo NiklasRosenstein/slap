@@ -1,0 +1,5 @@
+[[entries]]
+id = "3557911a-ead5-4833-9730-54972dd2a7ca"
+type = "fix"
+description = "Fix `slap venv X.Y` to create an environment of the specified Python major/minor version"
+author = "@NiklasRosenstein"

@@ -7,6 +7,7 @@ import shlex
 import typing as t
 from pathlib import Path
 
+import typing_extensions as te
 from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, option
@@ -33,17 +34,27 @@ python_option = option(
 )
 
 
+@t.overload
 def get_active_python_bin(cmd: Command) -> str:
+    ...
+
+
+@t.overload
+def get_active_python_bin(cmd: Command, fallback: te.Literal[False]) -> str | None:
+    ...
+
+
+def get_active_python_bin(cmd: Command, fallback: bool = True) -> str | None:
     """Returns the active Python installation."""
 
     if hasattr(cmd, "_python_bin"):
-        return cmd._python_bin  # type: ignore
-
-    python = cmd.option("python")
-    if not python:
-        python = os.getenv("PYTHON")
-
-    python = python or "python"
+        python = cmd._python_bin  # type: ignore
+    else:
+        python = cmd.option("python")
+        if not python:
+            python = os.getenv("PYTHON")
+    if fallback:
+        python = python or "python"
     cmd._python_bin = python
     return python
 
