@@ -1,0 +1,5 @@
+[[entries]]
+id = "6505b5da-dc4b-4c96-9dd9-f7ac29fc1e05"
+type = "fix"
+description = "Use SPDX license information only in `slap.util.extenral.licenses` instead of Deja code which now requires a login; this fixes `slap init` when it tries to get the license text"
+author = "@NiklasRosenstein"

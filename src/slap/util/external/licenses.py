@@ -1,20 +1,16 @@
 """
-Scraper for [DejaCode][1] and [SPDX][2].
+Scraper for [SPDX][1].
 
-  [1]: https://enterprise.dejacode.com/licenses/
-  [2]: https://spdx.org/licenses/
+  [1]: https://spdx.org/licenses/
 """
 
+from __future__ import annotations
+
 import dataclasses
-import re
-import textwrap
 import typing as t
 
-import bs4
 import requests
 from databind.core.settings import Alias
-
-BASE_URL = "https://enterprise.dejacode.com/licenses/public/{}/"
 
 
 @dataclasses.dataclass
@@ -29,78 +25,30 @@ class SpdxLicense:
     is_osi_approved: t.Annotated[bool, Alias("isOsiApproved")]
     is_fsf_libre: t.Annotated[bool | None, Alias("isFsfLibre")] = None
 
+    def get_details(self) -> SpdxLicenseDetails:
+        import databind.json
+        response = requests.get(self.details_url)
+        response.raise_for_status()
+        return databind.json.load(response.json(), SpdxLicenseDetails)
+
 
 @dataclasses.dataclass
-class DejaCodeLicense:
-    license_text: str
-    key: t.Annotated[str, Alias("Key")]
-    name: t.Annotated[str, Alias("Name")]
-    short_name: t.Annotated[str, Alias("Short Name")]
-    category: t.Annotated[str, Alias("Category")]
-    license_type: t.Annotated[str, Alias("License type")]
-    license_profile: t.Annotated[str, Alias("License profile")]
-    license_style: t.Annotated[str, Alias("License style")]
-    owner: t.Annotated[str, Alias("Owner")]
-    spdx_short_identifier: t.Annotated[str, Alias("SPDX short identifier")]
-    keywords: t.Annotated[str, Alias("Keywords")]
-    standard_notice: t.Annotated[str | None, Alias("Standard notice")]
-    special_obligations: t.Annotated[str | None, Alias("Special obligations")]
-    publication_year: t.Annotated[int, Alias("Publication year")]
-    urn: t.Annotated[str, Alias("URN")]
-    dataspace: t.Annotated[str, Alias("Dataspace")]
-    homepage_url: t.Annotated[str, Alias("Homepage URL")]
-    text_urls: t.Annotated[str, Alias("Text URLs")]
-    osi_url: t.Annotated[str, Alias("OSI URL")]
-    faq_url: t.Annotated[str, Alias("FAQ URL")]
-    guidance_url: t.Annotated[str | None, Alias("Guidance URL")]
-    other_urls: t.Annotated[str | None, Alias("Other URLs")]
-
-
-def _get_table_value_by_key(soup, key):
-    regex = re.compile("\s*" + re.escape(key) + "\s*")
-    item = soup.find("span", text=regex)
-    if item is None:
-        raise ValueError("<span/> for key {!r} not found".format(key))
-    value = item.parent.findNext("dd").find("pre").text
-    if value == "\xa0":
-        value = ""
-    return value or None
-
-
-def _get_license_text(soup):
-    tab = soup.find(id="tab_license-text")
-    if tab is None:
-        raise ValueError("#tab_license-text not found")
-    pre = soup.find("div", {"class": "clipboard"}).find("pre")
-    return pre.text
-
-
-def get_license_metadata(license_name: str) -> DejaCodeLicense:
-    """Retrives the HTML metadata page for the specified license from the DejaCode website and extracts information
-    such as the name, category, license type, standard notice and license text."""
-
-    url = BASE_URL.format(license_name.replace(" ", "-").lower())
-    response = requests.get(url)
-    response.raise_for_status()
-    html = response.text
-    soup = bs4.BeautifulSoup(html, "html.parser")
-
-    # Get the keys that need to be extracted from the dataclass field aliases
-    from databind.core.schema import convert_dataclass_to_schema
-    from databind.json import load
-
-    schema = convert_dataclass_to_schema(DejaCodeLicense)
-    extract_keys = [field.aliases[0] for field in schema.fields.values() if field.aliases]
-
-    data = {}
-    for key in extract_keys:
-        data[key] = _get_table_value_by_key(soup, key)
-    data["Publication year"] = int(data["Publication year"])
-    if data["Standard notice"]:
-        data["Standard notice"] = textwrap.dedent(data["Standard notice"])
-    data["license_text"] = _get_license_text(soup)
-
-    return load(data, DejaCodeLicense)
+class SpdxLicenseDetails:
+    name: str
+    license_id: t.Annotated[str, Alias("licenseId")]
+    license_text: t.Annotated[str, Alias("licenseText")]
+    license_text_html: t.Annotated[str, Alias("licenseTextHtml")]
+    cross_ref: t.Annotated[list[dict[str, t.Any]], Alias("crossRef")]
+    see_also: t.Annotated[list[str], Alias("seeAlso")]
+    standard_license_template: t.Annotated[str, Alias("standardLicenseTemplate")]
+    is_osi_approved: t.Annotated[bool, Alias("isOsiApproved")]
+    is_deprecated_license_id: t.Annotated[bool, Alias("isDeprecatedLicenseId")]
+    license_comments: t.Annotated[str | None, Alias("licenseComments")] = None
+    is_fsf_libre: t.Annotated[bool | None, Alias("isFsfLibre")] = None
+    standard_license_header_html: t.Annotated[str | None, Alias("standardLicenseHeaderHtml")] = None
+    standard_license_header: t.Annotated[str | None, Alias("standardLicenseHeader")] = None
+    standard_license_header_template: t.Annotated[str | None, Alias("standardLicenseHeaderTemplate")] = None
+    deprecated_version: t.Annotated[str | None, Alias("deprecatedVersion")] = None
 
 
 def wrap_license_text(license_text: str, width: int = 79) -> str:
@@ -138,15 +86,30 @@ def get_spdx_licenses() -> dict[str, SpdxLicense]:
     return {l.license_id: l for l in licenses}
 
 
+def get_spdx_license_details(license_id: str) -> SpdxLicenseDetails:
+    """ Returns the details for a single SPDX license. """
+
+    import databind.json
+
+    url = f"https://spdx.org/licenses/{license_id}.json"
+    response = requests.get(url)
+    response.raise_for_status()
+    return databind.json.load(response.json(), SpdxLicenseDetails, filename=url)
+
+
 if __name__ == "__main__":
     import argparse
+    from termcolor import colored
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-l", "--list", action="store_true")
     parser.add_argument("license", nargs="?")
+    parser.add_argument("-w", "--wrap", type=int, default=80)
     args = parser.parse_args()
     if args.list:
-        for key, value in get_spdx_licenses().items():
-            print(key, value)
+        for key, value in sorted(get_spdx_licenses().items()):
+            print(f'{colored(key, attrs=["bold"])}: {value.name}')
+    elif args.license:
+        print(wrap_license_text(get_spdx_license_details(args.license).license_text, args.wrap - 1))
     else:
-        print(get_license_metadata(args.license))
+        parser.error('need an argument')

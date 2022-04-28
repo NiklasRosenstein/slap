@@ -5,7 +5,7 @@ from pathlib import Path
 from slap import __version__
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
-from slap.util.external.licenses import get_license_metadata, wrap_license_text
+from slap.util.external.licenses import get_spdx_license_details, wrap_license_text
 from slap.util.vcs import get_git_author
 
 TEMPLATES = {
@@ -210,10 +210,9 @@ class InitCommandPlugin(ApplicationPlugin, Command):
             )
         for filename, content in TEMPLATES[template].items():
             if filename == "LICENSE":
-                content = get_license_metadata(self.option("license")).license_text
-                content = wrap_license_text(content)
-                content = "Copyright (c) {year} {author_name}\n\n".format(**scope) + content
-                content = f'The {self.option("license")} License\n\n' + content
+                content = get_spdx_license_details(self.option("license")).license_text
+                content = wrap_license_text(content).replace('<year>', str(scope['year']))
+                content = wrap_license_text(content).replace('<copyright holders>', scope['author_name'])
             else:
                 filename = filename.format(**scope)
                 content = textwrap.dedent(content.format(**scope)).strip()
