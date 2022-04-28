@@ -27,6 +27,7 @@ class SpdxLicense:
 
     def get_details(self) -> SpdxLicenseDetails:
         import databind.json
+
         response = requests.get(self.details_url)
         response.raise_for_status()
         return databind.json.load(response.json(), SpdxLicenseDetails)
@@ -87,7 +88,7 @@ def get_spdx_licenses() -> dict[str, SpdxLicense]:
 
 
 def get_spdx_license_details(license_id: str) -> SpdxLicenseDetails:
-    """ Returns the details for a single SPDX license. """
+    """Returns the details for a single SPDX license."""
 
     import databind.json
 
@@ -99,6 +100,7 @@ def get_spdx_license_details(license_id: str) -> SpdxLicenseDetails:
 
 if __name__ == "__main__":
     import argparse
+
     from termcolor import colored
 
     parser = argparse.ArgumentParser()
@@ -112,4 +114,4 @@ if __name__ == "__main__":
     elif args.license:
         print(wrap_license_text(get_spdx_license_details(args.license).license_text, args.wrap - 1))
     else:
-        parser.error('need an argument')
+        parser.error("need an argument")

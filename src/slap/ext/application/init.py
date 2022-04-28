@@ -211,8 +211,8 @@ class InitCommandPlugin(ApplicationPlugin, Command):
         for filename, content in TEMPLATES[template].items():
             if filename == "LICENSE":
                 content = get_spdx_license_details(self.option("license")).license_text
-                content = wrap_license_text(content).replace('<year>', str(scope['year']))
-                content = wrap_license_text(content).replace('<copyright holders>', scope['author_name'])
+                content = wrap_license_text(content).replace("<year>", str(scope["year"]))
+                content = wrap_license_text(content).replace("<copyright holders>", scope["author_name"])
             else:
                 filename = filename.format(**scope)
                 content = textwrap.dedent(content.format(**scope)).strip()
