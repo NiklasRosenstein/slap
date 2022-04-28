@@ -1,0 +1,5 @@
+[[entries]]
+id = "7fd54dfa-8411-4d1c-a24b-61b5ebd93a19"
+type = "fix"
+description = "Automatic detection of packages now ignores subdirectories that have a `pyproject.toml` file"
+author = "@NiklasRosenstein"

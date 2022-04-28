@@ -35,6 +35,9 @@ def detect_packages(directory: Path) -> list[Package]:
         if path.is_file() and path.suffix == ".py" and path.stem not in modules:
             modules.append(path.stem)
 
+    # Remove modules that seem to be other Python projects.
+    modules = [m for m in modules if not (directory / m.partition(".")[0] / "pyproject.toml").is_file()]
+
     if not modules:
         return []
 
