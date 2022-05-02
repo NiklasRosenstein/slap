@@ -90,7 +90,11 @@ class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         to_install = (
             Stream(dependencies.values())
-            .filter(lambda d: self.option("upgrade") or distributions[d.name] is None)
+            .map(lambda dep: (dep, distributions[dep.name]))
+            .filter(
+                lambda item: self.option("upgrade") or item[1] is None or not item[0].version.accepts(item[1].version)
+            )
+            .map(lambda item: item[0])
             .collect()
         )
 

@@ -1,0 +1,5 @@
+[[entries]]
+id = "ab18a5cf-47e1-462b-8422-ba32f2c36efe"
+type = "fix"
+description = "The `slap add` command now installs the dependency even if `--upgrade` is not specified if the constraint does not accept the currently installed version."
+author = "@NiklasRosenstein"
