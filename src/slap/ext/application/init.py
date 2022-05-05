@@ -50,8 +50,8 @@ TEMPLATES = {
             mypy = "mypy src/"
             pytest = "pytest tests/ -vv"
             black = "black --check src/ tests/"
-            isort = "isort --check-only src/ tests"
-            flake8 = "flake8 src/ tests"
+            isort = "isort --check-only src/ tests/"
+            flake8 = "flake8 src/ tests/"
 
             [tool.slap.run]
             fmt = "black src/ tests/ && isort src/ tests/"
