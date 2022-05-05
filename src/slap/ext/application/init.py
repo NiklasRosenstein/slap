@@ -126,7 +126,7 @@ TEMPLATES = {
                     python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10", "3.x" ]
                 steps:
                 - uses: actions/checkout@v2
-                - uses: NiklasRosenstein/slap@gha/install/v1
+                - uses: python-slaps/slap.cli@gha/install/v1
                 - uses: actions/setup-python@v2
                   with: {{ python-version: "${{{{ matrix.python-version }}}}" }}
                 - run: slap install -vv --no-venv-check
@@ -137,7 +137,7 @@ TEMPLATES = {
                 if: github.event_name == 'pull_request'
                 steps:
                   - uses: actions/checkout@v2
-                  - uses: NiklasRosenstein/slap@gha/changelog/update/v1
+                  - uses: python-slaps/slap.cli@gha/changelog/update/v1
     """,
     },
 }

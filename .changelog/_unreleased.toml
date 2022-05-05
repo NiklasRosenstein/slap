@@ -1,0 +1,5 @@
+[[entries]]
+id = "8c24c380-9a85-4b48-88a4-43543404175f"
+type = "improvement"
+description = "Update GH action reference after Slap repository was moved from `NiklasRosenstein/slap` to `python-slaps/slap.cli`"
+author = "@NiklasRosenstein"
