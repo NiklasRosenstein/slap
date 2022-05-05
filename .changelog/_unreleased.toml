@@ -1,0 +1,5 @@
+[[entries]]
+id = "6086ecdb-74c6-4018-860b-3ceeca7d1113"
+type = "improvement"
+description = "Update default template to include black, isort, flake8"
+author = "@NiklasRosenstein"

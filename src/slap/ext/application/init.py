@@ -11,105 +11,133 @@ from slap.util.vcs import get_git_author
 TEMPLATES = {
     "poetry": {
         "pyproject.toml": """
-      [build-system]
-      requires = ["poetry-core"]
-      build-backend = "poetry.core.masonry.api"
+            [build-system]
+            requires = ["poetry-core"]
+            build-backend = "poetry.core.masonry.api"
 
-      [tool.poetry]
-      name = "{name}"
-      version = "0.1.0"
-      description = ""
-      authors = ["{author_name} <{author_email}>"]
-      license = "{license}"
-      readme = "readme.md"
-      packages = [{{ include = "{path}", from = "src" }}]
-      classifiers = []
-      keywords = []
+            [tool.poetry]
+            name = "{name}"
+            version = "0.1.0"
+            description = ""
+            authors = ["{author_name} <{author_email}>"]
+            license = "{license}"
+            readme = "readme.md"
+            packages = [{{ include = "{path}", from = "src" }}]
+            classifiers = []
+            keywords = []
 
-      [tool.poetry.urls]
-      # "Bug Tracker" = ""
-      # Documentation = ""
-      # Homepage = ""
-      # Repository = ""
+            [tool.poetry.urls]
+            # "Bug Tracker" = ""
+            # Documentation = ""
+            # Homepage = ""
+            # Repository = ""
 
-      [tool.poetry.dependencies]
-      python = "^3.7"
+            [tool.poetry.dependencies]
+            python = "^3.7"
 
-      [tool.poetry.dev-dependencies]
-      mypy = "*"
-      pytest = "*"
+            [tool.poetry.dev-dependencies]
+            black = "*"
+            flake8 = "*"
+            isort = "*"
+            mypy = "*"
+            pytest = "*"
 
-      [tool.slap]
-      typed = true
+            [tool.slap]
+            typed = true
 
-      [tool.slap.test]
-      check = "slap check"
-      mypy = "MYPYPATH=src mypy src/ --namespace-packages --explicit-package-bases"
-      pytest = "pytest test/ -vv"
+            [tool.slap.test]
+            check = "slap check"
+            mypy = "mypy src/"
+            pytest = "pytest tests/ -vv"
+            black = "black --check src/ tests/"
+            isort = "isort --check-only src/ tests"
+            flake8 = "flake8 src/ tests"
 
-      [tool.mypy]
-      pretty = true
-      namespace_packages = true
-      warn_redundant_casts = true
-      warn_unused_ignores = true
-      warn_no_return = true
-      warn_unreachable = true
-      show_error_context = true
-      show_error_codes = true
-    """,
+            [tool.slap.run]
+            fmt = "black src/ tests/ && isort src/ tests/"
+
+            [tool.mypy]
+            explicit_package_bases = true
+            mypy_path = ["src"]
+            namespace_packages = true
+            pretty = true
+            show_error_codes = true
+            show_error_context = true
+            warn_no_return = true
+            warn_redundant_casts = true
+            warn_unreachable = true
+            warn_unused_ignores = true
+
+            [tool.isort]
+            profile = "black"
+            line_length = 120
+            combine_as_imports = true
+            indent = "  "
+        """,
         "LICENSE": "",
         "readme.md": """
-      # {name}
+            # {name}
 
-    """,
+        """,
+        ".flake8": """
+            [flake8]
+            max-line-length = 120
+            ignore=
+            E111, # Indentation is not a multiple of four
+            E114, # Indentation is not a multiple of four (comment)
+            E121, # continuation line under-indented for hanging indent
+            E127, # continuation line over-indented for visual indent
+            E128, # continuation line under-indented for visual indent
+            W503, # line break before binary operator
+            W504, # line break after binary operator
+        """,
         ".gitignore": """
-      /.vscode
-      /dist
-      /build
-      .venv/
-      *.egg-info/
-      __pycache__/
-      poetry.lock
-    """,
+            /.vscode
+            /dist
+            /build
+            .venv/
+            *.egg-info/
+            __pycache__/
+            poetry.lock
+        """,
         "src/{path}/__init__.py": """
-
-      __version__ = '0.1.0'
-    """,
-        "test/test_import.py": """
-      def test_import():
-        exec('from {dotted_name} import *')
+            __version__ = "0.1.0"
+        """,
+        "tests/test_import.py": """
+            def test_import():
+                exec("from {dotted_name} import *")
     """,
         "src/{path}/py.typed": "",
     },
     "github": {
         ".github/workflows/python-package.yml": """
-      name: Python application
+            name: Python application
 
-      on:
-        push: {{ branches: [ develop ], tags: [ "*" ] }}
-        pull_request: {{ branches: [ develop ] }}
+            on:
+              push: {{ branches: [ develop ], tags: [ "*" ] }}
+              pull_request: {{ branches: [ develop ] }}
 
-      jobs:
-        test:
-          runs-on: ubuntu-latest
-          strategy:
-            fail-fast: false
-            matrix:
-              python-version: [ "3.7", "3.8", "3.9", "3.10", "3.x" ]
-          steps:
-          - uses: actions/checkout@v2
-          - uses: NiklasRosenstein/slap@gha/install/v1
-          - uses: actions/setup-python@v2
-            with: {{ python-version: "${{{{ matrix.python-version }}}}" }}
-          - run: slap install -vv --no-venv-check
-          - run: slap test
+            jobs:
+              test:
+                runs-on: ubuntu-latest
+                strategy:
+                  fail-fast: false
+                  matrix:
+                    python-version: [ "3.7", "3.8", "3.9", "3.10", "3.x" ]
+                steps:
+                - uses: actions/checkout@v2
+                - uses: NiklasRosenstein/slap@gha/install/v1
+                - uses: actions/setup-python@v2
+                  with: {{ python-version: "${{{{ matrix.python-version }}}}" }}
+                - run: slap install -vv --no-venv-check
+                - run: slap test
 
-        update-changelog:
-          runs-on: ubuntu-latest
-          if: github.event_name == 'pull_request'
-          steps:
-            - uses: actions/checkout@v2
-            - uses: NiklasRosenstein/slap@gha/changelog/update/v1
+              update-changelog:
+                runs-on: ubuntu-latest
+                if: github.event_name == 'pull_request'
+                steps:
+                  - uses: actions/checkout@v2
+                  - uses: NiklasRosenstein/slap@gha/changelog/update/v1
     """,
     },
 }
