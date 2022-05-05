@@ -33,7 +33,7 @@ TEMPLATES = {
             # Repository = ""
 
             [tool.poetry.dependencies]
-            python = "^3.7"
+            python = "^3.6"
 
             [tool.poetry.dev-dependencies]
             black = "*"
@@ -123,7 +123,7 @@ TEMPLATES = {
                 strategy:
                   fail-fast: false
                   matrix:
-                    python-version: [ "3.7", "3.8", "3.9", "3.10", "3.x" ]
+                    python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10", "3.x" ]
                 steps:
                 - uses: actions/checkout@v2
                 - uses: NiklasRosenstein/slap@gha/install/v1

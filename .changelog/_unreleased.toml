@@ -3,3 +3,9 @@ id = "6086ecdb-74c6-4018-860b-3ceeca7d1113"
 type = "improvement"
 description = "Update default template to include black, isort, flake8"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "01e636c8-ad5d-4810-98b0-315ed84faff6"
+type = "improvement"
+description = "Set min Python version in init templates to 3.6"
+author = "@NiklasRosenstein"
