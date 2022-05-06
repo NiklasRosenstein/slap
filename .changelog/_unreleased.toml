@@ -3,3 +3,9 @@ id = "a3bfa069-d920-4269-92af-1a7c74f74a56"
 type = "fix"
 description = "Add missing black options to init template"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "bfa2dff6-fb5f-4c23-ba26-1cd4c657b708"
+type = "improvement"
+description = "Init template now uses dmypy by default"
+author = "@NiklasRosenstein"

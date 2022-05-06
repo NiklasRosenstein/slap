@@ -47,7 +47,7 @@ TEMPLATES = {
 
             [tool.slap.test]
             check = "slap check"
-            mypy = "mypy src/"
+            mypy = "dmypy run src/"
             pytest = "pytest tests/ -vv"
             black = "black --check src/ tests/"
             isort = "isort --check-only src/ tests/"
