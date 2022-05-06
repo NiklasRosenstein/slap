@@ -9,3 +9,9 @@ id = "bfa2dff6-fb5f-4c23-ba26-1cd4c657b708"
 type = "improvement"
 description = "Init template now uses dmypy by default"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "4f109020-213c-4c33-adfd-4c12fc9dbc18"
+type = "improvement"
+description = "Set python_version = 3.6 in Init template"
+author = "@NiklasRosenstein"

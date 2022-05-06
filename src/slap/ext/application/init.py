@@ -57,6 +57,7 @@ TEMPLATES = {
             fmt = "black src/ tests/ && isort src/ tests/"
 
             [tool.mypy]
+            python_version = "3.6"
             explicit_package_bases = true
             mypy_path = ["src"]
             namespace_packages = true
