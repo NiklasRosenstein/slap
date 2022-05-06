@@ -73,6 +73,9 @@ TEMPLATES = {
             line_length = 120
             combine_as_imports = true
             indent = "  "
+
+            [tool.black]
+            line-length = 120
         """,
         "LICENSE": "",
         "readme.md": """

@@ -1,0 +1,5 @@
+[[entries]]
+id = "a3bfa069-d920-4269-92af-1a7c74f74a56"
+type = "fix"
+description = "Add missing black options to init template"
+author = "@NiklasRosenstein"
