@@ -73,7 +73,6 @@ TEMPLATES = {
             profile = "black"
             line_length = 120
             combine_as_imports = true
-            indent = "  "
 
             [tool.black]
             line-length = 120
@@ -86,14 +85,6 @@ TEMPLATES = {
         ".flake8": """
             [flake8]
             max-line-length = 120
-            ignore=
-            E111, # Indentation is not a multiple of four
-            E114, # Indentation is not a multiple of four (comment)
-            E121, # continuation line under-indented for hanging indent
-            E127, # continuation line over-indented for visual indent
-            E128, # continuation line under-indented for visual indent
-            W503, # line break before binary operator
-            W504, # line break after binary operator
         """,
         ".gitignore": """
             /.vscode
