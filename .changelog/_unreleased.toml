@@ -15,3 +15,9 @@ id = "4f109020-213c-4c33-adfd-4c12fc9dbc18"
 type = "improvement"
 description = "Set python_version = 3.6 in Init template"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "c1192d47-238f-4564-a020-ff7a7f6bde1d"
+type = "fix"
+description = "`slap install` no longer calls Pip without dependenciesto install, instead it prints this info and exits successfully"
+author = "@NiklasRosenstein"

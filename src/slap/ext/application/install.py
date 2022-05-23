@@ -250,6 +250,10 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             if not (isinstance(dependency, PypiDependency) and dependency.name in project_names)
         ]
 
+        if not dependencies:
+            self.line("nothing to install.", "info")
+            return 0
+
         options = InstallOptions(
             indexes=get_indexes_for_projects(projects),
             quiet=self.option("quiet"),
