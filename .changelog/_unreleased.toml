@@ -1,0 +1,5 @@
+[[entries]]
+id = "e28158db-ec95-4189-a525-c142bec6a1a7"
+type = "improvement"
+description = "add `strict` option to Mypy settings in template"
+author = "@NiklasRosenstein"

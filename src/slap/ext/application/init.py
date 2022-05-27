@@ -64,6 +64,7 @@ TEMPLATES = {
             pretty = true
             show_error_codes = true
             show_error_context = true
+            strict = true
             warn_no_return = true
             warn_redundant_casts = true
             warn_unreachable = true
