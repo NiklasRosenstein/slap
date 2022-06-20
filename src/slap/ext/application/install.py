@@ -124,7 +124,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         option(
             "--upgrade",
             description="Upgrade already installed packages.",
-            flag=False,
+            flag=True,
         ),
         option(
             "--from",

@@ -1,0 +1,5 @@
+[[entries]]
+id = "74ad840e-acb8-4dd4-ae8f-20c376880857"
+type = "fix"
+description = "Fix `slap install --upgrade` option which is now correctly a flag when it previously incorrectly expected an argument"
+author = "@NiklasRosenstein"
