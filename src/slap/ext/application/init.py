@@ -86,6 +86,10 @@ TEMPLATES = {
         ".flake8": """
             [flake8]
             max-line-length = 120
+            # Black can yield formatted code that triggers these Flake8 warnings.
+            ignore=
+                W503, # line break before binary operator
+                W504, # line break after binary operator
         """,
         ".gitignore": """
             /.vscode

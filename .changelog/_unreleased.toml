@@ -1,0 +1,5 @@
+[[entries]]
+id = "b61f6f13-c563-4369-b59d-434570d6cfc1"
+type = "improvement"
+description = "Add `W503` and `W504` to `.flake8` file of `slap init`"
+author = "@NiklasRosenstein"
