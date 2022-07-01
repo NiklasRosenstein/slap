@@ -84,7 +84,7 @@ def get_spdx_licenses() -> dict[str, SpdxLicense]:
     response = requests.get(url)
     response.raise_for_status()
     licenses = databind.json.load(response.json()["licenses"], list[SpdxLicense], filename=url)
-    return {l.license_id: l for l in licenses}
+    return {line.license_id: line for line in licenses}
 
 
 def get_spdx_license_details(license_id: str) -> SpdxLicenseDetails:

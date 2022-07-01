@@ -12,8 +12,6 @@ from pathlib import Path
 from cleo.application import Application as BaseCleoApplication  # type: ignore[import]
 from cleo.commands.command import Command as _BaseCommand  # type: ignore[import]
 from cleo.helpers import argument, option  # type: ignore[import]
-from cleo.io.inputs.argument import Argument  # type: ignore[import]
-from cleo.io.inputs.option import Option  # type: ignore[import]
 from cleo.io.io import IO  # type: ignore[import]
 from databind.core.settings import Alias
 
@@ -25,9 +23,8 @@ if t.TYPE_CHECKING:
     from slap.configuration import Configuration
     from slap.project import Project
     from slap.repository import Repository
-    from slap.util.vcs import Vcs
 
-__all__ = ["Command", "argument", "option", "IO", "Application", "ApplicationPlugin"]
+__all__ = ["Command", "argument", "option", "IO", "Application"]
 logger = logging.getLogger(__name__)
 
 

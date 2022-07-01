@@ -27,7 +27,6 @@ class GeneralChecksPlugin(CheckPlugin):
 
     @check("typed")
     def _check_py_typed(self, project: Project) -> tuple[CheckResult, str]:
-        check_name = "typed"
         expect_typed = project.config().typed
         if expect_typed is None:
             return Check.Result.WARNING, "<b>tool.slap.typed</b> is not set"

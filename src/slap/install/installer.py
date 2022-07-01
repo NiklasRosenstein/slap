@@ -112,7 +112,7 @@ class PipInstaller(Installer):
                 logger.info("Collecting recursive dependencies for project <val>%s</val>", dependency.path)
                 if self.symlink_helper is None:
                     raise Exception(
-                        f"Unable to install %r because no symlink helper is available in this context", dependency
+                        "Unable to install %r because no symlink helper is available in this context", dependency
                     )
                 dependencies += filter_dependencies(
                     dependencies=self.symlink_helper.get_dependencies_for_project(dependency.path),

@@ -41,7 +41,7 @@ class ChangelogValidationCheckPlugin(CheckPlugin):
 
         return (
             Check.ERROR if bad_changelogs else Check.Result.OK,
-            f"Broken or invalid changelogs" if bad_changelogs else f"All {count} changelogs are valid.",
+            "Broken or invalid changelogs" if bad_changelogs else f"All {count} changelogs are valid.",
             (
                 "\n".join(f"<i>{fn}</i>: {err}" for fn, err in bad_files)
                 if bad_files

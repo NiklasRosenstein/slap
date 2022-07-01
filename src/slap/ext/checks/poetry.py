@@ -60,7 +60,8 @@ class PoetryChecksPlugin(CheckPlugin):
             return Check.Result.OK, f"Poetry readme is configured correctly (path: <b>{detected_readme}</b>)"
         return (
             Check.Result.WARNING,
-            f"Poetry readme appears to be misconfigured (detected: <b>{detected_readme}</b>, configured: <b>{poetry_readme}</b>)",
+            f"Poetry readme appears to be misconfigured (detected: <b>{detected_readme}</b>, "
+            f"configured: <b>{poetry_readme}</b>)",
         )
 
     @check("urls")
@@ -96,7 +97,8 @@ class PoetryChecksPlugin(CheckPlugin):
     def get_classifiers_check(self, project: Project) -> tuple[CheckResult, str]:
         """Checks if all Python package classifiers are valid and recommends to configure them if none are set."""
 
-        # TODO: Check for recommended classifier topics (Development State, Environment, Programming Language, Topic, Typing, etc.)
+        # TODO: Check for recommended classifier topics (Development State, Environment,
+        #       Programming Language, Topic, Typing, etc.)
         classifiers = self.poetry.get("classifiers")  # TODO: Support classifiers in [project]
         if not classifiers:
             return Check.RECOMMENDATION, "Please configure classifiers."
@@ -108,7 +110,7 @@ class PoetryChecksPlugin(CheckPlugin):
             else:
                 bad_classifiers = set(classifiers) - set(good_classifiers)
                 if bad_classifiers:
-                    return Check.ERROR, f"Found bad classifiers: " + ",".join(f'<s>"{c}"</s>' for c in bad_classifiers)
+                    return Check.ERROR, "Found bad classifiers: " + ",".join(f'<s>"{c}"</s>' for c in bad_classifiers)
                 else:
                     return Check.OK, "All classifiers are valid."
 

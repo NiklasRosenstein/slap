@@ -3,7 +3,6 @@ import re
 import subprocess as sp
 from pathlib import Path
 
-from slap import __version__
 from slap.plugins import ChangelogUpdateAutomationPlugin
 
 

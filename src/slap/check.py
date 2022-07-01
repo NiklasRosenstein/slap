@@ -5,8 +5,6 @@ import enum
 import inspect
 import typing as t
 
-from nr.util.generic import T
-
 if t.TYPE_CHECKING:
     from slap.application import Application
     from slap.project import Project

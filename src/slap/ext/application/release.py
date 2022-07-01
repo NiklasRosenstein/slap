@@ -5,8 +5,7 @@ import sys
 import typing as t
 from pathlib import Path
 
-import typing_extensions as te
-from databind.core.settings import Alias, ExtraKeys, Remainder
+from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, argument, option
 from slap.configuration import Configuration
@@ -106,7 +105,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
       commit and tag to the remote Git repository immediately. You can specify the
       <opt>--remote, -r</opt> option to change the remote which will be pushed to (defaults
       to "origin").
-    """
+    """  # noqa: E501
 
     app: Application
     config: dict[Configuration, ReleaseConfig]
@@ -139,7 +138,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         import databind.json
 
         result = {}
-        for project in t.cast(list[Configuration], [app.repository] + app.repository.projects()):  # type: ignore[operator]
+        for project in t.cast(list[Configuration], [app.repository] + app.repository.projects()):  # type: ignore[operator]  # noqa: E501
             data = project.raw_config().get("release", {})
             result[project] = databind.json.load(data, ReleaseConfig)
         self.app = app
@@ -221,7 +220,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
         versions = set(ref.value for ref in version_refs)
         if not versions:
-            self.line(f"<info>no version numbers detected</info>")
+            self.line("<info>no version numbers detected</info>")
             return 1
 
         if len(versions) > 1:
@@ -235,7 +234,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
                 self.line(f"<error>version mismatch, expected <b>{version}</b>, got <b>{has_version}</b></error>")
                 return 1
 
-        self.line(f"<comment>versions are ok</comment>")
+        self.line("<comment>versions are ok</comment>")
         self._show_version_refs(version_refs)
         return 0
 
@@ -252,7 +251,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         try:
             current_branch = self.git.get_current_branch_name()
         except NoCurrentBranchError:
-            self.line_error(f"error: not currently on a Git branch", "error")
+            self.line_error("error: not currently on a Git branch", "error")
             return False
 
         if current_branch != config.branch:
@@ -265,7 +264,8 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         return True
 
     def _check_clean_worktree(self, required_files: list[Path]) -> bool:
-        """Internal. Checks that the Git work state is clean and that all the *required_files* are tracked in the repo."""
+        """Internal. Checks that the Git work state is clean and that all the *required_files* are tracked
+        in the repo."""
 
         if not self.is_git_repository or self.option("no-worktree-check"):
             return True
@@ -284,7 +284,8 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
             return False
         if any(f.mode[0] not in " ?" for f in file_status):
             self.line(
-                "<fg=yellow>found modified files in the staging area. these files will be committed into the release tag.</fg>"
+                "<fg=yellow>found modified files in the staging area. these files will be committed into "
+                "the release tag.</fg>"
             )
             if not self.confirm("continue?"):
                 return False
@@ -353,7 +354,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         for plugin in self._load_plugins(self.app.repository):
             try:
                 changed_files.extend(plugin.create_release(self.app.repository, str(target_version), dry))
-            except:
+            except BaseException:
                 self.line_error(f"error with {type(plugin).__name__}.bump_version()", "error")
                 raise
 
@@ -416,8 +417,9 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
                 version_ref = match_version_ref_pattern(project.directory / config.file, pattern)
                 if version_ref and version_ref.value == "":
                     self.line_error(
-                        f"warning: custom reference <b>{config}</b> matches an empty string.\n  make sure you have at least one "
-                        f"character after the <b>{{version}}</b> construct (ex. <b>version: {{version}}$</b>)",
+                        f"warning: custom reference <b>{config}</b> matches an empty string.\n  make sure you have "
+                        f"at least one character after the <b>{{version}}</b> construct "
+                        "(ex. <b>version: {{version}}$</b>)",
                         "warning",
                     )
                 if version_ref is not None:
@@ -439,7 +441,6 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     def handle(self) -> int:
         """Entrypoint for the command."""
 
-        from nr.util import Stream
         from nr.util.git import Git
 
         self.git = Git()
@@ -475,7 +476,8 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
         else:
             self.line_error(
-                "<error>error: no action implied, specify a <info>version</info> argument or the <info>--validate</info> option"
+                "<error>error: no action implied, specify a <info>version</info> argument or the "
+                "<info>--validate</info> option"
             )
             return 1
 

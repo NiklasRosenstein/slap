@@ -20,7 +20,7 @@ class ChangelogReleasePlugin(ReleasePlugin):
                 old = unreleased.path.relative_to(cwd)
                 new = new_version.path.relative_to(cwd)
                 if not changed_files:
-                    self.io.write_line(f"releasing changelog")
+                    self.io.write_line("releasing changelog")
                 self.io.write_line(f"  <fg=cyan>{old}</fg> → <b>{new}</b>")
                 if not dry:
                     unreleased.release(target_version)

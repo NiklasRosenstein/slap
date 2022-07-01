@@ -46,7 +46,8 @@ class SourceCodeVersionReferencesPlugin(ReleasePlugin):
 
         if packages_without_version:
             logger.warning(
-                "Unable to detect <val>__version__</val> in the following packages of project <subj>%s</sub>: <obj>%s</obj>",
+                "Unable to detect <val>__version__</val> in the following packages of project "
+                "<subj>%s</sub>: <obj>%s</obj>",
                 project,
                 [p.name for p in packages_without_version],
             )

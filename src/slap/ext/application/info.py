@@ -61,7 +61,7 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
                 self.line(f"  depends on: {project_names}")
 
             deps = project.dependencies()
-            self.line(f"  dependencies:")
+            self.line("  dependencies:")
             self._print_deps("run", deps.run)
             self._print_deps("dev", deps.dev)
             for key, value in deps.extra.items():

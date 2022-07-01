@@ -121,7 +121,8 @@ class VenvAwareCommand(Command):
     def execute(self, io: IO) -> int:
         if os.getenv("VIRTUAL_ENV"):
             io.error_output.write_line(
-                f'<info>(venv-aware) a virtual environment is already activated (<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
+                "<info>(venv-aware) a virtual environment is already activated "
+                f'(<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
             )
         else:
             manager = VenvManager()
@@ -133,7 +134,7 @@ class VenvAwareCommand(Command):
                 )
             else:
                 io.error_output.write_line(
-                    f"<warning>(venv-aware) there is no current environment that can be activated</warning>"
+                    "<warning>(venv-aware) there is no current environment that can be activated</warning>"
                 )
 
         return super().execute(io)
@@ -184,7 +185,8 @@ class VenvCommand(Command):
             "--activate",
             "-a",
             description="Activate the environment given by the environment name. Note that using this option if used "
-            "directly with the Slap CLI will cause an error because it needs to be shadowed by a function of your shell.",
+            "directly with the Slap CLI will cause an error because it needs to be shadowed by a function of your "
+            "shell.",
         ),
         option(
             "--create",
@@ -366,7 +368,7 @@ class VenvCommand(Command):
 
         if self.option("delete"):
             if not venv:
-                self.line_error(f"error: missing environment name", "error")
+                self.line_error("error: missing environment name", "error")
                 return 1
             if not venv.exists():
                 self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', "error")
@@ -388,7 +390,7 @@ class VenvCommand(Command):
                 if venv and self.argument("name"):
                     self.line_error(f'error: environment <s>"{venv.name}"</s> does not exist', "error")
                 else:
-                    self.line_error(f"error: no active environment", "error")
+                    self.line_error("error: no active environment", "error")
                 return 1
             print(venv.directory.absolute())
 

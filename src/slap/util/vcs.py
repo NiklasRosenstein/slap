@@ -5,12 +5,9 @@ import re
 import typing as t
 from pathlib import Path
 
-import requests
 from nr.util.functional import Consumer
 from nr.util.generic import T
 from nr.util.git import Git as _Git, NoCurrentBranchError
-
-from slap.changelog import is_url
 
 
 class FileStatus(enum.Enum):
@@ -94,9 +91,9 @@ class Vcs(abc.ABC):
         name: str | None = None,
         log_line: Consumer[str] | None = None,
     ) -> None:
-        """Commit the given files into the VCS, and optionally create a tag with the given name. If a remote is specified
-        for the *push* argument, the commit that was just created on the current branch as well as the tag name if one was
-        specified will be pushed to the remote."""
+        """Commit the given files into the VCS, and optionally create a tag with the given name. If a remote is
+        specified for the *push* argument, the commit that was just created on the current branch as well as the tag
+        name if one was specified will be pushed to the remote."""
 
     @classmethod
     @abc.abstractclassmethod

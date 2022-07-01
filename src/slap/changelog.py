@@ -117,7 +117,7 @@ class ManagedChangelog:
     def save(self, changelog: Changelog | None) -> None:
         if changelog is None:
             if self._content is None:
-                raise RuntimeError(f'ManagedChangelog.content was not loaded and no "changelog" parameter was provided')
+                raise RuntimeError('ManagedChangelog.content was not loaded and no "changelog" parameter was provided')
             changelog = self._content
         if changelog.release_date is None and self.path.name != self._manager.unreleased_fn:
             raise RuntimeError(
@@ -226,11 +226,11 @@ class ChangelogManager:
         if self.valid_types is not None and entry.type not in self.valid_types:
             raise ValueError(f"invalid change type: {entry.type}")
         if entry.authors is not None and entry.author is not None:
-            raise ValueError(f'entry has "author" and "authors", only one should be present')
+            raise ValueError('entry has "author" and "authors", only one should be present')
         if not entry.get_authors():
-            raise ValueError(f'entry has no "author" or "authors"')
+            raise ValueError('entry has no "author" or "authors"')
         if not all(entry.get_authors()):
-            raise ValueError(f"empty string in author(s)")
+            raise ValueError("empty string in author(s)")
         if self.repository_host:
             if entry.pr:
                 entry.pr = self.repository_host.get_pull_request_by_reference(entry.pr).url

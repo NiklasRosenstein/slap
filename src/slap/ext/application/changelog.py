@@ -8,7 +8,7 @@ from pathlib import Path
 from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, argument, option
-from slap.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
+from slap.changelog import Changelog, ChangelogManager, ManagedChangelog
 from slap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
 from slap.project import Project
 from slap.repository import Issue, PullRequest, Repository
@@ -104,7 +104,8 @@ class ChangelogAddCommand(BaseChangelogCommand):
         option(
             "--type",
             "-t",
-            description=f"The type of the changelog. Unless configured differently, one of {', '.join(DEFAULT_VALID_TYPES)}",
+            description="The type of the changelog. Unless configured differently, one of "
+            "{', '.join(DEFAULT_VALID_TYPES)}",
             flag=False,
         ),
         option(
@@ -116,7 +117,8 @@ class ChangelogAddCommand(BaseChangelogCommand):
         option(
             "--author",
             "-a",
-            description="Your username or email address. By default, this will be your configured Git name and email address.",
+            description="Your username or email address. By default, this will be your configured "
+            "Git name and email address.",
             flag=False,
         ),
         option(
@@ -131,24 +133,25 @@ class ChangelogAddCommand(BaseChangelogCommand):
         option(
             "--issue",
             "-i",
-            description="An issue related to this changelog. If the remote repository is well supported by Slap, an issue "
-            "number may be specified and converted to a full URL by Slap, otherwise a full URL must be specified.",
+            description="An issue related to this changelog. If the remote repository is well supported by Slap, "
+            "an issue number may be specified and converted to a full URL by Slap, otherwise a full URL must be "
+            "specified.",
             flag=False,
             multiple=True,
         ),
         option(
             "--commit",
             "-c",
-            description="Commit the currently staged changes in the VCS as well as the updated changelog file to disk. The "
-            "commit message is a concatenation of the <opt>--type, -t</opt> and <opt>--description, -d</opt>, as well as "
-            "the directory relative to the VCS toplevel if the changelog is created not in the toplevel directory of the "
-            "repository.",
+            description="Commit the currently staged changes in the VCS as well as the updated changelog file to disk. "
+            "The commit message is a concatenation of the <opt>--type, -t</opt> and <opt>--description, -d</opt>, as "
+            "well as the directory relative to the VCS toplevel if the changelog is created not in the toplevel "
+            "directory of the repository.",
         ),
     ]
 
     def handle(self) -> int:
         if self.manager.readonly:
-            self.line_error(f"error: cannot add changelog because the feature must be enabled in the config", "error")
+            self.line_error("error: cannot add changelog because the feature must be enabled in the config", "error")
             return 1
 
         vcs = self.app.repository.vcs()
@@ -247,8 +250,8 @@ class ChangelogUpdatePrCommand(Command):
         ),
         option(
             "--use",
-            description="Use the specified plugin to publish the updated changelogs. Use this in supported CI environments "
-            "instead of manually configuring the command-line settings.",
+            description="Use the specified plugin to publish the updated changelogs. Use this in supported CI "
+            "environments instead of manually configuring the command-line settings.",
             flag=False,
         ),
         option(
@@ -384,7 +387,7 @@ class ChangelogUpdatePrCommand(Command):
 
         if self.option("push") and not self.option("commit"):
             self.line_error(
-                f"error: <opt>--push, -p</opt> can only be used in combination with <opt>--commit, -c</opt>", "error"
+                "error: <opt>--push, -p</opt> can only be used in combination with <opt>--commit, -c</opt>", "error"
             )
             return False
 
@@ -452,7 +455,7 @@ class ChangelogFormatCommand(BaseChangelogCommand):
 
     def _validate_arguments(self) -> bool:
         if self.option("all") and self.argument("version"):
-            self.line_error(f"error: <opt>--all, -a</opt> is incompatible with <opt>version</opt> argument", "error")
+            self.line_error("error: <opt>--all, -a</opt> is incompatible with <opt>version</opt> argument", "error")
             return False
         return True
 
@@ -475,7 +478,7 @@ class ChangelogFormatCommand(BaseChangelogCommand):
             assert changelog.content.release_date
             print(f"## {changelog.version} ({changelog.content.release_date})")
         else:
-            print(f"## Unreleased")
+            print("## Unreleased")
             if not changelog.exists():
                 return
 
@@ -549,7 +552,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
     def handle(self) -> int:
         import yaml
 
-        vcs = self.app.repository.vcs()
+        # vcs = self.app.repository.vcs()
         author = self.option("author") or get_default_author(self.app)
 
         if not author:

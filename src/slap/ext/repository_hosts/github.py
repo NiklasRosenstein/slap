@@ -23,8 +23,8 @@ def github_get_username_from_email(api_base_url: str, email: str) -> str:
 @dataclasses.dataclass
 class GithubRepositoryHost(RepositoryHost):
 
-    #: The owner and repository name separated by a slash. If the repository is hosted on GitHub enterprise, the
-    #: domain of the GHE instance must precede the owner and repository name by another slash (e.g. `ghe.io/owner/repo`).
+    #: The owner and repository name separated by a slash. If the repository is hosted on GitHub enterprise, the domain
+    #: of the GHE instance must precede the owner and repository name by another slash (e.g. `ghe.io/owner/repo`).
     repo: str
 
     def _get_base_url(self) -> str:
@@ -32,7 +32,7 @@ class GithubRepositoryHost(RepositoryHost):
         if len(parts) == 3:
             return f"https://{parts[0]}"
         else:
-            return f"https://github.com"
+            return "https://github.com"
 
     def _get_api_url(self) -> str:
         # TODO (@NiklasRosenstein): Can we rely on GHE having an `api.` subdomain?

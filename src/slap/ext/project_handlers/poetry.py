@@ -7,7 +7,6 @@ import typing as t
 
 from slap.ext.project_handlers.base import PyprojectHandler
 from slap.project import Dependencies, Package, Project
-from slap.python.dependency import Dependency, PypiDependency
 
 if t.TYPE_CHECKING:
     from slap.python.dependency import Dependency

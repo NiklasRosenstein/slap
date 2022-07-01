@@ -6,7 +6,6 @@ import json
 import logging
 import pickle
 import subprocess as sp
-import sys
 import textwrap
 import typing as t
 from pathlib import Path

@@ -49,7 +49,7 @@ def get_classifiers(force_refresh: bool = False) -> list[str]:
         os.makedirs(os.path.dirname(CACHE_FILENAME), exist_ok=True)
         with open(CACHE_FILENAME, "w") as fp:
             fp.writelines((x + "\n" for x in classifiers))
-    except:
+    except BaseException:
         logger.exception("Unable to write classifiers cache file.")
 
     _runtime_cache = classifiers

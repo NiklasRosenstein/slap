@@ -163,7 +163,7 @@ class PypiDependency(Dependency, _PypiDependency):
         match = re.match(r"\s*[^<>=!~\^\(\)\*]+", value)
         if match:
             name = match.group(0)
-            version_spec = VersionSpec(value[match.end() :].strip())
+            version_spec = VersionSpec(value[match.end() :].strip())  # noqa: E203
         else:
             name = value
             version_spec = VersionSpec("")
@@ -172,10 +172,10 @@ class PypiDependency(Dependency, _PypiDependency):
         return PypiDependency(name=name, version=version_spec, extras=extras, markers=markers.strip() or None)
 
     @staticmethod
-    def parse_list(l: t.Iterable[str]) -> list[PypiDependency]:
+    def parse_list(lst: t.Iterable[str]) -> list[PypiDependency]:
         """Parses a list of strings as #PypiDependency#s."""
 
-        return [PypiDependency.parse(x) for x in l]
+        return [PypiDependency.parse(x) for x in lst]
 
 
 @dataclasses.dataclass
@@ -250,7 +250,8 @@ def parse_dependency_string(value: str) -> Dependency:
 
     value = re.sub(r"\s--(\w+)=(.*)(\s|$)", handle_option, value)
 
-    # Check if it's a dependency of the form `<name> @ <package>`. This can be either a #UrlDependency or #GitDependency.
+    # Check if it's a dependency of the form `<name> @ <package>`. This can be either a
+    # #UrlDependency or #GitDependency.
     if "@" in value:
         markers: str | None
         name, url = value.partition("@")[::2]
@@ -322,7 +323,7 @@ def _parse_single_dependency_config(name: str, dep: str | dict[str, t.Any]) -> D
         >>> _parse_single_dependency_config('foo', 'git+https://github.com/foo/foo.git') == GitDependency('foo', 'https://github.com/foo/foo.git')
         >>> _parse_single_dependency_config('foo', {'version': '1.2.3'}) == PypiDependency('foo', VersionSpec('1.2.3'))
         >>> _parse_single_dependency_config('foo', {'git': 'https://...'}) == GitDependency('foo', 'https://...')
-    """
+    """  # noqa: E501
 
     dependency: Dependency
 
@@ -340,7 +341,8 @@ def _parse_single_dependency_config(name: str, dep: str | dict[str, t.Any]) -> D
         ):
             dependency = parse_dependency_string(f"{name} @ {dep}")
         else:
-            # If dep is _just_ a version number, we need to prefix it with a = to ensure the PypiDependency is parsed correctly.
+            # If dep is _just_ a version number, we need to prefix it with a = to ensure the PypiDependency
+            # is parsed correctly.
             dep = dep.strip()
             if dep and dep[0].isnumeric():
                 dep = f"={dep}"

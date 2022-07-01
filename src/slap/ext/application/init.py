@@ -2,7 +2,6 @@ import datetime
 import textwrap
 from pathlib import Path
 
-from slap import __version__
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
 from slap.util.external.licenses import get_spdx_license_details, wrap_license_text
@@ -252,7 +251,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
             if self.option("as-markdown"):
                 print(f'```{path.suffix[1:]} title="{path}"')
                 print(content, "    ")
-                print(f"```\n\n")
+                print("```\n\n")
                 continue
 
             if path.exists() and not self.option("overwrite"):

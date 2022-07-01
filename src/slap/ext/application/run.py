@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import shlex
 import subprocess as sp
-import typing as t
 
-from slap.application import Application, Command, argument
+from slap.application import Application, argument
 from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 

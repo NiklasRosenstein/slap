@@ -80,7 +80,7 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
             exit_code = 0
 
         self.line(
-            f"Summary: "
+            "Summary: "
             + ", ".join(
                 f"{count} <fg={COLORS[result]};options=bold>{result.name}</fg>"
                 for result, count in sorted(counter.items())
@@ -163,6 +163,6 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
                 checks.append(check)
 
         if checks:
-            self.line(f"Global checks:")
+            self.line("Global checks:")
             self._print_checks(checks)
             self.line("")

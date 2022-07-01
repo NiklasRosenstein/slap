@@ -3,7 +3,6 @@ from __future__ import annotations
 import dataclasses
 import logging
 import os
-import shlex
 import typing as t
 from pathlib import Path
 
@@ -96,7 +95,8 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         option(
             "--only",
             description="Path to the subproject to install only. May still cause other projects to be installed if "
-            "required by the selected project via inter dependencies, but only their run dependencies will be installed.",
+            "required by the selected project via inter dependencies, but only their run dependencies will be "
+            "installed.",
             flag=False,
         ),
         option(
@@ -293,7 +293,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         else:
             if not self.app.repository.projects:
-                self.line_error(f"error: no projects found")
+                self.line_error("error: no projects found")
                 return []
             return self.app.repository.get_projects_ordered()
 

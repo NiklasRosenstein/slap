@@ -47,8 +47,9 @@ class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         ),
         option(
             "--upgrade",
-            description="Upgrade dependencies that are already installed and declared in the project. If the dependency "
-            "is already declared, the --source option can be skipped as it will be inherited from the declaration.",
+            description="Upgrade dependencies that are already installed and declared in the project. If the "
+            "dependency is already declared, the --source option can be skipped as it will be inherited from "
+            "the declaration.",
         ),
         venv_check_option,
         python_option,
@@ -72,7 +73,7 @@ class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         project = self.app.main_project()
         if not project or not project.is_python_project:
-            self.line_error(f"error: not situated in a Python project", "error")
+            self.line_error("error: not situated in a Python project", "error")
             return 1
 
         dependencies: dict[str, PypiDependency] = {}
