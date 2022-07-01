@@ -112,13 +112,6 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     ]
     options = [
         option(
-            "--exclude",
-            "-x",
-            description="Do not run the specified test. Can be passed multiple times.",
-            flag=False,
-            multiple=True,
-        ),
-        option(
             "--no-line-prefix",
             "-s",
             description="Do not prefix output from the test commands with the test name (default if a single argument "
@@ -128,6 +121,13 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             "--list",
             "-l",
             description="List all available tests",
+        ),
+        option(
+            "--exclude",
+            "-x",
+            description="Do not run the specified test. Can be passed multiple times.",
+            flag=False,
+            multiple=True,
         ),
     ]
     options[0]._default = NotSet.Value  # Hack to set a default value for the flag
