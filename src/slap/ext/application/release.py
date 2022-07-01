@@ -335,7 +335,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
         changed_files: list[Path] = []
 
-        self._show_version_refs(version_refs, target_version)
+        self._show_version_refs(version_refs, str(target_version))
         self.line("")
         for filename, refs in Stream(version_refs).groupby(lambda r: r.file):
             with open(filename) as fp:
@@ -470,7 +470,9 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
             target_version = self._get_new_version(version_refs, version)
             changed_files = self._bump_version(version_refs, target_version, self.option("dry"))
             if self.option("tag"):
-                tag_name = self._create_tag(target_version, changed_files, self.option("dry"), self.option("force"))
+                tag_name = self._create_tag(
+                    str(target_version), changed_files, self.option("dry"), self.option("force")
+                )
                 if self.option("push"):
                     self._push_to_remote(tag_name, self.option("remote"), self.option("dry"), self.option("force"))
 

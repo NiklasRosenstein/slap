@@ -28,10 +28,10 @@ class VersionSpec:
     dependency specification, or a [Poetry Dependencies][] specification string."""
 
     def __init__(self, version_spec: str) -> None:
-        from poetry.core.packages.dependency import Dependency  # type: ignore[import]
+        from poetry.core.packages.dependency import Dependency as _PoetryDependency  # type: ignore[import]
 
         self.__original = version_spec
-        self.__dependency = Dependency("", version_spec)
+        self.__dependency = _PoetryDependency("", version_spec)
 
     def __bool__(self) -> bool:
         """Returns `True` if the version spec is initialized from an empty string. Note that it will otherwise
