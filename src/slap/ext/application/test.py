@@ -112,8 +112,15 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     ]
     options = [
         option(
+            "--exclude",
+            "-x",
+            description="Do not run the specified test. Can be passed multiple times.",
+            flag=False,
+            multiple=True,
+        ),
+        option(
             "--no-line-prefix",
-            "s",
+            "-s",
             description="Do not prefix output from the test commands with the test name (default if a single argument "
             "for <info>test</info> is specified).",
         ),
@@ -164,6 +171,7 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             return 1
 
         test_names: list[str] = self.argument("test")
+        exclude_tests: list[str] = self.option("exclude")
 
         if not test_names:
             tests = set(self.tests)
@@ -173,6 +181,8 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             except ValueError as exc:
                 self.line_error(f"error: {exc}", "error")
                 return 1
+
+        tests -= {t for a in exclude_tests for t in self._select_tests(a)}
 
         if (no_line_prefix := self.option("no-line-prefix")) is NotSet.Value:
             no_line_prefix = test_names is not None and len(tests) == 1
