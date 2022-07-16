@@ -1,0 +1,5 @@
+[[entries]]
+id = "443f4a96-6bcc-42d6-8971-591567cf710b"
+type = "fix"
+description = "`slap publish` now builds from the current project subdirectory"
+author = "@NiklasRosenstein"

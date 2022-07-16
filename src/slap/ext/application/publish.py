@@ -92,7 +92,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
                     continue
 
                 self.line(f"Build <info>{project.dist_name()}</info>")
-                builder = build.ProjectBuilder(Path.cwd(), executable)
+                builder = build.ProjectBuilder(project.directory, executable)
 
                 sdist = Path(builder.build("sdist", build_dir))
                 self.line(f"  <comment>{sdist.name}</comment>")
