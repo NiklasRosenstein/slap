@@ -130,7 +130,7 @@ warn_no_return = true
 warn_unreachable = true
 show_error_context = true
 show_error_codes = true
-namespace_packages = true
+# namespace_packages = true
 
 [tool.black]
 line-length = 120
