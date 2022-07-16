@@ -20,6 +20,7 @@ jobs:
     - run: pip install . && slap install --no-venv-check
     - run: slap info
     - run: slap test
+    - run: slap publish --dry
 
   test-pep508:
     runs-on: ubuntu-latest
