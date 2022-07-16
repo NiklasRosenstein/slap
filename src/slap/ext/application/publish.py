@@ -80,7 +80,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
             for project in self.app.repository.projects():
                 if isolated_env:
-                    isolated_env.install(project.dependencies().build)
+                    isolated_env.install([str(x) for x in project.dependencies().build])
                 if not project.is_python_project:
                     continue
 

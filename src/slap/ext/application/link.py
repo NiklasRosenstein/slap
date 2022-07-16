@@ -83,7 +83,7 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             directory = src_dir
         return directory
 
-    def handle(self) -> int | None:
+    def handle(self) -> int:
         result = super().handle()
         if result != 0:
             return result
@@ -92,7 +92,7 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             return 1
 
         link_repository(self.io, self.app.repository, self.option("dump-pyproject"), get_active_python_bin(self))
-        return None
+        return 0
 
 
 def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False, python: str | None = None) -> None:

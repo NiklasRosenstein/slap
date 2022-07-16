@@ -40,7 +40,9 @@ class FlitProjectHandler(PyprojectHandler):
 
         flit: dict[str, t.Any] | None = project.pyproject_toml.get("tool", {}).get("flit")
         project_conf: dict[str, t.Any] | None = project.pyproject_toml.get("project")
-        build_dependencies = project.pyproject_toml.get("build-system", {}).get("requires", [])
+        build_dependencies = PypiDependency.parse_list(
+            project.pyproject_toml.get("build-system", {}).get("requires", [])
+        )
 
         if project_conf is not None:
             optional = project_conf.get("optional-dependencies", {})

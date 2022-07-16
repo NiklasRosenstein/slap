@@ -33,12 +33,16 @@ class ReportDependenciesCommand(VenvAwareCommand):
         super().__init__()
         self.app = app
 
-    def handle(self) -> None:
+    def handle(self) -> int:
         import databind.json
         import tqdm  # type: ignore[import]
 
         from slap.python.environment import DistributionGraph, PythonEnvironment, build_distribution_graph
         from slap.python.pep508 import filter_dependencies
+
+        result = super().handle()
+        if result != 0:
+            return result
 
         extras = set(filter(bool, map(str.strip, (self.option("extras") or "").split(","))))
 
@@ -78,6 +82,7 @@ class ReportDependenciesCommand(VenvAwareCommand):
                             pass
 
         print(json.dumps(output, indent=2, sort_keys=True))
+        return 0
 
 
 class ReportPlugin(ApplicationPlugin):

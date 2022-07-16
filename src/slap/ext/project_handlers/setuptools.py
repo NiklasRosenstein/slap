@@ -78,6 +78,7 @@ class SetuptoolsProjectHandler(BaseProjectHandler):
                 extra: PypiDependency.parse_list(parse_list_semi(value))
                 for extra, value in options.get("extras_require", {}).items()
             },
+            PypiDependency.parse_list(parse_list_semi(options.get("setup_requires", ""))),
         )
 
     def get_version_refs(self, project: Project) -> list[VersionRef]:

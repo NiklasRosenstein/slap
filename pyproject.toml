@@ -110,7 +110,7 @@ github = "slap.ext.repository_hosts.github:GithubRepositoryHost"
 typed = true
 
 [tool.slap.test]
-mypy = "mypy src --namespace-packages"
+mypy = "dmypy run src"
 pytest = "pytest tests/ -vv"
 check = "slap check"
 isort = "isort src/ tests/ --check-only"
@@ -130,6 +130,7 @@ warn_no_return = true
 warn_unreachable = true
 show_error_context = true
 show_error_codes = true
+namespace_packages = true
 
 [tool.black]
 line-length = 120
