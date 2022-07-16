@@ -118,7 +118,7 @@ black = "black src/ tests/ --check"
 flake8 = "flake8 src/ tests/"
 
 [tool.slap.run]
-"docs:build" = "cd docs && novella --base-url slap/"
+"docs:build" = "cd docs && novella --base-url slap-cli/"
 "docs:dev" = "cd docs && novella --serve"
 fmt = "isort src/ tests/ && black src/ tests"
 
