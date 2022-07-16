@@ -8,8 +8,6 @@ import build.env
 from slap.application import Application, Command, option
 from slap.plugins import ApplicationPlugin
 
-from .install import python_option
-
 
 class PublishCommandPlugin(Command, ApplicationPlugin):
     """A wrapper to publish the Python project to a repository such as PyPI.
