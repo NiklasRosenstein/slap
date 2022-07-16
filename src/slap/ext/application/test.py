@@ -105,6 +105,7 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
     app: Application
     tests: list[Test]
+    requires_venv: t.ClassVar[bool] = False
 
     name = "test"
     arguments = [

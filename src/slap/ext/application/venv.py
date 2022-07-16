@@ -118,6 +118,8 @@ class VenvAwareCommand(Command):
     command is executed, it will check if we're currently in a virtual environment. If not, it will activate
     the environment that is considered "active" by the Slap `venv` command."""
 
+    requires_venv: t.ClassVar[bool] = True
+
     options = [
         option(
             "no-venv-check",
@@ -141,7 +143,7 @@ class VenvAwareCommand(Command):
                 self.io.error_output.write_line(
                     f'<info>(venv-aware) activating current environment <s>"{venv.name}"</s></info>'
                 )
-            else:
+            elif self.requires_venv:
                 self.io.error_output.write_line(
                     "<warning>(venv-aware) there is no current environment that can be activated</warning>"
                 )

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shlex
 import subprocess as sp
+from typing import ClassVar
 
 from slap.application import Application, argument
 from slap.ext.application.venv import VenvAwareCommand
@@ -20,7 +21,9 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         $ slap run pytest -- -vv
     """
 
-    name = "run"
+    name: str = "run"
+    requires_venv: ClassVar[bool] = False
+
     arguments = [
         argument(
             "args",
