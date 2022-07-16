@@ -1,12 +1,19 @@
 import contextlib
 import tempfile
 from pathlib import Path
+from typing import Iterable
 
 import build
 import build.env
 
 from slap.application import Application, Command, option
+from slap.install.installer import PipInstaller
 from slap.plugins import ApplicationPlugin
+
+
+def flatten(it: Iterable[Iterable[str]]) -> Iterable[str]:
+    for item in it:
+        yield from item
 
 
 class PublishCommandPlugin(Command, ApplicationPlugin):
@@ -78,7 +85,9 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
             for project in self.app.repository.projects():
                 if isolated_env:
-                    isolated_env.install([str(x) for x in project.dependencies().build])
+                    isolated_env.install(
+                        list(flatten(PipInstaller.dependency_to_pip_arguments(x) for x in project.dependencies().build))
+                    )
                 if not project.is_python_project:
                     continue
 
