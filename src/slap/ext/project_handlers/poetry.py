@@ -68,6 +68,7 @@ class PoetryProjectHandler(PyprojectHandler):
             run=[d for d in dependencies if d.name != "python"],
             dev=parse_dependencies(poetry.get("dev-dependencies", [])),
             extra={k: parse_dependencies(v) for k, v in poetry.get("extras", {}).items()},
+            build=project.pyproject_toml.get("build-system", {}).get("requires", []),
             indexes=indexes,
         )
 

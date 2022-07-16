@@ -28,6 +28,7 @@ class Dependencies:
     run: t.Sequence[Dependency]
     dev: t.Sequence[Dependency]
     extra: t.Mapping[str, t.Sequence[Dependency]]
+    build: t.Sequence[Dependency]
     indexes: Indexes = None  # type: ignore  # To avoid having to import the Indexes class globally
 
     def __post_init__(self) -> None:

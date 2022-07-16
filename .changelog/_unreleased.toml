@@ -15,3 +15,12 @@ author = "@NiklasRosenstein"
 issues = [
     "https://github.com/NiklasRosenstein/slap/issues/61",
 ]
+
+[[entries]]
+id = "87694a2f-65d3-45f1-a758-0533b85a40e8"
+type = "improvement"
+description = "use `build` module instead of hand-crafted build backend, add `Dependencies.build` property"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/slap/issues/53",
+]

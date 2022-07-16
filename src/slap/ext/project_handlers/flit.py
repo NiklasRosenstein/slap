@@ -40,6 +40,7 @@ class FlitProjectHandler(PyprojectHandler):
 
         flit: dict[str, t.Any] | None = project.pyproject_toml.get("tool", {}).get("flit")
         project_conf: dict[str, t.Any] | None = project.pyproject_toml.get("project")
+        build_dependencies = project.pyproject_toml.get("build-system", {}).get("requires", [])
 
         if project_conf is not None:
             optional = project_conf.get("optional-dependencies", {})
@@ -48,6 +49,7 @@ class FlitProjectHandler(PyprojectHandler):
                 PypiDependency.parse_list(project_conf.get("dependencies", [])),
                 PypiDependency.parse_list(optional.pop("dev", [])),
                 {extra: PypiDependency.parse_list(value) for extra, value in optional.items()},
+                build_dependencies,
             )
         elif flit is not None:
             optional = flit.get("requires-extra", {})
@@ -56,10 +58,11 @@ class FlitProjectHandler(PyprojectHandler):
                 PypiDependency.parse_list(flit.get("requires", [])),
                 PypiDependency.parse_list(optional.pop("dev", [])),
                 {extra: PypiDependency.parse_list(value) for extra, value in optional.items()},
+                build_dependencies,
             )
         else:
             logger.warning("Unable to read dependencies for project <subj>%s</subj>", project)
-            return Dependencies(None, [], [], {})
+            return Dependencies(None, [], [], {}, build_dependencies)
 
     def get_add_dependency_toml_location_and_config(
         self,

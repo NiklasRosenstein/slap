@@ -2,9 +2,13 @@ import contextlib
 import tempfile
 from pathlib import Path
 
+import build
+import build.env
+
 from slap.application import Application, Command, option
 from slap.plugins import ApplicationPlugin
-from slap.python.pep517 import BuildBackend
+
+from .install import python_option
 
 
 class PublishCommandPlugin(Command, ApplicationPlugin):
@@ -24,6 +28,12 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
     name = "publish"
     options = [
+        option(
+            "python",
+            flag=False,
+            description="use this Python executable to build the distribution but do not automatically install build "
+            "requirements into it; if not specified a temporary build environment is created",
+        ),
         option("repository", "r", flag=False, default="pypi"),
         option("repository-url", flag=False),
         option("sign", "s"),
@@ -61,18 +71,25 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
             if build_dir is None:
                 build_dir = stack.enter_context(tempfile.TemporaryDirectory())
 
+            executable = self.option("python")
+            if not executable:
+                isolated_env = stack.enter_context(build.env.IsolatedEnvBuilder())
+                executable = isolated_env.executable
+            else:
+                isolated_env = None
+
             for project in self.app.repository.projects():
+                if isolated_env:
+                    isolated_env.install(project.dependencies().build)
                 if not project.is_python_project:
                     continue
 
                 self.line(f"Build <info>{project.dist_name()}</info>")
-                backend = BuildBackend(
-                    project.pyproject_toml.value()["build-system"]["build-backend"], project.directory, Path(build_dir)
-                )
+                builder = build.ProjectBuilder(Path.cwd(), executable)
 
-                sdist = backend.build_sdist()
+                sdist = Path(builder.build("sdist", build_dir))
                 self.line(f"  <comment>{sdist.name}</comment>")
-                wheel = backend.build_wheel()
+                wheel = Path(builder.build("wheel", build_dir))
                 self.line(f"  <comment>{wheel.name}</comment>")
 
                 distributions += [sdist, wheel]
