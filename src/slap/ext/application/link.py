@@ -9,7 +9,7 @@ from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.repository import Repository
 
-from .install import get_active_python_bin, python_option, venv_check, venv_check_option
+from .install import get_active_python_bin, python_option, venv_check
 
 
 class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
@@ -62,13 +62,12 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
     name = "link"
     help = textwrap.dedent(__doc__)
-    options = [
+    options = VenvAwareCommand.options + [
         python_option,
         option(
             "--dump-pyproject",
             description="Dump the updated pyproject.toml and do not actually do the linking.",
         ),
-        venv_check_option,
     ]
 
     def load_configuration(self, app: Application) -> None:
@@ -85,6 +84,10 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         return directory
 
     def handle(self) -> int | None:
+        result = super().handle()
+        if result != 0:
+            return result
+
         if not venv_check(self, "refusing to link"):
             return 1
 

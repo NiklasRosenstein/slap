@@ -6,7 +6,7 @@ import subprocess as sp
 import typing as t
 from pathlib import Path
 
-from slap.application import IO, Application, Command, argument, option
+from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
 from slap.python.environment import PythonEnvironment
 
@@ -118,10 +118,19 @@ class VenvAwareCommand(Command):
     command is executed, it will check if we're currently in a virtual environment. If not, it will activate
     the environment that is considered "active" by the Slap `venv` command."""
 
-    def execute(self, io: IO) -> int:
+    options = [
+        option(
+            "no-venv-check",
+            description="Do not check if the target Python environment is a virtual environment.",
+        )
+    ]
+
+    def handle(self) -> int:
+        if self.option("no-venv-check"):
+            return 0
         if os.getenv("VIRTUAL_ENV"):
-            io.error_output.write_line(
-                "<info>(venv-aware) a virtual environment is already activated "
+            self.io.error_output.write_line(
+                "<info>(venv-aware) a virtual environment is already activated"
                 f'(<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
             )
         else:
@@ -129,15 +138,15 @@ class VenvAwareCommand(Command):
             venv = manager.get_last_activated()
             if venv:
                 venv.activate()
-                io.error_output.write_line(
+                self.io.error_output.write_line(
                     f'<info>(venv-aware) activating current environment <s>"{venv.name}"</s></info>'
                 )
             else:
-                io.error_output.write_line(
+                self.io.error_output.write_line(
                     "<warning>(venv-aware) there is no current environment that can be activated</warning>"
                 )
-
-        return super().execute(io)
+                return 1
+        return 0
 
 
 class VenvCommand(Command):

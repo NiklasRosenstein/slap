@@ -6,3 +6,12 @@ author = "@NiklasRosenstein"
 issues = [
     "https://github.com/NiklasRosenstein/slap/issues/62",
 ]
+
+[[entries]]
+id = "9cf88811-de43-4b9a-ac52-a9919fcd68b2"
+type = "improvement"
+description = "add `--no-venv-check` option to `VenvAwareCommand`, fixes #61"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/slap/issues/61",
+]

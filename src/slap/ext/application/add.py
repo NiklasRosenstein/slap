@@ -1,7 +1,7 @@
 import logging
 
 from slap.application import Application, argument, option
-from slap.ext.application.install import get_active_python_bin, python_option, venv_check, venv_check_option
+from slap.ext.application.install import get_active_python_bin, python_option, venv_check
 from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.python.dependency import PypiDependency, VersionSpec
@@ -22,7 +22,7 @@ class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             multiple=True,
         )
     ]
-    options = [
+    options = VenvAwareCommand.options + [
         option(
             "--dev",
             "-d",
@@ -51,7 +51,6 @@ class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             "dependency is already declared, the --source option can be skipped as it will be inherited from "
             "the declaration.",
         ),
-        venv_check_option,
         python_option,
     ]
 
@@ -70,6 +69,10 @@ class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         if not self._validate_options():
             return 1
+
+        result = super().handle()
+        if result != 0:
+            return result
 
         project = self.app.main_project()
         if not project or not project.is_python_project:

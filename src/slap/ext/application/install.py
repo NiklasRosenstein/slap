@@ -21,10 +21,7 @@ if t.TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
-venv_check_option = option(
-    "--no-venv-check",
-    description="Do not check if the target Python environment is a virtual environment.",
-)
+
 python_option = option(
     "--python",
     "-p",
@@ -91,7 +88,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
     app: Application
     name = "install"
-    options = [
+    options = VenvAwareCommand.options + [
         option(
             "--only",
             description="Path to the subproject to install only. May still cause other projects to be installed if "
@@ -131,7 +128,6 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             description="Install another Slap project from the given directory.",
             flag=False,
         ),
-        venv_check_option,
         python_option,
     ]
 
@@ -160,6 +156,10 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         if not self._validate_args():
             return 1
+
+        result = super().handle()
+        if result != 0:
+            return result
 
         if from_dir := self.option("from"):
             # TODO (@NiklasRosenstein): This is pretty hacky, but it works so far. We basically modify the application

@@ -39,6 +39,9 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         app.cleo.add(self)
 
     def handle(self) -> int:
+        result = super().handle()
+        if result != 0:
+            return result
         command: list[str] = self.argument("args")
         if command[0] in self.config:
             command_string = self.config[command[0]] + " " + _join_args(command[1:])

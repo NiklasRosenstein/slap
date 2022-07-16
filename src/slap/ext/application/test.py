@@ -110,7 +110,7 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     arguments = [
         argument("test", "One or more tests to run (runs all if none are specified)", optional=True, multiple=True),
     ]
-    options = [
+    options = VenvAwareCommand.options + [
         option(
             "--no-line-prefix",
             "-s",
@@ -130,7 +130,9 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             multiple=True,
         ),
     ]
-    options[0]._default = NotSet.Value  # Hack to set a default value for the flag
+
+    # Hack to set a default value for the flag
+    next(opt for opt in options if opt.name == "no-line-prefix")._default = NotSet.Value
 
     def load_configuration(self, app: Application) -> None:
         self.app = app
@@ -158,6 +160,9 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         return result
 
     def handle(self) -> int:
+        result = super().handle()
+        if result != 0:
+            return result
         if self.option("list"):
             if self.argument("test"):
                 self.line_error("error: incompatible arguments (<opt>test</opt> and <opt>-l,--list</opt>)", "error")
