@@ -20,7 +20,7 @@ class ReportDependenciesCommand(VenvAwareCommand):
     """Reports the installed run dependencies of your current project(s) as JSON."""
 
     name = "report dependencies"
-    options = [
+    options = VenvAwareCommand.options + [
         option(
             "extras",
             description="A comma-separated list of extra dependencies to include.",

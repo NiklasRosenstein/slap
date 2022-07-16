@@ -1,0 +1,5 @@
+[[entries]]
+id = "eb66dd36-3fa3-4c12-88e3-3b5654c74626"
+type = "fix"
+description = "fix `slap report dependencies` command (regression in previous release)"
+author = "@NiklasRosenstein"
