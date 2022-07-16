@@ -38,7 +38,7 @@ class GeneralChecksPlugin(CheckPlugin):
 
         if expect_typed and has_no_py_typed:
             error = True
-            message = f'<b>py.typed</b> missing in package(s) <b>{", ".join(has_py_typed)}</b>'
+            message = f'<b>py.typed</b> missing in package(s) <b>{", ".join(has_no_py_typed)}</b>'
         elif not expect_typed and has_py_typed:
             error = True
             message = f'<b>py.typed</b> in package(s) should not exist <b>{", ".join(has_py_typed)}</b>'
