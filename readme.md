@@ -19,36 +19,36 @@ I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
 >
 > If you use Slap in GitHub Actions, try one of the actions provided by Slap directly:
 >
-> * [`NiklasRosenstein/slap@gha/install/v1`](https://niklasrosenstein.github.io/slap/guides/github/#install-slap)
-> * [`NiklasRosenstein/slap@gha/changelog/update/v1`](https://niklasrosenstein.github.io/slap/guides/github/#update-changelogs)
+> * [`NiklasRosenstein/slap@gha/install/v1`](https://python-slap.github.io/slap-cli/guides/github/#install-slap)
+> * [`NiklasRosenstein/slap@gha/changelog/update/v1`](https://python-slap.github.io/slap-cli/guides/github/#update-changelogs)
 
 ## Documentation
 
-You can find the documentation for Slap here: <https://niklasrosenstein.github.io/slap/>
+You can find the documentation for Slap here: <https://python-slap.github.io/slap-cli/>
 
-Check out the [Getting started](https://niklasrosenstein.github.io/slap/getting-started/) guide.
+Check out the [Getting started](https://python-slap.github.io/slap-cli/getting-started/) guide.
 
 ## Feature Matrix
 
 | Feature | Poetry | Documentation |
 | ------- | ------ | ------------- |
-| Manage structured changelog entries | ❌ | [slap changelog](https://niklasrosenstein.github.io/slap/commands/changelog/) |
-| Show project details | ❌ | [slap info](https://niklasrosenstein.github.io/slap/commands/info/) |
-| Build and publish to PyPI using Twine | ✅ (single project only) | [slap publish](https://niklasrosenstein.github.io/slap/commands/publish/) |
-| Create a new release (bump version numbersr)| ❌ (sub-par support) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
-| Run a command configured in `pyproject.toml` | ❌ | [slap run](https://niklasrosenstein.github.io/slap/commands/run/) |
-| Run tests configured in `pyproject.toml` | ❌ | [slap test](https://niklasrosenstein.github.io/slap/commands/test/) |
-| Manage Python virtualenv's | ✅ (but out-of-worktree) | [slap venv](https://niklasrosenstein.github.io/slap/commands/venv/) |
-| Generate a dependencies report | ❌ | [slap report dependencies](https://niklasrosenstein.github.io/slap/commands/report/) |
+| Manage structured changelog entries | ❌ | [slap changelog](https://python-slap.github.io/slap-cli/commands/changelog/) |
+| Show project details | ❌ | [slap info](https://python-slap.github.io/slap-cli/commands/info/) |
+| Build and publish to PyPI using Twine | ✅ (single project only) | [slap publish](https://python-slap.github.io/slap-cli/commands/publish/) |
+| Create a new release (bump version numbersr)| ❌ (sub-par support) | [slap release](https://python-slap.github.io/slap-cli/commands/release/) |
+| Run a command configured in `pyproject.toml` | ❌ | [slap run](https://python-slap.github.io/slap-cli/commands/run/) |
+| Run tests configured in `pyproject.toml` | ❌ | [slap test](https://python-slap.github.io/slap-cli/commands/test/) |
+| Manage Python virtualenv's | ✅ (but out-of-worktree) | [slap venv](https://python-slap.github.io/slap-cli/commands/venv/) |
+| Generate a dependencies report | ❌ | [slap report dependencies](https://python-slap.github.io/slap-cli/commands/report/) |
 
 | Feature / Build backend | Flit  | Poetry  | Setuptools  | Documentation |
 | ----------------------- | ----- | ------- | ----------- | --------- |
-| Add dependency | ✅ | ✅ | ❌ | [slap add](https://niklasrosenstein.github.io/slap/commands/add/) |
-| Sanity check project configuration | | ✅ | | [slap check](https://niklasrosenstein.github.io/slap/commands/check/) |
-| Bootstrap project files | | ✅ | | [slap init](https://niklasrosenstein.github.io/slap/commands/init/) |
-| Install projects using Pip | ✅ | ✅ | ✅ | [slap install](https://niklasrosenstein.github.io/slap/commands/install/) |
-| Symlink projects (editable installs) | ✅ | ✅ | ✅ | [slap link](https://niklasrosenstein.github.io/slap/commands/link/) |
-| Bump interdependencies in mono-repository | ✅ (not tested regularly) | ✅ | ✅ (partial) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
+| Add dependency | ✅ | ✅ | ❌ | [slap add](https://python-slap.github.io/slap-cli/commands/add/) |
+| Sanity check project configuration | | ✅ | | [slap check](https://python-slap.github.io/slap-cli/commands/check/) |
+| Bootstrap project files | | ✅ | | [slap init](https://python-slap.github.io/slap-cli/commands/init/) |
+| Install projects using Pip | ✅ | ✅ | ✅ | [slap install](https://python-slap.github.io/slap-cli/commands/install/) |
+| Symlink projects (editable installs) | ✅ | ✅ | ✅ | [slap link](https://python-slap.github.io/slap-cli/commands/link/) |
+| Bump interdependencies in mono-repository | ✅ (not tested regularly) | ✅ | ✅ (partial) | [slap release](https://python-slap.github.io/slap-cli/commands/release/) |
 
 > __Legend__: ✅ explicitly supported, ❌ explicitly not supported, (blank) not relevant or currently not supported
 
