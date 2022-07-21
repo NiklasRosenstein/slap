@@ -63,6 +63,7 @@ def venv_check(cmd: Command, message="refusing to install", env: PythonEnvironme
         if not env.is_venv():
             cmd.line_error(f"error: {message} because you are not in a virtual environment", "error")
             cmd.line_error("       enter a virtual environment or use <opt>--no-venv-check</opt>", "error")
+            cmd.line_error(f"       the Python executable you are targeting is <s>{env.executable}</s>", "error")
             return False
     return True
 
@@ -170,7 +171,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         python_environment = PythonEnvironment.of(get_active_python_bin(self))
         if not venv_check(self, env=python_environment):
-            return False
+            return 1
 
         projects = self._get_projects_to_install()
         if not projects:

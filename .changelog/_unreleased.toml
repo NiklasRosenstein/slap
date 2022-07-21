@@ -3,3 +3,9 @@ id = "e026dc27-8dc9-406f-b164-5daeeadc51cf"
 type = "feature"
 description = "add `--ignore-active-venv` option to Venv-aware commands such as `slap install`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "d0a1b793-d7e9-4927-9eb2-f40399b57ce5"
+type = "fix"
+description = "fix wrong return code in `slap install` if venv check fails (e.g. if attempting to install into a virtual environment without `--no-venv-check`)"
+author = "@NiklasRosenstein"
