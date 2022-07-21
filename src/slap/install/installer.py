@@ -32,6 +32,8 @@ class Indexes:
     urls: dict[str, str] = dataclasses.field(default_factory=dict)
 
     def combine_with(self, other: Indexes) -> None:
+        """Combine this configuration with another. All values from *self* take precedence."""
+
         if other.default and self.default and other.default != self.default:
             logger.warning(
                 "Conflicting default index between projects in repository: %r (current), %r",
@@ -42,7 +44,7 @@ class Indexes:
             self.default = other.default
 
         # TODO (@NiklasRosenstein): Warn about conflicting package indexes.
-        self.urls = {**other.urls, **self.urls}
+        self.urls = {**self.urls, **other.urls}
 
 
 @dataclasses.dataclass

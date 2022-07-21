@@ -5,9 +5,11 @@ import logging
 import os
 import typing as t
 from pathlib import Path
+from urllib.parse import unquote
 
 import typing_extensions as te
 from databind.core.settings import Alias, ExtraKeys
+from nr.util.url import Url
 
 from slap.application import Application, Command, option
 from slap.configuration import Configuration
@@ -16,6 +18,7 @@ from slap.plugins import ApplicationPlugin
 from slap.project import Project
 
 if t.TYPE_CHECKING:
+    from slap.install.installer import Indexes
     from slap.python.dependency import Dependency
     from slap.python.environment import PythonEnvironment
 
@@ -66,6 +69,30 @@ def venv_check(cmd: Command, message="refusing to install", env: PythonEnvironme
             cmd.line_error(f"       the Python executable you are targeting is <s>{env.executable}</s>", "error")
             return False
     return True
+
+
+def parse_extra_index_url_spec(spec: str) -> tuple[str, str]:
+    """Parses a spec for an extra index URL which must be of the form `name=...,url=https://...` and may
+    additional provide values a `username=...` and `password=...`."""
+
+    values = {k.strip(): unquote(v.strip()) for k, v in (x.partition("=")[::2] for x in spec.split(","))}
+    try:
+        name = values.pop("name")
+        url = values.pop("url")
+        username = values.pop("username", None)
+        password = values.pop("password", None)
+    except KeyError as exc:
+        raise ValueError(f"invalid extra index URL spec {spec!r}: missing {exc}")
+    for key in values:
+        raise ValueError(f"invalid extra index URL spec {spec!r}: unrecognized key {key!r}")
+
+    parsed_url = Url.of(url)
+    if username:
+        parsed_url.username = username
+    if password:
+        parsed_url.password = password
+
+    return name, str(parsed_url)
 
 
 @dataclasses.dataclass
@@ -128,6 +155,19 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             "--from",
             description="Install another Slap project from the given directory.",
             flag=False,
+        ),
+        option(
+            "--index-url",
+            description="Set the main index URL.",
+            flag=False,
+        ),
+        option(
+            "--extra-index",
+            description="Add an index URL to install from. Must be formatted like <s>name=myindex,url=https://...</s> "
+            "The username and password may be specified as arguments as well. Note that this format requires "
+            "that commas are urlencoded if they are presented in the URL.",
+            flag=False,
+            multiple=True,
         ),
         python_option,
     ]
@@ -260,6 +300,10 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             quiet=self.option("quiet"),
             upgrade=self.option("upgrade"),
         )
+        override_indexes = self._get_indexes_from_cli()
+        override_indexes.combine_with(options.indexes)
+        options.indexes = override_indexes
+
         installer = PipInstaller(self)
         status_code = installer.install(dependencies, python_environment, options)
         if status_code != 0:
@@ -312,6 +356,15 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             extras.update(self.config[self.app.repository].dev_extras or [])
 
         return extras
+
+    def _get_indexes_from_cli(self) -> Indexes:
+        from slap.install.installer import Indexes
+
+        indexes = Indexes(default=self.option("index-url"))
+        for extra in self.option("extra-index"):
+            name, url = parse_extra_index_url_spec(extra)
+            indexes.urls[name] = url
+        return indexes
 
     # SymlinkHelper
 

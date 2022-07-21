@@ -3,3 +3,9 @@ id = "f883516d-424c-4dfd-9ea9-9d90d5f4b9b2"
 type = "improvement"
 description = "make use of `nr.python.environment` package to detect and deactivate/activate a virtual env"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "61c89680-487c-45d2-b096-7f8d32597707"
+type = "feature"
+description = "add `--index-url` and `--extra-index` option to `slap install` (note that `--extra-index` requires a different value format than Pip's `--extra-index-url`  option)"
+author = "@NiklasRosenstein"

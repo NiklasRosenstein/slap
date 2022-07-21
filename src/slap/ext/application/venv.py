@@ -109,7 +109,8 @@ class VenvAwareCommand(Command):
         if self.option("ignore-active-venv") and venv:
             self.line(f"<info>(venv-aware) deactivating current virtual environment (<s>{venv.path}</s>)</info>")
             venv.deactivate(os.environ)
-        elif venv:
+            venv = None
+        if venv:
             self.io.error_output.write_line(
                 "<info>(venv-aware) a virtual environment is already activated "
                 f'(<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
