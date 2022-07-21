@@ -3,9 +3,10 @@ import os
 import shutil
 import string
 import subprocess as sp
-import sys
 import typing as t
 from pathlib import Path
+
+from nr.python.environment.virtualenv import VirtualEnvInfo, get_current_venv
 
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
@@ -38,57 +39,13 @@ USER_INIT_SCRIPTS = {
 }
 
 
-def is_relative_to(apath: Path, bpath: Path) -> bool:
-    """Checks if *apath* is a path relative to *bpath*."""
-
-    if sys.version_info[:2] < (3, 9):
-        try:
-            apath.relative_to(bpath)
-            return True
-        except ValueError:
-            return False
-    else:
-        return apath.is_relative_to(bpath)
-
-
-class Venv:
-    def __init__(self, directory: Path) -> None:
-        self.directory = directory
-
-    @property
-    def name(self) -> str:
-        return self.directory.name
-
-    def exists(self) -> bool:
-        return self.directory.exists()
-
+class Venv(VirtualEnvInfo):
     def create(self, python_bin: str) -> None:
-        self.directory.parent.mkdir(parents=True, exist_ok=True)
-        sp.check_call([python_bin, "-m", "venv", self.directory])
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        sp.check_call([python_bin, "-m", "venv", self.path])
 
     def delete(self) -> None:
-        shutil.rmtree(self.directory)
-
-    def get_bin_directory(self) -> Path:
-        if os.name == "nt":
-            return self.directory / "Scripts"
-        else:
-            return self.directory / "bin"
-
-    def get_bin(self, program: str) -> Path:
-        path = self.get_bin_directory() / program
-        if os.name == "nt":
-            path = path.with_name(path.name + ".exe")
-        return path
-
-    def get_python_version(self) -> str:
-        return sp.check_output([self.get_bin("python"), "-c", "import sys; print(sys.version)"]).decode().strip()
-
-    def activate(self) -> None:
-        """Activate the environment by updating the current `PATH` environment variable."""
-
-        os.environ["PATH"] = str(self.get_bin_directory().absolute()) + os.pathsep + os.environ["PATH"]
-        os.environ["VIRTUAL_ENV"] = str(self.directory.absolute())
+        shutil.rmtree(self.path)
 
 
 class VenvManager:
@@ -145,20 +102,14 @@ class VenvAwareCommand(Command):
         ),
     ]
 
-    def _deactivate_venv(self) -> None:
-        venv = os.environ.pop("VIRTUAL_ENV", None)
-        if venv:
-            self.line(f"<info>(venv-aware) deactivating current virtual environment (<s>{venv}</s>)</info>")
-            paths = os.getenv("PATH", "").split(os.pathsep)
-            paths = [path for path in paths if not is_relative_to(Path(path), Path(venv))]
-            os.environ["PATH"] = os.pathsep.join(paths)
-
     def handle(self) -> int:
         if self.option("no-venv-check"):
             return 0
-        if self.option("ignore-active-venv"):
-            self._deactivate_venv()
-        if os.getenv("VIRTUAL_ENV"):
+        venv = get_current_venv(os.environ)
+        if self.option("ignore-active-venv") and venv:
+            self.line(f"<info>(venv-aware) deactivating current virtual environment (<s>{venv.path}</s>)</info>")
+            venv.deactivate(os.environ)
+        elif venv:
             self.io.error_output.write_line(
                 "<info>(venv-aware) a virtual environment is already activated "
                 f'(<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
@@ -167,7 +118,7 @@ class VenvAwareCommand(Command):
             manager = VenvManager()
             venv = manager.get_last_activated()
             if venv:
-                venv.activate()
+                venv.activate(os.environ)
                 self.io.error_output.write_line(
                     f'<info>(venv-aware) activating current environment <s>"{venv.name}"</s></info>'
                 )
@@ -431,7 +382,7 @@ class VenvCommand(Command):
                 else:
                     self.line_error("error: no active environment", "error")
                 return 1
-            print(venv.directory.absolute())
+            print(venv.path.absolute())
 
         return 0
 

@@ -1,0 +1,5 @@
+[[entries]]
+id = "f883516d-424c-4dfd-9ea9-9d90d5f4b9b2"
+type = "improvement"
+description = "make use of `nr.python.environment` package to detect and deactivate/activate a virtual env"
+author = "@NiklasRosenstein"
