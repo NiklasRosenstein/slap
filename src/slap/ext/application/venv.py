@@ -3,6 +3,7 @@ import os
 import shutil
 import string
 import subprocess as sp
+import sys
 import typing as t
 from pathlib import Path
 
@@ -35,6 +36,19 @@ SHADOW_INIT_SCRIPTS = {
 USER_INIT_SCRIPTS = {
     "bash": 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i bash)"',
 }
+
+
+def is_relative_to(apath: Path, bpath: Path) -> bool:
+    """Checks if *apath* is a path relative to *bpath*."""
+
+    if sys.version_info[:2] < (3, 9):
+        try:
+            apath.relative_to(bpath)
+            return True
+        except ValueError:
+            return False
+    else:
+        return apath.is_relative_to(bpath)
 
 
 class Venv:
@@ -124,15 +138,29 @@ class VenvAwareCommand(Command):
         option(
             "no-venv-check",
             description="Do not check if the target Python environment is a virtual environment.",
-        )
+        ),
+        option(
+            "ignore-active-venv",
+            description="Ignore the currently active VIRTUAL_ENV and act as if it isn't set.",
+        ),
     ]
+
+    def _deactive_venv(self) -> None:
+        venv = os.environ.pop("VIRTUAL_ENV", None)
+        if venv:
+            self.line(f"<info>(venv-aware) deactivating current virtual environment (<s>{venv}</s>)</info>")
+            paths = os.getenv("PATH", "").split(os.pathsep)
+            paths = [path for path in paths if not is_relative_to(Path(path), Path(venv))]
+            os.environ["PATH"] = os.pathsep.join(paths)
 
     def handle(self) -> int:
         if self.option("no-venv-check"):
             return 0
+        if self.option("ignore-active-venv"):
+            self._deactivate_venv()
         if os.getenv("VIRTUAL_ENV"):
             self.io.error_output.write_line(
-                "<info>(venv-aware) a virtual environment is already activated"
+                "<info>(venv-aware) a virtual environment is already activated "
                 f'(<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
             )
         else:

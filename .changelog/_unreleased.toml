@@ -1,0 +1,5 @@
+[[entries]]
+id = "e026dc27-8dc9-406f-b164-5daeeadc51cf"
+type = "feature"
+description = "add `--ignore-active-venv` option to Venv-aware commands such as `slap install`"
+author = "@NiklasRosenstein"
