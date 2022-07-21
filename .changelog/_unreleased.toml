@@ -1,0 +1,5 @@
+[[entries]]
+id = "dcb74f4d-d3a3-4896-9ef8-f54b88444ec8"
+type = "fix"
+description = "fix an AttributeError when using new `--ignore-active-venv` option (no clue why Mypy did not pick it up)"
+author = "@NiklasRosenstein"

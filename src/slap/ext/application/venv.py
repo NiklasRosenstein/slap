@@ -145,7 +145,7 @@ class VenvAwareCommand(Command):
         ),
     ]
 
-    def _deactive_venv(self) -> None:
+    def _deactivate_venv(self) -> None:
         venv = os.environ.pop("VIRTUAL_ENV", None)
         if venv:
             self.line(f"<info>(venv-aware) deactivating current virtual environment (<s>{venv}</s>)</info>")
