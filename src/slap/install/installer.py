@@ -31,16 +31,16 @@ class Indexes:
     #: A mapping that assigns each key (the name of the index) its index URL.
     urls: dict[str, str] = dataclasses.field(default_factory=dict)
 
-    def combine_with(self, other: Indexes) -> None:
+    def combine_with(self, other: Indexes, allow_override_default: bool = False) -> None:
         """Combine this configuration with another. All values from *self* take precedence."""
 
-        if other.default and self.default and other.default != self.default:
+        if other.default and self.default and other.default != self.default and not allow_override_default:
             logger.warning(
                 "Conflicting default index between projects in repository: %r (current), %r",
                 self.default,
                 other.default,
             )
-        if not self.default:
+        if not self.default or allow_override_default:
             self.default = other.default
 
         # TODO (@NiklasRosenstein): Warn about conflicting package indexes.

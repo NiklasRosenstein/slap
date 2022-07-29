@@ -1,0 +1,5 @@
+[[entries]]
+id = "8dbf84a9-dbb5-4a49-81a4-2245a0287aae"
+type = "breaking change"
+description = "replace `--index-url` option with `--index` option which takes the same format as `--extra-index` (but the `name=` key can be omitted)"
+author = "@NiklasRosenstein"

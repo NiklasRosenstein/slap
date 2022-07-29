@@ -71,13 +71,13 @@ def venv_check(cmd: Command, message="refusing to install", env: PythonEnvironme
     return True
 
 
-def parse_extra_index_url_spec(spec: str) -> tuple[str, str]:
+def parse_extra_index_url_spec(spec: str) -> tuple[str | None, str]:
     """Parses a spec for an extra index URL which must be of the form `name=...,url=https://...` and may
     additional provide values a `username=...` and `password=...`."""
 
     values = {k.strip(): unquote(v.strip()) for k, v in (x.partition("=")[::2] for x in spec.split(","))}
     try:
-        name = values.pop("name")
+        name = values.pop("name", None)
         url = values.pop("url")
         username = values.pop("username", None)
         password = values.pop("password", None)
@@ -157,8 +157,9 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             flag=False,
         ),
         option(
-            "--index-url",
-            description="Set the main index URL.",
+            "--index",
+            description="Set the main index URL. Must be formatted like an <opt>--extra-index</opt> but the name "
+            "can be omitted.",
             flag=False,
         ),
         option(
@@ -301,7 +302,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             upgrade=self.option("upgrade"),
         )
         override_indexes = self._get_indexes_from_cli()
-        override_indexes.combine_with(options.indexes)
+        override_indexes.combine_with(options.indexes, allow_override_default=True)
         options.indexes = override_indexes
 
         installer = PipInstaller(self)
@@ -360,9 +361,15 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     def _get_indexes_from_cli(self) -> Indexes:
         from slap.install.installer import Indexes
 
-        indexes = Indexes(default=self.option("index-url"))
+        indexes = Indexes()
+        index = self.option("index")
+        if index:
+            indexes.default = parse_extra_index_url_spec(index)[1]
+
         for extra in self.option("extra-index"):
             name, url = parse_extra_index_url_spec(extra)
+            if name is None:
+                raise ValueError(f"extra index spec requires a name: {extra!r}")
             indexes.urls[name] = url
         return indexes
 
