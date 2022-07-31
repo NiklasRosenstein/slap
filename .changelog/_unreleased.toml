@@ -1,0 +1,5 @@
+[[entries]]
+id = "64fbce5a-dce6-4d67-9d63-07f660f0267c"
+type = "fix"
+description = "bump dependency on `nr.util` which is guaranteed to have the `nr.utils.url` package"
+author = "@NiklasRosenstein"
