@@ -1,0 +1,5 @@
+[[entries]]
+id = "f7a7e992-b470-4122-a3dc-11c9ce9deb37"
+type = "fix"
+description = "Updated how `slap install --index` and `--extra-index` are used to inject credentials; they now behave the same (with `--extra-index` marked as deprecated). The `url` is now optional, allowing you use the option only to inject credentials of a package index configured in the project (e.g. `pyproject.toml`) without specifying the URL"
+author = "@NiklasRosenstein"

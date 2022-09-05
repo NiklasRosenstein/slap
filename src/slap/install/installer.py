@@ -9,6 +9,9 @@ import shlex
 import subprocess as sp
 import typing as t
 from pathlib import Path
+from urllib.parse import unquote
+
+from nr.util.url import Url
 
 from slap.python.dependency import MultiDependency
 from slap.python.pep508 import filter_dependencies, test_dependency
@@ -22,6 +25,43 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
+class IndexSpec:
+    name: str
+    url: str | None
+    username: str | None
+    password: str | None
+
+    @property
+    def url_with_auth(self) -> str:
+        assert self.url is not None, "IndexSpec.url is None"
+        parsed_url = Url.of(self.url)
+        if self.username:
+            parsed_url.username = self.username
+        if self.password:
+            parsed_url.password = self.password
+        return str(parsed_url)
+
+    @classmethod
+    def parse(cls, spec: str) -> IndexSpec:
+        """Parses a spec for an extra index URL which must be of the form `name=...,url=https://...` and may
+        additional provide values a `username=...` and `password=...`."""
+
+        values = {k.strip(): unquote(v.strip()) for k, v in (x.partition("=")[::2] for x in spec.split(","))}
+        try:
+            name = values.pop("name")
+            url = values.pop("url", None)
+            username = values.pop("username", None)
+            password = values.pop("password", None)
+        except KeyError as exc:
+            raise ValueError(f"invalid index spec {spec!r}: missing {exc}")
+        for key in values:
+            raise ValueError(f"invalid index spec {spec!r}: unrecognized key {key!r}")
+        if not any((url, username, password)):
+            raise ValueError(f"invalid index spec {spec!r}: need one of url, username, password")
+        return cls(name, url, username, password)
+
+
+@dataclasses.dataclass
 class Indexes:
     """Represents a configuration of PyPI indexes."""
 
@@ -31,17 +71,16 @@ class Indexes:
     #: A mapping that assigns each key (the name of the index) its index URL.
     urls: dict[str, str] = dataclasses.field(default_factory=dict)
 
-    def combine_with(self, other: Indexes, allow_override_default: bool = False) -> None:
+    def combine_with(self, other: Indexes) -> None:
         """Combine this configuration with another. All values from *self* take precedence."""
 
-        if other.default and self.default and other.default != self.default and not allow_override_default:
+        if other.default and self.default and other.default != self.default:
             logger.warning(
                 "Conflicting default index between projects in repository: %r (current), %r",
                 self.default,
                 other.default,
             )
-        if not self.default or allow_override_default:
-            self.default = other.default
+        self.default = self.default or other.default
 
         # TODO (@NiklasRosenstein): Warn about conflicting package indexes.
         self.urls = {**self.urls, **other.urls}

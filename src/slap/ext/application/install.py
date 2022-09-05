@@ -5,11 +5,9 @@ import logging
 import os
 import typing as t
 from pathlib import Path
-from urllib.parse import unquote
 
 import typing_extensions as te
 from databind.core.settings import Alias, ExtraKeys
-from nr.util.url import Url
 
 from slap.application import Application, Command, option
 from slap.configuration import Configuration
@@ -69,30 +67,6 @@ def venv_check(cmd: Command, message="refusing to install", env: PythonEnvironme
             cmd.line_error(f"       the Python executable you are targeting is <s>{env.executable}</s>", "error")
             return False
     return True
-
-
-def parse_extra_index_url_spec(spec: str) -> tuple[str | None, str]:
-    """Parses a spec for an extra index URL which must be of the form `name=...,url=https://...` and may
-    additional provide values a `username=...` and `password=...`."""
-
-    values = {k.strip(): unquote(v.strip()) for k, v in (x.partition("=")[::2] for x in spec.split(","))}
-    try:
-        name = values.pop("name", None)
-        url = values.pop("url")
-        username = values.pop("username", None)
-        password = values.pop("password", None)
-    except KeyError as exc:
-        raise ValueError(f"invalid extra index URL spec {spec!r}: missing {exc}")
-    for key in values:
-        raise ValueError(f"invalid extra index URL spec {spec!r}: unrecognized key {key!r}")
-
-    parsed_url = Url.of(url)
-    if username:
-        parsed_url.username = username
-    if password:
-        parsed_url.password = password
-
-    return name, str(parsed_url)
 
 
 @dataclasses.dataclass
@@ -158,15 +132,17 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         ),
         option(
             "--index",
-            description="Set the main index URL. Must be formatted like an <opt>--extra-index</opt> but the name "
-            "can be omitted.",
+            description="Set an index URL to install from. Must be formatted like <s>name=myindex,url=https://...</s> "
+            "The username and password may be specified as arguments as well. Note that this format requires "
+            "that commas are urlencoded if they are presented in the URL. This argument can be used to override the "
+            "URL of the index that a dependency is installed from (the dependency must specify a `source` in "
+            "`pyproject.toml`) and/or inject credentials.",
             flag=False,
+            multiple=True,
         ),
         option(
             "--extra-index",
-            description="Add an index URL to install from. Must be formatted like <s>name=myindex,url=https://...</s> "
-            "The username and password may be specified as arguments as well. Note that this format requires "
-            "that commas are urlencoded if they are presented in the URL.",
+            description="Deprecated. Same as --index.",
             flag=False,
             multiple=True,
         ),
@@ -301,9 +277,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             quiet=self.option("quiet"),
             upgrade=self.option("upgrade"),
         )
-        override_indexes = self._get_indexes_from_cli()
-        override_indexes.combine_with(options.indexes, allow_override_default=True)
-        options.indexes = override_indexes
+        self._update_indexes_from_cli(options.indexes)
 
         installer = PipInstaller(self)
         status_code = installer.install(dependencies, python_environment, options)
@@ -358,20 +332,16 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
         return extras
 
-    def _get_indexes_from_cli(self) -> Indexes:
-        from slap.install.installer import Indexes
+    def _update_indexes_from_cli(self, indexes: Indexes) -> None:
+        from slap.install.installer import IndexSpec
 
-        indexes = Indexes()
-        index = self.option("index")
-        if index:
-            indexes.default = parse_extra_index_url_spec(index)[1]
-
-        for extra in self.option("extra-index"):
-            name, url = parse_extra_index_url_spec(extra)
-            if name is None:
-                raise ValueError(f"extra index spec requires a name: {extra!r}")
-            indexes.urls[name] = url
-        return indexes
+        for extra in (*self.option("extra-index"), *self.option("index")):
+            spec = IndexSpec.parse(extra)
+            if spec.name in indexes.urls:
+                spec.url = spec.url or indexes.urls[spec.name]
+            else:
+                logger.warning('passed an --index option for a source that does not exist (source: "%s")', spec.name)
+            indexes.urls[spec.name] = spec.url_with_auth
 
     # SymlinkHelper
 
