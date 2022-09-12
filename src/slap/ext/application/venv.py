@@ -100,13 +100,20 @@ class VenvAwareCommand(Command):
             "ignore-active-venv",
             description="Ignore the currently active VIRTUAL_ENV and act as if it isn't set.",
         ),
+        option(
+            "use-venv",
+            description="Use the specified Slap-managed virtual environment. This can be used to run a command "
+            "in a seperate environment without activating or setting it as the current environment. Note that this "
+            "option can not be used to run in a globally managed environment.",
+            flag=False,
+        ),
     ]
 
     def handle(self) -> int:
         if self.option("no-venv-check"):
             return 0
         venv = get_current_venv(os.environ)
-        if self.option("ignore-active-venv") and venv:
+        if (self.option("ignore-active-venv") or self.option("use-venv")) and venv:
             self.line(f"<info>(venv-aware) deactivating current virtual environment (<s>{venv.path}</s>)</info>")
             venv.deactivate(os.environ)
             venv = None
@@ -117,7 +124,13 @@ class VenvAwareCommand(Command):
             )
         else:
             manager = VenvManager()
-            venv = manager.get_last_activated()
+            if self.option("use-venv"):
+                venv = manager.get(self.option("use-venv"))
+                if not venv.exists():
+                    self.io.error_output.write_line(f'<error>environment <s>"{venv.name}"</s> does not exist</error>')
+                    return 1
+            else:
+                venv = manager.get_last_activated()
             if venv:
                 venv.activate(os.environ)
                 self.io.error_output.write_line(
@@ -207,6 +220,7 @@ class VenvCommand(Command):
             description="Print the path of the specified or the current venv. Exit with status code 1 and no output if "
             "the environment does not exist or there is no current environment.",
         ),
+        option("--exists", "-e", description="Return 0 if the specified environment exists, 1 otherwise."),
         option(
             "--init-code",
             "-i",
@@ -225,7 +239,7 @@ class VenvCommand(Command):
     ]
 
     def _validate_args(self) -> bool:
-        for opt in ("activate", "create", "delete", "set"):
+        for opt in ("activate", "create", "delete", "set", "exists"):
             if self.option("init-code") and self.option(opt):
                 self.line_error(
                     f"error: <opt>-i,--init-code</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>", "error"
@@ -236,20 +250,22 @@ class VenvCommand(Command):
                     f"error: <opt>-l,--list</opt> is not compatible with <opt>-{opt[0]},--{opt}</opt>", "error"
                 )
                 return False
-        for opt in ("delete", "set"):
+        for opt in ("delete", "set", "exists"):
             if self.option(opt) and not self.argument("name"):
                 self.line_error("error: missing <opt>name</opt> argument", "error")
                 return False
-        for opt in ("activate", "create", "set"):
+        for opt in ("activate", "create", "set", "exists"):
             if self.option("delete") and self.option(opt):
                 self.line_error("error: <opt>-d,--delete</opt> is not compatible with <opt>--{opt}</opt>", "error")
                 return False
         if self.option("path"):
-            for opt in ("activate", "create", "delete", "set", "list", "init-code", "python"):
+            for opt in ("activate", "create", "delete", "set", "list", "init-code", "python", "exists"):
                 if self.option(opt):
                     self.line_error("error: <opt>--path,-P</opt> is not compatible with <opt>--{opt}</opt>", "error")
                     return False
-        if not any(self.option(opt) for opt in ("activate", "create", "delete", "set", "list", "init-code", "path")):
+        if not any(
+            self.option(opt) for opt in ("activate", "create", "delete", "set", "list", "init-code", "path", "exists")
+        ):
             self.line_error("error: no operation specified", "error")
             return False
         return True
@@ -384,6 +400,10 @@ class VenvCommand(Command):
                     self.line_error("error: no active environment", "error")
                 return 1
             print(venv.path.absolute())
+
+        if self.option("exists"):
+            assert venv is not None
+            return 0 if venv.exists() else 0
 
         return 0
 

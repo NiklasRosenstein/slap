@@ -1,0 +1,5 @@
+[[entries]]
+id = "844de497-b518-470f-8a9c-33107ad19760"
+type = "feature"
+description = "add `--use-venv` option to all Venv-aware commands, add `slap venv --exists,-e` flag"
+author = "@NiklasRosenstein"
