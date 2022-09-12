@@ -1,0 +1,5 @@
+[[entries]]
+id = "0c8fd676-4ccc-44c2-bfee-90926bd83b64"
+type = "fix"
+description = "fix return code of `slap venv --exists,-e`"
+author = "@NiklasRosenstein"

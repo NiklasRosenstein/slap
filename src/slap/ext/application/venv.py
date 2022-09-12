@@ -403,7 +403,7 @@ class VenvCommand(Command):
 
         if self.option("exists"):
             assert venv is not None
-            return 0 if venv.exists() else 0
+            return 0 if venv.exists() else 1
 
         return 0
 
