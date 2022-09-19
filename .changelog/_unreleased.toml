@@ -1,0 +1,8 @@
+[[entries]]
+id = "3c4cb586-eaff-4259-9b5d-ed828cdd3518"
+type = "fix"
+description = "fixed an issue with `poetry-core ==1.2.0`"
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/python-slap/slap-cli/issues/66",
+]

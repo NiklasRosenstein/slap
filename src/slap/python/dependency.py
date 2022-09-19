@@ -163,7 +163,7 @@ class PypiDependency(Dependency, _PypiDependency):
         match = re.match(r"\s*[^<>=!~\^\(\)\*]+", value)
         if match:
             name = match.group(0)
-            version_spec = VersionSpec(value[match.end() :].strip())  # noqa: E203
+            version_spec = VersionSpec(value[match.end() :].strip() or '*')  # noqa: E203
         else:
             name = value
             version_spec = VersionSpec("")
