@@ -34,7 +34,7 @@ def test__split_package_name_with_extras__bad_input():
 
 
 def test__parse_dependency_string__can_parse_pypi_dependency():
-    assert parse_dependency_string("kek") == PypiDependency("kek", VersionSpec(""))
+    assert parse_dependency_string("kek") == PypiDependency("kek", VersionSpec("*"))
     assert parse_dependency_string("kek *") == PypiDependency("kek", VersionSpec("*"))
     assert parse_dependency_string("kek>=1.0.0,<2.0.0") == PypiDependency("kek", VersionSpec(">=1.0.0,<2.0.0"))
     assert parse_dependency_string("kek ^1.0.0") == PypiDependency("kek", VersionSpec("^1.0.0"))
@@ -86,7 +86,7 @@ def test__parse_dependency_string__can_parse_path_dependency():
 
 
 def test__parse_dependency_config__various_configurations():
-    assert parse_dependency_config("kek", "") == PypiDependency("kek", VersionSpec(""))
+    assert parse_dependency_config("kek", "*") == PypiDependency("kek", VersionSpec("*"))
     assert parse_dependency_config("kek", "1.0.0") == PypiDependency("kek", VersionSpec("1.0.0"))
     assert parse_dependency_config("kek", {"url": "https://blob.org/kek-1.2.1.tar.gz"}) == UrlDependency(
         "kek", "https://blob.org/kek-1.2.1.tar.gz"
@@ -106,7 +106,7 @@ def test__parse_dependency_config__various_configurations():
     ) == MultiDependency(
         "kek",
         [
-            PypiDependency("kek", VersionSpec("")),
+            PypiDependency("kek", VersionSpec("*")),
             GitDependency("kek", "https://github.com/foo/foo.git", markers='python_version=">=2.7,<3.3"'),
             PypiDependency("kek", VersionSpec("^1.2.1"), python=VersionSpec(">=3.7")),
             UrlDependency("kek", "https://a.b"),
@@ -119,13 +119,12 @@ def test__parse_dependency_config__various_configurations():
 
 
 def test__VersionSpec__can_take_empty_string():
-    assert VersionSpec("").to_pep_508() == ""
-    assert not VersionSpec("")
+    assert VersionSpec("*").to_pep_508() == ""
+    assert not VersionSpec("*")
 
 
 def test__VersionSpec__can_take_wildcard():
     assert VersionSpec("*").to_pep_508() == ""
-    assert VersionSpec("") != VersionSpec("*")
     assert VersionSpec("*") == VersionSpec("*")
 
 
@@ -146,14 +145,14 @@ def test__VersionSpec__throws_on_invalid_pep_508_spec():
 
 
 def test__PypiDependency__parse():
-    assert PypiDependency.parse("foo") == PypiDependency("foo", VersionSpec(""))
+    assert PypiDependency.parse("foo") == PypiDependency("foo", VersionSpec("*"))
     assert PypiDependency.parse("foo ^1.0.0") == PypiDependency("foo", VersionSpec("^1.0.0"))
     assert PypiDependency.parse('foo ^1.0.0; platform_system="Linux"') == PypiDependency(
         "foo", VersionSpec("^1.0.0"), markers='platform_system="Linux"'
     )
-    assert PypiDependency.parse("PySocks (!=1.5.7,<2.0,>=1.5.6) ; extra == 'socks'") == PypiDependency(
-        "PySocks", VersionSpec("(!=1.5.7,<2.0,>=1.5.6)"), markers="extra == 'socks'"
+    assert PypiDependency.parse("PySocks !=1.5.7,<2.0,>=1.5.6 ; extra == 'socks'") == PypiDependency(
+        "PySocks", VersionSpec("!=1.5.7,<2.0,>=1.5.6"), markers="extra == 'socks'"
     )
 
     # TODO (@NiklasRosenstein): This is actually a bad example and we should start raising an error for it.
-    assert PypiDependency.parse("foo 1.0.0") == PypiDependency("foo 1.0.0", VersionSpec(""))
+    assert PypiDependency.parse("foo 1.0.0") == PypiDependency("foo 1.0.0", VersionSpec("*"))

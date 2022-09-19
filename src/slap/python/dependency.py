@@ -30,14 +30,14 @@ class VersionSpec:
     def __init__(self, version_spec: str) -> None:
         from poetry.core.packages.dependency import Dependency as _PoetryDependency  # type: ignore[import]
 
-        self.__original = version_spec
-        self.__dependency = _PoetryDependency("", version_spec)
+        self.__original = version_spec.strip()
+        self.__dependency = _PoetryDependency("", self.__original)
 
     def __bool__(self) -> bool:
         """Returns `True` if the version spec is initialized from an empty string. Note that it will otherwise
         behave exactly the same as if it was initialized with `*` (matching any package version)."""
 
-        return bool(self.__original)
+        return bool(self.__original) and self.__original != "*"
 
     def __str__(self) -> str:
         return self.__original
@@ -163,7 +163,7 @@ class PypiDependency(Dependency, _PypiDependency):
         match = re.match(r"\s*[^<>=!~\^\(\)\*]+", value)
         if match:
             name = match.group(0)
-            version_spec = VersionSpec(value[match.end() :].strip() or '*')  # noqa: E203
+            version_spec = VersionSpec(value[match.end() :].strip() or "*")  # noqa: E203
         else:
             name = value
             version_spec = VersionSpec("")
