@@ -53,12 +53,12 @@ jobs:
     - uses: actions/upload-artifact@v2
       with: { name: docs, path: docs/_site }
 
-  # docs-publish:
-  #   needs: [ test, docs ]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/download-artifact@v2
-  #     with: { name: docs, path: docs/_site }
-  #   - uses: Cecilapp/GitHub-Pages-deploy@v3
-  #     env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
-  #     with: { email: rosensteinniklas@gmail.com, build_dir: docs/_site }
+  docs-publish:
+    needs: [ test, docs ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v2
+      with: { name: docs, path: docs/_site }
+    - uses: Cecilapp/GitHub-Pages-deploy@v3
+      env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      with: { email: rosensteinniklas@gmail.com, build_dir: docs/_site }
