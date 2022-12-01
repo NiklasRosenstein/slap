@@ -1,0 +1,5 @@
+[[entries]]
+id = "7ab372e2-5882-4986-9713-2c5ff0660542"
+type = "fix"
+description = "fix `.flake8` config in template created by `slap init`, newer versions of Flake will error if a comment is on the same line with a value"
+author = "@NiklasRosenstein"
