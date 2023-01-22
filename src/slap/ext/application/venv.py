@@ -138,7 +138,8 @@ class VenvAwareCommand(Command):
                 )
             elif self.requires_venv:
                 self.io.error_output.write_line(
-                    "<warning>(venv-aware) there is no current environment that can be activated</warning>"
+                    "<warning>(venv-aware) there is no current environment that can be activated, use "
+                    "`slap venv -s {env}` to set the current environment</warning>"
                 )
                 return 1
         return 0

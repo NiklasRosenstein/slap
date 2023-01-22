@@ -1,0 +1,5 @@
+[[entries]]
+id = "d3cdc955-98da-4cac-9cd5-93af636845e8"
+type = "improvement"
+description = "improve error message when there is no current environment set via `slap venv -s {env}`"
+author = "@NiklasRosenstein"
