@@ -32,7 +32,11 @@ class TestRunner:
         from codecs import getreader
 
         from cleo.io.io import OutputType  # type: ignore[import]
-        from ptyprocess import PtyProcessUnicode  # type: ignore[import]
+
+        if os.name != "nt":
+            from ptyprocess import PtyProcessUnicode  # type: ignore[import]
+        else:
+            PtyProcessUnicode = None
 
         color = (
             self._colors[0]
@@ -40,12 +44,19 @@ class TestRunner:
             else self._colors[(self._colors.index(TestRunner._prev_color) + 1) % len(self._colors)]
         )
         TestRunner._prev_color = color
-        command = ["bash", "-c", self.config]
+
+        if os.name == "nt":
+            command = ["cmd", "/k", self.config]
+        else:
+            shell = os.getenv("SHELL", "bash")
+            command = [shell, "-c", self.config]
         prefix = f"{self.name}| "
 
         logger.info("Running command <subj>%s</subj> in <val>%s</val>", command, self.cwd)
 
         try:
+            if PtyProcessUnicode is None:
+                raise OSError
             cols, rows = os.get_terminal_size()
         except OSError:
             sproc = sp.Popen(command, cwd=self.cwd, stdout=sp.PIPE, stderr=sp.STDOUT)

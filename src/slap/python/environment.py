@@ -5,6 +5,7 @@ import functools
 import json
 import logging
 import pickle
+import shutil
 import subprocess as sp
 import textwrap
 import typing as t
@@ -60,6 +61,15 @@ class PythonEnvironment:
 
         if isinstance(python, str):
             python = [python]
+
+        # NOTE(NiklasRosenstein): On Windows, we might not end up running the Python version of the current
+        #   virtual environment when just calling "python" or "python.exe", which is why we need to use
+        #   `shutil.which()` to manually resolve it.
+        #
+        #   A similar issue is described here: https://stackoverflow.com/q/65283987/791713
+        full_path = shutil.which(python[0])
+        if full_path:
+            python = [full_path] + list(python[1:])
 
         # We ensure that the Pep508 module is importable.
         pep508_path = str(Path(pep508.__file__).parent)

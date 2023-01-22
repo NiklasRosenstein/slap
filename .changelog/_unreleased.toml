@@ -1,0 +1,5 @@
+[[entries]]
+id = "3f897353-c1c5-4a0c-b502-551c6db2b333"
+type = "fix"
+description = "Fix running Slap on Windows for commands run from `slap test` and detecting the active Python virtualenv."
+author = "@NiklasRosenstein"
