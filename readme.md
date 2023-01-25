@@ -24,7 +24,7 @@ I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
 
 ## Documentation
 
-You can find the documentation for Slap here: <https://python-slap.github.io/slap-cli/>
+You can find the documentation for Slap here: <https://niklasrosenstein.github.io/slap/>
 
 Check out the [Getting started](https://python-slap.github.io/slap-cli/getting-started/) guide.
 
