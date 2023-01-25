@@ -40,6 +40,7 @@ Check out the [Getting started](https://python-slap.github.io/slap-cli/getting-s
 | Run tests configured in `pyproject.toml` | ❌ | [slap test](https://python-slap.github.io/slap-cli/commands/test/) |
 | Manage Python virtualenv's | ✅ (but out-of-worktree) | [slap venv](https://python-slap.github.io/slap-cli/commands/venv/) |
 | Generate a dependencies report | ❌ | [slap report dependencies](https://python-slap.github.io/slap-cli/commands/report/) |
+| Project dependencies lock file | ✅ | ❌ |
 
 | Feature / Build backend | Flit  | Poetry  | Setuptools  | Documentation |
 | ----------------------- | ----- | ------- | ----------- | --------- |
