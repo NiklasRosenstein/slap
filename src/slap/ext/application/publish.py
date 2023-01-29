@@ -63,7 +63,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
     def activate(self, app: Application, config: None) -> None:
         self.app = app
-        return app.cleo.add(self)
+        app.cleo.add(self)
 
     def handle(self) -> int:
         from twine.commands.upload import upload

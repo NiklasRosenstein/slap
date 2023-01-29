@@ -45,14 +45,14 @@ def get_active_python_bin(cmd: Command, fallback: bool = True) -> str | None:
     """Returns the active Python installation."""
 
     if hasattr(cmd, "_python_bin"):
-        python = cmd._python_bin  # type: ignore
+        python = cmd._python_bin  # type: ignore[attr-defined]
     else:
         python = cmd.option("python")
         if not python:
             python = os.getenv("PYTHON")
     if fallback:
         python = python or "python"
-    cmd._python_bin = python
+    cmd._python_bin = python  # type: ignore[attr-defined]
     return python
 
 

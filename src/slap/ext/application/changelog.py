@@ -354,7 +354,7 @@ class ChangelogUpdatePrCommand(Command):
         changed_files = [changelog.path for changelog, _ in changelogs]
 
         if self.option("commit"):
-            assert not self.automation_plugin
+            assert not automation_plugin
             self._vcs.commit_files(
                 changed_files,
                 f'Updated {num_updates} PR reference{"" if num_updates == 0 else "s"}.',

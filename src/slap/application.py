@@ -33,7 +33,7 @@ class Command(_BaseCommand):
         if not cls.help:
             first_line, remainder = (cls.__doc__ or "").partition("\n")[::2]
             cls.help = (first_line.strip() + "\n" + textwrap.dedent(remainder)).strip()
-        cls.description = cls.description or (cls.help.strip().splitlines()[0] if cls.help else None)
+        cls.description = cls.description or (cls.help.strip().splitlines()[0] if cls.help else None) or ""
 
         # TODO (@NiklasRosenstein): Implement automatic wrapping of description text, but we
         #   need to ignore HTML tags that are used to colour the output.
@@ -141,7 +141,7 @@ class CleoApplication(BaseCleoApplication):
         super()._configure_io(io)
         self._init_callback(io)
 
-    def _run_command(self, command: Command, io: IO) -> int:
+    def _run_command(self, command: Command, io: IO) -> int:  # type: ignore[override]
         return super()._run_command(command, io)
 
 

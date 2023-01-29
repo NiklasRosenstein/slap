@@ -143,8 +143,8 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         ),
     ]
 
-    # Hack to set a default value for the flag
-    next(opt for opt in options if opt.name == "no-line-prefix")._default = NotSet.Value
+    # Hack to set a default value for the flag.
+    next(opt for opt in options if opt.name == "no-line-prefix")._default = NotSet.Value  # type: ignore[assignment]
 
     def load_configuration(self, app: Application) -> None:
         self.app = app
