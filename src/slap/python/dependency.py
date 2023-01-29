@@ -18,9 +18,12 @@ import dataclasses
 import re
 import typing as t
 from pathlib import Path
+from typing import TypeVar
 from urllib.parse import parse_qs, parse_qsl, urlparse, urlunparse
 
-from nr.util.generic import T
+from typing_extensions import TypeAlias
+
+T = TypeVar("T")
 
 
 class VersionSpec:
@@ -201,7 +204,7 @@ class MultiDependency(Dependency, _MultiDependency):
 #: Represents a dependency configuration that does not contain the dependency name, such as is used for example
 #: by Poetry. A plain string is parsed like a dependency string (see #parse_dependency_string()), while a dictionary
 #: represents a more complex dependency configuration that can be parsed into other types of dependencies as well.
-DependencyConfig = str | dict[str, t.Any] | list[dict[str, t.Any]]
+DependencyConfig: TypeAlias = "str | dict[str, t.Any] | list[dict[str, t.Any]]"
 
 
 def split_package_name_with_extras(value: str) -> tuple[str, list[str] | None]:
@@ -383,7 +386,7 @@ def _parse_single_dependency_config(name: str, dep: str | dict[str, t.Any]) -> D
 def parse_dependency_config(name: str, dep: DependencyConfig) -> Dependency:
     """Converts a dependency configuration. This "happens" to be compatible with the Poetry configuration format."""
 
-    if isinstance(dep, dict | str):
+    if isinstance(dep, (dict, str)):
         dependency = _parse_single_dependency_config(name, dep)
     elif isinstance(dep, list):
         dependency = MultiDependency(name, [_parse_single_dependency_config(name, x) for x in dep])
