@@ -53,8 +53,14 @@ types-PyYAML = "^6.0.3"
 types-requests = "^2.27.7"
 types-termcolor = "^1.1.3"
 
-[tool.poetry.extras]
-docs = ["mkdocs", "mkdocs-material", "novella==0.2.3", "pydoc-markdown==4.6.0"]
+[tool.poetry.groups.docs]
+optional = true
+
+[tool.poetry.groups.docs.dependencies]
+mkdocs = "*"
+mkdocs-material = "*"
+novella = "0.2.3"
+pydoc-markdown = "4.6.0"
 
 [tool.poetry.scripts]
 slap = "slap.__main__:main"

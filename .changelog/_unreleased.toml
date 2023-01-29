@@ -3,3 +3,15 @@ id = "d3cdc955-98da-4cac-9cd5-93af636845e8"
 type = "improvement"
 description = "improve error message when there is no current environment set via `slap venv -s {env}`"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "1edc3046-6211-486b-9a1d-8416a97491c3"
+type = "feature"
+description = "support Poetry 1.2.0+ new `tool.poetry.group.dev.dependencies`"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "530c41ef-0948-41e0-ba0b-c5f81cbe32c0"
+type = "fix"
+description = "fix `pyproject.toml` for Poetry 1.3.0+ validation of `tool.poetry.extras` which can only list dependency names, but not their version constraints. Instead, use `tool.poetry.groups.*` introduced in Poetry 1.2.0"
+author = "@NiklasRosenstein"

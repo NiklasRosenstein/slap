@@ -63,11 +63,30 @@ class PoetryProjectHandler(PyprojectHandler):
                 indexes.default = source["name"]
             indexes.urls[source["name"]] = source["url"]
 
+        # Parse dependency groups (since Poetry 1.2.0). We have Slap treat optional groups
+        # just like extras, and non-optional groups as normal runtime dependencies.
+        dev: list[Dependency] = []
+        extra: dict[str, list[Dependency]] = {}
+        for group_name, group in poetry.get("groups", {}).items():
+            optional = group.get("optional", False)
+            group_deps = parse_dependencies(group.get("dependencies", []))
+            if group_name == "dev":
+                dev += group_deps
+            elif optional:
+                extra[group_name] = group_deps
+            else:
+                dependencies += group_deps
+
+        # Parse old-style configuration for dev-dependencies/extras.
+        dev += parse_dependencies(poetry.get("dev-dependencies", []))
+        for group_name, deps in poetry.get("extras", {}).items():
+            extra.setdefault(group_name, []).extend(parse_dependencies(deps))
+
         return Dependencies(
             python=python.version if python else None,
             run=[d for d in dependencies if d.name != "python"],
-            dev=parse_dependencies(poetry.get("dev-dependencies", [])),
-            extra={k: parse_dependencies(v) for k, v in poetry.get("extras", {}).items()},
+            dev=dev,
+            extra=extra,
             build=PypiDependency.parse_list(project.pyproject_toml.get("build-system", {}).get("requires", [])),
             indexes=indexes,
         )
