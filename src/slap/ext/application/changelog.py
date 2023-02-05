@@ -204,7 +204,6 @@ class ChangelogUpdatePrCommand(Command):
     changelog entry after the PR has been created.
     """
 
-    name = "changelog update-pr"
     arguments = [
         argument(
             "base_revision",
@@ -261,9 +260,13 @@ class ChangelogUpdatePrCommand(Command):
         ),
     ]
 
-    def __init__(self, app: Application):
+    def __init__(self, app: Application, name: str = "changelog pr update", deprecated: bool = False):
         super().__init__()
         self.app = app
+        self.name = name
+        if deprecated:
+            self.description = "Deprecated. Use <info>changelog pr update</info> instead."
+            self.help = f"{self.description}\n\n{self.help}"
         self.managers = {
             config: get_changelog_manager(app.repository, config if isinstance(config, Project) else None)
             for config in app.configurations()
@@ -642,6 +645,7 @@ class ChangelogCommandPlugin(ApplicationPlugin):
     def activate(self, app: "Application", config: ChangelogManager) -> None:
         app.cleo.add(ChangelogAddCommand(app, config))
         app.cleo.add(ChangelogUpdatePrCommand(app))
+        app.cleo.add(ChangelogUpdatePrCommand(app, name="changelog update-pr", deprecated=True))
         app.cleo.add(ChangelogFormatCommand(app, config))
         app.cleo.add(ChangelogConvertCommand(app, config))
 

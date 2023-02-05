@@ -1,0 +1,5 @@
+[[entries]]
+id = "ca85e9cb-09db-445d-bc3b-ce0725126a04"
+type = "improvement"
+description = "Rename `changelog update-pr` command to `changelog pr update`, keeping the old as a deprecated alias."
+author = "@NiklasRosenstein"
