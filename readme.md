@@ -14,4 +14,5 @@ jobs:
         with: { version: '1.3.0' }
 ```
 
-If no `version` is specified, or the version is set to `*`, the newest version will be installed.
+If no `version` is specified, or the version is set to `*`, the newest version will be installed. A constraint like
+`>=1.7.0` can also be specified for the version.

@@ -19,7 +19,7 @@ runs:
         VERSION='${{ inputs.version }}'
         if [ "$VERSION" == '*' ]; then
           VERSION=''
-        else
+        elif [[ $VERSION =~ ^[0-9] ]];
           VERSION="==$VERSION"
         fi
         pip install pipx -q && pipx install "slap-cli$VERSION"
