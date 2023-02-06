@@ -4,14 +4,13 @@ import logging
 import re
 import sys
 import typing as t
-from functools import partial
 from pathlib import Path
 
 from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, argument, option
 from slap.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
-from slap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
+from slap.plugins import ApplicationPlugin, GitRepositoryHostPlugin
 from slap.project import Project
 from slap.repository import Issue, PullRequest, Repository
 from slap.util.pygments import toml_highlight
@@ -238,38 +237,24 @@ class ChangelogDiffBaseCommand(Command):
             config: get_changelog_manager(app.repository, config if isinstance(config, Project) else None)
             for config in app.configurations()
         }
-        self.automation_plugin: ChangelogUpdateAutomationPlugin | None
+        self.git_host: GitRepositoryHostPlugin | None
         self.base_ref: str
         self.head_ref: str | None
         self.vcs: Vcs
 
-    def get_automation_plugins(self) -> dict[str, t.Callable[[], ChangelogUpdateAutomationPlugin]]:
-        """Iterates over all registered automation plugins and returns a dictionary that maps
-        the plugin name to a factory function."""
-
-        from nr.util.plugins import iter_entrypoints
-
-        result: dict[str, t.Callable[[], ChangelogUpdateAutomationPlugin]] = {}
-        for ep in iter_entrypoints(ChangelogUpdateAutomationPlugin.ENTRYPOINT):
-            result[ep.name] = partial(lambda ep: ep.load()(), ep)
-
-        return result
-
     def validate_arguments(self) -> None:
         """Validates the arguments to the command to populates relevant attributes."""
 
-        plugins = self.get_automation_plugins()
         plugin_name: str | None = self.option("use")
         if plugin_name is not None:
-            if plugin_name not in plugins:
-                self.line_error(f"<error>plugin `<info>{plugin_name}</info>` does not exist.</error>")
-                sys.exit(1)
             logger.info("Loading changelog update automation plugin <i>%s</i>", plugin_name)
-            self.automation_plugin = plugins[plugin_name]()
-            self.automation_plugin.io = self.io
-            self.automation_plugin.initialize()
+            try:
+                self.git_host = GitRepositoryHostPlugin.get(plugin_name, self.io)
+            except ValueError:
+                self.line_error(f"plugin `<info>{plugin_name}</info>` does not exist.", "error")
+                sys.exit(1)
         else:
-            self.automation_plugin = None
+            self.git_host = None
 
         ref_or_range: str | None = self.argument("ref_or_range")
         if ref_or_range is not None:
@@ -280,11 +265,11 @@ class ChangelogDiffBaseCommand(Command):
             self.base_ref = base_revision
             self.head_ref = head_revision or None
         else:
-            if self.automation_plugin is None:
+            if self.git_host is None:
                 self.line_error("Need a base Git ref, Git range or set the --use option.", "error")
                 sys.exit(1)
-            self.base_ref = self.automation_plugin.get_base_ref()
-            self.head_ref = self.automation_plugin.get_head_ref()
+            self.base_ref = self.git_host.get_base_ref()
+            self.head_ref = self.git_host.get_head_ref()
 
         vcs = self.app.repository.vcs()
         if not vcs:
@@ -364,10 +349,10 @@ class ChangelogDiffUpdatePrCommand(ChangelogDiffBaseCommand):
 
         pr_url: str | None = self.option("pr")
         if pr_url is None:
-            if self.automation_plugin is None:
+            if self.git_host is None:
                 self.line_error("need <opt>--pr</opt> or <opt>--use</opt>", "error")
                 sys.exit(1)
-            pr_url = self.automation_plugin.get_pr()
+            pr_url = self.git_host.get_pr()
         self.pr_url = pr_url
 
     def handle(self) -> int:
@@ -406,10 +391,10 @@ class ChangelogDiffUpdatePrCommand(ChangelogDiffBaseCommand):
             self.line("no entries to update", "info")
             return 0
 
-        if self.automation_plugin and not self.option("dry"):
+        if self.git_host and not self.option("dry"):
             plural = "" if total_updates == 0 else "s"
             commit_message = f"Updated PR reference{plural} in {num_updates} changelog{plural}."
-            self.automation_plugin.publish_changes(changed_files, commit_message)
+            self.git_host.publish_changes(changed_files, commit_message)
 
         return 0
 

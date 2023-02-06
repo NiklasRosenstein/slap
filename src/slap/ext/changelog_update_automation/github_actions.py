@@ -3,10 +3,10 @@ import re
 import subprocess as sp
 from pathlib import Path
 
-from slap.plugins import ChangelogUpdateAutomationPlugin
+from slap.plugins import GitRepositoryHostPlugin
 
 
-class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlugin):
+class GithubActionsRepositoryHostPlugin(GitRepositoryHostPlugin):
     """A plugin for use in GitHub Actions via `slap changelog update-pr --use github-actions` which will do all steps
     to push the updated changelogs back to a pull request branch. It should be used only in an action that is run as
     part of a GitHub pull request.
