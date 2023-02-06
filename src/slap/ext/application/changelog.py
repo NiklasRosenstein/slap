@@ -2,17 +2,20 @@ import dataclasses
 import io
 import logging
 import re
+import sys
 import typing as t
+from functools import partial
 from pathlib import Path
 
 from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, argument, option
-from slap.changelog import Changelog, ChangelogManager, ManagedChangelog
+from slap.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
 from slap.plugins import ApplicationPlugin, ChangelogUpdateAutomationPlugin
 from slap.project import Project
 from slap.repository import Issue, PullRequest, Repository
 from slap.util.pygments import toml_highlight
+from slap.util.vcs import Vcs
 
 logger = logging.getLogger(__name__)
 
@@ -196,28 +199,150 @@ class ChangelogAddCommand(BaseChangelogCommand):
         return 0
 
 
-class ChangelogUpdatePrCommand(Command):
-    """Update the <code>pr</code> field of changelog entries in a commit range.
+@dataclasses.dataclass
+class ChangelogDiff:
+    added_entries: list[ChangelogEntry] = dataclasses.field(default_factory=list)
+    removed_entries: list[ChangelogEntry] = dataclasses.field(default_factory=list)
+    updated_entries: list[tuple[ChangelogEntry, ChangelogEntry]] = dataclasses.field(default_factory=list)
+    unchanged_entries: list[ChangelogEntry] = dataclasses.field(default_factory=list)
 
-    Updates all changelog entries that were added in a given commit range. This is
-    useful to run in CI for a pull request to avoid having to manually update the
-    changelog entry after the PR has been created.
-    """
+
+class ChangelogDiffBaseCommand(Command):
+    """Base class for commands that perform changelog diffs."""
 
     arguments = [
         argument(
-            "base_revision",
-            description="The revision ID to look back to to make out which changelog entries have been added since.",
-            optional=True,
-        ),
-        argument(
-            "pr",
-            description="The reference to the PR that should be inserted into all entries added between the specified "
-            "revision and the current version of the unreleased changelog.",
+            "ref_or_range",
+            description="The Git ref or Git range (formatted as BASE..HEAD) to look inspect the diff for. If only "
+            "a Git ref is specified, the diff between that ref and the current worktree is used. The "
+            "<code>--use</code> option can be used in a compatible CI environment to automatically derive the base "
+            "Git ref in Pull Requests.",
             optional=True,
         ),
     ]
+
     options = [
+        option(
+            "--use",
+            description="Use the specified plugin for interacting with the Git repository host. Use this in "
+            "supported CI environments instead of manually configuring the command-line settings. You can list "
+            "the available plugins with the <info>changelog pr plugins</info> command.",
+            flag=False,
+        ),
+    ]
+
+    def __init__(self, app: Application) -> None:
+        super().__init__()
+        self.app = app
+        self.managers = {
+            config: get_changelog_manager(app.repository, config if isinstance(config, Project) else None)
+            for config in app.configurations()
+        }
+        self.automation_plugin: ChangelogUpdateAutomationPlugin | None
+        self.base_ref: str
+        self.head_ref: str | None
+        self.vcs: Vcs
+
+    def get_automation_plugins(self) -> dict[str, t.Callable[[], ChangelogUpdateAutomationPlugin]]:
+        """Iterates over all registered automation plugins and returns a dictionary that maps
+        the plugin name to a factory function."""
+
+        from nr.util.plugins import iter_entrypoints
+
+        result: dict[str, t.Callable[[], ChangelogUpdateAutomationPlugin]] = {}
+        for ep in iter_entrypoints(ChangelogUpdateAutomationPlugin.ENTRYPOINT):
+            result[ep.name] = partial(lambda ep: ep.load()(), ep)
+
+        return result
+
+    def validate_arguments(self) -> None:
+        """Validates the arguments to the command to populates relevant attributes."""
+
+        plugins = self.get_automation_plugins()
+        plugin_name: str | None = self.option("use")
+        if plugin_name is not None:
+            if plugin_name not in plugins:
+                self.line_error(f"<error>plugin `<info>{plugin_name}</info>` does not exist.</error>")
+                sys.exit(1)
+            logger.info("Loading changelog update automation plugin <i>%s</i>", plugin_name)
+            self.automation_plugin = plugins[plugin_name]()
+            self.automation_plugin.io = self.io
+            self.automation_plugin.initialize()
+        else:
+            self.automation_plugin = None
+
+        ref_or_range: str | None = self.argument("ref_or_range")
+        if ref_or_range is not None:
+            base_revision, sep, head_revision = ref_or_range.partition("..")
+            if sep and not head_revision:
+                self.line_error(f"invalid Git range: <code>{ref_or_range}</code>", "error")
+                sys.exit(1)
+            self.base_ref = base_revision
+            self.head_ref = head_revision or None
+        else:
+            if self.automation_plugin is None:
+                self.line_error("Need a base Git ref, Git range or set the --use option.", "error")
+                sys.exit(1)
+            self.base_ref = self.automation_plugin.get_base_ref()
+            self.head_ref = self.automation_plugin.get_head_ref()
+
+        vcs = self.app.repository.vcs()
+        if not vcs:
+            self.line_error("VCS is not configured or could not be detected", "error")
+            sys.exit(1)
+        self.vcs = vcs
+
+    def get_diff(self, manager: ChangelogManager) -> ChangelogDiff:
+        """Calculates the difference in the unreleased changelogs for the given changelog manager."""
+
+        changelog_path = manager.unreleased().path
+
+        # Load the old changelog contents.
+        old_changelog: Changelog | None = None
+        old_data = self.vcs.get_file_contents(changelog_path, self.base_ref)
+        if old_data is not None:
+            old_changelog = manager.load(io.StringIO(old_data.decode()))
+
+        # Load the new changelog contents.
+        new_changelog: Changelog | None = None
+        if self.head_ref:
+            new_data = self.vcs.get_file_contents(changelog_path, self.head_ref)
+            if new_data is not None:
+                new_changelog = manager.load(io.StringIO(new_data.decode()))
+        elif changelog_path.is_file():
+            new_changelog = manager.load(changelog_path)
+
+        old_entries = {e.id: e for e in old_changelog.entries} if old_changelog else {}
+        new_entries = {e.id: e for e in new_changelog.entries} if new_changelog else {}
+
+        diff = ChangelogDiff()
+        for entry_id in {*old_entries, *new_entries}:
+            if entry_id in old_entries and entry_id in new_entries:
+                if old_entries[entry_id] == new_entries[entry_id]:
+                    diff.unchanged_entries.append(old_entries[entry_id])
+                else:
+                    diff.updated_entries.append((old_entries[entry_id], new_entries[entry_id]))
+            elif entry_id not in new_entries:
+                diff.removed_entries.append(old_entries[entry_id])
+            elif entry_id not in old_entries:
+                diff.added_entries.append(new_entries[entry_id])
+            else:
+                assert False, "whaat?"
+
+        return diff
+
+
+class ChangelogDiffUpdatePrCommand(ChangelogDiffBaseCommand):
+    """Update the <code>pr</code> field of changelog entries in a commit range.
+
+    Updates all changelog entries that were added in a given commit range in the
+    unreleased changelog. This is useful to run in CI for a pull request to avoid
+    having to manually update the changelog entry after the PR has been created.
+    """
+
+    name = "changelog diff pr update"
+
+    options = ChangelogDiffBaseCommand.options + [
         option(
             "--dry",
             "-d",
@@ -228,189 +353,65 @@ class ChangelogUpdatePrCommand(Command):
             description="Update PR references even if an entry's reference is already set but different.",
         ),
         option(
-            "--commit",
-            "-c",
-            description="Commit the changes, if any.",
-        ),
-        option(
-            "--push",
-            "-p",
-            description="Push the changes, if any.",
-        ),
-        option(
-            "--name",
-            description="Override the <code>user.name</code> Git option (only with <opt>--commit, -c</opt>)",
+            "--pr",
+            description="The PR URL to set. If not set, the <opt>--use</opt> option must be specified.",
             flag=False,
-        ),
-        option(
-            "--email",
-            description="Override the <code>user.email</code> Git option (only with <opt>--commit, -c</opt>).",
-            flag=False,
-        ),
-        option(
-            "--use",
-            description="Use the specified plugin to publish the updated changelogs. Use this in supported CI "
-            "environments instead of manually configuring the command-line settings.",
-            flag=False,
-        ),
-        option(
-            "--list",
-            "-l",
-            description="List the available plugins you can pass to the <opt>--use</opt> option.",
         ),
     ]
 
-    def __init__(self, app: Application, name: str = "changelog pr update", deprecated: bool = False):
-        super().__init__()
-        self.app = app
-        self.name = name
-        if deprecated:
-            self.description = "Deprecated. Use <info>changelog pr update</info> instead."
-            self.help = f"{self.description}\n\n{self.help}"
-        self.managers = {
-            config: get_changelog_manager(app.repository, config if isinstance(config, Project) else None)
-            for config in app.configurations()
-        }
+    def validate_arguments(self) -> None:
+        super().validate_arguments()
+
+        pr_url: str | None = self.option("pr")
+        if pr_url is None:
+            if self.automation_plugin is None:
+                self.line_error("need <opt>--pr</opt> or <opt>--use</opt>", "error")
+                sys.exit(1)
+            pr_url = self.automation_plugin.get_pr()
+        self.pr_url = pr_url
 
     def handle(self) -> int:
-        from nr.util.plugins import iter_entrypoints, load_entrypoint
+        self.validate_arguments()
 
-        if not self._validate_arguments():
-            return 1
+        total_updates = 0
+        changed_files: list[Path] = []
 
-        if self.option("list"):
-            for ep in iter_entrypoints(ChangelogUpdateAutomationPlugin.ENTRYPOINT):
-                self.line(f"  • {ep.name}")
-            return 0
-
-        automation_plugin: ChangelogUpdateAutomationPlugin | None = None
-        if plugin_name := self.option("use"):
-            logger.info("Loading changelog update automation plugin <subj>%s</subj>", plugin_name)
-            automation_plugin = load_entrypoint(ChangelogUpdateAutomationPlugin, plugin_name)()  # type: ignore[misc]
-            automation_plugin.io = self.io
-            automation_plugin.initialize()
-            base_revision: str = automation_plugin.get_base_ref()
-        else:
-            base_revision = self.argument("base_revision")
-        assert base_revision
-
-        changelogs: list[tuple[ManagedChangelog, ChangelogManager]] = []
-        for _, manager in self.managers.items():
-            unreleased = manager.unreleased()
-            if unreleased.exists():
-                changelogs.append((unreleased, manager))
-
-        if not changelogs:
-            self.line("no entries to update", "info")
-            return 0
-
-        if not (pr := self.argument("pr")):
-            assert automation_plugin
-            pr = automation_plugin.get_pr()
-
-        host = self.app.repository.host()
-        if host:
-            try:
-                pr = host.get_pull_request_by_reference(pr).url
-            except ValueError as exc:
-                self.line_error(f"error: {exc}", "error")
-                return 1
-
-        num_updates = 0
-        for changelog, manager in changelogs:
-
-            prev_contents = self._vcs.get_file_contents(changelog.path, base_revision)
-            if prev_contents is None:
-                prev_entry_ids = set[str]()
-            else:
-                prev_changelog = manager.deser.load(
-                    io.StringIO(prev_contents.decode("utf8")), f"{base_revision}:{changelog.path}"
-                )
-                prev_entry_ids = {e.id for e in prev_changelog.entries}
-
-            new_entry_ids = {e.id for e in changelog.content.entries if e.pr != pr} - prev_entry_ids
-            entries_to_update = [
-                e for e in changelog.content.entries if e.id in new_entry_ids and (not e.pr or self.option("overwrite"))
-            ]
-            if not entries_to_update:
+        for manager in self.managers.values():
+            changelog_ref = manager.unreleased()
+            if not changelog_ref.exists():
                 continue
 
-            self.line(
-                f"update <info>{changelog.path.relative_to(Path.cwd())}</info> "
-                f'({len(entries_to_update)} reference{"s" if len(new_entry_ids) != 1 else ""})'
-            )
+            num_updates = 0
+            changelog = changelog_ref.load()
+            diff = self.get_diff(manager)
+            for entry_id in (e.id for e in diff.added_entries):
+                entry = changelog.find_entry(entry_id)
+                if entry is None:
+                    self.line_error(
+                        f"Changelog entry <code>{entry_id}</code> found in diff does not " "exist in worktree.",
+                        "warning",
+                    )
+                    continue
+                if entry.pr is None or self.option("overwrite"):
+                    entry.pr = self.pr_url
+                    num_updates += 1
+                    total_updates += 1
 
-            num_updates += len(entries_to_update)
-            for entry in entries_to_update:
-                entry.pr = pr
+            if not self.option("dry") and num_updates > 0:
+                self.line(f"updated <i>{num_updates}</i> entries in <fg=yellow>{changelog_ref.path}</fg>", "info")
+                changelog_ref.save(changelog)
+                changed_files.append(changelog_ref.path)
 
-            if not self.option("dry"):
-                changelog.save(None)
-
-        if not num_updates:
+        if total_updates == 0:
             self.line("no entries to update", "info")
             return 0
 
-        if self.option("dry"):
-            return 0
-
-        changed_files = [changelog.path for changelog, _ in changelogs]
-
-        if self.option("commit"):
-            assert not automation_plugin
-            self._vcs.commit_files(
-                changed_files,
-                f'Updated {num_updates} PR reference{"" if num_updates == 0 else "s"}.',
-                push=self._remote,
-                name=self.option("name"),
-                email=self.option("email"),
-            )
-
-        if automation_plugin:
-            automation_plugin.publish_changes(changed_files)
+        if self.automation_plugin and not self.option("dry"):
+            plural = "" if total_updates == 0 else "s"
+            commit_message = f"Updated PR reference{plural} in {num_updates} changelog{plural}."
+            self.automation_plugin.publish_changes(changed_files, commit_message)
 
         return 0
-
-    def _validate_arguments(self) -> bool:
-        if self.option("list"):
-            if used_option := next((o.name for o in self.options if o.name != "list" and self.option(o.name)), None):
-                self.line_error(f"error: <opt>--{used_option}</opt> cannot be used with <opt>--list</opt>", "error")
-                return False
-
-        elif self.option("use"):
-            if used_option := next((o.name for o in self.options if o.name != "use" and self.option(o.name)), None):
-                self.line_error(f"error: <opt>--{used_option}</opt> cannot be used with <opt>--use</opt>", "error")
-                return False
-
-        else:
-            for arg in ("base_revision", "pr"):
-                if not self.argument(arg):
-                    self.line_error(f"error: missing argument <opt>{arg}</opt>", "error")
-                    return False
-
-        if self.option("push") and not self.option("commit"):
-            self.line_error(
-                "error: <opt>--push, -p</opt> can only be used in combination with <opt>--commit, -c</opt>", "error"
-            )
-            return False
-
-        vcs = self.app.repository.vcs()
-        if not vcs:
-            self.line_error("error: VCS is not configured or could not be detected", "error")
-            return False
-        self._vcs = vcs
-
-        if self.option("push"):
-            self._remote = next((r for r in self._vcs.get_remotes() if r.default), None)
-        else:
-            self._remote = None
-
-        for opt in ("email", "name"):
-            if self.option(opt) and not self.option("commit"):
-                self.line_error(f"error: <opt>--{opt}</opt> is not valid without <opt>--commit, -c</opt>", "error")
-                return False
-
-        return True
 
 
 class ChangelogFormatCommand(BaseChangelogCommand):
@@ -644,8 +645,7 @@ class ChangelogCommandPlugin(ApplicationPlugin):
 
     def activate(self, app: "Application", config: ChangelogManager) -> None:
         app.cleo.add(ChangelogAddCommand(app, config))
-        app.cleo.add(ChangelogUpdatePrCommand(app))
-        app.cleo.add(ChangelogUpdatePrCommand(app, name="changelog update-pr", deprecated=True))
+        app.cleo.add(ChangelogDiffUpdatePrCommand(app))
         app.cleo.add(ChangelogFormatCommand(app, config))
         app.cleo.add(ChangelogConvertCommand(app, config))
 

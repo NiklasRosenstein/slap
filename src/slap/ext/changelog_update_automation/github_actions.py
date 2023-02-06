@@ -59,10 +59,9 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
             raise EnvironmentError(f'could not determine Pull Request ID from GITHUB_REF="{ref}"')
         return match.group(1)
 
-    def publish_changes(self, changed_files: list[Path]) -> None:
+    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None:
         user_name = os.environ.get("GIT_USER_NAME", "GitHub Action")
         user_email = os.environ.get("GIT_USER_EMAIL", "github-action@users.noreply.github.com")
-        commit_message = os.environ.get("GIT_COMMIT_MESSAGE", "Update changelog PR references")
         if os.getenv("GIT_SHOW_DIFF"):
             sp.check_output(["git", "diff"], stderr=sp.PIPE)
         sp.check_output(["git", "add"] + [str(f) for f in changed_files], stderr=sp.PIPE)

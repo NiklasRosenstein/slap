@@ -161,6 +161,9 @@ class VersionIncrementingRulePlugin(abc.ABC):
         ...
 
 
+# TODO(NiklasRosenstein): ChangelogUpdateAutomationPlugin should better be called GitRepositoryHostPlugin.
+
+
 class ChangelogUpdateAutomationPlugin(abc.ABC):
     """This plugin type can be used with the `slap changelog update-pr -use <plugin_name>` option. It provides all the
     details derivable from the environment (e.g. environment variables available from CI builds) that can be used to
@@ -180,10 +183,13 @@ class ChangelogUpdateAutomationPlugin(abc.ABC):
     def get_base_ref(self) -> str:
         ...
 
+    def get_head_ref(self) -> str | None:
+        return None
+
     @abc.abstractmethod
     def get_pr(self) -> str:
         ...
 
     @abc.abstractmethod
-    def publish_changes(self, changed_files: list[Path]) -> None:
+    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None:
         ...
