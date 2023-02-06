@@ -1134,7 +1134,7 @@ pytest| tests/slap/python/test_dependency.py::test__PypiDependency__parse PASSED
 pytest| tests/slap/python/test_environment.py::test__PythonEnvironment__with_current_python_instance PASSED [ 93%]
 pytest| tests/slap/python/test_pep508.py::test__Pep508Environment__sample_markers PASSED [100%]
 pytest| 
-pytest| ======================== 14 passed, 1 skipped in 0.54s =========================
+pytest| ======================== 14 passed, 1 skipped in 0.65s =========================
 
 test summary:
   • black (exit code: 0)
@@ -1214,14 +1214,13 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.7.1
-  pyproject.toml:       1.7.0 → 1.7.1 # &#39;version = &quot;1.7.0&quot;&#39;
-  src/slap/__init__.py: 1.7.0 → 1.7.1 # &#39;__version__ = &quot;1.7.0&quot;&#39;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>    $ cd .. &amp;&amp; slap release --dry --tag --push patch --no-branch-check --no-worktree-check 2&gt;/dev/null  # exited with return code 1
+    bumping 2 version references to 1.7.1
+      pyproject.toml:       1.7.0 → 1.7.1 # &#39;version = &quot;1.7.0&quot;&#39;
+      src/slap/__init__.py: 1.7.0 → 1.7.1 # &#39;__version__ = &quot;1.7.0&quot;&#39;
 
 
-tagging 1.7.1
-
-pushing develop, 1.7.1 to origin
+    tagging 1.7.1
 </code></pre></div>
 
 </details>
