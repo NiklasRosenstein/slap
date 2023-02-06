@@ -612,6 +612,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#assert-changelogs" class="md-nav__link">
+    Assert Changelogs
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -806,6 +813,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#assert-changelogs" class="md-nav__link">
+    Assert Changelogs
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -852,9 +866,9 @@ pick an exact version for your configuration to avoid surprises.</p>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap test</span>
 </code></pre></div>
 <h3 id="update-changelogs">Update Changelogs</h3>
-<p>The <code>slap changelog update-pr</code> command updates the PR references of changelogs added between two Git revisions. In
+<p>The <code>slap changelog diff pr update</code> command updates the PR references of changelogs added between two Git revisions. In
 addition, by passing <code>--use github-actions</code>, there is almost no need for any additional configuration inside of a
-GitHub action run for a Pull Request event. The <a href="https://github.com/NiklasRosenstein/slap/tree/github-action/changelog-update/v1"><code>NiklasRosenstein/slap@gha/changelog/update/v1</code></a> action
+GitHub action run for a Pull Request event. The <a href="https://github.com/NiklasRosenstein/slap/tree/gha/changelog/update/v2"><code>NiklasRosenstein/slap@gha/changelog/update/v2</code></a> action
 makes automatically updated changelogs a breeze:</p>
 <div class="highlight"><span class="filename">.github/workflows/python.yml</span><pre><span></span><code><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">pull_request</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="nt">jobs</span><span class="p">:</span>
@@ -863,7 +877,22 @@ makes automatically updated changelogs a breeze:</p>
 <span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == &#39;pull_request&#39;</span>
 <span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NiklasRosenstein/slap@gha/changelog/update/v1</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NiklasRosenstein/slap@gha/changelog/update/v2</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*&#39;</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</code></pre></div>
+<h2 id="assert-changelogs">Assert Changelogs</h2>
+<p>The <code>slap changelog diff assert-added</code> command is similar to the <code>slap changelog diff pr update</code> command in that it
+inspects the diff of changelogs between to Git versions, but it fails if no new changelog entry was added to the
+unreleased changelog.</p>
+<p>We recommend that you use the GitHub Action <a href="https://github.com/NiklasRosenstein/slap/tree/gha/changelog/assert-added/v2"><code>NiklasRosenstein/slap@gha/changelog/assert-added/v2</code></a>.</p>
+<div class="highlight"><span class="filename">.github/workflows/python.yml</span><pre><span></span><code><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">pull_request</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">changelog-update</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.base_ref != &#39;&#39; &amp;&amp; !contains(github.event.pull_request.labels.*.name, &#39;no changelog&#39;)</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NiklasRosenstein/slap@gha/changelog/assert-added/v2</span>
 <span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*&#39;</span><span class="w"> </span><span class="p p-Indicator">}</span>
 </code></pre></div>
 
