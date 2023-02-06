@@ -10,11 +10,15 @@ runs:
   steps:
 
     - run: git fetch
+      shell: bash
+
     - run: git checkout $GITHUB_HEAD_REF
+      shell: bash
       if: github.head_ref != ''
 
     - uses: NiklasRosenstein/slap@gha/install/v1
       with: { version: "${{ inputs.version }}" }
 
     - name: Update changelogs
+      shell: bash
       run: slap changelog diff pr update --use github-actions -vv
