@@ -271,6 +271,11 @@ class ChangelogDiffBaseCommand(Command):
             self.base_ref = self.git_host.get_base_ref()
             self.head_ref = self.git_host.get_head_ref()
 
+        if self.head_ref is None:
+            self.ref_range = f"{self.base_ref}..WORKTREE"
+        else:
+            self.ref_range = f"{self.base_ref}..{self.head_ref}"
+
         vcs = self.app.repository.vcs()
         if not vcs:
             self.line_error("VCS is not configured or could not be detected", "error")
@@ -396,6 +401,28 @@ class ChangelogDiffUpdatePrCommand(ChangelogDiffBaseCommand):
             commit_message = f"Updated PR reference{plural} in {num_updates} changelog{plural}."
             self.git_host.publish_changes(changed_files, commit_message)
 
+        return 0
+
+
+class ChangelogDiffAssertCommand(ChangelogDiffBaseCommand):
+    """This command can be used to assert that changelog entries have been added
+    in a Git revision range."""
+
+    name = "changelog diff assert-added"
+
+    def handle(self) -> int:
+        self.validate_arguments()
+        added: list[ChangelogEntry] = []
+        for manager in self.managers.values():
+            diff = self.get_diff(manager)
+            added += diff.added_entries
+        if not added:
+            self.line_error(f"no changelog entries have been added in <code>{self.ref_range}</code>", "error")
+            return 1
+        self.line(f"<i>{len(added)}</i> changelog entries added in <code>{self.ref_range}</code>\n")
+        for entry in added:
+            print("*", entry.description)
+            print()
         return 0
 
 
@@ -631,6 +658,7 @@ class ChangelogCommandPlugin(ApplicationPlugin):
     def activate(self, app: "Application", config: ChangelogManager) -> None:
         app.cleo.add(ChangelogAddCommand(app, config))
         app.cleo.add(ChangelogDiffUpdatePrCommand(app))
+        app.cleo.add(ChangelogDiffAssertCommand(app))
         app.cleo.add(ChangelogFormatCommand(app, config))
         app.cleo.add(ChangelogConvertCommand(app, config))
 

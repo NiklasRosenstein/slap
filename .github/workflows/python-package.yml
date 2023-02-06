@@ -44,7 +44,7 @@ jobs:
     - uses: actions/setup-python@v2
       with: { python-version: "3.10" }
     - run: pip install . && slap install --no-venv-check
-    - run: slap changelog diff assert --added --use github-actions
+    - run: slap changelog diff assert-added --use github-actions
 
   test-pep508:
     runs-on: ubuntu-20.04
