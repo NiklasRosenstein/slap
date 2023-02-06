@@ -2,19 +2,23 @@
 
   [Slap]: https://github.com/NiklasRosenstein/slap
 
-This action updates changelog files managed by [Slap][] from a Pull Request to insert the URL of the PR into the newly added entries.
+This action updates changelog files managed by [Slap][] from a Pull Request to insert the
+URL of the PR into the newly added entries.
 
 ## Usage
 
 ```yaml
+on: [ pull_request ]
 jobs:
   changelog-update:
+    name: "Insert the Pull Request URL into new changelog entries"
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
-      - uses: NiklasRosenstein/slap@gha/changelog/update/v1
-        with: { version: '1.3.0' }
+      - uses: NiklasRosenstein/slap@gha/changelog/update/v2
+        with: { version: '*' }
 ```
 
-If no `version` is specified, or the version is set to `*`, the newest version of Slap will be installed.
+If no `version` is specified, the version will default to `>=1.7.0` (which is the minimum version
+of Slap required for this action to work).

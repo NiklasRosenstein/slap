@@ -2,9 +2,9 @@ name: 'slap - Update changelogs'
 description: 'Updates changelogs managed by Slap to inject the pull request reference.'
 inputs:
   version:
-    description: The version of Slap to install
+    description: The version of Slap to install. Defaults to `>=1.7.0`.
     required: true
-    default: '*'
+    default: '>=1.7.0'
 runs:
   using: "composite"
   steps:
