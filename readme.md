@@ -15,9 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v2
       - uses: NiklasRosenstein/slap@gha/changelog/update/v2
-        with: { version: '*' }
 ```
 
 If no `version` is specified, the version will default to `>=1.7.0` (which is the minimum version
