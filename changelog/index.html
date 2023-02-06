@@ -2542,6 +2542,9 @@ Reimplement command to update PRs in added changelog entries and rename it to `s
   <tr><td>Improvement</td><td>
 
 Update `GithubActionsChangelogUpdateAutomationPlugin.get_pr()` to return the full PR URL instead of just the number.</td><td><a href="https://github.com/NiklasRosenstein/slap/pull/75">75</a></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Breaking change</td><td>
+
+Rename `ChangelogUpdateAutomationPlugin` to `GitRepositoryHostPlugin`, add `GitRepositoryHostPlugin.all()` and `~.get()`, rename plugin entrypoint from `slap.plugins.changelog_update_automation` to `slap.plugins.git_repository_host`</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
 </table>
 
 <h2 id="1633-2023-01-29">1.6.33 (2023-01-29)</h2>
