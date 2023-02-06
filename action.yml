@@ -1,0 +1,20 @@
+name: 'slap - Assert new changelog entries have been added'
+description: 'Asserts that new changelog entries have been added in a GitHub Pull Request.'
+inputs:
+  version:
+    description: The version of Slap to install. Defaults to `>=1.7.0`.
+    required: true
+    default: '>=1.7.0'
+runs:
+  using: "composite"
+  steps:
+
+    - run: git fetch
+    - run: git checkout $GITHUB_HEAD_REF
+      if: github.head_ref != ''
+
+    - uses: NiklasRosenstein/slap@gha/install/v1
+      with: { version: "${{ inputs.version }}" }
+
+    - name: Assert new changelog entries have been added
+      run: slap changelog diff assert-added --use github-actions -vv
