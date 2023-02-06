@@ -9,9 +9,12 @@ runs:
   using: "composite"
   steps:
 
+    - run: git fetch
+    - run: git checkout $GITHUB_HEAD_REF
+      if: github.head_ref != ''
+
     - uses: NiklasRosenstein/slap@gha/install/v1
       with: { version: "${{ inputs.version }}" }
 
     - name: Update changelogs
-      shell: bash
-      run: slap -vv changelog update-pr --use github-actions
+      run: slap changelog diff pr update --use github-actions -vv
