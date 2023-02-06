@@ -51,6 +51,7 @@ makes automatically updated changelogs a breeze:
 on: [ pull_request ]
 jobs:
   changelog-update:
+    name: "Insert the Pull Request URL into new changelog entries"
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
@@ -72,7 +73,8 @@ We recommend that you use the GitHub Action [`NiklasRosenstein/slap@gha/changelo
 ```yaml title=".github/workflows/python.yml"
 on: [ pull_request ]
 jobs:
-  changelog-update:
+  assert-new-changelog-entries:
+    name: "Assert that new changelog entries have been added"
     runs-on: ubuntu-latest
     if: github.base_ref != '' && !contains(github.event.pull_request.labels.*.name, 'no changelog')
     steps:
