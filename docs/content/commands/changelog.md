@@ -104,14 +104,27 @@ This is actually used in this very documentation: Check out the [Changelog](../c
 
 ---
 
-### `slap changelog update-pr`
+### `slap changelog diff pr update`
 
 Updates the `pr` field of entries in the unreleased changelog. This is useful to run from continuous integration
 jobs to avoid having to manually inject the pull request URL into changelog entries. If you are using GitHub, try
-using the [`NiklasRosenstein/slap@gha/changelog/update/v1`](../guides/github.md#update-changelogs) action.
+using the [`NiklasRosenstein/slap@gha/changelog/update/v2`](../guides/github.md#update-changelogs) action.
 
 <details><summary>Synopsis</summary>
 ```
-@shell slap changelog update-pr --help
+@shell slap changelog diff pr update --help
+```
+</details>
+
+---
+
+### `slap changelog diff assert-added`
+
+This is a useful command to run in CI on Pull Requests to ensure that a new changelog entry was added by the PR.
+If you are using GitHub, try using the [`NiklasRosenstein/slap@gha/changelog/assert-added/v2`](../guides/github.md#assert-changelogs) action.
+
+<details><summary>Synopsis</summary>
+```
+@shell slap changelog diff assert-added --help
 ```
 </details>

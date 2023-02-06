@@ -45,6 +45,12 @@ class Changelog:
     entries: list[ChangelogEntry] = dataclasses.field(default_factory=list)
     release_date: t.Annotated[datetime.date | None, Alias("release-date")] = None
 
+    def find_entry(self, entry_id: str) -> ChangelogEntry | None:
+        for entry in self.entries:
+            if entry.id == entry_id:
+                return entry
+        return None
+
 
 class ChangelogDeser(abc.ABC):
     @abc.abstractmethod
@@ -111,7 +117,7 @@ class ManagedChangelog:
 
     def load(self, reload: bool = False) -> Changelog:
         if self._content is None or reload:
-            self._content = self._manager._load(self.path)
+            self._content = self._manager.load(self.path)
         return self._content
 
     def save(self, changelog: Changelog | None) -> None:
@@ -125,7 +131,7 @@ class ManagedChangelog:
             )
         if changelog.release_date is not None and self.path.name == self._manager.unreleased_fn:
             raise RuntimeError(f"changelog with release date must be a version (but is {self.path.name})")
-        self._manager._save(changelog, self.path)
+        self._manager.save(changelog, self.path)
 
     def release(self, version: str) -> None:
         """Releases the changelog as the specified version."""
@@ -165,16 +171,21 @@ class ChangelogManager:
     #: If enabled, write operations to the changelog directory are disabled.
     readonly: bool = False
 
-    def _load(self, file: Path) -> Changelog:
-        with file.open("r") as fp:
-            return self.deser.load(fp, str(file))
+    def load(self, file: Path | t.TextIO) -> Changelog:
+        if isinstance(file, Path):
+            with file.open("r") as fp:
+                return self.load(fp)
+        return self.deser.load(file, str(file))
 
-    def _save(self, changelog: Changelog, file: Path) -> None:
+    def save(self, changelog: Changelog, file: Path | t.TextIO) -> None:
         if self.readonly:
             raise RuntimeError(f'"{self.directory}" is readonly')
-        file.parent.mkdir(parents=True, exist_ok=True)
-        with file.open("w") as fp:
-            self.deser.save(changelog, fp, str(file))
+        if isinstance(file, Path):
+            file.parent.mkdir(parents=True, exist_ok=True)
+            with file.open("w") as fp:
+                self.save(changelog, fp)
+        else:
+            self.deser.save(changelog, file, str(file))
 
     def unreleased(self) -> ManagedChangelog:
         return ManagedChangelog(self, self.directory / self.unreleased_fn, None)

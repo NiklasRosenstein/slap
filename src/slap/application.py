@@ -29,6 +29,9 @@ logger = logging.getLogger(__name__)
 
 
 class Command(_BaseCommand):
+    help: str
+    description: str
+
     def __init_subclass__(cls) -> None:
         if not cls.help:
             first_line, remainder = (cls.__doc__ or "").partition("\n")[::2]

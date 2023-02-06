@@ -3,10 +3,10 @@ import re
 import subprocess as sp
 from pathlib import Path
 
-from slap.plugins import ChangelogUpdateAutomationPlugin
+from slap.plugins import GitRepositoryHostPlugin
 
 
-class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlugin):
+class GithubActionsRepositoryHostPlugin(GitRepositoryHostPlugin):
     """A plugin for use in GitHub Actions via `slap changelog update-pr --use github-actions` which will do all steps
     to push the updated changelogs back to a pull request branch. It should be used only in an action that is run as
     part of a GitHub pull request.
@@ -57,12 +57,13 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
         match = re.match(r"refs/pull/(\d+)", ref)
         if not match:
             raise EnvironmentError(f'could not determine Pull Request ID from GITHUB_REF="{ref}"')
-        return match.group(1)
+        pr_number = match.group(1)
+        repository = os.environ["GITHUB_REPOSITORY"]
+        return f"https://github.com/{repository}/pull/{pr_number}"
 
-    def publish_changes(self, changed_files: list[Path]) -> None:
+    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None:
         user_name = os.environ.get("GIT_USER_NAME", "GitHub Action")
         user_email = os.environ.get("GIT_USER_EMAIL", "github-action@users.noreply.github.com")
-        commit_message = os.environ.get("GIT_COMMIT_MESSAGE", "Update changelog PR references")
         if os.getenv("GIT_SHOW_DIFF"):
             sp.check_output(["git", "diff"], stderr=sp.PIPE)
         sp.check_output(["git", "add"] + [str(f) for f in changed_files], stderr=sp.PIPE)

@@ -22,6 +22,30 @@ jobs:
     - run: slap test
     - run: slap publish --dry
 
+  update-pr:
+    name: "Insert PR reference into added changelogs."
+    runs-on: ubuntu-20.04
+    if: github.base_ref != ''
+    steps:
+    - uses: actions/checkout@v2
+    - run: git fetch && git checkout $GITHUB_HEAD_REF
+    - uses: actions/setup-python@v2
+      with: { python-version: "3.10" }
+    - run: pip install . && slap install --no-venv-check
+    - run: slap changelog diff pr update --use github-actions
+
+  require-changelog:
+    name: "Require added changelog entries on Pull Requests."
+    runs-on: ubuntu-20.04
+    if: github.base_ref != '' && !contains(github.event.pull_request.labels.*.name, 'no changelog')  # Only on pull_request or pull_request_target events, and if the PR is not labeled
+    steps:
+    - uses: actions/checkout@v2
+    - run: git fetch && git checkout $GITHUB_HEAD_REF
+    - uses: actions/setup-python@v2
+      with: { python-version: "3.10" }
+    - run: pip install . && slap install --no-venv-check
+    - run: slap changelog diff assert-added --use github-actions
+
   test-pep508:
     runs-on: ubuntu-20.04
     strategy:

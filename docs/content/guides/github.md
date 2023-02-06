@@ -40,21 +40,45 @@ jobs:
 
 ### Update Changelogs
 
-  [1]: https://github.com/NiklasRosenstein/slap/tree/github-action/changelog-update/v1
+  [1]: https://github.com/NiklasRosenstein/slap/tree/gha/changelog/update/v2
 
-The `slap changelog update-pr` command updates the PR references of changelogs added between two Git revisions. In
+The `slap changelog diff pr update` command updates the PR references of changelogs added between two Git revisions. In
 addition, by passing `--use github-actions`, there is almost no need for any additional configuration inside of a
-GitHub action run for a Pull Request event. The [`NiklasRosenstein/slap@gha/changelog/update/v1`][1] action
+GitHub action run for a Pull Request event. The [`NiklasRosenstein/slap@gha/changelog/update/v2`][1] action
 makes automatically updated changelogs a breeze:
 
 ```yaml title=".github/workflows/python.yml"
 on: [ pull_request ]
 jobs:
   changelog-update:
+    name: "Insert the Pull Request URL into new changelog entries"
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
-      - uses: NiklasRosenstein/slap@gha/changelog/update/v1
+      - uses: NiklasRosenstein/slap@gha/changelog/update/v2
+        with: { version: '*' }
+```
+
+## Assert Changelogs
+
+  [2]: https://github.com/NiklasRosenstein/slap/tree/gha/changelog/assert-added/v2
+
+The `slap changelog diff assert-added` command is similar to the `slap changelog diff pr update` command in that it
+inspects the diff of changelogs between to Git versions, but it fails if no new changelog entry was added to the
+unreleased changelog.
+
+We recommend that you use the GitHub Action [`NiklasRosenstein/slap@gha/changelog/assert-added/v2`][2].
+
+```yaml title=".github/workflows/python.yml"
+on: [ pull_request ]
+jobs:
+  assert-new-changelog-entries:
+    name: "Assert that new changelog entries have been added"
+    runs-on: ubuntu-latest
+    if: github.base_ref != '' && !contains(github.event.pull_request.labels.*.name, 'no changelog')
+    steps:
+      - uses: actions/checkout@v2
+      - uses: NiklasRosenstein/slap@gha/changelog/assert-added/v2
         with: { version: '*' }
 ```

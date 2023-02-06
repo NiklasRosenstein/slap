@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import typing as t
+from functools import partial
 
 from nr.util.generic import T
 
@@ -161,14 +162,14 @@ class VersionIncrementingRulePlugin(abc.ABC):
         ...
 
 
-class ChangelogUpdateAutomationPlugin(abc.ABC):
+class GitRepositoryHostPlugin(abc.ABC):
     """This plugin type can be used with the `slap changelog update-pr -use <plugin_name>` option. It provides all the
     details derivable from the environment (e.g. environment variables available from CI builds) that can be used to
     detect which changelog entries have been added in a pull request, the pull request URL and the means to publish
     the changes back to the original repository.
     """
 
-    ENTRYPOINT = "slap.plugins.changelog_update_automation"
+    ENTRYPOINT = "slap.plugins.git_repository_host"
 
     io: IO
 
@@ -180,10 +181,41 @@ class ChangelogUpdateAutomationPlugin(abc.ABC):
     def get_base_ref(self) -> str:
         ...
 
+    def get_head_ref(self) -> str | None:
+        return None
+
     @abc.abstractmethod
     def get_pr(self) -> str:
         ...
 
     @abc.abstractmethod
-    def publish_changes(self, changed_files: list[Path]) -> None:
+    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None:
         ...
+
+    @staticmethod
+    def all() -> dict[str, t.Callable[[], GitRepositoryHostPlugin]]:
+        """Iterates over all registered automation plugins and returns a dictionary that maps
+        the plugin name to a factory function."""
+
+        from nr.util.plugins import iter_entrypoints
+
+        result: dict[str, t.Callable[[], GitRepositoryHostPlugin]] = {}
+        for ep in iter_entrypoints(GitRepositoryHostPlugin.ENTRYPOINT):
+            result[ep.name] = partial(lambda ep: ep.load()(), ep)
+
+        return result
+
+    @staticmethod
+    def get(plugin_name: str, io: IO) -> GitRepositoryHostPlugin:
+        """Returns an instance of the plugin with given name, fully initialized.
+
+        Raises a #ValueError if the plugin does not exist."""
+
+        plugins = GitRepositoryHostPlugin.all()
+        if plugin_name not in plugins:
+            raise ValueError(f"plugin {GitRepositoryHostPlugin.ENTRYPOINT}:{plugin_name} does not exist")
+
+        plugin = plugins[plugin_name]()
+        plugin.io = io
+        plugin.initialize()
+        return plugin

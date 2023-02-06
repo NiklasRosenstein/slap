@@ -80,8 +80,8 @@ run = "slap.ext.application.run:RunCommandPlugin"
 test = "slap.ext.application.test:TestCommandPlugin"
 venv = "slap.ext.application.venv:VenvPlugin"
 
-[tool.poetry.plugins."slap.plugins.changelog_update_automation"]
-github-actions = "slap.ext.changelog_update_automation.github_actions:GithubActionsChangelogUpdateAutomationPlugin"
+[tool.poetry.plugins."slap.plugins.git_repository_host"]
+github-actions = "slap.ext.git_repository_host.github_actions:GithubActionsRepositoryHostPlugin"
 
 [tool.poetry.plugins."slap.plugins.check"]
 changelog = "slap.ext.checks.changelog:ChangelogValidationCheckPlugin"
