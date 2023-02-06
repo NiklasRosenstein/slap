@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.base_ref != '' && !contains(github.event.pull_request.labels.*.name, 'no changelog')
     steps:
-      - uses: actions/checkout@v2
       - uses: NiklasRosenstein/slap@gha/changelog/assert-added/v2
 ```
 
