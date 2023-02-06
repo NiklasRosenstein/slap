@@ -22,6 +22,16 @@ jobs:
     - run: slap test
     - run: slap publish --dry
 
+  update-pr:
+    runs-on: ubuntu-20.04
+    if: github.base_ref != ''
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with: { python-version: "3.10" }
+    - run: pip install . && slap install --no-venv-check
+    - run: slap changelog diff pr update --use github-actions
+
   test-pep508:
     runs-on: ubuntu-20.04
     strategy:
