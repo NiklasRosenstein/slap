@@ -15,7 +15,7 @@
         <link rel="next" href="../check/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.8">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
     
     
       
@@ -915,7 +915,7 @@
 <span class="k">class</span> <span class="nc">ChangelogConfig</span><span class="p">()</span>
 </code></pre></div>
 
-[[view_source]](https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/application/changelog.py#L41)
+[[view_source]](https://github.com/NiklasRosenstein/slap/blob/nr/changelog-pr-features/docs/../src/slap/ext/application/changelog.py#L44)
 
 <a id="slap.ext.application.changelog.ChangelogConfig.enabled"></a>
 
@@ -1118,39 +1118,15 @@ Options:
 jobs to avoid having to manually inject the pull request URL into changelog entries. If you are using GitHub, try
 using the <a href="../../guides/github/#update-changelogs"><code>NiklasRosenstein/slap@gha/changelog/update/v1</code></a> action.</p>
 <details><summary>Synopsis</summary>
-<div class="highlight"><pre><span></span><code>Description:
-  Update the pr field of changelog entries in a commit range.
+<div class="highlight"><pre><span></span><code>    $ slap changelog update-pr --help  # exited with return code 1
 
-Usage:
-  changelog update-pr [options] [--] [&lt;base_revision&gt; [&lt;pr&gt;]]
+    The command &quot;changelog&quot; does not exist.
 
-Arguments:
-  base_revision         The revision ID to look back to to make out which changelog entries have been added since.
-  pr                    The reference to the PR that should be inserted into all entries added between the specified revision and the current version of the unreleased changelog.
-
-Options:
-  -d, --dry             Do not actually make changes on disk.
-      --overwrite       Update PR references even if an entry&#39;s reference is already set but different.
-  -c, --commit          Commit the changes, if any.
-  -p, --push            Push the changes, if any.
-      --name=NAME       Override the user.name Git option (only with --commit, -c)
-      --email=EMAIL     Override the user.email Git option (only with --commit, -c).
-      --use=USE         Use the specified plugin to publish the updated changelogs. Use this in supported CI environments instead of manually configuring the command-line settings.
-  -l, --list            List the available plugins you can pass to the --use option.
-  -h, --help            Display help for the given command. When no command is given display help for the help command.
-  -q, --quiet           Do not output any message.
-  -V, --version         Display this application version.
-      --ansi            Force ANSI output.
-      --no-ansi         Disable ANSI output.
-  -n, --no-interaction  Do not ask any interactive question.
-  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
-
-Help:
-  Update the pr field of changelog entries in a commit range.
-
-  Updates all changelog entries that were added in a given commit range. This is
-  useful to run in CI for a pull request to avoid having to manually update the
-  changelog entry after the PR has been created.
+    Did you mean one of these?
+        changelog add
+        changelog format
+        changelog convert
+        changelog diff pr update
 </code></pre></div>
 </details>
 
@@ -1198,7 +1174,7 @@ Help:
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a00a7c5e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.6df46069.min.js"></script>
       
     
   </body>
