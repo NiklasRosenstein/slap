@@ -873,6 +873,7 @@ makes automatically updated changelogs a breeze:</p>
 <div class="highlight"><span class="filename">.github/workflows/python.yml</span><pre><span></span><code><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">pull_request</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="nt">jobs</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">changelog-update</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Insert</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">Pull</span><span class="nv"> </span><span class="s">Request</span><span class="nv"> </span><span class="s">URL</span><span class="nv"> </span><span class="s">into</span><span class="nv"> </span><span class="s">new</span><span class="nv"> </span><span class="s">changelog</span><span class="nv"> </span><span class="s">entries&quot;</span>
 <span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
 <span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == &#39;pull_request&#39;</span>
 <span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
@@ -887,7 +888,8 @@ unreleased changelog.</p>
 <p>We recommend that you use the GitHub Action <a href="https://github.com/NiklasRosenstein/slap/tree/gha/changelog/assert-added/v2"><code>NiklasRosenstein/slap@gha/changelog/assert-added/v2</code></a>.</p>
 <div class="highlight"><span class="filename">.github/workflows/python.yml</span><pre><span></span><code><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">pull_request</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="nt">jobs</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">changelog-update</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">assert-new-changelog-entries</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Assert</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">new</span><span class="nv"> </span><span class="s">changelog</span><span class="nv"> </span><span class="s">entries</span><span class="nv"> </span><span class="s">have</span><span class="nv"> </span><span class="s">been</span><span class="nv"> </span><span class="s">added&quot;</span>
 <span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
 <span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.base_ref != &#39;&#39; &amp;&amp; !contains(github.event.pull_request.labels.*.name, &#39;no changelog&#39;)</span>
 <span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
