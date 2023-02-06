@@ -57,7 +57,9 @@ class GithubActionsChangelogUpdateAutomationPlugin(ChangelogUpdateAutomationPlug
         match = re.match(r"refs/pull/(\d+)", ref)
         if not match:
             raise EnvironmentError(f'could not determine Pull Request ID from GITHUB_REF="{ref}"')
-        return match.group(1)
+        pr_number = match.group(1)
+        repository = os.environ["GITHUB_REPOSITORY"]
+        return f"https://github.com/{repository}/pull/{pr_number}"
 
     def publish_changes(self, changed_files: list[Path], commit_message: str) -> None:
         user_name = os.environ.get("GIT_USER_NAME", "GitHub Action")

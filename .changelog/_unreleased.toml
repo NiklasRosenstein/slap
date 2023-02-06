@@ -3,11 +3,15 @@ id = "ca85e9cb-09db-445d-bc3b-ce0725126a04"
 type = "improvement"
 description = "Rename `changelog update-pr` command to `changelog pr update`, keeping the old as a deprecated alias."
 author = "@NiklasRosenstein"
-pr = "75"
 
 [[entries]]
 id = "ce84fd8b-2093-46c2-aff0-ff937101f809"
 type = "breaking change"
 description = "Reimplement command to update PRs in added changelog entries and rename it to `slap changelog diff pr update`"
 author = "@NiklasRosenstein"
-pr = "75"
+
+[[entries]]
+id = "8628d6e9-3906-4810-aa5a-279dcd830f6a"
+type = "improvement"
+description = "Update `GithubActionsChangelogUpdateAutomationPlugin.get_pr()` to return the full PR URL instead of just the number."
+author = "@NiklasRosenstein"
