@@ -1,0 +1,5 @@
+[[entries]]
+id = "b76eaa27-9ef7-416d-a40f-79cea9ff4b72"
+type = "fix"
+description = "The Poetry key for dependency groups is `[tool.poetry.group]`, not `[tool.poetry.groups]`. We now support both but show a warning if the latter is used to inform the user that they should be using `group` instead."
+author = "@NiklasRosenstein"
