@@ -65,9 +65,25 @@ class PoetryProjectHandler(PyprojectHandler):
 
         # Parse dependency groups (since Poetry 1.2.0). We have Slap treat optional groups
         # just like extras, and non-optional groups as normal runtime dependencies.
+        #
+        # NOTE(NiklasRosenstein): Due to a previous bug, Slap was reading the incorrect
+        #   configuration key "tool.poetry.groups" instead of "tool.poetry.group". In order to
+        #   not break projects that have come to rely on "groups" instead of "group", we need
+        #   to keep supporting both for the time being.
+        peotry_groups = poetry.get("groups", {})
+        if peotry_groups:
+            logger.warning(
+                "Your project is currenetly using `[tool.poetry.groups]`, but should be using `[tool.poetry.group]`"
+            )
+            logger.warning(
+                "The `groups` variant is only supported by Slap and will break in newer versions "
+                "of the Poetry backend."
+            )
+            logger.warning("Poetry actually only supports the `[tool.poetry.group]` key.")
+        peotry_groups.update(poetry.get("group", {}))
         dev: list[Dependency] = []
         extra: dict[str, list[Dependency]] = {}
-        for group_name, group in poetry.get("groups", {}).items():
+        for group_name, group in peotry_groups.items():
             optional = group.get("optional", False)
             group_deps = parse_dependencies(group.get("dependencies", []))
             if group_name == "dev":
