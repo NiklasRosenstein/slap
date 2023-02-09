@@ -73,7 +73,7 @@ class PoetryProjectHandler(PyprojectHandler):
         peotry_groups = poetry.get("groups", {})
         if peotry_groups:
             logger.warning(
-                "Your project is currenetly using `[tool.poetry.groups]`, but should be using `[tool.poetry.group]`"
+                "Your project is currently using `[tool.poetry.groups]`, but should be using `[tool.poetry.group]`"
             )
             logger.warning(
                 "The `groups` variant is only supported by Slap and will break in newer versions "
