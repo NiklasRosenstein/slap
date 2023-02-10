@@ -3,3 +3,15 @@ id = "e68bf649-8a8e-4dcb-85d9-d4b30a9e934b"
 type = "improvement"
 description = "fix spelling in warning log"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "67ac876d-50e1-498d-bf18-25bc52c6caa8"
+type = "feature"
+description = "Add zsh to supported shells for shimming"
+author = "@cdbrkfxrpt"
+
+[[entries]]
+id = "65cc3464-7565-48f0-9d94-cece8114cbbe"
+type = "fix"
+description = "Fix outdated command documentation"
+author = "@cdbrkfxrpt"

@@ -92,12 +92,12 @@ class ChangelogAddCommand(BaseChangelogCommand):
       <fg=green>author</fg> = <fg=yellow>"username"</fg>
       <fg=green>pr</fg> = <fg=yellow>"https://github.com/username/my_package/pulls/13"</fg>
 
-    Changelog entries can be managed easily using the <info>slap log</info> command.
+    Changelog entries can be managed easily using the <info>slap changelog</info> command.
 
-      <fg=yellow>$</fg> slap log add -t feature -d 'Improvement to `my_package.util`"
+      <fg=yellow>$</fg> slap changelog add -t feature -d 'Improvement to `my_package.util`"
 
     The <fg=green>pr</fg> field is usually set manually after the PR is created or updated
-    automatically by a CI action using the <info>slap log update-pr-field</info> command.
+    automatically by a CI action using the <info>slap changelog update-pr-field</info> command.
     """
 
     name = "changelog add"
@@ -106,8 +106,8 @@ class ChangelogAddCommand(BaseChangelogCommand):
         option(
             "--type",
             "-t",
-            description="The type of the changelog. Unless configured differently, one of "
-            "{', '.join(DEFAULT_VALID_TYPES)}",
+            description="The type of the changelog. Unless configured differently, one of: "
+            f"{', '.join(DEFAULT_VALID_TYPES)}",
             flag=False,
         ),
         option(
