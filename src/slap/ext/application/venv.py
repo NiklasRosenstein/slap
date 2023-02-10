@@ -20,22 +20,38 @@ SHADOW_INIT_SCRIPTS = {
     "bash": """
     function slap() {
       local ORIGINAL=$(which slap)
-      if ! [ $? = 0 ]; then
+      if [[ $? != 0 ]]; then
         >&2 echo "error: command 'slap' does not exist"
         return 127
       fi
-      if [ "$1" == "venv" ] && [[ "$2" =~ -[gc]*a[gc]* ]]; then
+      if [[ "$1" == "venv" && "$2" =~ -[gc]*a[gc]* ]]; then
         eval "$(SLAP_SHADOW=true "$ORIGINAL" "$@")"
       else
         "$ORIGINAL" "$@"
       fi
       return $?
     }
-  """,
+    """,
+    "zsh": """
+    function slap() {
+      local ORIGINAL=$(command which slap)
+      if [[ $? != 0 ]]; then
+        >&2 echo "error: command 'slap' does not exist"
+        return 127
+      fi
+      if [[ "$1" == "venv" && "$2" =~ -[gc]*a[gc]* ]]; then
+        eval "$(SLAP_SHADOW=true "$ORIGINAL" "$@")"
+      else
+        "$ORIGINAL" "$@"
+      fi
+      return $?
+    }
+    """,
 }
 
 USER_INIT_SCRIPTS = {
     "bash": 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i bash)"',
+    "zsh": 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i zsh)"',
 }
 
 
@@ -158,7 +174,8 @@ class VenvCommand(Command):
 
     <u>Usage Example:</u>
 
-        <code>$ slap venv -i bash >> ~/.profile; source ~/.profile
+        <code>$ slap venv -i bash >> ~/.profile; source ~/.profile  # for bash
+        $ slap venv -i zsh >> ~/.zshrc; source ~/.zshrc       # for zsh
         $ slap venv -cg craftr
         <info>creating global environment <s>"craftr"</s> (using <code>python3</code>)</info>
         $ slap venv -lg</code>
