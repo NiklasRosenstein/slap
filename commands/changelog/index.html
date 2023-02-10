@@ -15,7 +15,7 @@
         <link rel="next" href="../check/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -1012,7 +1012,7 @@ Usage:
   changelog add [options]
 
 Options:
-  -t, --type=TYPE                The type of the changelog. Unless configured differently, one of {&#39;, &#39;.join(DEFAULT_VALID_TYPES)}
+  -t, --type=TYPE                The type of the changelog. Unless configured differently, one of: breaking change, deprecation, docs, feature, fix, hygiene, improvement, refactor, tests
   -d, --description=DESCRIPTION  A Markdown formatted description of the changelog entry.
   -a, --author=AUTHOR            Your username or email address. By default, this will be your configured Git name and email address.
       --pr=PR                    The pull request that the change is introduced to the main branch with. This is not usually known at the time the changelog entry is created, so this option is not often used. If the remote repository is well supported by Slap, a pull request number may be specified and converted to a full URL by Slap, otherwise a full URL must be specified.
@@ -1053,12 +1053,12 @@ Help:
     author = &quot;username&quot;
     pr = &quot;https://github.com/username/my_package/pulls/13&quot;
 
-  Changelog entries can be managed easily using the slap log command.
+  Changelog entries can be managed easily using the slap changelog command.
 
-    $ slap log add -t feature -d &#39;Improvement to `my_package.util`&quot;
+    $ slap changelog add -t feature -d &#39;Improvement to `my_package.util`&quot;
 
   The pr field is usually set manually after the PR is created or updated
-  automatically by a CI action using the slap log update-pr-field command.
+  automatically by a CI action using the slap changelog update-pr-field command.
 </code></pre></div>
 </details>
 
@@ -1226,7 +1226,7 @@ Options:
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="../../assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
     
   </body>

@@ -15,7 +15,7 @@
         <link rel="next" href="../../guides/github/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.11">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
     
     
       
@@ -825,7 +825,7 @@ Options:
   -l, --list                 List the available environments.
   -p, --path                 Print the path of the specified or the current venv. Exit with status code 1 and no output if the environment does not exist or there is no current environment.
   -e, --exists               Return 0 if the specified environment exists, 1 otherwise.
-  -i, --init-code=INIT-CODE  Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash
+  -i, --init-code=INIT-CODE  Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash, zsh
       --python=PYTHON        The Python executable to use to create the virtual environment. If this is not specified, it defaults to python + the environment name if the environment name looks like a version number (contains numbers and dots). Otehrwise, it defaults to python3.
   -h, --help                 Display help for the given command. When no command is given display help for the help command.
   -q, --quiet                Do not output any message.
@@ -848,7 +848,8 @@ Help:
 
   Usage Example:
 
-      $ slap venv -i bash &gt;&gt; ~/.profile; source ~/.profile
+      $ slap venv -i bash &gt;&gt; ~/.profile; source ~/.profile  # for bash
+      $ slap venv -i zsh &gt;&gt; ~/.zshrc; source ~/.zshrc       # for zsh
       $ slap venv -cg craftr
       creating global environment &quot;craftr&quot; (using python3)
       $ slap venv -lg
@@ -898,11 +899,11 @@ only supports <code>bash</code> as an argument.</p>
 <p>What will be evaluated in your init script then implements the shadow function:</p>
 <div class="highlight"><span class="filename">$ SLAP_SHADOW=true slap venv -i bash</span><pre><span></span><code><span class="k">function</span><span class="w"> </span>slap<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ORIGINAL</span><span class="o">=</span><span class="k">$(</span>which<span class="w"> </span>slap<span class="k">)</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span>&gt;<span class="p">&amp;</span><span class="m">2</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;error: command &#39;slap&#39; does not exist&quot;</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">127</span>
 <span class="w">  </span><span class="k">fi</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;venv&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span>~<span class="w"> </span>-<span class="o">[</span>gc<span class="o">]</span>*a<span class="o">[</span>gc<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;venv&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span>~<span class="w"> </span>-<span class="o">[</span>gc<span class="o">]</span>*a<span class="o">[</span>gc<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nv">SLAP_SHADOW</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ORIGINAL</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span>
 <span class="w">  </span><span class="k">else</span>
 <span class="w">    </span><span class="s2">&quot;</span><span class="nv">$ORIGINAL</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
@@ -960,7 +961,7 @@ it is an error.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="../../assets/javascripts/bundle.4b2c34cd.min.js"></script>
       
     
   </body>
