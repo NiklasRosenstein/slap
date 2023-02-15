@@ -162,14 +162,14 @@ class VersionIncrementingRulePlugin(abc.ABC):
         ...
 
 
-class GitRepositoryHostPlugin(abc.ABC):
+class RepositoryCIPlugin(abc.ABC):
     """This plugin type can be used with the `slap changelog update-pr -use <plugin_name>` option. It provides all the
     details derivable from the environment (e.g. environment variables available from CI builds) that can be used to
     detect which changelog entries have been added in a pull request, the pull request URL and the means to publish
     the changes back to the original repository.
     """
 
-    ENTRYPOINT = "slap.plugins.git_repository_host"
+    ENTRYPOINT = "slap.plugins.repository_ci"
 
     io: IO
 
@@ -193,27 +193,27 @@ class GitRepositoryHostPlugin(abc.ABC):
         ...
 
     @staticmethod
-    def all() -> dict[str, t.Callable[[], GitRepositoryHostPlugin]]:
+    def all() -> dict[str, t.Callable[[], RepositoryCIPlugin]]:
         """Iterates over all registered automation plugins and returns a dictionary that maps
         the plugin name to a factory function."""
 
         from nr.util.plugins import iter_entrypoints
 
-        result: dict[str, t.Callable[[], GitRepositoryHostPlugin]] = {}
-        for ep in iter_entrypoints(GitRepositoryHostPlugin.ENTRYPOINT):
+        result: dict[str, t.Callable[[], RepositoryCIPlugin]] = {}
+        for ep in iter_entrypoints(RepositoryCIPlugin.ENTRYPOINT):
             result[ep.name] = partial(lambda ep: ep.load()(), ep)
 
         return result
 
     @staticmethod
-    def get(plugin_name: str, io: IO) -> GitRepositoryHostPlugin:
+    def get(plugin_name: str, io: IO) -> RepositoryCIPlugin:
         """Returns an instance of the plugin with given name, fully initialized.
 
         Raises a #ValueError if the plugin does not exist."""
 
-        plugins = GitRepositoryHostPlugin.all()
+        plugins = RepositoryCIPlugin.all()
         if plugin_name not in plugins:
-            raise ValueError(f"plugin {GitRepositoryHostPlugin.ENTRYPOINT}:{plugin_name} does not exist")
+            raise ValueError(f"plugin {RepositoryCIPlugin.ENTRYPOINT}:{plugin_name} does not exist")
 
         plugin = plugins[plugin_name]()
         plugin.io = io

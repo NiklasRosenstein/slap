@@ -3,32 +3,13 @@ import re
 import subprocess as sp
 from pathlib import Path
 
-from slap.plugins import GitRepositoryHostPlugin
+from slap.plugins import RepositoryCIPlugin
 
 
-class GithubActionsRepositoryHostPlugin(GitRepositoryHostPlugin):
+class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
     """A plugin for use in GitHub Actions via `slap changelog update-pr --use github-actions` which will do all steps
     to push the updated changelogs back to a pull request branch. It should be used only in an action that is run as
     part of a GitHub pull request.
-
-    The GitHub Action should be configured like this:
-
-    ```yaml
-    update-changelogs:
-      if: github.event_name == 'pull_request'
-      permissions:
-        contents: write
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
-        with: {{ python-version: '3.10' }}
-      - name: Install Slap
-        run: pip install slap-cli==1.0.2
-      - name: Update PR references in changelogs
-        run: slap changelog update-pr --use github-actions
-    ```
 
     GitHub environment variables used:
 

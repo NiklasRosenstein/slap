@@ -10,7 +10,7 @@ from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, argument, option
 from slap.changelog import Changelog, ChangelogEntry, ChangelogManager, ManagedChangelog
-from slap.plugins import ApplicationPlugin, GitRepositoryHostPlugin
+from slap.plugins import ApplicationPlugin, RepositoryCIPlugin
 from slap.project import Project
 from slap.repository import Issue, PullRequest, Repository
 from slap.util.pygments import toml_highlight
@@ -242,7 +242,7 @@ class ChangelogDiffBaseCommand(Command):
             config: get_changelog_manager(app.repository, config if isinstance(config, Project) else None)
             for config in app.configurations()
         }
-        self.git_host: GitRepositoryHostPlugin | None
+        self.ci: RepositoryCIPlugin | None
         self.base_ref: str
         self.head_ref: str | None
         self.vcs: Vcs
@@ -254,12 +254,12 @@ class ChangelogDiffBaseCommand(Command):
         if plugin_name is not None:
             logger.info("Loading changelog update automation plugin <i>%s</i>", plugin_name)
             try:
-                self.git_host = GitRepositoryHostPlugin.get(plugin_name, self.io)
+                self.ci = RepositoryCIPlugin.get(plugin_name, self.io)
             except ValueError:
                 self.line_error(f"plugin `<info>{plugin_name}</info>` does not exist.", "error")
                 sys.exit(1)
         else:
-            self.git_host = None
+            self.ci = None
 
         ref_or_range: str | None = self.argument("ref_or_range")
         if ref_or_range is not None:
@@ -270,11 +270,11 @@ class ChangelogDiffBaseCommand(Command):
             self.base_ref = base_revision
             self.head_ref = head_revision or None
         else:
-            if self.git_host is None:
+            if self.ci is None:
                 self.line_error("Need a base Git ref, Git range or set the --use option.", "error")
                 sys.exit(1)
-            self.base_ref = self.git_host.get_base_ref()
-            self.head_ref = self.git_host.get_head_ref()
+            self.base_ref = self.ci.get_base_ref()
+            self.head_ref = self.ci.get_head_ref()
 
         if self.head_ref is None:
             self.ref_range = f"{self.base_ref}..WORKTREE"
@@ -359,10 +359,10 @@ class ChangelogDiffUpdatePrCommand(ChangelogDiffBaseCommand):
 
         pr_url: str | None = self.option("pr")
         if pr_url is None:
-            if self.git_host is None:
+            if self.ci is None:
                 self.line_error("need <opt>--pr</opt> or <opt>--use</opt>", "error")
                 sys.exit(1)
-            pr_url = self.git_host.get_pr()
+            pr_url = self.ci.get_pr()
         self.pr_url = pr_url
 
     def handle(self) -> int:
@@ -401,10 +401,10 @@ class ChangelogDiffUpdatePrCommand(ChangelogDiffBaseCommand):
             self.line("no entries to update", "info")
             return 0
 
-        if self.git_host and not self.option("dry"):
+        if self.ci and not self.option("dry"):
             plural = "" if total_updates == 0 else "s"
             commit_message = f"Updated PR reference{plural} in {num_updates} changelog{plural}."
-            self.git_host.publish_changes(changed_files, commit_message)
+            self.ci.publish_changes(changed_files, commit_message)
 
         return 0
 
