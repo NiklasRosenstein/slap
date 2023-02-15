@@ -15,3 +15,9 @@ id = "65cc3464-7565-48f0-9d94-cece8114cbbe"
 type = "fix"
 description = "Fix outdated command documentation"
 author = "@cdbrkfxrpt"
+
+[[entries]]
+id = "d3d0055e-c957-4d41-97f9-dd5ce27f62ad"
+type = "improvement"
+description = "allow GitHub username resolution to raise any Exception; we catch it, log it and fall back to using the configured Git email address instead."
+author = "@NiklasRosenstein"

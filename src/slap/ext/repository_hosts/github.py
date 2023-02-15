@@ -1,5 +1,6 @@
 import dataclasses
 import functools
+import logging
 import re
 from pathlib import Path
 
@@ -8,15 +9,17 @@ import requests
 from slap.changelog import is_url
 from slap.repository import Issue, PullRequest, Repository, RepositoryHost
 
+logger = logging.getLogger(__name__)
+
 
 @functools.lru_cache()
-def github_get_username_from_email(api_base_url: str, email: str) -> str:
+def github_get_username_from_email(api_base_url: str, email: str) -> str | None:
     assert email, "no email address"
     response = requests.get(f"{api_base_url}/search/users", params={"q": email})
     response.raise_for_status()
     results = response.json()
     if not results["items"]:
-        raise ValueError(f"no GitHub username found for email {email!r}")
+        return None
     return results["items"][0]["login"]
 
 
@@ -67,7 +70,7 @@ class GithubRepositoryHost(RepositoryHost):
         assert vcs
         email = vcs.get_author().email
         username = github_get_username_from_email(self._get_api_url(), email)
-        return ("@" + username) if username else email
+        return ("@" + username) if username else None
 
     def get_issue_by_reference(self, issue_reference: str) -> Issue:
         issue_reference = issue_reference.lstrip("#")
