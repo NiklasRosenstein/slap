@@ -34,9 +34,8 @@ DEFAULT_VALID_TYPES = [
 
 def get_default_author(app: Application) -> str | None:
     vcs = app.repository.vcs()
-    remote = app.repository.host()
     username: str | None = None
-    if remote:
+    if remote := app.repository.host():
         try:
             username = remote.get_username(app.repository)
         except Exception as exc:
