@@ -15,3 +15,9 @@ id = "65cc3464-7565-48f0-9d94-cece8114cbbe"
 type = "fix"
 description = "Fix outdated command documentation"
 author = "@cdbrkfxrpt"
+
+[[entries]]
+id = "ab82d50e-1635-41a8-8ae5-1759ad8eba92"
+type = "improvement"
+description = "Rename `GitRepositoryHostPlugin` to `RepositoryCIPlugin`; this clarifies the intent and reduces confusion with the `RepositoryHost` interface."
+author = "@NiklasRosenstein"
