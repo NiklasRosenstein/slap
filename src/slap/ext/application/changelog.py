@@ -36,10 +36,13 @@ def get_default_author(app: Application) -> str | None:
     vcs = app.repository.vcs()
     remote = app.repository.host()
     username: str | None = None
-    try:
-        username = remote.get_username(app.repository)
-    except Exception as exc:
-        logger.warning(f"unable to fetch GitHub username, falling back to configured email address. (reason: {exc})")
+    if remote:
+        try:
+            username = remote.get_username(app.repository)
+        except Exception as exc:
+            logger.warning(
+                f"unable to fetch GitHub username, falling back to configured email address. (reason: {exc})"
+            )
     if username is None and vcs:
         username = vcs.get_author().email
     return username
