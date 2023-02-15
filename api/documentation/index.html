@@ -890,11 +890,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#class-gitrepositoryhostplugin" class="md-nav__link">
-    Class GitRepositoryHostPlugin
+  <a href="#class-repositoryciplugin" class="md-nav__link">
+    Class RepositoryCIPlugin
   </a>
   
-    <nav class="md-nav" aria-label="Class GitRepositoryHostPlugin">
+    <nav class="md-nav" aria-label="Class RepositoryCIPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1246,11 +1246,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#class-gitrepositoryhostplugin" class="md-nav__link">
-    Class GitRepositoryHostPlugin
+  <a href="#class-repositoryciplugin" class="md-nav__link">
+    Class RepositoryCIPlugin
   </a>
   
-    <nav class="md-nav" aria-label="Class GitRepositoryHostPlugin">
+    <nav class="md-nav" aria-label="Class RepositoryCIPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1535,30 +1535,30 @@ or would have modified.</p>
 <p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L154">[view_source]</a></p>
 <p>This plugin type can be implemented to provide rules accepted by the <code>slap release &lt;rule&gt;</code> command to "bump" an
 existing version number to another. The builtin rules implemented in <code>slap.ext.version_incrementing_rules</code>.</p>
-<p><a id="slap.plugins.GitRepositoryHostPlugin"></a></p>
-<p><a id="pydoc:slap.plugins.GitRepositoryHostPlugin"></a></p>
-<h2 id="class-gitrepositoryhostplugin">Class GitRepositoryHostPlugin</h2>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">GitRepositoryHostPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
+<p><a id="slap.plugins.RepositoryCIPlugin"></a></p>
+<p><a id="pydoc:slap.plugins.RepositoryCIPlugin"></a></p>
+<h2 id="class-repositoryciplugin">Class RepositoryCIPlugin</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RepositoryCIPlugin</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">)</span>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L165">[view_source]</a></p>
 <p>This plugin type can be used with the <code>slap changelog update-pr -use &lt;plugin_name&gt;</code> option. It provides all the
 details derivable from the environment (e.g. environment variables available from CI builds) that can be used to
 detect which changelog entries have been added in a pull request, the pull request URL and the means to publish
 the changes back to the original repository.</p>
-<p><a id="slap.plugins.GitRepositoryHostPlugin.all"></a></p>
-<p><a id="pydoc:slap.plugins.GitRepositoryHostPlugin.all"></a></p>
+<p><a id="slap.plugins.RepositoryCIPlugin.all"></a></p>
+<p><a id="pydoc:slap.plugins.RepositoryCIPlugin.all"></a></p>
 <h4 id="all">all</h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">def</span> <span class="nf">all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">GitRepositoryHostPlugin</span><span class="p">]]</span>
+<span class="k">def</span> <span class="nf">all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">RepositoryCIPlugin</span><span class="p">]]</span>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L196">[view_source]</a></p>
 <p>Iterates over all registered automation plugins and returns a dictionary that maps
 the plugin name to a factory function.</p>
-<p><a id="slap.plugins.GitRepositoryHostPlugin.get"></a></p>
-<p><a id="pydoc:slap.plugins.GitRepositoryHostPlugin.get"></a></p>
+<p><a id="slap.plugins.RepositoryCIPlugin.get"></a></p>
+<p><a id="pydoc:slap.plugins.RepositoryCIPlugin.get"></a></p>
 <h4 id="get">get</h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">plugin_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="p">:</span> <span class="n">IO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GitRepositoryHostPlugin</span>
+<span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">plugin_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="p">:</span> <span class="n">IO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RepositoryCIPlugin</span>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/plugins.py#L209">[view_source]</a></p>
 <p>Returns an instance of the plugin with given name, fully initialized.</p>
