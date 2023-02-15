@@ -33,7 +33,6 @@ DEFAULT_VALID_TYPES = [
 
 
 def get_default_author(app: Application) -> str | None:
-    vcs = app.repository.vcs()
     username: str | None = None
     if remote := app.repository.host():
         try:
@@ -42,7 +41,7 @@ def get_default_author(app: Application) -> str | None:
             logger.warning(
                 f"unable to fetch GitHub username, falling back to configured email address. (reason: {exc})"
             )
-    if username is None and vcs:
+    if username is None and (vcs := app.repository.vcs()):
         username = vcs.get_author().email
     return username
 
