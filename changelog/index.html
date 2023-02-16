@@ -2576,6 +2576,9 @@ Fix outdated command documentation</td><td></td><td></td><td>@cdbrkfxrpt</td></t
   <tr><td>Improvement</td><td>
 
 Rename `GitRepositoryHostPlugin` to `RepositoryCIPlugin`; this clarifies the intent and reduces confusion with the `RepositoryHost` interface.</td><td><a href="https://github.com/NiklasRosenstein/slap/pull/79">79</a></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+allow GitHub username resolution to raise any Exception; we catch it, log it and fall back to using the configured Git email address instead.</td><td><a href="https://github.com/NiklasRosenstein/slap/pull/80">80</a></td><td></td><td>@NiklasRosenstein</td></tr>
 </table>
 
 <h2 id="171-2023-02-09">1.7.1 (2023-02-09)</h2>
