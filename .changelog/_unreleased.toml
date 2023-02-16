@@ -22,3 +22,10 @@ type = "improvement"
 description = "Rename `GitRepositoryHostPlugin` to `RepositoryCIPlugin`; this clarifies the intent and reduces confusion with the `RepositoryHost` interface."
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/79"
+
+[[entries]]
+id = "d3d0055e-c957-4d41-97f9-dd5ce27f62ad"
+type = "improvement"
+description = "allow GitHub username resolution to raise any Exception; we catch it, log it and fall back to using the configured Git email address instead."
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/80"

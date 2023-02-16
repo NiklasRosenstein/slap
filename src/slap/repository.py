@@ -43,6 +43,12 @@ class RepositoryHost(abc.ABC):
 
     @abc.abstractmethod
     def get_username(self, repository: Repository) -> str | None:
+        """
+        :param repository: The repository configuration. This is usually used to retrieve the VCS associated
+            with the repository to read the configured VCS user's email address.
+        :return: The username if it could be resolved, or `None` if there is no matching username.
+        :raise Exception: Any exception will be caught, logged and fallback behavior will be used instead.
+        """
         ...
 
     @abc.abstractmethod
