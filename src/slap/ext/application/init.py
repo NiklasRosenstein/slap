@@ -93,12 +93,13 @@ TEMPLATES = {
                 W504,
         """,
         ".gitignore": """
-            /.vscode
-            /dist
-            /build
+            __pycache__/
+            .dmypy.json
             .venv/
             *.egg-info/
-            __pycache__/
+            /.vscode
+            /build
+            /dist
             poetry.lock
         """,
         "src/{path}/__init__.py": """
