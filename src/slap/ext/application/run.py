@@ -68,7 +68,7 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
                     working_dirs[project.id] = project.directory
 
             if not commands_to_execute:
-                commands_to_execute["$"] = command
+                commands_to_execute["$"] = _join_args(command)
 
         if len(commands_to_execute) > 1:
             level = logging.WARNING
