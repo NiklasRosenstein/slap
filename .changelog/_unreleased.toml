@@ -7,3 +7,12 @@ pr = "https://github.com/NiklasRosenstein/slap/pull/84"
 issues = [
     "https://github.com/NiklasRosenstein/slap/issues/81",
 ]
+
+[[entries]]
+id = "be756b0c-cfbd-40c2-8312-09f5d17889fa"
+type = "feature"
+description = "The `slap run` command can now run the commands defined in every project of a monorepository (if set), only if the monorepository does not define the command itself (in `slap.toml`)."
+author = "@NiklasRosenstein"
+issues = [
+    "https://github.com/NiklasRosenstein/slap/issues/82",
+]
