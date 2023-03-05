@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import logging
 import shlex
 import subprocess as sp
+from pathlib import Path
 from typing import ClassVar
 
 from slap.application import Application, argument
 from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
+
+logger = logging.getLogger(__name__)
 
 
 class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
@@ -45,12 +49,54 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         result = super().handle()
         if result != 0:
             return result
+
+        main_project = self.app.main_project()
+        commands_to_execute = {}
+        working_dirs = {}
+
         command: list[str] = self.argument("args")
         if command[0] in self.config:
             command_string = self.config[command[0]] + " " + _join_args(command[1:])
+            commands_to_execute[main_project.id if main_project else "/"] = command_string
+            working_dirs[main_project.id if main_project else "/"] = Path.cwd()
         else:
-            command_string = _join_args(command)
-        return sp.call(command_string, shell=True)
+            for project in self.app.repository.projects():
+                config = project.raw_config().get("run", {})
+                if command[0] in config:
+                    command_string = config[command[0]] + " " + _join_args(command[1:])
+                    commands_to_execute[project.id] = command_string
+                    working_dirs[project.id] = project.directory
+
+            if not commands_to_execute:
+                commands_to_execute["$"] = _join_args(command)
+
+        if len(commands_to_execute) > 1:
+            level = logging.WARNING
+        else:
+            level = logging.INFO
+
+        results = {}
+        for key, command_string in commands_to_execute.items():
+            logger.log(level, "(%s) Running command: $ %s", key, command_string)
+            results[key] = sp.call(command_string, shell=True, cwd=working_dirs[key])
+
+        if any(x != 0 for x in results.values()):
+            level = logging.WARNING
+            exit_code = results[next(iter(results))] if len(results) == 1 else 127
+            status = "FAILED"
+        else:
+            level = logging.INFO
+            exit_code = 0
+            status = "SUCCESS"
+
+        if len(results) == 1:
+            logging.log(level, "Exit code: %s (status: %s)", exit_code, status)
+        else:
+            logging.log(level, "Multi-run results: (status: %s)", status)
+            for key in results:
+                logging.log(level, "  %s: %s", key, results[key])
+
+        return exit_code
 
 
 def _join_args(args: list[str]) -> str:
