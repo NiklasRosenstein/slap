@@ -1,0 +1,5 @@
+[[entries]]
+id = "78dd7d1b-a714-4458-9249-7668429b493b"
+type = "improvement"
+description = "Add `.dmypy.json` to `.gitignore` generated with `slap init`."
+author = "@NiklasRosenstein"
