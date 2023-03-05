@@ -3,3 +3,10 @@ id = "78dd7d1b-a714-4458-9249-7668429b493b"
 type = "improvement"
 description = "Add `.dmypy.json` to `.gitignore` generated with `slap init`."
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a7d9d372-529c-4097-a3c1-745f8484edd7"
+type = "fix"
+description = "Fix regression when using `slap run <cmd>` where `<cmd>` is not a command defined in the project or repository configuration introduced in the previous version."
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/87"
