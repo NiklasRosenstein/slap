@@ -3,6 +3,7 @@ id = "1326c953-8cd4-486d-8a5e-a78f7e3d045c"
 type = "fix"
 description = "Dependency with extras are now written correctly into `pyprojec.toml` for Poetry projects"
 author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/84"
 issues = [
     "https://github.com/NiklasRosenstein/slap/issues/81",
 ]
