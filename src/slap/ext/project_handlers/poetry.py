@@ -133,7 +133,7 @@ def convert_dependency_to_poetry_config(dependency: Dependency) -> t.Mapping[str
     from slap.python.dependency import PypiDependency
 
     if isinstance(dependency, PypiDependency):
-        if not dependency.markers and not dependency.python and not dependency.source:
+        if not dependency.markers and not dependency.python and not dependency.source and not dependency.extras:
             return str(dependency.version)
         result = tomlkit.api.inline_table()
         result["version"] = str(dependency.version)
