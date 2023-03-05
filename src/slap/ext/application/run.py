@@ -26,7 +26,7 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     """
 
     name: str = "run"
-    requires_venv: ClassVar[bool] = False
+    requires_venv: ClassVar[bool] = True
 
     arguments = [
         argument(

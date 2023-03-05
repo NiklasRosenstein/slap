@@ -10,3 +10,10 @@ type = "fix"
 description = "Fix regression when using `slap run <cmd>` where `<cmd>` is not a command defined in the project or repository configuration introduced in the previous version."
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/87"
+
+[[entries]]
+id = "4ae592bb-a3ef-4460-856a-436c2adf58e4"
+type = "improvement"
+description = "To avoid confusion, the `slap run` command now must be run from a virtual environment."
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/89"
