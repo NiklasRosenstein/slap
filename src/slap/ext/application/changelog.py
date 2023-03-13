@@ -530,7 +530,9 @@ class ChangelogFormatCommand(BaseChangelogCommand):
                 text = "Link"
             else:
                 url, text = item.url, item.id
-        return f'<a href="{url}">{text}</a>'
+            return f'<a href="{url}">{text}</a>'
+        else:
+            return ref
 
 
 class ChangelogConvertCommand(BaseChangelogCommand):

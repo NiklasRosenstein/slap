@@ -1,0 +1,5 @@
+[[entries]]
+id = "8b1ec691-fe64-4355-b109-e3c49ee92b37"
+type = "fix"
+description = "Fix a `NameError` that occurred in `slap changelog format --markdown` when Slap does not understand the repository host of your project."
+author = "@NiklasRosenstein"
