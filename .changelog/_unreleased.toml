@@ -1,0 +1,5 @@
+[[entries]]
+id = "fd7ce130-6026-4a00-8cd5-75c89b685c56"
+type = "fix"
+description = "Fix extracting package \"extras\" from the Poetry dependencies configuration."
+author = "@NiklasRosenstein"

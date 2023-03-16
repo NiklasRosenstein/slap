@@ -379,6 +379,7 @@ def _parse_single_dependency_config(name: str, dep: str | dict[str, t.Any]) -> D
     if not isinstance(dep, str):
         dependency.python = VersionSpec(dep["python"]) if dep.get("python") else None
         dependency.markers = dep.get("markers")
+        dependency.extras = dep.get("extras")
 
     return dependency
 
