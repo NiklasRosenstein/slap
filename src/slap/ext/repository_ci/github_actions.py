@@ -119,10 +119,13 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             )
             self._base_ref = ("origin", os.environ["GITHUB_BASE_REF"])
             self._base_branch = self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-base"
-            self._head_ref = ("origin", f"pull/{self._pull_request_id}/head")
-            self._head_branch = self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-head"
 
-            # self._head_ref = (self.HEAD_REMOTE_NAME, os.environ["GITHUB_HEAD_REF"])
+            # NOTE(@NiklasRosenstein): We can't use the pull/<pr>/head ref because it is a hidden Git ref
+            #       that Github won't allow pushing to. We actually need to push to the head repository
+            #       directly.
+            # self._head_ref = ("origin", f"pull/{self._pull_request_id}/head")
+            self._head_ref = (self.HEAD_REMOTE_NAME, os.environ["GITHUB_HEAD_REF"])
+            self._head_branch = self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-head"
 
             logger.info(
                 "This is a GitHub pull request (id: %s) %s/%s → %s/%s",
@@ -137,30 +140,30 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             base_remote = self._repo.remote(self._base_ref[0])
             base_remote.fetch(self._base_ref[1])
 
-            # # Make sure that there is a remote for the fork.
-            # try:
-            #     head_remote = self._repo.remote(self.HEAD_REMOTE_NAME)
-            # except ValueError:
-            #     logger.info(
-            #         "Creating %s remote (url: %s)",
-            #         self.HEAD_REMOTE_NAME,
-            #         self._pull_request.head_html_url,
-            #     )
-            #     head_remote = self._repo.create_remote(self.HEAD_REMOTE_NAME, self._pull_request.head_html_url)
-            # else:
-            #     logger.info(
-            #         "Updating %s remote (url: %s)",
-            #         self.HEAD_REMOTE_NAME,
-            #         self._pull_request.head_html_url,
-            #     )
-            #     head_remote.set_url(self._pull_request.head_html_url)
+            # Make sure that there is a remote for the fork.
+            try:
+                head_remote = self._repo.remote(self.HEAD_REMOTE_NAME)
+            except ValueError:
+                logger.info(
+                    "Creating %s remote (url: %s)",
+                    self.HEAD_REMOTE_NAME,
+                    self._pull_request.head_html_url,
+                )
+                head_remote = self._repo.create_remote(self.HEAD_REMOTE_NAME, self._pull_request.head_html_url)
+            else:
+                logger.info(
+                    "Updating %s remote (url: %s)",
+                    self.HEAD_REMOTE_NAME,
+                    self._pull_request.head_html_url,
+                )
+                head_remote.set_url(self._pull_request.head_html_url)
 
             logger.info("Fetching head ref '%s/%s'", *self._head_ref)
             head_remote = self._repo.remote(self._head_ref[0])
-            head_remote.fetch(self._head_ref[1] + ':' + self._head_branch)
+            head_remote.fetch(self._head_ref[1] + ":" + self._head_branch)
 
             logger.info("Checking out '%s/%s' as '%s'.", *self._head_ref, self._head_branch)
-            self._repo.git.checkout(self._head_branch) #"/".join(self._head_ref[:2]), "-b", self._head_branch)
+            self._repo.git.checkout(self._head_branch)  # "/".join(self._head_ref[:2]), "-b", self._head_branch)
 
             assert self._repo.active_branch.name == self._head_branch
         else:
@@ -197,4 +200,4 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._repo.index.commit(message=commit_message, author=Actor(user_name, user_email))
 
         logger.info("Pushing changes to %s/%s", *self._head_ref)
-        self._repo.git.push(self._head_ref[0], self._head_branch + ':' + self._head_ref[1])
+        self._repo.git.push(self._head_ref[0], self._head_branch + ":" + self._head_ref[1])
