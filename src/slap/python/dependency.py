@@ -166,7 +166,12 @@ class PypiDependency(Dependency, _PypiDependency):
         match = re.match(r"\s*[^<>=!~\^\(\)\*]+", value)
         if match:
             name = match.group(0)
-            version_spec = VersionSpec(value[match.end() :].strip() or "*")  # noqa: E203
+            constraint = value[match.end() :].strip() or "*"
+            if constraint.startswith("("):
+                if not constraint.endswith(")"):
+                    raise ValueError(f"invalid version constraint {constraint!r}")
+                constraint = constraint[1:-1].strip()
+            version_spec = VersionSpec(constraint)  # noqa: E203
         else:
             name = value
             version_spec = VersionSpec("")

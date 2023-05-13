@@ -3,3 +3,9 @@ id = "e178f3c0-e5c7-4d71-848a-5f033ee9b697"
 type = "improvement"
 description = "add E203 to ignored lints in flake8"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "78a841db-cd55-46c4-a95d-a2d4239b544e"
+type = "fix"
+description = "Fix parsing version constraints that are wrapped with parentheses"
+author = "@NiklasRosenstein"
