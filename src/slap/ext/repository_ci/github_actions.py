@@ -146,7 +146,10 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
 
     * `GITHUB_API_URL`
     * `GITHUB_REPOSITORY`
-    * `GITHUB_REF` (the github PR number formatted as `refs/pull/{id}`)
+    * `GITHUB_REF` (the github PR number formatted as `refs/pull/{id}/head`)
+    * `GITHUB_PR_ID` -- When running in a `pull_request_target` event, the pull request ID is not available in
+        `GITHUB_REF` and must be passed manually to this environment variable from
+        `${{ github.event.pull_request.number }}`.
 
     For pull requests:
 
@@ -199,8 +202,11 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._client = SimpleGithubClient(self._github_api_url, self._github_token)
         self._repository = os.environ["GITHUB_REPOSITORY"]
         self._ref = os.environ["GITHUB_REF"]
+
         self._pull_request_id = parse_pull_request_id(self._ref)
-        logger.debug("Pull request ID: %s (from GITHUB_REF=%s)", self._pull_request_id, self._ref)
+        if not self._pull_request_id and "GITHUB_PR_ID" in os.environ:
+            self._pull_request_id = os.environ["GITHUB_PR_ID"]
+        logger.debug("Pull request ID: %s", self._pull_request_id, self._ref)
 
         assert self._github_token, "GITHUB_TOKEN environment variable is empty"
 
