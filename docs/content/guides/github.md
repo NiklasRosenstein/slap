@@ -62,15 +62,18 @@ jobs:
   changelog-update:
     name: "Insert the Pull Request URL into new changelog entries"
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request_target'
     steps:
       - uses: actions/checkout@v2
-      - uses: NiklasRosenstein/slap@gha/changelog/update/v3
-        with: { version: '*' }
+      - uses: NiklasRosenstein/slap@gha/changelog/update/v2
+        with: { pr-id: '${{ github.event.pull_request.number }}' }
 ```
 
-The action will pass the `${{ github.token }}` as the `GITHUB_TOKEN` environment variable for running Slap. This token
-is used to query the head ref of the Pull Request and to create a new commit with the updated changelogs.
+> The action takes additionally a `version`, `ref` and `token` input, but the defaults should be good enoguh in most
+> cases.
+
+Note that this workflow only works properly with the `pull_request_target` event. This is because the `pull_request`
+event cannot post comments to the Pull Request.
 
 !!! warning "Forks are not supported"
 

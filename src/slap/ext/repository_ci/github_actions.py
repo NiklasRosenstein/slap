@@ -298,7 +298,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             message = (
                 "This pull request is from a forked repository (%s). The GITHUB_TOKEN available in CI does not have "
                 "the permissions to push back to the branch from the forked repository. Please manually apply and "
-                "push the following changes:\n\n%s\n"
+                "push the following changes:\n\n```diff\n%s\n```\n"
             )
             message_args = (self._pull_request.head_repository, _diff())
             logger.error(message, *message_args)
