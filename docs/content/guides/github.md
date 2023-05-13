@@ -7,13 +7,19 @@ title: GitHub
 Most of Slap's functionality is independent of the repository hosting service that you use. However, Slap comes with
 some built-in utities to make integration with GitHub easier.
 
+__Table of Contents__
+
+* [Install Slap](#install-slap)
+* [Update Changelogs](#update-changelogs)
+* [Assert Changelogs](#assert-changelogs)
+
 ## GitHub Actions
 
 ### Install Slap
 
   [0]: https://github.com/NiklasRosenstein/slap/tree/github-action/install/v1
 
-The [`NiklasRosenstein/slap@gha/install/v1`][0] action installs Slap for you. It does this by setting up
+The [`NiklasRosenstein/slap@gha/install/v2`][0] action installs Slap for you. It does this by setting up
 Python 3.10 and installing Slap via Pipx.
 
 !!! note
@@ -30,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: NiklasRosenstein/slap@gha/install/v1
+      - uses: NiklasRosenstein/slap@gha/install/v2
         with: { version: '*' }
       - uses: actions/setup-python@v2
         with: { python-version: "3.x" }
@@ -38,13 +44,16 @@ jobs:
       - run: slap test
 ```
 
+Instead of a `version`, you can also supply a Git ref with the `ref` input instead. This is useful when you want to
+test unreleased changes to Slap.
+
 ### Update Changelogs
 
   [1]: https://github.com/NiklasRosenstein/slap/tree/gha/changelog/update/v2
 
 The `slap changelog diff pr update` command updates the PR references of changelogs added between two Git revisions. In
 addition, by passing `--use github-actions`, there is almost no need for any additional configuration inside of a
-GitHub action run for a Pull Request event. The [`NiklasRosenstein/slap@gha/changelog/update/v2`][1] action
+GitHub action run for a Pull Request event. The [`NiklasRosenstein/slap@gha/changelog/update/v3`][1] action
 makes automatically updated changelogs a breeze:
 
 ```yaml title=".github/workflows/python.yml"
@@ -56,9 +65,18 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
-      - uses: NiklasRosenstein/slap@gha/changelog/update/v2
+      - uses: NiklasRosenstein/slap@gha/changelog/update/v3
         with: { version: '*' }
 ```
+
+The action will pass the `${{ github.token }}` as the `GITHUB_TOKEN` environment variable for running Slap. This token
+is used to query the head ref of the Pull Request and to create a new commit with the updated changelogs.
+
+!!! warning "Forks are not supported"
+
+    The `GITHUB_TOKEN` does not have permissions to write back into the branch of a forked repository. If a pull
+    request from a fork is recognized by Slap, it will instead post a comment to the Pull Request, asking the user
+    to update the changelog entry manually.
 
 ## Assert Changelogs
 

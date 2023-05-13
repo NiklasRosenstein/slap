@@ -11,12 +11,12 @@ from unittest.mock import patch
 
 from git.repo import Repo
 from git.util import Actor
-from pytest import fixture
+from pytest import fixture, raises
 
 from slap.ext.repository_ci.github_actions import (
-    GhPullRequest,
     GithubActionsRepositoryCIPlugin,
-    get_github_pull_request,
+    PullRequestFromForkedRepositoryNotSupported,
+    SimpleGithubClient,
 )
 
 
@@ -41,12 +41,28 @@ class MockGitHubApiServer:
 
         def do_GET(self):
             match = re.match(r"/repos/(.+)/pulls/([^/]+)", self.path)
-            if not match:
-                self.send_error(404)
+            if match:
+                self._handle_pull_request(match.group(1), match.group(2))
+                return
+            # comments
+            match = re.match(r"/repos/(.+)/issues/([^/]+)/comments", self.path)
+            if match:
+                self._handle_comments_get(match.group(1), match.group(2))
                 return
 
+            self.send_error(404)
+
+        def do_POST(self):
+            match = re.match(r"/repos/(.+)/issues/([^/]+)/comments", self.path)
+            if match:
+                self._handle_comment_post(match.group(1), match.group(2))
+                return
+
+            self.send_error(404)
+
+        def _handle_pull_request(self, repository: str, pr_id: str) -> None:
             for pull in self._pulls:
-                if match.group(1) == pull.repository and match.group(2) == pull.id:
+                if repository == pull.repository and pr_id == pull.id:
                     break
             else:
                 self.send_error(404)
@@ -68,6 +84,16 @@ class MockGitHubApiServer:
                     }
                 ).encode("utf-8")
             )
+
+        def _handle_comments_get(self, repository: str, pr_id: str) -> None:
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"[]")
+
+        def _handle_comment_post(self, repository: str, pr_id: str) -> None:
+            self.send_response(201)
+            self.end_headers()
+            self.wfile.write(b'{"id": "foobar", "body": "foobar"}')
 
     def __init__(self) -> None:
         self._pulls: list[MockPullRequestData] = []
@@ -113,7 +139,7 @@ def tempdir() -> Iterator[Path]:
             os.chdir(cwd)
 
 
-def test__get_github_pull_request(mock_api: MockGitHubApiServer) -> None:
+def test__SimpleGithubClient__get_pull_request(mock_api: MockGitHubApiServer) -> None:
     mock_api.add_pull_request(
         MockPullRequestData(
             repository="octodad/octo-repo",
@@ -124,14 +150,9 @@ def test__get_github_pull_request(mock_api: MockGitHubApiServer) -> None:
         )
     )
 
-    response = get_github_pull_request(
-        github_api_url=mock_api.addr,
-        repository="octodad/octo-repo",
-        pull_request_id="123",
-        token="",
-    )
-
-    assert response == GhPullRequest(
+    client = SimpleGithubClient(github_api_url=mock_api.addr, token="")
+    response = client.get_pull_request(repository="octodad/octo-repo", pull_request_id="123")
+    assert response == SimpleGithubClient.PullRequest(
         html_url="https://github.com/octodad/octo-repo/pull/123",
         head_repository="octodad/octo-repo",
         head_html_url="https://github.com/octodad/octo-repo/pull/123",
@@ -164,7 +185,7 @@ def test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes(mock_api: Mock
     forked_git = Repo(forked_repo)
     forked_readme = forked_repo / "README.md"
     assert forked_readme.exists()
-    forked_readme.write_text("Hello world!\nThis lione is from forked-repo.\n")
+    forked_readme.write_text("Hello world!\nThis line is from forked-repo.\n")
     forked_git.index.add(["README.md"])
     forked_git.index.commit("Initial commit", author=Actor("John Doe", "john@doe.com"))
 
@@ -206,8 +227,12 @@ def test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes(mock_api: Mock
 
         expect_readme_content = forked_readme.read_text() + "This line is from main-repo automation.\n"
         main_readme.write_text(expect_readme_content)
-        plugin.publish_changes([main_readme], "Update README.md")
 
-    # Expect that the forked_repo has been updated.
-    forked_git.git.checkout(forked_git_active_branch)
-    assert forked_readme.read_text() == expect_readme_content
+        # We know that we can't actually support pull requests from forked repositories, so we expect an exception.
+        with raises(PullRequestFromForkedRepositoryNotSupported):
+            plugin.publish_changes([main_readme], "Update README.md")
+
+    # If we could actually push to a fork, we'd expect the forked repository to have been updated.
+    # # Expect that the forked_repo has been updated.
+    # forked_git.git.checkout(forked_git_active_branch)
+    # assert forked_readme.read_text() == expect_readme_content
