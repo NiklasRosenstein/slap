@@ -216,9 +216,11 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             askpass = Path(tmpdir) / "askpass.sh"
             askpass.write_text(askpass_script)
             askpass.chmod(0o700)
-            environ = {
-                "GIT_ASKPASS": str(askpass),
-            }
-            with patch.dict("os.environ", environ):
+            environ = self._repo.git.environment().copy()
+            self._repo.git.update_environment(GIT_ASKPASS=str(askpass))
+            try:
                 logger.info("Pushing changes to %s/%s", *self._head_ref)
                 self._repo.git.push(self._head_ref[0], self._head_branch + ":" + self._head_ref[1])
+            finally:
+                self._repo.git.environment().clear()
+                self._repo.git.environment().update(environ)
