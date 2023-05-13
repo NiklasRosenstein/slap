@@ -162,7 +162,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             logger.info("Checking out '%s/%s' as '%s'.", *self._head_ref, self._head_branch)
             self._repo.git.checkout(self._head_branch) #"/".join(self._head_ref[:2]), "-b", self._head_branch)
 
-            assert self._repo.active_branch.name == self._head_ref[1]
+            assert self._repo.active_branch.name == self._head_branch
         else:
             logger.info("This is not a GitHub pull request.")
 
