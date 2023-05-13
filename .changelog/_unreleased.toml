@@ -1,0 +1,5 @@
+[[entries]]
+id = "ffb21822-a989-49f8-9e7d-ea8af5c2de2a"
+type = "fix"
+description = "Fix `slap changelog diff pr update --use github-actions` command used by the `NklasRosenstein/slap@gha/changelog/update/v2` action to support forks."
+author = "@NiklasRosenstein"

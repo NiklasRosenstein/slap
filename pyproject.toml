@@ -40,6 +40,7 @@ twine = "^3.7.0"
 tqdm = "^4.64.0"
 build = "^0.8.0"
 "nr.python.environment" = "^0.1.4"
+gitpython = "^3.1.31"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
