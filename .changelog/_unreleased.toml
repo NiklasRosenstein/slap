@@ -9,3 +9,9 @@ id = "78a841db-cd55-46c4-a95d-a2d4239b544e"
 type = "fix"
 description = "Fix parsing version constraints that are wrapped with parentheses"
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "a9d38705-64cf-434d-8d0b-26c7a29a0e91"
+type = "fix"
+description = "Fix Github workflow templates"
+author = "@NiklasRosenstein"

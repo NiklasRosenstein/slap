@@ -6,7 +6,7 @@
 name: "Changelog"
 
 on:
-  pull_request_target: { branches: [ "develop" ] }
+  pull_request_target: {{ branches: [ "develop" ] }}
 
 jobs:
   changelog-update:
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: NiklasRosenstein/slap@gha/changelog/update/v2
-        with: { version: '*', pr-id: '${{ github.event.pull_request.number }}' }
+        with: {{ pr-id: '${{{{ github.event.pull_request.number }}}}' }}
 
   assert-new-changelog-entries:
     name: "At least one new changelog entry must be added"
@@ -25,4 +25,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: NiklasRosenstein/slap@gha/changelog/assert-added/v2
-        with: { version: '*', pr-id: '${{ github.event.pull_request.number }}' }
+        with: {{ pr-id: '${{{{ github.event.pull_request.number }}}}' }}

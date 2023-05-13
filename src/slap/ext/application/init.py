@@ -8,7 +8,7 @@ from slap.plugins import ApplicationPlugin
 from slap.util.external.licenses import get_spdx_license_details, wrap_license_text
 from slap.util.vcs import get_git_author
 
-TEMPLATES = ["poetry", "github-workflows"]
+TEMPLATES = ["poetry", "github"]
 
 
 def load_template(name: str) -> Iterable[tuple[str, str]]:
