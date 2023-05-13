@@ -16,3 +16,10 @@ jobs:
 
 If no `version` is specified, or the version is set to `*`, the newest version will be installed. A constraint like
 `>=1.7.0` can also be specified for the version.
+
+## Changelog
+
+### `v1` -> `v2`
+
+* Now supports a `ref` input which is taken into account over the `version` input if specified. It can point to
+  a Git ref in the [NiklasRosenstein/slap][Slap] repository to install from.
