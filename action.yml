@@ -22,7 +22,7 @@ runs:
     - run: git fetch
       shell: bash
 
-    - uses: NiklasRosenstein/slap@gha/install/v2
+    - uses: NiklasRosenstein/slap@gha/install/v1
       with: { version: "${{ inputs.version }}", ref: "${{ inputs.ref }}" }
 
     - name: Update changelogs

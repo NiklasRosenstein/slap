@@ -23,7 +23,7 @@ of Slap required for this action to work).
 
 ## Changelog
 
-### `v2` -> `v3`
+### 2023-05-13
 
 * Support the `ref` input that was also added to the `NiklasRosenstein/slap@gha/install/v2` action.
 * Now requires that a `github_token` input is set.
