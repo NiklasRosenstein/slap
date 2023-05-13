@@ -312,6 +312,10 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         assert self._head_branch is not None
         assert self._pull_request is not None
 
+        # Make sure checks for this commit are ignored.
+        # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks#skipping-and-requesting-checks-for-individual-commits  # noqa: E501
+        commit_message = f"{commit_message}\n\nskip-checks: true"
+
         def _diff() -> str:
             return sp.check_output(["git", "diff"]).decode("utf-8")
 
