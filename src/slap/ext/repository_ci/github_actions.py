@@ -200,7 +200,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._repository = os.environ["GITHUB_REPOSITORY"]
         self._ref = os.environ["GITHUB_REF"]
         self._pull_request_id = parse_pull_request_id(self._ref)
-        logger.debug("Pull request ID: %s", self._pull_request_id)
+        logger.debug("Pull request ID: %s (from GITHUB_REF=%s)", self._pull_request_id, self._ref)
 
         assert self._github_token, "GITHUB_TOKEN environment variable is empty"
 
