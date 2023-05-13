@@ -810,7 +810,7 @@ that can be installed, built or published to PyPI or another repository.</p>
 <p>A project with a <code>slap.toml</code> configuration file (or with no configuration file) is usually used as the parent
 project for two or more sub-projects. This configuration represents a mono-repository where multiple projects
 are stored and versioned together.</p>
-<p>Slap understands most details about a project through a <a href="/slap-cli/api/documentation#pydoc:slap.plugins.ProjectHandlerPlugin">Class ProjectHandlerPlugin</a>. It comes
+<p>Slap understands most details about a project through a <a href="/slap/api/documentation#pydoc:slap.plugins.ProjectHandlerPlugin">Class ProjectHandlerPlugin</a>. It comes
 with a default implementation that supports Poetry and Flit Python projects.</p>
 <h2 id="repository">Repository</h2>
 <p>A repository is a directory that contains one or more projects. For singular projects, the repository directory
@@ -845,7 +845,7 @@ project (i.e. if it has a <code>pyproject.toml</code> instead of a <code>slap.to
 </div>
 </div>
 </div>
-<p>Slap understands most details about a repository through a <a href="/slap-cli/api/documentation#pydoc:slap.plugins.RepositoryHandlerPlugin">Class RepositoryHandlerPlugin</a>. It
+<p>Slap understands most details about a repository through a <a href="/slap/api/documentation#pydoc:slap.plugins.RepositoryHandlerPlugin">Class RepositoryHandlerPlugin</a>. It
 comes with a default implementation that supports Git repositories and GitHub.</p>
 
 

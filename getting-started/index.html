@@ -263,13 +263,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-installation" class="md-nav__link">
-    1. Installation
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#2-bootstrapping-a-new-project" class="md-nav__link">
     2. Bootstrapping a new project
   </a>
@@ -832,13 +825,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-installation" class="md-nav__link">
-    1. Installation
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#2-bootstrapping-a-new-project" class="md-nav__link">
     2. Bootstrapping a new project
   </a>
@@ -927,19 +913,7 @@
 
 
 <h1 id="getting-started">Getting started</h1>
-<h2 id="1-installation">1. Installation</h2>
-<p>I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)</p>
-<div class="highlight"><pre><span></span><code>$ pipx install slap-cli
-</code></pre></div>
-<blockquote>
-<p><strong>Note</strong>: Currently Slap relies on an alpha version of <code>poetry-core</code> (<code>^1.1.0a6</code>). If you install it into
-the same environment as Poetry itself, you may also need to use an alpha version of Poetry (e.g. <code>1.2.0a2</code>).</p>
-<p>If you use Slap in GitHub Actions, try one of the actions provided by Slap directly:</p>
-<ul>
-<li><a href="https://python-slap.github.io/slap-cli/guides/github/#install-slap"><code>NiklasRosenstein/slap@gha/install/v1</code></a></li>
-<li><a href="https://python-slap.github.io/slap-cli/guides/github/#update-changelogs"><code>NiklasRosenstein/slap@gha/changelog/update/v1</code></a></li>
-</ul>
-</blockquote>
+<p>@cat ../../readme.md :with { markdown_section = "Installation", rename_section_to = "1. Installation" }</p>
 <h2 id="2-bootstrapping-a-new-project">2. Bootstrapping a new project</h2>
 <p>Slap has an <code>init</code> command that bootstraps project files for you. You can preview what the
 generated files look like by checking out the <a href="../commands/init/">init command's documentation</a>.</p>
@@ -1026,7 +1000,7 @@ Project &quot;.&quot; (id: slap-cli)
   version: 1.8.0
   dist-name: slap-cli
   packages: slap (src)
-  readme: readme.md
+  readme: README.md
   handler: PoetryProjectHandler
   dependencies:
     run:
@@ -1062,7 +1036,7 @@ Project &quot;.&quot; (id: slap-cli)
     extra.docs:
       - mkdocs
       - mkdocs-material
-      - &#39;novella ==0.2.3&#39;
+      - &#39;novella ==0.2.5&#39;
       - &#39;pydoc-markdown ==4.6.0&#39;
 </code></pre></div>
 
@@ -1071,12 +1045,12 @@ Project &quot;.&quot; (id: slap-cli)
 <h2 id="6-sanity-check-your-project-configuration">6. Sanity check your project configuration</h2>
 <p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration. The
 below example is the check output for Slap's own project.</p>
-<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 133 changelogs are valid.
+<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 134 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
   poetry:license               OK             — License &quot;MIT&quot; is a valid SPDX identifier.
-  poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
+  poetry:readme                OK             — Poetry will autodetect your readme (README.md)
   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
   release:source-code-version  OK             — Found __version__ in slap
   release:consistent-versions  OK             — All version references are equal
@@ -1101,55 +1075,47 @@ test commands like the below example to your project configuration.</p>
 </code></pre></div>
 <details><summary><code>slap test</code> for Slap's project</summary>
 
-<div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>black| All done! ✨ 🍰 ✨
-black| 53 files would be left unchanged.
-check|   changelog:validate           OK             — All 133 changelogs are valid.
-check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
-check|   general:typed                OK             — py.typed exists as expected
-check|   poetry:classifiers           OK             — All classifiers are valid.
-check|   poetry:license               OK             — License &quot;MIT&quot; is a valid SPDX identifier.
-check|   poetry:readme                OK             — Poetry readme is configured correctly (path: readme.md)
-check|   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
-check|   release:source-code-version  OK             — Found __version__ in slap
-check|   release:consistent-versions  OK             — All version references are equal
-check| 
-check| Summary: 8 OK, 1 RECOMMENDATION, exit code: 0
-mypy| Daemon started
-mypy| Success: no issues found in 610 source files
-pytest| ============================= test session starts ==============================
-pytest| platform linux -- Python 3.10.11, pytest-7.3.1, pluggy-1.0.0 -- /home/runner/work/slap/slap/.venvs/runtime/bin/python
-pytest| cachedir: .pytest_cache
-pytest| rootdir: /home/runner/work/slap/slap
-pytest| collecting ... collected 18 items
-pytest| 
-pytest| tests/integration/test_repository_ci_github_actions.py::test__SimpleGithubClient__get_pull_request PASSED [  5%]
-pytest| tests/integration/test_repository_ci_github_actions.py::test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes[pull_request] PASSED [ 11%]
-pytest| tests/integration/test_repository_ci_github_actions.py::test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes[pull_request_target] PASSED [ 16%]
-pytest| tests/slap/python/test_dependency.py::test__split_package_name_with_extras__good_input PASSED [ 22%]
-pytest| tests/slap/python/test_dependency.py::test__split_package_name_with_extras__bad_input PASSED [ 27%]
-pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_pypi_dependency PASSED [ 33%]
-pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_git_dependency PASSED [ 38%]
-pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_url_dependency PASSED [ 44%]
-pytest| tests/slap/python/test_dependency.py::test__parse_dependency_string__can_parse_path_dependency PASSED [ 50%]
-pytest| tests/slap/python/test_dependency.py::test__parse_dependency_config__various_configurations PASSED [ 55%]
-pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_empty_string PASSED [ 61%]
-pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_wildcard PASSED [ 66%]
-pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_pep_508_spec PASSED [ 72%]
-pytest| tests/slap/python/test_dependency.py::test__VersionSpec__can_take_semver_spec PASSED [ 77%]
-pytest| tests/slap/python/test_dependency.py::test__VersionSpec__throws_on_invalid_pep_508_spec SKIPPED (Detecting invalid PEP 508 selectors is currently not supported) [ 83%]
-pytest| tests/slap/python/test_dependency.py::test__PypiDependency__parse PASSED [ 88%]
-pytest| tests/slap/python/test_environment.py::test__PythonEnvironment__with_current_python_instance PASSED [ 94%]
-pytest| tests/slap/python/test_pep508.py::test__Pep508Environment__sample_markers PASSED [100%]
-pytest| 
-pytest| ======================== 17 passed, 1 skipped in 2.35s =========================
+<div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>    $ cd .. &amp;&amp; slap test  # exited with return code 1
+    black| would reformat /home/runner/work/slap/slap/src/slap/application.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/changelog.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/check.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/link.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/test.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/release.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/project_handlers/flit.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/project_handlers/poetry.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/repository_hosts/github.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/ext/repository_ci/github_actions.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/install/installer.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/util/cleo.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/python/dependency.py
+    black| 
+    black| Oh no! 💥 💔 💥
+    black| 13 files would be reformatted, 40 files would be left unchanged.
+    check|   changelog:validate           OK             — All 134 changelogs are valid.
+    check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
+    check|   general:typed                OK             — py.typed exists as expected
+    check|   poetry:classifiers           OK             — All classifiers are valid.
+    check|   poetry:license               OK             — License &quot;MIT&quot; is a valid SPDX identifier.
+    check|   poetry:readme                OK             — Poetry will autodetect your readme (README.md)
+    check|   poetry:urls                  RECOMMENDATION — Please configure the following URLs: &quot;Bug Tracker&quot;
+    check|   release:source-code-version  OK             — Found __version__ in slap
+    check|   release:consistent-versions  OK             — All version references are equal
+    check| 
+    check| Summary: 8 OK, 1 RECOMMENDATION, exit code: 0
+    flake8| bash: flake8: command not found
+    isort| bash: isort: command not found
+    mypy| bash: dmypy: command not found
+    pytest| bash: pytest: command not found
 
-test summary:
-  • black (exit code: 0)
-  • check (exit code: 0)
-  • flake8 (exit code: 0)
-  • isort (exit code: 0)
-  • mypy (exit code: 0)
-  • pytest (exit code: 0)
+    test summary:
+      • black (exit code: 1)
+      • check (exit code: 0)
+      • flake8 (exit code: 127)
+      • isort (exit code: 127)
+      • mypy (exit code: 127)
+      • pytest (exit code: 127)
+    (venv-aware) a virtual environment is already activated (/home/runner/work/slap/slap/.venvs/docs)
 </code></pre></div>
 
 </details>
@@ -1225,6 +1191,8 @@ To create a new release, pass the version number or a rule name instead.
   pyproject.toml:       1.8.0 → 1.8.1 # &#39;version = &quot;1.8.0&quot;&#39;
   src/slap/__init__.py: 1.8.0 → 1.8.1 # &#39;__version__ = &quot;1.8.0&quot;&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.8.1.toml
 
 tagging 1.8.1
 
