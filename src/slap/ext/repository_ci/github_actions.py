@@ -111,7 +111,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
                 self._github_api_url, self._repository, self._pull_request_id, self._github_token
             )
             self._base_ref = ("origin", os.environ["GITHUB_BASE_REF"])
-            self._head_ref = ("origin", self._ref.replace("refs/", ""))
+            self._head_ref = ("origin", f"pull/{self._pull_request_id}/head")
             # self._head_ref = (self.HEAD_REMOTE_NAME, os.environ["GITHUB_HEAD_REF"])
 
             logger.info(
