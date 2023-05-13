@@ -30,8 +30,7 @@ runs:
         elif [[ $VERSION =~ ^[0-9] ]]; then
           install_arg="slap-cli==$VERSION"
         else
-          >&2 echo "Invalid VERSION=\"$VERSION\" or REF=\"$REF\""
-          exit 1
+          install_arg="slap-cli$VERSION"
         fi
 
         echo "Installing: $install_arg"
