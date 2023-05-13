@@ -106,6 +106,8 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._pull_request_id = parse_pull_request_id(self._ref)
         logger.debug("Pull request ID: %s", self._pull_request_id)
 
+        assert self._github_token, "GITHUB_TOKEN environment variable is empty"
+
         # This information is only available when we're in a pull request workflow..
         self._base_ref: tuple[str, str] | None = None
         self._base_branch: str | None = None
@@ -212,7 +214,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
                     *) exit 1 ;;
                 esac
                 """
-            )
+            ).strip()
             askpass = Path(tmpdir) / "askpass.sh"
             askpass.write_text(askpass_script)
             askpass.chmod(0o700)
