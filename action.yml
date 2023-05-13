@@ -3,12 +3,15 @@ description: 'Updates changelogs managed by Slap to inject the pull request refe
 inputs:
   version:
     description: The version of Slap to install. Defaults to `>=1.7.0`.
-    required: true
+    required: false
     default: '>=1.7.0'
   ref:
     description: A Git ref to install Slap from. If this is specified, the version input is ignored.
     required: false
     default: ''
+  github_token:
+    description: Pass along the Github token.
+    required: true
 runs:
   using: "composite"
   steps:
@@ -24,3 +27,4 @@ runs:
     - name: Update changelogs
       shell: bash
       run: slap changelog diff pr update --use github-actions -vv
+      env: { GITHUB_TOKEN: '${{ inputs.github_token }}' }
