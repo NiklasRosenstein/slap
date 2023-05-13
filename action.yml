@@ -23,7 +23,6 @@ runs:
         VERSION='${{ inputs.version }}'
         REF='${{ inputs.ref }}'
 
-        local install_arg
         if [ ! -z "$REF" ]; then
           install_arg="git+https://github.com/NiklasRosenstein/slap.git@$REF"
         elif [ "$VERSION" == '*' ]; then
