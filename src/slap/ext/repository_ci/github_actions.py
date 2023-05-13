@@ -56,6 +56,7 @@ class SimpleGithubClient:
         self._session.headers.update(
             {
                 "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
                 "Authorization": f"Bearer {self._token}",
             }
         )
@@ -166,7 +167,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         body = f"{prefix}\n\n{body}"
         try:
             comments = self._client.get_pr_comments(self._repository, self._pull_request_id)
-        except requests.HTTPError as e:
+        except requests.HTTPError:
             logger.exception("Failed to fetch comments on pull request %s", self._pull_request_id)
             comments = []
         for comment in comments:
