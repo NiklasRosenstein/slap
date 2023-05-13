@@ -87,7 +87,7 @@ class SimpleGithubClient:
         Fetches the comments on a GitHub Pull Request.
         """
 
-        response = requests.get(f"{self._github_api_url}/repos/{repository}/issues/{pull_request_id}/comments")
+        response = self._session.get(f"{self._github_api_url}/repos/{repository}/issues/{pull_request_id}/comments")
         response.raise_for_status()
         data = response.json()
 
@@ -104,7 +104,7 @@ class SimpleGithubClient:
         Deletes a comment on a GitHub Pull Request.
         """
 
-        response = requests.delete(f"{self._github_api_url}/repos/{repository}/issues/comments/{comment_id}")
+        response = self._session.delete(f"{self._github_api_url}/repos/{repository}/issues/comments/{comment_id}")
         response.raise_for_status()
 
     def create_pr_comment(self, repository: str, pull_request_id: str, body: str) -> Comment:
@@ -112,7 +112,7 @@ class SimpleGithubClient:
         Creates a comment on a GitHub Pull Request.
         """
 
-        response = requests.post(
+        response = self._session.post(
             f"{self._github_api_url}/repos/{repository}/issues/{pull_request_id}/comments",
             json={"body": body},
         )
