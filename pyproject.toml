@@ -125,7 +125,7 @@ black  = "black src/ tests/ --check"
 flake8 = "flake8 src/ tests/"
 
 [tool.slap.run]
-"docs:install" = "slap venv -c docs -p python3.10 && slap install --use-venv docs --only-extras docs"
+"docs:install" = "slap venv -c docs --python python3.10 && slap install --use-venv docs --only-extras docs"
 "docs:build"   = "slap run --use-venv docs -- bash -c 'export PATH=\"$(slap venv -p)/bin:${PATH}\" && cd docs && novella --base-url slap/'"
 "docs:dev"     = "slap run --use-venv docs -- bash -c 'export PATH=\"$(slap venv -p)/bin:${PATH}\" && cd docs && novella --base-url slap/ --serve'"
 fmt            = "isort src/ tests/ && black src/ tests"
