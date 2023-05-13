@@ -25,9 +25,9 @@ runs:
 
         if [ ! -z "$REF" ]; then
           install_arg="git+https://github.com/NiklasRosenstein/slap.git@$REF"
-        elif [ "$VERSION" == '*' ]; then
-          install_arg="slap-cli"
         elif [[ $VERSION =~ ^[0-9] ]]; then
           install_arg="slap-cli==$VERSION"
+        else
+          install_arg="slap-cli"
         fi
         pip install pipx -q && pipx install "$install_arg"
