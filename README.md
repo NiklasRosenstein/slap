@@ -19,7 +19,7 @@ If no `version` is specified, or the version is set to `*`, the newest version w
 
 ## Changelog
 
-### `v1` -> `v2`
+### 2023-05-13
 
 * Now supports a `ref` input which is taken into account over the `version` input if specified. It can point to
   a Git ref in the [NiklasRosenstein/slap][Slap] repository to install from.
