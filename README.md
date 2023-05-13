@@ -20,3 +20,9 @@ jobs:
 
 If no `version` is specified, the version will default to `>=1.7.0` (which is the minimum version
 of Slap required for this action to work).
+
+## Changelog
+
+### `v2` -> `v3`
+
+* Support the `ref` input that was also added to the `NiklasRosenstein/slap@gha/install/v2` action.

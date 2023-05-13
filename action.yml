@@ -5,6 +5,10 @@ inputs:
     description: The version of Slap to install. Defaults to `>=1.7.0`.
     required: true
     default: '>=1.7.0'
+  ref:
+    description: A Git ref to install Slap from. If this is specified, the version input is ignored.
+    required: false
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -21,8 +25,8 @@ runs:
       shell: bash
       if: github.head_ref != ''
 
-    - uses: NiklasRosenstein/slap@gha/install/v1
-      with: { version: "${{ inputs.version }}" }
+    - uses: NiklasRosenstein/slap@gha/install/v2
+      with: { version: "${{ inputs.version }}", ref: "${{ inputs.ref }}" }
 
     - name: Update changelogs
       shell: bash
