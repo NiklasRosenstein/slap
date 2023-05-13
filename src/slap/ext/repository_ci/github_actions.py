@@ -164,7 +164,12 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         assert self._pull_request_id is not None
         prefix = f"<!-- {self.COMMENT_RE_ID} -->"
         body = f"{prefix}\n\n{body}"
-        for comment in self._client.get_pr_comments(self._repository, self._pull_request_id):
+        try:
+            comments = self._client.get_pr_comments(self._repository, self._pull_request_id)
+        except requests.HTTPError as e:
+            logger.exception("Failed to fetch comments on pull request %s", self._pull_request_id)
+            comments = []
+        for comment in comments:
             if comment.body.strip().startswith(prefix):
                 logger.debug("Removing old comment: %s", comment.id)
                 self._client.delete_pr_comment(self._repository, comment.id)
