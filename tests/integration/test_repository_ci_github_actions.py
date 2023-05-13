@@ -219,7 +219,7 @@ def test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes(
         environ["GITHUB_PR_ID"] = "123"
         environ["GITHUB_REF"] = main_git.active_branch.name
     else:
-        environ["GITHUB_REF"] = f"refs/pull/123/merge"
+        environ["GITHUB_REF"] = "refs/pull/123/merge"
 
     with patch.dict("os.environ", environ):
         os.chdir(main_repo)
