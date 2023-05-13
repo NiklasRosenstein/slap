@@ -12,6 +12,7 @@ inputs:
   github_token:
     description: Pass along the Github token.
     required: true
+    default: '${{ github.token }}'
 runs:
   using: "composite"
   steps:
