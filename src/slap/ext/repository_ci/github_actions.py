@@ -56,7 +56,7 @@ class SimpleGithubClient:
         self._session.headers.update(
             {
                 "Accept": "application/vnd.github+json",
-                "Authorization": f"token {self._token}",
+                "Authorization": f"Bearer {self._token}",
             }
         )
 
