@@ -18,13 +18,6 @@ runs:
     - run: git fetch
       shell: bash
 
-    - run: env
-      shell: bash
-
-    - run: git checkout $GITHUB_HEAD_REF
-      shell: bash
-      if: github.head_ref != ''
-
     - uses: NiklasRosenstein/slap@gha/install/v2
       with: { version: "${{ inputs.version }}", ref: "${{ inputs.ref }}" }
 
