@@ -207,8 +207,8 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
                 f"""
                 #!/bin/sh
                 case "$1" in
-                    username) echo "github-actions[bot]" ;;
-                    password) echo "{self._github_token}" ;;
+                    Username*) echo "github-actions[bot]" ;;
+                    Password*) echo "{self._github_token}" ;;
                     *) exit 1 ;;
                 esac
                 """
