@@ -111,7 +111,8 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
                 self._github_api_url, self._repository, self._pull_request_id, self._github_token
             )
             self._base_ref = ("origin", os.environ["GITHUB_BASE_REF"])
-            self._head_ref = (self.HEAD_REMOTE_NAME, os.environ["GITHUB_HEAD_REF"])
+            self._head_ref = ("origin", self._ref)
+            # self._head_ref = (self.HEAD_REMOTE_NAME, os.environ["GITHUB_HEAD_REF"])
 
             logger.info(
                 "This is a GitHub pull request (id: %s) %s/%s → %s/%s",
@@ -126,37 +127,32 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             base_remote = self._repo.remote(self._base_ref[0])
             base_remote.fetch(self._base_ref[1])
 
-            # Make sure that there is a remote for the fork.
-            try:
-                head_remote = self._repo.remote(self.HEAD_REMOTE_NAME)
-            except ValueError:
-                logger.info(
-                    "Creating %s remote (url: %s)",
-                    self.HEAD_REMOTE_NAME,
-                    self._pull_request.head_html_url,
-                )
-                head_remote = self._repo.create_remote(self.HEAD_REMOTE_NAME, self._pull_request.head_html_url)
-            else:
-                logger.info(
-                    "Updating %s remote (url: %s)",
-                    self.HEAD_REMOTE_NAME,
-                    self._pull_request.head_html_url,
-                )
-                head_remote.set_url(self._pull_request.head_html_url)
+            # # Make sure that there is a remote for the fork.
+            # try:
+            #     head_remote = self._repo.remote(self.HEAD_REMOTE_NAME)
+            # except ValueError:
+            #     logger.info(
+            #         "Creating %s remote (url: %s)",
+            #         self.HEAD_REMOTE_NAME,
+            #         self._pull_request.head_html_url,
+            #     )
+            #     head_remote = self._repo.create_remote(self.HEAD_REMOTE_NAME, self._pull_request.head_html_url)
+            # else:
+            #     logger.info(
+            #         "Updating %s remote (url: %s)",
+            #         self.HEAD_REMOTE_NAME,
+            #         self._pull_request.head_html_url,
+            #     )
+            #     head_remote.set_url(self._pull_request.head_html_url)
 
-            logger.info("Fetching head ref '%s/%s'", *self._head_ref)
-            head_remote.fetch(self._head_ref[1])
+            # logger.info("Fetching head ref '%s/%s'", *self._head_ref)
+            # head_remote.fetch(self._head_ref[1])
 
             checkout_head = self._head_ref
-            if self._base_ref[1] == self._head_ref[1]:
-                self._head_ref = (
-                    self._head_ref[0],
-                    self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-" + self._head_ref[1],
-                )
-                logger.info(
-                    "Base and head ref are the same. Using generate branch name '%s' for head ref.",
-                    self.HEAD_REMOTE_NAME,
-                )
+            self._head_ref = (
+                self._head_ref[0],
+                self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-" + self._head_ref[1],
+            )
 
             logger.info("Checking out '%s/%s' as '%s'.", *checkout_head, self._head_ref[1])
             self._repo.git.checkout("/".join(checkout_head), "-b", self._head_ref[1])
