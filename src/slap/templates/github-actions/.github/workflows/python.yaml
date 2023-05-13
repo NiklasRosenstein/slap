@@ -28,4 +28,4 @@ jobs:
     - run: slap run --no-venv-check docs:build
     - uses: JamesIves/github-pages-deploy-action@4.1.4
       if: github.ref == 'refs/heads/develop'
-      with: { branch: gh-pages, folder: docs/site, ssh-key: "${{ secrets.DEPLOY_KEY }}" }
+      with: { branch: gh-pages, folder: docs/_site, ssh-key: "${{ secrets.DEPLOY_KEY }}" }
