@@ -74,7 +74,7 @@ class SimpleGithubClient:
         """
 
         response = self._session.get(f"{self._github_api_url}/repos/{repository}/pulls/{pull_request_id}")
-        response.raise_for_status()
+        self._raise_for_status(response)
         data = response.json()
 
         return self.PullRequest(
@@ -89,7 +89,7 @@ class SimpleGithubClient:
         """
 
         response = self._session.get(f"{self._github_api_url}/repos/{repository}/issues/{pull_request_id}/comments")
-        response.raise_for_status()
+        self._raise_for_status(response)
         data = response.json()
 
         return [
@@ -106,7 +106,7 @@ class SimpleGithubClient:
         """
 
         response = self._session.delete(f"{self._github_api_url}/repos/{repository}/issues/comments/{comment_id}")
-        response.raise_for_status()
+        self._raise_for_status(response)
 
     def create_pr_comment(self, repository: str, pull_request_id: str, body: str) -> Comment:
         """
@@ -117,12 +117,24 @@ class SimpleGithubClient:
             f"{self._github_api_url}/repos/{repository}/issues/{pull_request_id}/comments",
             json={"body": body},
         )
-        response.raise_for_status()
+        self._raise_for_status(response)
         data = response.json()
         return self.Comment(
             id=data["id"],
             body=data["body"],
         )
+
+    def _raise_for_status(self, response: requests.Response) -> None:
+        try:
+            response.raise_for_status()
+        except requests.HTTPError:
+            logger.warning(
+                "Requested to '%s' return status code %d with body: %s",
+                response.request.url,
+                response.status_code,
+                response.text,
+            )
+            raise
 
 
 class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
