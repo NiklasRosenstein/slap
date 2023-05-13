@@ -19,3 +19,11 @@ jobs:
 
 If no `version` is specified, it defaults to `>=1.7.0` which is the minimum version of Slap that
 this action works with.
+
+## Changelog
+
+### 2023-05-13
+
+* Support the `ref` input that was also added to the `NiklasRosenstein/slap@gha/install/v2` action.
+* Support for `github_token` input
+* Added `pr-id` input
