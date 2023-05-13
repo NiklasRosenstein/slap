@@ -294,22 +294,22 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         def _diff() -> str:
             return sp.check_output(["git", "diff"]).decode("utf-8")
 
-        if self._pull_request.head_repository != self._repository:
-            message = (
-                "This pull request is from a forked repository (`%s`). The `GITHUB_TOKEN` available in CI does not "
-                "have the permissions to push back to the branch from the forked repository. Please manually apply "
-                "and push the following changes:\n\n```diff\n%s\n```\n"
-            )
-            message_args = (self._pull_request.head_repository, _diff())
-            logger.error(message, *message_args)
-            self.create_or_update_comment(message % message_args)
-            raise PullRequestFromForkedRepositoryNotSupported(self._pull_request.head_repository)
+        # if self._pull_request.head_repository != self._repository:
+        #     message = (
+        #         "This pull request is from a forked repository (`%s`). The `GITHUB_TOKEN` available in CI does not "
+        #         "have the permissions to push back to the branch from the forked repository. Please manually apply "
+        #         "and push the following changes:\n\n```diff\n%s\n```\n"
+        #     )
+        #     message_args = (self._pull_request.head_repository, _diff())
+        #     logger.error(message, *message_args)
+        #     self.create_or_update_comment(message % message_args)
+        #     raise PullRequestFromForkedRepositoryNotSupported(self._pull_request.head_repository)
 
         # NOTE(@NiklasRosenstein): A lot of what follows is based on the assumption that the head repository
         #       may be a fork and that we can push to it; so once that actually becomes true, we should be able
         #       to get rid of the check above and be finally happy.
 
-        logger.info("Showing diff before pushing changes to remote.")
+        print(_diff())
 
         user_name = os.environ.get("GIT_USER_NAME", "GitHub Action")
         user_email = os.environ.get("GIT_USER_EMAIL", "github-action@users.noreply.github.com")
