@@ -216,6 +216,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             askpass = Path(tmpdir) / "askpass.sh"
             askpass.write_text(askpass_script)
             askpass.chmod(0o700)
+            logger.info("Using %s as GIT_ASKPASS, content: %s", askpass, askpass_script)
             environ = self._repo.git.environment().copy()
             self._repo.git.update_environment(GIT_ASKPASS=str(askpass))
             try:
