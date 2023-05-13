@@ -1,0 +1,5 @@
+[[entries]]
+id = "e178f3c0-e5c7-4d71-848a-5f033ee9b697"
+type = "improvement"
+description = "add E203 to ignored lints in flake8"
+author = "@NiklasRosenstein"
