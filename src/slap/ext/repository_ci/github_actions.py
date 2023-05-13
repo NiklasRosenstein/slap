@@ -4,6 +4,9 @@ import re
 import subprocess as sp
 from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from textwrap import dedent
+from unittest.mock import patch
 
 import requests
 from git.repo import Repo
@@ -199,5 +202,22 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._repo.index.add([str(f) for f in changed_files])
         self._repo.index.commit(message=commit_message, author=Actor(user_name, user_email))
 
-        logger.info("Pushing changes to %s/%s", *self._head_ref)
-        self._repo.git.push(self._head_ref[0], self._head_branch + ":" + self._head_ref[1])
+        with TemporaryDirectory() as tmpdir:
+            askpass_script = dedent(
+                f"""
+                #!/bin/sh
+                case "$1" in
+                    username) echo "github-actions[bot]" ;;
+                    password) echo "{self._github_token}" ;;
+                    *) exit 1 ;;
+                esac
+                """
+            )
+            askpass = Path(tmpdir) / "askpass.sh"
+            askpass.write_text(askpass_script)
+            environ = {
+                "GIT_ASKPASS": str(askpass),
+            }
+            with patch.dict("os.environ", environ):
+                logger.info("Pushing changes to %s/%s", *self._head_ref)
+                self._repo.git.push(self._head_ref[0], self._head_branch + ":" + self._head_ref[1])
