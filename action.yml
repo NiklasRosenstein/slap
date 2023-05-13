@@ -31,6 +31,7 @@ runs:
           install_arg="slap-cli==$VERSION"
         else
           >@2 echo "Invalid VERSION=\"$VERSION\" or REF=\"$REF\""
+          exit 1
         fi
 
         echo "Installing: $install_arg"
