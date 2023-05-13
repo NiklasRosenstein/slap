@@ -157,10 +157,10 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
 
             logger.info("Fetching head ref '%s/%s'", *self._head_ref)
             head_remote = self._repo.remote(self._head_ref[0])
-            head_remote.fetch(self._head_ref[1])
+            head_remote.fetch(self._head_ref[1] + ':' + self._head_branch)
 
             logger.info("Checking out '%s/%s' as '%s'.", *self._head_ref, self._head_branch)
-            self._repo.git.checkout("/".join(self._head_ref[:2]), "-b", self._head_branch)
+            self._repo.git.checkout(self._head_branch) #"/".join(self._head_ref[:2]), "-b", self._head_branch)
 
             assert self._repo.active_branch.name == self._head_ref[1]
         else:
@@ -182,6 +182,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         if self._pull_request_id is None:
             raise RuntimeError("Not in a pull request")
         assert self._head_ref is not None
+        assert self._head_branch is not None
 
         logger.info("Showing diff before pushing changes to remote.")
         sp.run(["git", "diff"], check=True)
@@ -196,4 +197,4 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._repo.index.commit(message=commit_message, author=Actor(user_name, user_email))
 
         logger.info("Pushing changes to %s/%s", *self._head_ref)
-        self._repo.git.push(self._head_ref[0], self._head_ref[1])
+        self._repo.git.push(self._head_ref[0], self._head_branch + ':' + self._head_ref[1])
