@@ -40,6 +40,7 @@ twine = "^3.7.0"
 tqdm = "^4.64.0"
 build = "^0.8.0"
 "nr.python.environment" = "^0.1.4"
+gitpython = "^3.1.31"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -117,7 +118,7 @@ github = "slap.ext.repository_hosts.github:GithubRepositoryHost"
 typed = true
 
 [tool.slap.test]
-mypy = "dmypy run src -- --namespace-packages"
+mypy = "dmypy run src -- --namespace-packages --exclude src/slap/templates"
 pytest = "pytest tests/ -vv"
 check = "slap check"
 isort = "isort src/ tests/ --check-only"

@@ -1,148 +1,28 @@
 import datetime
 import textwrap
 from pathlib import Path
+from typing import Iterable
 
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
 from slap.util.external.licenses import get_spdx_license_details, wrap_license_text
 from slap.util.vcs import get_git_author
 
-TEMPLATES = {
-    "poetry": {
-        "pyproject.toml": """
-            [build-system]
-            requires = ["poetry-core"]
-            build-backend = "poetry.core.masonry.api"
+TEMPLATES = ["poetry", "github-workflows"]
 
-            [tool.poetry]
-            name = "{name}"
-            version = "0.1.0"
-            description = ""
-            authors = ["{author_name} <{author_email}>"]
-            license = "{license}"
-            readme = "readme.md"
-            packages = [{{ include = "{path}", from = "src" }}]
-            classifiers = []
-            keywords = []
 
-            [tool.poetry.urls]
-            # "Bug Tracker" = ""
-            # Documentation = ""
-            # Homepage = ""
-            # Repository = ""
+def load_template(name: str) -> Iterable[tuple[str, str]]:
+    """
+    Loads a template, iterating over all its files.
+    """
 
-            [tool.poetry.dependencies]
-            python = "^3.6"
+    import slap
 
-            [tool.poetry.dev-dependencies]
-            black = "*"
-            flake8 = "*"
-            isort = "*"
-            mypy = "*"
-            pytest = "*"
-
-            [tool.slap]
-            typed = true
-
-            [tool.slap.test]
-            check = "slap check"
-            mypy = "dmypy run src/"
-            pytest = "pytest tests/ -vv"
-            black = "black --check src/ tests/"
-            isort = "isort --check-only src/ tests/"
-            flake8 = "flake8 src/ tests/"
-
-            [tool.slap.run]
-            fmt = "black src/ tests/ && isort src/ tests/"
-
-            [tool.mypy]
-            python_version = "3.6"
-            explicit_package_bases = true
-            mypy_path = ["src"]
-            namespace_packages = true
-            pretty = true
-            show_error_codes = true
-            show_error_context = true
-            strict = true
-            warn_no_return = true
-            warn_redundant_casts = true
-            warn_unreachable = true
-            warn_unused_ignores = true
-
-            [tool.isort]
-            profile = "black"
-            line_length = 120
-            combine_as_imports = true
-
-            [tool.black]
-            line-length = 120
-        """,
-        "LICENSE": "",
-        "readme.md": """
-            # {name}
-
-        """,
-        ".flake8": """
-            [flake8]
-            max-line-length = 120
-            # Black can yield formatted code that triggers these Flake8 warnings.
-            ignore=
-                # line break before binary operator
-                W503,
-                # line break after binary operator
-                W504,
-        """,
-        ".gitignore": """
-            __pycache__/
-            .dmypy.json
-            .venv/
-            *.egg-info/
-            /.vscode
-            /build
-            /dist
-            poetry.lock
-        """,
-        "src/{path}/__init__.py": """
-            __version__ = "0.1.0"
-        """,
-        "tests/test_import.py": """
-            def test_import():
-                exec("from {dotted_name} import *")
-    """,
-        "src/{path}/py.typed": "",
-    },
-    "github": {
-        ".github/workflows/python-package.yml": """
-            name: Python application
-
-            on:
-              push: {{ branches: [ develop ], tags: [ "*" ] }}
-              pull_request: {{ branches: [ develop ] }}
-
-            jobs:
-              test:
-                runs-on: ubuntu-latest
-                strategy:
-                  fail-fast: false
-                  matrix:
-                    python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10", "3.x" ]
-                steps:
-                - uses: actions/checkout@v2
-                - uses: python-slap/slap-cli@gha/install/v1
-                - uses: actions/setup-python@v2
-                  with: {{ python-version: "${{{{ matrix.python-version }}}}" }}
-                - run: slap install -vv --no-venv-check
-                - run: slap test
-
-              update-changelog:
-                runs-on: ubuntu-latest
-                if: github.event_name == 'pull_request'
-                steps:
-                  - uses: actions/checkout@v2
-                  - uses: python-slap/slap-cli@gha/changelog/update/v1
-    """,
-    },
-}
+    path = Path(slap.__file__).parent / "templates" / name
+    for filename in path.glob("**/*"):
+        if filename.is_dir():
+            continue
+        yield str(filename.relative_to(path)), filename.read_text()
 
 
 class InitCommandPlugin(ApplicationPlugin, Command):
@@ -238,7 +118,7 @@ class InitCommandPlugin(ApplicationPlugin, Command):
                     "package": self.option("name").replace(".", "_").replace("-", "_"),
                 }
             )
-        for filename, content in TEMPLATES[template].items():
+        for filename, content in load_template(template):
             if filename == "LICENSE":
                 content = get_spdx_license_details(self.option("license")).license_text
                 content = wrap_license_text(content).replace("<year>", str(scope["year"]))

@@ -1,0 +1,17 @@
+[[entries]]
+id = "ffb21822-a989-49f8-9e7d-ea8af5c2de2a"
+type = "fix"
+description = "Fix `slap changelog diff pr update --use github-actions` command used by the `NklasRosenstein/slap@gha/changelog/update/v2` action to support forks."
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "84d57dba-1ae8-41a8-86f1-122ef992098e"
+type = "improvement"
+description = "Store templates that can be created with `slap init` in files instead of in code, improve Python template to include `pycln` and a dummy for running `slap run docs:build`, updated Github actions workflow templates to use `pull_request_target` for changelog validation"
+author = "@NiklasRosenstein"
+
+[[entries]]
+id = "724c14e9-d83a-43de-95ec-03a02153c907"
+type = "improvement"
+description = "add `skip-checks: true` to commits pushed by `slap changelog diff pr update`"
+author = "@NiklasRosenstein"
