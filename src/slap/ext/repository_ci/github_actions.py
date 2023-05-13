@@ -146,6 +146,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
 
     * `GITHUB_API_URL`
     * `GITHUB_REPOSITORY`
+    * `GITHUB_EVENT_NAME`
     * `GITHUB_REF` (the github PR number formatted as `refs/pull/{id}/head`)
     * `GITHUB_PR_ID` -- When running in a `pull_request_target` event, the pull request ID is not available in
         `GITHUB_REF` and must be passed manually to this environment variable from
@@ -198,17 +199,11 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
     def initialize(self) -> None:
         self._repo = Repo(Path.cwd())
         self._github_api_url = os.environ["GITHUB_API_URL"]
-        self._github_token = os.environ["GITHUB_TOKEN"]
+        self._github_token = os.environ.get("GITHUB_TOKEN", "")
         self._client = SimpleGithubClient(self._github_api_url, self._github_token)
         self._repository = os.environ["GITHUB_REPOSITORY"]
         self._ref = os.environ["GITHUB_REF"]
-
-        self._pull_request_id = parse_pull_request_id(self._ref)
-        if not self._pull_request_id and "GITHUB_PR_ID" in os.environ:
-            self._pull_request_id = os.environ["GITHUB_PR_ID"]
-        logger.debug("Pull request ID: %s", self._pull_request_id, self._ref)
-
-        assert self._github_token, "GITHUB_TOKEN environment variable is empty"
+        self._event_name = os.environ["GITHUB_EVENT_NAME"]
 
         # This information is only available when we're in a pull request workflow..
         self._base_ref: tuple[str, str] | None = None
@@ -216,10 +211,36 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._head_ref: tuple[str, str] | None = None
         self._head_branch: str | None = None
         self._pull_request: SimpleGithubClient.PullRequest | None = None
+        self._pull_request_id: str | None = None
+        self._supports_forked_prs: bool = False
+
+        if self._event_name == "pull_request":
+            # The GITHUB_TOKEN won't have the permission to push back to a fork.
+            self._pull_request_id = parse_pull_request_id(self._ref)
+            self._supports_forked_prs = False
+        elif self._event_name == "pull_request_target":
+            # The GITHUB_TOKEN does have permission to fork back to a fork, but the pull request ID is not available
+            # in GITHUB_REF.
+            if "GITHUB_PR_ID" not in os.environ:
+                raise RuntimeError(
+                    "GITHUB_PR_ID environment variable must be set manually when running in a `pull_request_target` "
+                    "event. You can obtain the pull request ID from `${{ github.event.pull_request.number }}`."
+                )
+            self._pull_request_id = os.environ["GITHUB_PR_ID"]
+            self._supports_forked_prs = True
+        logger.debug("Pull request ID: %s", self._pull_request_id)
 
         if self._pull_request_id is not None:
-            self._pull_request = self._client.get_pull_request(self._repository, self._pull_request_id)
 
+            # We need a GitHub token when running in a pull request. This is so that we can query the GitHub API
+            # for the pull request information. Technically, we wouldn't need it for public repositories, but that's
+            # a special case we don't handle at the moment.
+            if not self._github_token:
+                raise RuntimeError(
+                    "GITHUB_TOKEN environment variable must be set when running in a pull request workflow."
+                )
+
+            self._pull_request = self._client.get_pull_request(self._repository, self._pull_request_id)
             self._base_ref = ("origin", os.environ["GITHUB_BASE_REF"])
             self._base_branch = self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-base"
 
@@ -294,16 +315,16 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         def _diff() -> str:
             return sp.check_output(["git", "diff"]).decode("utf-8")
 
-        # if self._pull_request.head_repository != self._repository:
-        #     message = (
-        #         "This pull request is from a forked repository (`%s`). The `GITHUB_TOKEN` available in CI does not "
-        #         "have the permissions to push back to the branch from the forked repository. Please manually apply "
-        #         "and push the following changes:\n\n```diff\n%s\n```\n"
-        #     )
-        #     message_args = (self._pull_request.head_repository, _diff())
-        #     logger.error(message, *message_args)
-        #     self.create_or_update_comment(message % message_args)
-        #     raise PullRequestFromForkedRepositoryNotSupported(self._pull_request.head_repository)
+        if not self._supports_forked_prs and self._pull_request.head_repository != self._repository:
+            message = (
+                "This pull request is from a forked repository (`%s`). The `GITHUB_TOKEN` available in CI does not "
+                "have the permissions to push back to the branch from the forked repository. Please manually apply "
+                "and push the following changes:\n\n```diff\n%s\n```\n"
+            )
+            message_args = (self._pull_request.head_repository, _diff())
+            logger.error(message, *message_args)
+            self.create_or_update_comment(message % message_args)
+            raise PullRequestFromForkedRepositoryNotSupported(self._pull_request.head_repository)
 
         # NOTE(@NiklasRosenstein): A lot of what follows is based on the assumption that the head repository
         #       may be a fork and that we can push to it; so once that actually becomes true, we should be able

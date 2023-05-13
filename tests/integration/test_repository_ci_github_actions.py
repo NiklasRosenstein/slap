@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from git.repo import Repo
 from git.util import Actor
-from pytest import fixture, raises
+from pytest import fixture, mark, raises
 
 from slap.ext.repository_ci.github_actions import (
     GithubActionsRepositoryCIPlugin,
@@ -159,7 +159,10 @@ def test__SimpleGithubClient__get_pull_request(mock_api: MockGitHubApiServer) ->
     )
 
 
-def test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes(mock_api: MockGitHubApiServer, tempdir: Path) -> None:
+@mark.parametrize("event_name", ["pull_request", "pull_request_target"])
+def test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes(
+    mock_api: MockGitHubApiServer, tempdir: Path, event_name: str
+) -> None:
     """
     This integration test checks that the GitHub Actions plugin works correctly when running in GitHub actions
     to deal with a pull request from a forked repository.
@@ -207,11 +210,16 @@ def test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes(mock_api: Mock
     environ = {
         "GITHUB_API_URL": mock_api.addr,
         "GITHUB_REPOSITORY": "main-repo",
-        "GITHUB_REF": "refs/pull/123/merge",
         "GITHUB_HEAD_REF": forked_git_active_branch,
         "GITHUB_BASE_REF": main_git.active_branch.name,
         "GITHUB_TOKEN": "foo",
+        "GITHUB_EVENT_NAME": event_name,
     }
+    if event_name == "pull_request_target":
+        environ["GITHUB_PR_ID"] = "123"
+        environ["GITHUB_REF"] = main_git.active_branch.name
+    else:
+        environ["GITHUB_REF"] = f"refs/pull/123/merge"
 
     with patch.dict("os.environ", environ):
         os.chdir(main_repo)
@@ -229,10 +237,13 @@ def test__GithubActionsRepositoryCIPlugin__forked_pr_push_changes(mock_api: Mock
         main_readme.write_text(expect_readme_content)
 
         # We know that we can't actually support pull requests from forked repositories, so we expect an exception.
-        with raises(PullRequestFromForkedRepositoryNotSupported):
+        if event_name == "pull_request_target":
             plugin.publish_changes([main_readme], "Update README.md")
+        else:
+            with raises(PullRequestFromForkedRepositoryNotSupported):
+                plugin.publish_changes([main_readme], "Update README.md")
 
-    # If we could actually push to a fork, we'd expect the forked repository to have been updated.
-    # # Expect that the forked_repo has been updated.
-    # forked_git.git.checkout(forked_git_active_branch)
-    # assert forked_readme.read_text() == expect_readme_content
+    if event_name == "pull_request_target":
+        # Expect that the forked_repo has been updated.
+        forked_git.git.checkout(forked_git_active_branch)
+        assert forked_readme.read_text() == expect_readme_content
