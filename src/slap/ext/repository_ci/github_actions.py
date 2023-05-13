@@ -101,17 +101,27 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         self._ref = os.environ["GITHUB_REF"]
         self._github_token = os.environ["GITHUB_TOKEN"]
         self._pull_request_id = parse_pull_request_id(self._ref)
-        self._base_ref: tuple[str, str] | None = None
-        self._head_ref: tuple[str, str] | None = None
-        self._pull_request: GhPullRequest | None = None
         logger.debug("Pull request ID: %s", self._pull_request_id)
+
+        # This information is only available when we're in a pull request workflow..
+        self._base_ref: tuple[str, str] | None = None
+        self._base_branch: str | None = None
+        self._head_ref: tuple[str, str] | None = None
+        self._head_branch: str | None = None
+        self._pull_request: GhPullRequest | None = None
 
         if self._pull_request_id is not None:
             self._pull_request = get_github_pull_request(
-                self._github_api_url, self._repository, self._pull_request_id, self._github_token
+                self._github_api_url,
+                self._repository,
+                self._pull_request_id,
+                self._github_token,
             )
             self._base_ref = ("origin", os.environ["GITHUB_BASE_REF"])
+            self._base_branch = self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-base"
             self._head_ref = ("origin", f"pull/{self._pull_request_id}/head")
+            self._head_branch = self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-head"
+
             # self._head_ref = (self.HEAD_REMOTE_NAME, os.environ["GITHUB_HEAD_REF"])
 
             logger.info(
@@ -145,17 +155,12 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             #     )
             #     head_remote.set_url(self._pull_request.head_html_url)
 
-            # logger.info("Fetching head ref '%s/%s'", *self._head_ref)
-            # head_remote.fetch(self._head_ref[1])
+            logger.info("Fetching head ref '%s/%s'", *self._head_ref)
+            head_remote = self._repo.remote(self._head_ref[0])
+            head_remote.fetch(self._head_ref[1])
 
-            checkout_head = self._head_ref
-            self._head_ref = (
-                self._head_ref[0],
-                self.HEAD_BRANCH_PREFIX + self._pull_request_id + "-" + self._head_ref[1],
-            )
-
-            logger.info("Checking out '%s/%s' as '%s'.", *checkout_head, self._head_ref[1])
-            self._repo.git.checkout("/".join(checkout_head), "-b", self._head_ref[1])
+            logger.info("Checking out '%s/%s' as '%s'.", *self._head_ref, self._head_branch)
+            self._repo.git.checkout("/".join(self._head_ref[:2]), "-b", self._head_branch)
 
             assert self._repo.active_branch.name == self._head_ref[1]
         else:
