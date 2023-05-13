@@ -215,6 +215,7 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
             )
             askpass = Path(tmpdir) / "askpass.sh"
             askpass.write_text(askpass_script)
+            askpass.chmod(0o700)
             environ = {
                 "GIT_ASKPASS": str(askpass),
             }
