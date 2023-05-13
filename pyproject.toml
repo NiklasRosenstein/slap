@@ -60,7 +60,7 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 mkdocs = "*"
 mkdocs-material = "*"
-novella = "0.2.3"
+novella = "0.2.5"
 pydoc-markdown = "4.6.0"
 
 [tool.poetry.scripts]
@@ -118,17 +118,18 @@ github = "slap.ext.repository_hosts.github:GithubRepositoryHost"
 typed = true
 
 [tool.slap.test]
-mypy = "dmypy run src -- --namespace-packages --exclude src/slap/templates"
+mypy   = "dmypy run src -- --namespace-packages --exclude src/slap/templates"
 pytest = "pytest tests/ -vv"
-check = "slap check"
-isort = "isort src/ tests/ --check-only"
-black = "black src/ tests/ --check"
+check  = "slap check"
+isort  = "isort src/ tests/ --check-only"
+black  = "black src/ tests/ --check"
 flake8 = "flake8 src/ tests/"
 
 [tool.slap.run]
-"docs:build" = "cd docs && novella --base-url slap-cli/"
-"docs:dev" = "cd docs && novella --serve"
-fmt = "isort src/ tests/ && black src/ tests"
+"docs:install" = "slap venv -c docs -p python3.10 && slap install --use-venv docs --only-extras docs"
+"docs:build"   = "slap run --use-venv docs -- bash -c 'export PATH=\"$(slap venv -p)/bin:${PATH}\" && cd docs && novella --base-url slap/'"
+"docs:dev"     = "slap run --use-venv docs -- bash -c 'export PATH=\"$(slap venv -p)/bin:${PATH}\" && cd docs && novella --base-url slap/ --serve'"
+fmt            = "isort src/ tests/ && black src/ tests"
 
 [tool.mypy]
 pretty = true
