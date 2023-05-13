@@ -9,6 +9,10 @@ inputs:
     description: A Git ref to install Slap from. If this is specified, the version input is ignored.
     required: false
     default: ''
+  pr-id:
+    description: When running in a `pull_request_target` event, the Pull Request ID cannot be derived from and
+      environment variable. It must be passed here.
+    required: false
   github_token:
     description: Pass along the Github token.
     required: true
@@ -28,4 +32,4 @@ runs:
     - name: Update changelogs
       shell: bash
       run: slap changelog diff pr update --use github-actions -vv
-      env: { GITHUB_TOKEN: '${{ inputs.github_token }}' }
+      env: { GITHUB_TOKEN: '${{ inputs.github_token }}', GITHUB_PR_ID: '${{ inputs.pr-id }}' }
