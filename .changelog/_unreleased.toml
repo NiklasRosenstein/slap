@@ -1,0 +1,5 @@
+[[entries]]
+id = "5b9f7374-2d99-4a46-b359-e876e34e6beb"
+type = "breaking change"
+description = "Slap now tries to find the repository root even if the current working directory is in a sub-directory of a project in that mono repository. By default, projects in a mono repository will all share the same Virtual environment. This can be disabled by setting the `[tool.slap].shared_venv` setting in `pyproject.toml` to `false`."
+author = "@NiklasRosenstein"

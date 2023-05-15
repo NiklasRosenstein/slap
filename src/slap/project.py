@@ -58,6 +58,12 @@ class ProjectConfig:
     #: Whether the project source code is intended to be typed.
     typed: bool | None = None
 
+    #: Whether the virtual environment for this project should be shared with other projects in the same repository.
+    #: This means that the `.venvs` folder is not checked in the project's folder, but in the repository's folder.
+    #: This is useful for monorepos and by default will be inherit from the #Repository.use_shared_venv option. For
+    #: non-mono-repos, this doesn't have any effect.
+    shared_venv: bool | None = None
+
 
 class Project(Configuration):
     """Represents one Python project. Slap can work with multiple projects at the same time, for example if the same
@@ -208,3 +214,15 @@ class Project(Configuration):
     @property
     def is_python_project(self) -> bool:
         return self.pyproject_toml.exists()
+
+    @property
+    def shared_venv(self) -> bool:
+        """
+        If True, the project will share the venv with the other projects from the mono repository. This takes
+        precedence over #Repository.use_shared_venv.
+        """
+
+        shared_venv = self.config().shared_venv
+        if shared_venv is None:
+            shared_venv = self.repository.use_shared_venv
+        return shared_venv

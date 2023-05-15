@@ -10,6 +10,7 @@ from nr.python.environment.virtualenv import VirtualEnvInfo, get_current_venv
 
 from slap.application import Application, Command, argument, option
 from slap.plugins import ApplicationPlugin
+from slap.project import Project
 from slap.python.environment import PythonEnvironment
 
 logger = logging.getLogger(__name__)
@@ -100,6 +101,25 @@ class VenvManager:
         self._set_state(state)
 
 
+def get_venv_manager(project: Project) -> VenvManager:
+    """
+    Returns the virtual environment manager for the given project.
+    """
+
+    if not project.shared_venv:
+        return VenvManager(project.directory / ".venvs")
+    return VenvManager(project.repository.directory / ".venvs")
+
+
+def get_venv_manager_global_or_local(use_global: bool, project: Project | None) -> VenvManager:
+    if use_global:
+        return VenvManager(GLOBAL_VENVS_DIRECTORY)
+    else:
+        if not project:
+            raise RuntimeError("not inside a project")
+        return get_venv_manager(project)
+
+
 class VenvAwareCommand(Command):
     """Base class for commands that should be aware of the active local virtual environment. Before the
     command is executed, it will check if we're currently in a virtual environment. If not, it will activate
@@ -125,7 +145,15 @@ class VenvAwareCommand(Command):
         ),
     ]
 
+    def __init__(self, app: Application) -> None:
+        super().__init__()
+        self.app = app
+
     def handle(self) -> int:
+        project = self.app.main_project()
+        if not project:
+            raise RuntimeError("can only be run from inside a project")
+
         if self.option("no-venv-check"):
             return 0
         venv = get_current_venv(os.environ)
@@ -139,7 +167,7 @@ class VenvAwareCommand(Command):
                 f'(<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
             )
         else:
-            manager = VenvManager()
+            manager = get_venv_manager(project)
             if self.option("use-venv"):
                 venv = manager.get(self.option("use-venv"))
                 if not venv.exists():
@@ -256,6 +284,10 @@ class VenvCommand(Command):
         ),
     ]
 
+    def __init__(self, app: Application) -> None:
+        super().__init__()
+        self.app = app
+
     def _validate_args(self) -> bool:
         for opt in ("activate", "create", "delete", "set", "exists"):
             if self.option("init-code") and self.option(opt):
@@ -347,7 +379,7 @@ class VenvCommand(Command):
         if shell:
             return self._get_init_code(shell)
 
-        manager = VenvManager(GLOBAL_VENVS_DIRECTORY if self.option("global") else Path(".venvs"))
+        manager = get_venv_manager_global_or_local(self.option("global"), self.app.main_project())
 
         if self.option("list"):
             self._list_environments(manager)
@@ -453,9 +485,13 @@ class VenvLinkCommand(Command):
         ),
     ]
 
+    def __init__(self, app: Application) -> None:
+        super().__init__()
+        self.app = app
+
     def handle(self) -> int:
         location = "global" if self.option("global") else "local"
-        manager = VenvManager(GLOBAL_VENVS_DIRECTORY if self.option("global") else Path(".venvs"))
+        manager = get_venv_manager_global_or_local(self.option("global"), self.app.main_project())
         venv = manager.get(self.argument("name"))
         if not venv.exists():
             self.line_error(f'error: {location} environment <s>"{venv.name}"</s> does not exist', "error")
@@ -488,5 +524,5 @@ class VenvPlugin(ApplicationPlugin):
         return None
 
     def activate(self, app: Application, config: None) -> None:
-        app.cleo.add(VenvCommand())
-        app.cleo.add(VenvLinkCommand())
+        app.cleo.add(VenvCommand(app))
+        app.cleo.add(VenvLinkCommand(app))

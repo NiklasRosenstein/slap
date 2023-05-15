@@ -29,10 +29,6 @@ class ReportDependenciesCommand(VenvAwareCommand):
         option("with-license-text", description="Include license text in the output."),
     ]
 
-    def __init__(self, app: Application) -> None:
-        super().__init__()
-        self.app = app
-
     def handle(self) -> int:
         import databind.json
         import tqdm  # type: ignore[import]

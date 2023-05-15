@@ -18,6 +18,10 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
     app: Application
     name = "info"
 
+    def __init__(self, app: Application) -> None:
+        Command.__init__(self)
+        ApplicationPlugin.__init__(self, app)
+
     def load_configuration(self, app: Application) -> None:
         return None
 

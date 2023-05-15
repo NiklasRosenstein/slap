@@ -134,6 +134,10 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
     # TODO (@NiklasRosenstein): Support "git" rule for bumping versions
 
+    def __init__(self, app: Application) -> None:
+        Command.__init__(self)
+        ApplicationPlugin.__init__(self, app)
+
     def load_configuration(self, app: Application) -> dict[Configuration, ReleaseConfig]:
         import databind.json
 

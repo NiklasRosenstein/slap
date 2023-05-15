@@ -46,6 +46,10 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
         ),
     ]
 
+    def __init__(self, app: Application) -> None:
+        Command.__init__(self)
+        ApplicationPlugin.__init__(self, app)
+
     def load_configuration(self, app: "Application") -> dict[Project, CheckConfig]:
         import databind.json
 

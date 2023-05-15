@@ -25,6 +25,9 @@ class ApplicationPlugin(t.Generic[T], abc.ABC):
 
     ENTRYPOINT = "slap.plugins.application"
 
+    def __init__(self, app: Application) -> None:
+        pass
+
     @abc.abstractmethod
     def load_configuration(self, app: Application) -> T:
         """Load the configuration of the plugin. Usually, plugins will want to read the configuration from the Slap

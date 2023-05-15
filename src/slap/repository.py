@@ -92,6 +92,14 @@ class Repository(Configuration):
             return True
         return False
 
+    @property
+    def use_shared_venv(self) -> bool:
+        """
+        If True, the virtual environment between projects in the repository should be shared.
+        """
+
+        return True
+
     def _get_repository_handler(self) -> RepositoryHandlerPlugin | None:
         """Returns the handler for this repository."""
 

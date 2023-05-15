@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import subprocess as sp
 import textwrap
 import typing as t
 from pathlib import Path
@@ -185,10 +186,8 @@ class Application:
         """Return the Slap repository that is the subject of the current application. There may be command plugins
         that do not require the repository to function, so this property creates the repository lazily."""
 
-        from slap.repository import Repository
-
         if self._repository is None:
-            self._repository = Repository(self._directory)
+            self._repository = find_repository(self._directory)
 
         return self._repository
 
@@ -247,7 +246,7 @@ class Application:
             if plugin_name in disable:
                 continue
             try:
-                plugin = loader()()
+                plugin = loader()(self)
             except Exception:
                 logger.exception("Could not load plugin <subj>%s</subj> due to an exception", plugin_name)
             else:
@@ -261,3 +260,39 @@ class Application:
         """Loads and activates application plugins and then invokes the CLI."""
 
         self.cleo.run()
+
+
+def find_repository(directory: Path) -> Repository:
+    """
+    Finds the repository for the given directory. This will search for the closest parent directory that contains a
+    `slap.toml` configuration file. If no such file exists, but we're in a Git directory, and the given *directory*
+    is not the Git root directory, then a warning is printed and the *directory* is assumed to be the Slap repository
+    root.
+    """
+
+    from slap.repository import Repository
+
+    directory = directory.resolve()
+
+    try:
+        git_root = Path(sp.check_output(["git", "rev-parse", "--show-toplevel"]).decode().strip())
+    except sp.CalledProcessError:
+        git_root = None
+
+    if git_root is not None and git_root != directory:
+        directory.relative_to(git_root)  # Raises ValueError if not a sub directory
+
+        curdir = directory
+        while True:
+            if (curdir / "slap.toml").is_file():
+                return Repository(curdir)
+            if curdir == git_root:
+                break
+            curdir = curdir.parent
+
+        logger.warning(
+            "Could not find a <subj>slap.toml</subj> configuration file in the current directory or any of its "
+            "parents. Assuming that the current directory is the Slap repository root."
+        )
+
+    return Repository(directory)

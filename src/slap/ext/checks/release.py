@@ -48,7 +48,7 @@ class ReleaseChecksPlugin(CheckPlugin):
         """Checks if the version numbers in the project source code, project configuration and any other instances
         that are detected by release plugins or in the `[tool.slap.release].references` option are consistent."""
 
-        releaser = ReleaseCommandPlugin()
+        releaser = ReleaseCommandPlugin(app)
         releaser.load_configuration(app)
 
         version_refs = releaser._get_version_refs()
