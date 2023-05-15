@@ -288,7 +288,7 @@ def find_repository(directory: Path) -> Repository:
     directory = directory.resolve()
 
     try:
-        git_root = Path(sp.check_output(["git", "rev-parse", "--show-toplevel"]).decode().strip())
+        git_root = Path(sp.check_output(["git", "rev-parse", "--show-toplevel"], cwd=directory).decode().strip())
     except sp.CalledProcessError:
         git_root = None
 

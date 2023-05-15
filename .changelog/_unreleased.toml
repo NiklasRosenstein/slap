@@ -1,0 +1,5 @@
+[[entries]]
+id = "8b6cf74b-a68a-49e8-b03f-00bc80768880"
+type = "fix"
+description = "Fix using `slap install --from <path>` by passing the right CWD in `find_repository()`"
+author = "@NiklasRosenstein"
