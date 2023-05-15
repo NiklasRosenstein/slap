@@ -9,3 +9,9 @@ id = "b66b2aa6-2abe-4dbe-a189-4a70e8fa2352"
 type = "improvement"
 description = "`slap install` from a project inside a mono repository will only install that specific project and, if any, its dependencies among the projects in the same monorepository."
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "13afd41a-e4db-40b5-bc6a-1fa25fc3425b"
+type = "improvement"
+description = "Ensure that `slap check`, `slap publish`, `slap report`, `slap run` and `slap test` only run in the context of the main project when in a subdirectory mapping to a Project instead of the entire repository."
+author = "@NiklasRosenstein"

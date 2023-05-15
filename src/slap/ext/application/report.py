@@ -43,7 +43,7 @@ class ReportDependenciesCommand(VenvAwareCommand):
         extras = set(filter(bool, map(str.strip, (self.option("extras") or "").split(","))))
 
         requirements: list[Dependency] = []
-        for project in self.app.repository.projects():
+        for project in self.app.get_target_projects():
             requirements += project.dependencies().run
             if "dev" in extras:
                 requirements += project.dependencies().dev

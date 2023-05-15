@@ -261,6 +261,19 @@ class Application:
 
         self.cleo.run()
 
+    def get_target_projects(self) -> list[Project]:
+        """
+        Returns the list of projects that should be dealt with when executing a command. When there is a main project,
+        only the main project will be returned. When in the repository root, all projects will be returned.
+        """
+
+        main = self.main_project()
+        if main:
+            return [main]
+        if self._directory == self.repository.directory:
+            return self.repository.projects()
+        return []
+
 
 def find_repository(directory: Path) -> Repository:
     """

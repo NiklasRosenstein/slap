@@ -87,7 +87,7 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
             else:
                 isolated_env = None
 
-            for project in self.app.repository.projects():
+            for project in self.app.get_target_projects():
                 if isolated_env:
                     isolated_env.install(
                         list(flatten(PipInstaller.dependency_to_pip_arguments(x) for x in project.dependencies().build))

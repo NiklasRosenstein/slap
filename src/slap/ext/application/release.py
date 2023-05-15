@@ -105,6 +105,9 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
       commit and tag to the remote Git repository immediately. You can specify the
       <opt>--remote, -r</opt> option to change the remote which will be pushed to (defaults
       to "origin").
+
+    Note that this command always operates across the entire repository, even when run from inside
+    the directory of a project of a mono-repository.
     """  # noqa: E501
 
     app: Application
@@ -438,7 +441,10 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
         for ref in version_refs:
             if ref.file == ref.file.absolute():
-                ref.file = ref.file.relative_to(Path.cwd())
+                try:
+                    ref.file = ref.file.relative_to(Path.cwd())
+                except ValueError:
+                    pass
 
         return version_refs
 

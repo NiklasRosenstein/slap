@@ -54,7 +54,7 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
         import databind.json
 
         result = {}
-        for project in app.repository.projects():
+        for project in app.get_target_projects():
             config = databind.json.load(project.raw_config().get("check", {}), CheckConfig)
             result[project] = config
         return result
@@ -70,7 +70,7 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
         if self.app.repository.is_monorepo:
             for check in self._run_application_checks():
                 counter[check.result] += 1
-        for project in self.app.repository.projects():
+        for project in self.app.get_target_projects():
             if not project.is_python_project:
                 continue
             for check in self._run_project_checks(project):
@@ -151,7 +151,7 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
             self.line("")
 
     def _run_application_checks(self) -> t.Iterable[Check]:
-        plugin_names = {p for project in self.app.repository.projects() for p in self.config[project].plugins}
+        plugin_names = {p for project in self.app.get_target_projects() for p in self.config[project].plugins}
         checks = []
         for plugin_name in sorted(plugin_names):
             plugin = load_entrypoint(CheckPlugin, plugin_name)()

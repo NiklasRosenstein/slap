@@ -55,21 +55,21 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         working_dirs = {}
 
         command: list[str] = self.argument("args")
-        if command[0] in self.config:
+        if main_project and command[0] in self.config:
             command_string = self.config[command[0]] + " " + _join_args(command[1:])
             commands_to_execute[main_project.id if main_project else "/"] = command_string
             working_dirs[main_project.id if main_project else "/"] = Path.cwd()
-        else:
-            for project in self.app.repository.projects():
+        elif not main_project:
+            for project in self.app.get_target_projects():
                 config = project.raw_config().get("run", {})
                 if command[0] in config:
                     command_string = config[command[0]] + " " + _join_args(command[1:])
                     commands_to_execute[project.id] = command_string
                     working_dirs[project.id] = project.directory
 
-            if not commands_to_execute:
-                commands_to_execute["$"] = _join_args(command)
-                working_dirs["$"] = Path.cwd()
+        if not commands_to_execute:
+            commands_to_execute["$"] = _join_args(command)
+            working_dirs["$"] = Path.cwd()
 
         if len(commands_to_execute) > 1:
             level = logging.WARNING

@@ -149,7 +149,7 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     def load_configuration(self, app: Application) -> None:
         self.app = app
         self.tests = []
-        for project in app.repository.projects():
+        for project in app.get_target_projects():
             for test_name, command in project.raw_config().get("test", {}).items():
                 self.tests.append(Test(project, test_name, command))
 
