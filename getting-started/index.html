@@ -997,7 +997,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.9.0
+  version: 1.9.1
   dist-name: slap-cli
   packages: slap (src)
   readme: README.md
@@ -1045,7 +1045,7 @@ Project &quot;.&quot; (id: slap-cli)
 <h2 id="6-sanity-check-your-project-configuration">6. Sanity check your project configuration</h2>
 <p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration. The
 below example is the check output for Slap's own project.</p>
-<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 135 changelogs are valid.
+<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 136 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1092,7 +1092,7 @@ test commands like the below example to your project configuration.</p>
     black| 
     black| Oh no! 💥 💔 💥
     black| 13 files would be reformatted, 40 files would be left unchanged.
-    check|   changelog:validate           OK             — All 135 changelogs are valid.
+    check|   changelog:validate           OK             — All 136 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1187,14 +1187,14 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.9.1
-  pyproject.toml:       1.9.0 → 1.9.1 # &#39;version = &quot;1.9.0&quot;&#39;
-  src/slap/__init__.py: 1.9.0 → 1.9.1 # &#39;__version__ = &quot;1.9.0&quot;&#39;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.9.2
+  pyproject.toml:       1.9.1 → 1.9.2 # &#39;version = &quot;1.9.1&quot;&#39;
+  src/slap/__init__.py: 1.9.1 → 1.9.2 # &#39;__version__ = &quot;1.9.1&quot;&#39;
 
 
-tagging 1.9.1
+tagging 1.9.2
 
-pushing develop, 1.9.1 to origin
+pushing develop, 1.9.2 to origin
 </code></pre></div>
 
 </details>
@@ -1203,8 +1203,8 @@ pushing develop, 1.9.1 to origin
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.9.0 # &#39;version = &quot;1.9.0&quot;&#39;
-  src/slap/__init__.py: 1.9.0 # &#39;__version__ = &quot;1.9.0&quot;&#39;
+  pyproject.toml:       1.9.1 # &#39;version = &quot;1.9.1&quot;&#39;
+  src/slap/__init__.py: 1.9.1 # &#39;__version__ = &quot;1.9.1&quot;&#39;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
