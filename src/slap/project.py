@@ -204,12 +204,8 @@ class Project(Configuration):
         self.dependencies.get(True)
 
     @property
-    def id(self) -> str:
+    def id(self) -> str:  # type: ignore[override]
         return self.dist_name() or self.directory.resolve().name
-
-    @id.setter
-    def id(self, value: str) -> None:
-        self._id = value
 
     @property
     def is_python_project(self) -> bool:

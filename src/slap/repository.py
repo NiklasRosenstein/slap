@@ -87,6 +87,10 @@ class Repository(Configuration):
         self.host = Once(self._get_repository_host)
 
     @property
+    def id(self) -> str:  # type: ignore[override]
+        return "/"
+
+    @property
     def is_monorepo(self) -> bool:
         if len(self.projects()) > 1 or (len(self.projects()) == 1 and self.projects()[0].directory != self.directory):
             return True

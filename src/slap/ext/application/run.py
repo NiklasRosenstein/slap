@@ -60,7 +60,7 @@ class RunCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             commands_to_execute[main_project.id if main_project else "/"] = command_string
             working_dirs[main_project.id if main_project else "/"] = Path.cwd()
         elif not main_project:
-            for project in self.app.get_target_projects():
+            for project in self.app.configurations(targets_only=True):
                 config = project.raw_config().get("run", {})
                 if command[0] in config:
                     command_string = config[command[0]] + " " + _join_args(command[1:])

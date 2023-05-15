@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 class Configuration:
     """Represents the configuration stored in a directory, which is either read from `slap.toml` or `pyproject.toml`."""
 
+    id: str
+
     #: The directory of the project. This is the directory where the `slap.toml` or `pyproject.toml` configuration
     #: would usually reside in, but the existence of neither is absolutely required.
     directory: Path

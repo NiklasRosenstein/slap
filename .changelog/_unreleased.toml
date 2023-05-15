@@ -1,0 +1,5 @@
+[[entries]]
+id = "c0987d3e-cce7-4b55-a194-3f9c75ad7727"
+type = "fix"
+description = "Fix running command defined in Repository root with `slap run` broken by the previous version."
+author = "@NiklasRosenstein"

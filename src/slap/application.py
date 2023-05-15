@@ -212,11 +212,11 @@ class Application:
 
         return None
 
-    def configurations(self) -> list[Configuration]:
+    def configurations(self, targets_only: bool = False) -> list[Configuration]:
         """Return a list of all configuration objects, i.e. all projects and eventually the #Repository, unless one
         project is from the same directory as the repository."""
 
-        result: list[Configuration] = list(self.repository.projects())
+        result: list[Configuration] = list(self.get_target_projects() if targets_only else self.repository.projects())
         if self.repository.directory not in tuple(p.directory for p in self.repository.projects()):
             result.insert(0, self.repository)
         return result
