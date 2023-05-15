@@ -714,6 +714,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#181-2023-05-13" class="md-nav__link">
     1.8.1 (2023-05-13)
   </a>
@@ -1693,6 +1700,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#181-2023-05-13" class="md-nav__link">
     1.8.1 (2023-05-13)
   </a>
@@ -2649,6 +2663,19 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="unreleased">Unreleased</h2>
+<table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
+  <tr><td>Breaking change</td><td>
+
+Slap now tries to find the repository root even if the current working directory is in a sub-directory of a project in that mono repository. By default, projects in a mono repository will all share the same Virtual environment. This can be disabled by setting the `[tool.slap].shared_venv` setting in `pyproject.toml` to `false`.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+`slap install` from a project inside a mono repository will only install that specific project and, if any, its dependencies among the projects in the same monorepository.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+  <tr><td>Improvement</td><td>
+
+Ensure that `slap check`, `slap publish`, `slap report`, `slap run` and `slap test` only run in the context of the main project when in a subdirectory mapping to a Project instead of the entire repository.</td><td></td><td></td><td>@NiklasRosenstein</td></tr>
+</table>
+
 <h2 id="181-2023-05-13">1.8.1 (2023-05-13)</h2>
 <table><tr><th>Type</th><th>Description</th><th>PR</th><th>Issues</th><th>Author</th></tr>
   <tr><td>Improvement</td><td>
