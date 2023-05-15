@@ -7,7 +7,7 @@ from pathlib import Path
 from slap.application import IO, Application, option
 from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
-from slap.repository import Repository
+from slap.project import Project
 
 from .install import get_active_python_bin, python_option, venv_check
 
@@ -91,11 +91,16 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         if not venv_check(self, "refusing to link"):
             return 1
 
-        link_repository(self.io, self.app.repository, self.option("dump-pyproject"), get_active_python_bin(self))
+        link_repository(
+            self.io,
+            self.app.repository.get_projects_ordered(),
+            self.option("dump-pyproject"),
+            get_active_python_bin(self),
+        )
         return 0
 
 
-def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False, python: str | None = None) -> None:
+def link_repository(io: IO, projects: list[Project], dump_pyproject: bool = False, python: str | None = None) -> None:
 
     from flit.install import Installer  # type: ignore[import]
     from nr.util.fs import atomic_swap
@@ -112,7 +117,7 @@ def link_repository(io: IO, repository: Repository, dump_pyproject: bool = False
     # up installing as root but then just the linking step fails.
     os.environ["FLIT_ROOT_INSTALL"] = "1"
 
-    for project in repository.get_projects_ordered():
+    for project in projects:
         if not project.is_python_project:
             continue
 

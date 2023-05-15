@@ -201,6 +201,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             .map(lambda p: p.get_interdependencies(self.app.repository.projects(), recursive=True))
             .concat()
             .append(projects)
+            .distinct()
             .collect()
         )
 
@@ -285,7 +286,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             return status_code
 
         if self.option("link"):
-            self.link_project(Path(self.option("from") or "."))
+            self._link_projects(projects_plus_dependencies)
 
         return 0
 
@@ -312,6 +313,9 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
             return projects
 
         else:
+            main_project = self.app.main_project()
+            if main_project:
+                return [main_project]
             if not self.app.repository.projects:
                 self.line_error("error: no projects found")
                 return []
@@ -343,14 +347,17 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
                 logger.warning('passed an --index option for a source that does not exist (source: "%s")', spec.name)
             indexes.urls[spec.name] = spec.url_with_auth
 
+    def _link_projects(self, projects: list[Project]) -> None:
+        from slap.ext.application.link import link_repository
+
+        link_repository(self.io, projects, python=get_active_python_bin(self))
+
     # SymlinkHelper
 
     def get_dependencies_for_project(self, project: Path) -> list[Dependency]:
         # TODO (@NiklasRosenstein): Implement this method
         raise NotImplementedError
 
-    def link_project(self, project: Path) -> None:
-        from slap.ext.application.link import link_repository
-
-        app = Application(project)
-        link_repository(self.io, app.repository, python=get_active_python_bin(self))
+    def link_project(self, path: Path) -> None:
+        project = self.app.repository.get_project_by_directory(path)
+        self._link_projects([project])

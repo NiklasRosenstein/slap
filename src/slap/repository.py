@@ -157,3 +157,9 @@ class Repository(Configuration):
         from nr.util.optional import Optional
 
         return Optional(self._handler()).map(lambda h: h.get_repository_host(self)).or_else(None)
+
+    def get_project_by_directory(self, directory: Path) -> Project:
+        for project in self.projects():
+            if project.directory == directory:
+                return project
+        raise ValueError(f"no project found for directory {directory}")
