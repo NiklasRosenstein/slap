@@ -997,7 +997,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.8.1
+  version: 1.9.0
   dist-name: slap-cli
   packages: slap (src)
   readme: README.md
@@ -1187,16 +1187,14 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.8.2
-  pyproject.toml:       1.8.1 → 1.8.2 # &#39;version = &quot;1.8.1&quot;&#39;
-  src/slap/__init__.py: 1.8.1 → 1.8.2 # &#39;__version__ = &quot;1.8.1&quot;&#39;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.9.1
+  pyproject.toml:       1.9.0 → 1.9.1 # &#39;version = &quot;1.9.0&quot;&#39;
+  src/slap/__init__.py: 1.9.0 → 1.9.1 # &#39;__version__ = &quot;1.9.0&quot;&#39;
 
-releasing changelog
-  .changelog/_unreleased.toml → .changelog/1.8.2.toml
 
-tagging 1.8.2
+tagging 1.9.1
 
-pushing develop, 1.8.2 to origin
+pushing develop, 1.9.1 to origin
 </code></pre></div>
 
 </details>
@@ -1205,8 +1203,8 @@ pushing develop, 1.8.2 to origin
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.8.1 # &#39;version = &quot;1.8.1&quot;&#39;
-  src/slap/__init__.py: 1.8.1 # &#39;__version__ = &quot;1.8.1&quot;&#39;
+  pyproject.toml:       1.9.0 # &#39;version = &quot;1.9.0&quot;&#39;
+  src/slap/__init__.py: 1.9.0 # &#39;__version__ = &quot;1.9.0&quot;&#39;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
