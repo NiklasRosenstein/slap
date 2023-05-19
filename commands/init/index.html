@@ -15,7 +15,7 @@
         <link rel="next" href="../install/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.12">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.13">
     
     
       
@@ -831,30 +831,261 @@
 <h1 id="slap-init"><code>slap init</code></h1>
 <p>This command bootstrap Python project files.</p>
 <details><summary>Synopsis</summary>
-<div class="highlight"><pre><span></span><code>    $ slap init --help  # exited with return code 1
+<div class="highlight"><pre><span></span><code>Description:
+  Bootstrap some files for a Python project.
 
-    [90mCould not find a [34mslap.toml[0m configuration file in the current directory or any of its parents. Assuming that the current directory is the Slap repository root.[0m
+Usage:
+  init [options] [--] [&lt;directory&gt;]
 
-    &#39;InitCommandPlugin&#39; object has no attribute &#39;_definition&#39;
+Arguments:
+  directory                The directory in which to create the generated files. If not specified, a new directory with the name specified via the --name option is created.
+
+Options:
+      --name=NAME          The name of the Python package.
+      --license=LICENSE    The package license. [default: &quot;MIT&quot;]
+  -t, --template=TEMPLATE  The template to use. [default: &quot;poetry&quot;]
+  -f, --overwrite          Overwrite files.
+  -d, --dry                Dont actually write files.
+      --as-markdown        Render the content as Markdown (uses by the Slap docs)
+  -h, --help               Display help for the given command. When no command is given display help for the help command.
+  -q, --quiet              Do not output any message.
+  -V, --version            Display this application version.
+      --ansi               Force ANSI output.
+      --no-ansi            Disable ANSI output.
+  -n, --no-interaction     Do not ask any interactive question.
+  -v|vv|vvv, --verbose     Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
+
+Help:
+  Bootstrap some files for a Python project.
+
+  Currently available templates:
+
+  1. poetry
 </code></pre></div>
 </details>
 
 <h2 id="templates">Templates</h2>
 <h3 id="poetry">Poetry</h3>
 <div class="highlight"><span class="filename">$ slap init -t poetry --name my.pkg</span><pre><span></span><code>    $ slap init -t poetry --name my.pkg -f --dry  # exited with return code 1
+    write /home/runner/work/slap/slap/docs/LICENSE
+    write /home/runner/work/slap/slap/docs/README.md
+    write /home/runner/work/slap/slap/docs/.gitignore
+    write /home/runner/work/slap/slap/docs/pyproject.toml
+    write /home/runner/work/slap/slap/docs/.flake8
+    write /home/runner/work/slap/slap/docs/tests/test_import.py
     [90mCould not find a [34mslap.toml[0m configuration file in the current directory or any of its parents. Assuming that the current directory is the Slap repository root.[0m
 
-    &#39;InitCommandPlugin&#39; object has no attribute &#39;_definition&#39;
+    &#39;utf-8&#39; codec can&#39;t decode byte 0x90 in position 8: invalid start byte
 </code></pre></div>
 <div class="highlight"><pre><span></span><code>$ slap init -t poetry --name my.pkg --as-markdown -q  # exited with return code 1
+``` title=&quot;/home/runner/work/slap/slap/docs/LICENSE&quot;
+MIT License
+
+Copyright (c) 2023 Unknown
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+this software and associated documentation files (the &quot;Software&quot;), to deal in
+Software without restriction, including without limitation the rights to use,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the
+and to permit persons to whom the Software is furnished to do so, subject to
+following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+```
+
+
+```md title=&quot;/home/runner/work/slap/slap/docs/README.md&quot;
+# my.pkg
+
+```
+
+
+``` title=&quot;/home/runner/work/slap/slap/docs/.gitignore&quot;
+__pycache__/
+.dmypy.json
+.venv/
+*.egg-info/
+/.vscode
+/build
+/dist
+poetry.lock
+
+```
+
+
+```toml title=&quot;/home/runner/work/slap/slap/docs/pyproject.toml&quot;
+[build-system]
+requires = [&quot;poetry-core&quot;]
+build-backend = &quot;poetry.core.masonry.api&quot;
+
+[tool.poetry]
+name = &quot;my.pkg&quot;
+version = &quot;0.1.0&quot;
+description = &quot;&quot;
+authors = [&quot;Unknown &lt;me@unknown.org&gt;&quot;]
+license = &quot;MIT&quot;
+packages = [{ include = &quot;my/pkg&quot;, from = &quot;src&quot; }]
+classifiers = []
+keywords = []
+
+[tool.poetry.urls]
+# &quot;Bug Tracker&quot; = &quot;&quot;
+# Documentation = &quot;&quot;
+# Homepage = &quot;&quot;
+# Repository = &quot;&quot;
+
+[tool.poetry.dependencies]
+python = &quot;^3.8&quot;
+
+[tool.poetry.dev-dependencies]
+black = &quot;*&quot;
+flake8 = &quot;*&quot;
+isort = &quot;*&quot;
+mypy = &quot;*&quot;
+pycln = &quot;^2.1.3&quot;
+pytest = &quot;*&quot;
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+# ...
+
+[tool.slap]
+typed = true
+
+[tool.slap.test]
+check  = &quot;slap check&quot;
+black  = &quot;black --check src/ tests/&quot;
+flake8 = &quot;flake8 src/ tests/&quot;
+isort  = &quot;isort --check-only src/ tests/&quot;
+mypy   = &quot;dmypy run src/&quot;
+pycln  = &quot;pycln src/ tests/ --check&quot;
+pytest = &quot;pytest tests/ -vv&quot;
+
+[tool.slap.run]
+&quot;docs:build&quot; = &quot;&gt;&amp;2 echo &#39;Not implemented&#39; &amp;&amp; exit 1&quot;
+fmt          = &quot;pycln src/ tests/ &amp;&amp; black src/ tests/ &amp;&amp; isort src/ tests/&quot;
+
+[tool.mypy]
+python_version = &quot;3.8&quot;
+explicit_package_bases = true
+mypy_path = [&quot;src&quot;]
+namespace_packages = true
+pretty = true
+show_error_codes = true
+show_error_context = true
+strict = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
+
+[tool.isort]
+profile = &quot;black&quot;
+line_length = 120
+combine_as_imports = true
+
+[tool.black]
+line-length = 120
+
+```
+
+
+``` title=&quot;/home/runner/work/slap/slap/docs/.flake8&quot;
+[flake8]
+max-line-length = 120
+# Black can yield formatted code that triggers these Flake8 warnings.
+ignore=
+    # line break before binary operator
+    W503,
+    # line break after binary operator
+    W504,
+    # whitespace before &#39;:&#39;
+    E203,
+
+```
+
+
+```py title=&quot;/home/runner/work/slap/slap/docs/tests/test_import.py&quot;
+def test_import() -&gt; None:
+    exec(&quot;from my.pkg import *&quot;)
+
+```
 </code></pre></div>
 <h3 id="github">Github</h3>
-<div class="highlight"><span class="filename">$ slap init -t github</span><pre><span></span><code>    $ slap init -t github -f --dry  # exited with return code 1
-    [90mCould not find a [34mslap.toml[0m configuration file in the current directory or any of its parents. Assuming that the current directory is the Slap repository root.[0m
-
-    &#39;InitCommandPlugin&#39; object has no attribute &#39;_definition&#39;
+<div class="highlight"><span class="filename">$ slap init -t github</span><pre><span></span><code>write /home/runner/work/slap/slap/docs/.github/workflows/changelog.yaml
+write /home/runner/work/slap/slap/docs/.github/workflows/python.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>$ slap init -t github --as-markdown -q  # exited with return code 1
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/.github/workflows/changelog.yaml</span><pre><span></span><code><span class="c1"># This workflow will run on every pull request to the develop branch to do the following:</span>
+<span class="c1">#</span>
+<span class="c1"># - Insert the Pull Request URL into new changelog entries.</span>
+<span class="c1"># - Assert that a new changelog entry has been added in the PR unless a &quot;no changelog&quot; label is added to the PR.</span>
+
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Changelog&quot;</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pull_request_target</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&quot;develop&quot;</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">changelog-update</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Insert</span><span class="nv"> </span><span class="s">Pull</span><span class="nv"> </span><span class="s">Request</span><span class="nv"> </span><span class="s">URL</span><span class="nv"> </span><span class="s">into</span><span class="nv"> </span><span class="s">new</span><span class="nv"> </span><span class="s">changelog</span><span class="nv"> </span><span class="s">entries&quot;</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == &#39;pull_request_target&#39;</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NiklasRosenstein/slap@gha/changelog/update/v2</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> pr-id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;${{</span><span class="nv"> </span><span class="s">github.event.pull_request.number</span><span class="nv"> </span><span class="s">}}&#39;</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="w">  </span><span class="nt">assert-new-changelog-entries</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;At</span><span class="nv"> </span><span class="s">least</span><span class="nv"> </span><span class="s">one</span><span class="nv"> </span><span class="s">new</span><span class="nv"> </span><span class="s">changelog</span><span class="nv"> </span><span class="s">entry</span><span class="nv"> </span><span class="s">must</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">added&quot;</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.base_ref != &#39;&#39; &amp;&amp; !contains(github.event.pull_request.labels.*.name, &#39;no changelog&#39;)</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NiklasRosenstein/slap@gha/changelog/assert-added/v2</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> pr-id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;${{</span><span class="nv"> </span><span class="s">github.event.pull_request.number</span><span class="nv"> </span><span class="s">}}&#39;</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/.github/workflows/python.yaml</span><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Python&quot;</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&quot;develop&quot;</span><span class="w"> </span><span class="p p-Indicator">],</span><span class="nt"> tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&quot;*&quot;</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&quot;develop&quot;</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;3.8&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.9&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.10&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.11&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.x&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NiklasRosenstein/slap@gha/install/v1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v2</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> python-version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${{</span><span class="nv"> </span><span class="s">matrix.python-version</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap install --link --no-venv-check</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap test</span>
+
+<span class="w">  </span><span class="nt">documentation</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NiklasRosenstein/slap@gha/install/v1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap install --no-venv-check --only-extras docs</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slap run --no-venv-check docs:build</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">JamesIves/github-pages-deploy-action@4.1.4</span>
+<span class="w">      </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.ref == &#39;refs/heads/develop&#39;</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> branch</span><span class="p">:</span><span class="w"> </span><span class="nv">gh-pages</span><span class="p p-Indicator">,</span><span class="nt"> folder</span><span class="p">:</span><span class="w"> </span><span class="nv">docs/_site</span><span class="p p-Indicator">,</span><span class="nt"> ssh-key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;${{</span><span class="nv"> </span><span class="s">secrets.DEPLOY_KEY</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"> </span><span class="p p-Indicator">}</span>
 </code></pre></div>
 
 
@@ -901,7 +1132,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c2be25ad.min.js"></script>
+      <script src="../../assets/javascripts/bundle.b4d07000.min.js"></script>
       
     
   </body>

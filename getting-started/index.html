@@ -15,7 +15,7 @@
         <link rel="next" href="../configuration/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.12">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.13">
     
     
       
@@ -997,7 +997,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.9.1
+  version: 1.9.3
   dist-name: slap-cli
   packages: slap (src)
   readme: README.md
@@ -1045,7 +1045,7 @@ Project &quot;.&quot; (id: slap-cli)
 <h2 id="6-sanity-check-your-project-configuration">6. Sanity check your project configuration</h2>
 <p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration. The
 below example is the check output for Slap's own project.</p>
-<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 137 changelogs are valid.
+<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 138 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1092,7 +1092,7 @@ test commands like the below example to your project configuration.</p>
     black| 
     black| Oh no! 💥 💔 💥
     black| 13 files would be reformatted, 40 files would be left unchanged.
-    check|   changelog:validate           OK             — All 137 changelogs are valid.
+    check|   changelog:validate           OK             — All 138 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1187,16 +1187,14 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.9.2
-  pyproject.toml:       1.9.1 → 1.9.2 # &#39;version = &quot;1.9.1&quot;&#39;
-  src/slap/__init__.py: 1.9.1 → 1.9.2 # &#39;__version__ = &quot;1.9.1&quot;&#39;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.9.4
+  pyproject.toml:       1.9.3 → 1.9.4 # &#39;version = &quot;1.9.3&quot;&#39;
+  src/slap/__init__.py: 1.9.3 → 1.9.4 # &#39;__version__ = &quot;1.9.3&quot;&#39;
 
-releasing changelog
-  .changelog/_unreleased.toml → .changelog/1.9.2.toml
 
-tagging 1.9.2
+tagging 1.9.4
 
-pushing develop, 1.9.2 to origin
+pushing develop, 1.9.4 to origin
 </code></pre></div>
 
 </details>
@@ -1205,8 +1203,8 @@ pushing develop, 1.9.2 to origin
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.9.1 # &#39;version = &quot;1.9.1&quot;&#39;
-  src/slap/__init__.py: 1.9.1 # &#39;__version__ = &quot;1.9.1&quot;&#39;
+  pyproject.toml:       1.9.3 # &#39;version = &quot;1.9.3&quot;&#39;
+  src/slap/__init__.py: 1.9.3 # &#39;__version__ = &quot;1.9.3&quot;&#39;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
@@ -1269,7 +1267,7 @@ can pass the credentials to the <code>-u,--username</code> and <code>-p,--passwo
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c2be25ad.min.js"></script>
+      <script src="../assets/javascripts/bundle.b4d07000.min.js"></script>
       
     
   </body>
