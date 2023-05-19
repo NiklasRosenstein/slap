@@ -25,7 +25,7 @@ def load_template(name: str) -> Iterable[tuple[str, str]]:
         yield str(filename.relative_to(path)), filename.read_text()
 
 
-class InitCommandPlugin(ApplicationPlugin, Command):
+class InitCommandPlugin(Command, ApplicationPlugin):
     """Bootstrap some files for a Python project.
 
     Currently available templates:
@@ -78,6 +78,10 @@ class InitCommandPlugin(ApplicationPlugin, Command):
             description="Render the content as Markdown (uses by the Slap docs)",
         ),
     ]
+
+    def __init__(self, app: Application) -> None:
+        Command.__init__(self)
+        ApplicationPlugin.__init__(self, app)
 
     def load_configuration(self, app: Application) -> None:
         return None

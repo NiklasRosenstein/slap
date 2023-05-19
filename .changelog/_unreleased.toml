@@ -1,0 +1,5 @@
+[[entries]]
+id = "71955475-a55c-4e49-a573-1548260b9d7d"
+type = "fix"
+description = "Fixed `slap init` command which broke due to a change to the `ApplicationPlugin` constructor and a missing custom implementation of `InstallCommandPlugin.__init__()`"
+author = "@NiklasRosenstein"
