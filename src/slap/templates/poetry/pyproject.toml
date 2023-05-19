@@ -8,6 +8,7 @@ version = "0.1.0"
 description = ""
 authors = ["{author_name} <{author_email}>"]
 license = "{license}"
+readme = "README.md"
 packages = [{{ include = "{path}", from = "src" }}]
 classifiers = []
 keywords = []
