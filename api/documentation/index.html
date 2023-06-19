@@ -15,7 +15,7 @@
         <link rel="next" href="../../changelog/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.13">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.16">
     
     
       
@@ -23,10 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.26e3688c.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a6bdf11c.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc896b0.min.css">
       
       
 
@@ -1314,7 +1314,7 @@
 <h2 id="class-application">Class Application</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Application</span><span class="p">()</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L161">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L162">[view_source]</a></p>
 <p>The application object is the main hub for command-line interactions. It is responsible for managing the project
 that is the main subject of the command-line invokation (or multiple of such), provide the <a href="#pydoc:slap.application.Application.cleo">cleo</a> command-line
 application that <a href="#pydoc:slap.plugins.ApplicationPlugin">ApplicationPlugins</a> can register commands to, etc.</p>
@@ -1332,7 +1332,7 @@ application that <a href="#pydoc:slap.plugins.ApplicationPlugin">ApplicationPlug
 <div class="highlight"><pre><span></span><code><span class="nd">@property</span>
 <span class="k">def</span> <span class="nf">repository</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Repository</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L185">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L186">[view_source]</a></p>
 <p>Return the Slap repository that is the subject of the current application. There may be command plugins
 that do not require the repository to function, so this property creates the repository lazily.</p>
 <p><a id="slap.application.Application.configurations"></a></p>
@@ -1340,7 +1340,7 @@ that do not require the repository to function, so this property creates the rep
 <h4 id="configurations">configurations</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">configurations</span><span class="p">(</span><span class="n">targets_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Configuration</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L215">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L216">[view_source]</a></p>
 <p>Return a list of all configuration objects, i.e. all projects and eventually the {@link pydoc:slap.repository.Repository}, unless one
 project is from the same directory as the repository.</p>
 <p><a id="slap.application.Application.load_plugins"></a></p>
@@ -1348,7 +1348,7 @@ project is from the same directory as the repository.</p>
 <h4 id="load_plugins">load_plugins</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_plugins</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L224">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L225">[view_source]</a></p>
 <p>Loads all application plugins (see <a href="#pydoc:slap.plugins.ApplicationPlugin">ApplicationPlugin</a>) and activates them.</p>
 <p>By default, all plugins available in the <code>slap.application.ApplicationPlugin</code> entry point group are loaded. This
 behaviour can be modified by setting either the <code>[tool.slap.plugins.disable]</code> or <code>[tool.slap.plugins.enable]</code>
@@ -1360,14 +1360,15 @@ option.</p>
 <h4 id="run">run</h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L259">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L260">[view_source]</a></p>
 <p>Loads and activates application plugins and then invokes the CLI.</p>
 <p><a id="slap.application.Application.get_target_projects"></a></p>
 <p><a id="pydoc:slap.application.Application.get_target_projects"></a></p>
 <h4 id="get_target_projects">get_target_projects</h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_target_projects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Project</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_target_projects</span><span class="p">(</span>
+        <span class="n">only_projects</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Project</span><span class="p">]</span>
 </code></pre></div>
-<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L264">[view_source]</a></p>
+<p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L265">[view_source]</a></p>
 <p>Returns the list of projects that should be dealt with when executing a command. When there is a main project,
 only the main project will be returned. When in the repository root, all projects will be returned.</p>
 <hr />
@@ -1633,7 +1634,7 @@ the plugin name to a factory function.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.b4d07000.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a51614de.min.js"></script>
       
     
   </body>
