@@ -303,23 +303,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     def _get_projects_to_install(self) -> list[Project]:
         """Return the list of Slap projects to install."""
 
-        if only_project := self.option("only"):
-            project_path = Path(only_project).resolve()
-            projects = [p for p in self.app.repository.projects() if p.directory.resolve() == project_path]
-            if not projects:
-                self.line_error(f'error: "{only_project}" does not point to a project', "error")
-                return []
-            assert len(projects) == 1, projects
-            return projects
-
-        else:
-            main_project = self.app.main_project()
-            if main_project:
-                return [main_project]
-            if not self.app.repository.projects:
-                self.line_error("error: no projects found")
-                return []
-            return self.app.repository.get_projects_ordered()
+        return self.app.get_target_projects(self.option("only"))
 
     def _get_extras_to_install(self) -> set[str]:
         """Return a set of the extras that should be installed."""

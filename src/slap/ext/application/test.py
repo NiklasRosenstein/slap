@@ -115,7 +115,6 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     """
 
     app: Application
-    tests: list[Test]
     requires_venv: t.ClassVar[bool] = False
 
     name = "test"
@@ -123,6 +122,12 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         argument("test", "One or more tests to run (runs all if none are specified)", optional=True, multiple=True),
     ]
     options = VenvAwareCommand.options + [
+        option(
+            "--only",
+            description="Only run the tests for the projects in the given subdirectory. Multiple directories can be "
+            "specified by delimiting them with a comma.",
+            flag=False,
+        ),
         option(
             "--no-line-prefix",
             "-s",
@@ -148,13 +153,18 @@ class TestCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
     def load_configuration(self, app: Application) -> None:
         self.app = app
-        self.tests = []
-        for project in app.get_target_projects():
-            for test_name, command in project.raw_config().get("test", {}).items():
-                self.tests.append(Test(project, test_name, command))
 
     def activate(self, app: Application, config: None) -> None:
         app.cleo.add(self)
+
+    @property
+    def tests(self) -> list[Test]:
+        tests = []
+        projects = self.app.get_target_projects(self.option("only"))
+        for project in projects:
+            for test_name, command in project.raw_config().get("test", {}).items():
+                tests.append(Test(project, test_name, command))
+        return tests
 
     def _select_tests(self, name: str) -> set[Test]:
         result = set()
