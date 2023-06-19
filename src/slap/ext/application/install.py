@@ -303,7 +303,8 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     def _get_projects_to_install(self) -> list[Project]:
         """Return the list of Slap projects to install."""
 
-        return self.app.get_target_projects(self.option("only"))
+        from_path = self.option("from")
+        return self.app.get_target_projects(self.option("only"), Path(from_path).resolve() if from_path else None)
 
     def _get_extras_to_install(self) -> set[str]:
         """Return a set of the extras that should be installed."""

@@ -262,19 +262,22 @@ class Application:
 
         self.cleo.run()
 
-    def get_target_projects(self, only_projects: str | t.Sequence[str] | None = None) -> list[Project]:
+    def get_target_projects(
+        self, only_projects: str | t.Sequence[str] | None = None, cwd: Path | None = None
+    ) -> list[Project]:
         """
         Returns the list of projects that should be dealt with when executing a command. When there is a main project,
         only the main project will be returned. When in the repository root, all projects will be returned.
         """
 
+        cwd = cwd or self._directory
         if isinstance(only_projects, str):
             only_projects = split_by_commata(only_projects)
 
         if only_projects is not None:
             projects: list[Project] = []
             for only_project in only_projects:
-                project_path = Path(only_project).resolve()
+                project_path = (cwd / only_project).resolve()
                 matching_projects = [p for p in self.repository.projects() if p.directory.resolve() == project_path]
                 if not matching_projects:
                     raise ValueError(f'error: "{only_project}" does not point to a project')
@@ -284,7 +287,7 @@ class Application:
         main = self.main_project()
         if main:
             return [main]
-        if self._directory == self.repository.directory:
+        if cwd == self.repository.directory:
             return self.repository.get_projects_ordered()
         return []
 

@@ -1,0 +1,5 @@
+[[entries]]
+id = "486f39d3-1168-47d9-a557-9641bbe6d187"
+type = "fix"
+description = "Fix `slap install --from` and make it work with the `--only` option."
+author = "@NiklasRosenstein"
