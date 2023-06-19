@@ -1365,8 +1365,8 @@ option.</p>
 <p><a id="slap.application.Application.get_target_projects"></a></p>
 <p><a id="pydoc:slap.application.Application.get_target_projects"></a></p>
 <h4 id="get_target_projects">get_target_projects</h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_target_projects</span><span class="p">(</span>
-        <span class="n">only_projects</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Project</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_target_projects</span><span class="p">(</span><span class="n">only_projects</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">cwd</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Project</span><span class="p">]</span>
 </code></pre></div>
 <p><a href="https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/application.py#L265">[view_source]</a></p>
 <p>Returns the list of projects that should be dealt with when executing a command. When there is a main project,
