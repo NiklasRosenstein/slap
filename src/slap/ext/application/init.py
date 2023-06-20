@@ -22,6 +22,8 @@ def load_template(name: str) -> Iterable[tuple[str, str]]:
     for filename in path.glob("**/*"):
         if filename.is_dir():
             continue
+        if "__pycache__" in filename.parts:
+            continue
         yield str(filename.relative_to(path)), filename.read_text()
 
 

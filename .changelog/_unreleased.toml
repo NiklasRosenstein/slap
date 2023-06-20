@@ -1,0 +1,5 @@
+[[entries]]
+id = "8ff127f5-0c69-48bf-905b-74cd7745fc1f"
+type = "fix"
+description = "Avoid trying to render files in __pycache__ when using `slap init`."
+author = "@NiklasRosenstein"
