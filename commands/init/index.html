@@ -866,101 +866,92 @@ Help:
 
 <h2 id="templates">Templates</h2>
 <h3 id="poetry">Poetry</h3>
-<div class="highlight"><span class="filename">$ slap init -t poetry --name my.pkg</span><pre><span></span><code>    $ slap init -t poetry --name my.pkg -f --dry  # exited with return code 1
-    write /home/runner/work/slap/slap/docs/pyproject.toml
-    write /home/runner/work/slap/slap/docs/LICENSE
-    write /home/runner/work/slap/slap/docs/.flake8
-    write /home/runner/work/slap/slap/docs/README.md
-    write /home/runner/work/slap/slap/docs/.gitignore
-    write /home/runner/work/slap/slap/docs/src/my/pkg/py.typed
-    write /home/runner/work/slap/slap/docs/src/my/pkg/__init__.py
-    [90mCould not find a [34mslap.toml[0m configuration file in the current directory or any of its parents. Assuming that the current directory is the Slap repository root.[0m
-
-    &#39;utf-8&#39; codec can&#39;t decode byte 0xe3 in position 16: invalid continuation byte
+<div class="highlight"><span class="filename">$ slap init -t poetry --name my.pkg</span><pre><span></span><code>write /home/runner/work/slap/slap/docs/pyproject.toml
+write /home/runner/work/slap/slap/docs/LICENSE
+write /home/runner/work/slap/slap/docs/.flake8
+write /home/runner/work/slap/slap/docs/README.md
+write /home/runner/work/slap/slap/docs/.gitignore
+write /home/runner/work/slap/slap/docs/src/my/pkg/py.typed
+write /home/runner/work/slap/slap/docs/src/my/pkg/__init__.py
+write /home/runner/work/slap/slap/docs/tests/test_import.py
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>$ slap init -t poetry --name my.pkg --as-markdown -q  # exited with return code 1
-```toml title=&quot;/home/runner/work/slap/slap/docs/pyproject.toml&quot;
-[build-system]
-requires = [&quot;poetry-core&quot;]
-build-backend = &quot;poetry.core.masonry.api&quot;
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/pyproject.toml</span><pre><span></span><code><span class="k">[build-system]</span>
+<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;poetry-core&quot;</span><span class="p">]</span>
+<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;poetry.core.masonry.api&quot;</span>
 
-[tool.poetry]
-name = &quot;my.pkg&quot;
-version = &quot;0.1.0&quot;
-description = &quot;&quot;
-authors = [&quot;Unknown &lt;me@unknown.org&gt;&quot;]
-license = &quot;MIT&quot;
-readme = &quot;README.md&quot;
-packages = [{ include = &quot;my/pkg&quot;, from = &quot;src&quot; }]
-classifiers = []
-keywords = []
+<span class="k">[tool.poetry]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;my.pkg&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0.1.0&quot;</span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;Unknown &lt;me@unknown.org&gt;&quot;</span><span class="p">]</span>
+<span class="n">license</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;MIT&quot;</span>
+<span class="n">readme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;README.md&quot;</span>
+<span class="n">packages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="n">include</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;my/pkg&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;src&quot;</span><span class="w"> </span><span class="p">}]</span>
+<span class="n">classifiers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="n">keywords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
 
-[tool.poetry.urls]
-# &quot;Bug Tracker&quot; = &quot;&quot;
-# Documentation = &quot;&quot;
-# Homepage = &quot;&quot;
-# Repository = &quot;&quot;
+<span class="k">[tool.poetry.urls]</span>
+<span class="c1"># &quot;Bug Tracker&quot; = &quot;&quot;</span>
+<span class="c1"># Documentation = &quot;&quot;</span>
+<span class="c1"># Homepage = &quot;&quot;</span>
+<span class="c1"># Repository = &quot;&quot;</span>
 
-[tool.poetry.dependencies]
-python = &quot;^3.8&quot;
+<span class="k">[tool.poetry.dependencies]</span>
+<span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;^3.8&quot;</span>
 
-[tool.poetry.dev-dependencies]
-black = &quot;*&quot;
-flake8 = &quot;*&quot;
-isort = &quot;*&quot;
-mypy = &quot;*&quot;
-pycln = &quot;^2.1.3&quot;
-pytest = &quot;*&quot;
+<span class="k">[tool.poetry.dev-dependencies]</span>
+<span class="n">black</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<span class="n">flake8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<span class="n">isort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<span class="n">pycln</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;^2.1.3&quot;</span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
 
-[tool.poetry.group.docs]
-optional = true
+<span class="k">[tool.poetry.group.docs]</span>
+<span class="n">optional</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 
-[tool.poetry.group.docs.dependencies]
-# ...
+<span class="k">[tool.poetry.group.docs.dependencies]</span>
+<span class="c1"># ...</span>
 
-[tool.slap]
-typed = true
+<span class="k">[tool.slap]</span>
+<span class="n">typed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 
-[tool.slap.test]
-check  = &quot;slap check&quot;
-black  = &quot;black --check src/ tests/&quot;
-flake8 = &quot;flake8 src/ tests/&quot;
-isort  = &quot;isort --check-only src/ tests/&quot;
-mypy   = &quot;dmypy run src/&quot;
-pycln  = &quot;pycln src/ tests/ --check&quot;
-pytest = &quot;pytest tests/ -vv&quot;
+<span class="k">[tool.slap.test]</span>
+<span class="n">check</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;slap check&quot;</span>
+<span class="n">black</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;black --check src/ tests/&quot;</span>
+<span class="n">flake8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;flake8 src/ tests/&quot;</span>
+<span class="n">isort</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;isort --check-only src/ tests/&quot;</span>
+<span class="n">mypy</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dmypy run src/&quot;</span>
+<span class="n">pycln</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pycln src/ tests/ --check&quot;</span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pytest tests/ -vv&quot;</span>
 
-[tool.slap.run]
-&quot;docs:build&quot; = &quot;&gt;&amp;2 echo &#39;Not implemented&#39; &amp;&amp; exit 1&quot;
-fmt          = &quot;pycln src/ tests/ &amp;&amp; black src/ tests/ &amp;&amp; isort src/ tests/&quot;
+<span class="k">[tool.slap.run]</span>
+<span class="s">&quot;docs:build&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&gt;&amp;2 echo &#39;Not implemented&#39; &amp;&amp; exit 1&quot;</span>
+<span class="n">fmt</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;pycln src/ tests/ &amp;&amp; black src/ tests/ &amp;&amp; isort src/ tests/&quot;</span>
 
-[tool.mypy]
-python_version = &quot;3.8&quot;
-explicit_package_bases = true
-mypy_path = [&quot;src&quot;]
-namespace_packages = true
-pretty = true
-show_error_codes = true
-show_error_context = true
-strict = true
-warn_no_return = true
-warn_redundant_casts = true
-warn_unreachable = true
-warn_unused_ignores = true
+<span class="k">[tool.mypy]</span>
+<span class="n">python_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;3.8&quot;</span>
+<span class="n">explicit_package_bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">mypy_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;src&quot;</span><span class="p">]</span>
+<span class="n">namespace_packages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">pretty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">show_error_codes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">show_error_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">strict</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">warn_no_return</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">warn_redundant_casts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">warn_unreachable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">warn_unused_ignores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 
-[tool.isort]
-profile = &quot;black&quot;
-line_length = 120
-combine_as_imports = true
+<span class="k">[tool.isort]</span>
+<span class="n">profile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;black&quot;</span>
+<span class="n">line_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">120</span>
+<span class="n">combine_as_imports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 
-[tool.black]
-line-length = 120
-
-```
-
-
-``` title=&quot;/home/runner/work/slap/slap/docs/LICENSE&quot;
-MIT License
+<span class="k">[tool.black]</span>
+<span class="n">line-length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">120</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/LICENSE</span><pre><span></span><code>MIT License
 
 Copyright (c) 2023 Unknown
 
@@ -980,12 +971,8 @@ PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
 BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-```
-
-
-``` title=&quot;/home/runner/work/slap/slap/docs/.flake8&quot;
-[flake8]
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/.flake8</span><pre><span></span><code>[flake8]
 max-line-length = 120
 # Black can yield formatted code that triggers these Flake8 warnings.
 ignore=
@@ -995,18 +982,10 @@ ignore=
     W504,
     # whitespace before &#39;:&#39;
     E203,
-
-```
-
-
-```md title=&quot;/home/runner/work/slap/slap/docs/README.md&quot;
-# my.pkg
-
-```
-
-
-``` title=&quot;/home/runner/work/slap/slap/docs/.gitignore&quot;
-__pycache__/
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/README.md</span><pre><span></span><code><span class="gh"># my.pkg</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/.gitignore</span><pre><span></span><code>__pycache__/
 .dmypy.json
 .venv/
 *.egg-info/
@@ -1014,19 +993,13 @@ __pycache__/
 /build
 /dist
 poetry.lock
-
-```
-
-
-```typed title=&quot;/home/runner/work/slap/slap/docs/src/my/pkg/py.typed&quot;
-
-```
-
-
-```py title=&quot;/home/runner/work/slap/slap/docs/src/my/pkg/__init__.py&quot;
-__version__ = &quot;0.1.0&quot;
-
-```
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/src/my/pkg/py.typed</span><pre><span></span><code>
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/src/my/pkg/__init__.py</span><pre><span></span><code><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">/home/runner/work/slap/slap/docs/tests/test_import.py</span><pre><span></span><code><span class="k">def</span> <span class="nf">test_import</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">exec</span><span class="p">(</span><span class="s2">&quot;from my.pkg import *&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="github">Github</h3>
 <div class="highlight"><span class="filename">$ slap init -t github</span><pre><span></span><code>write /home/runner/work/slap/slap/docs/.github/workflows/python.yaml
