@@ -34,7 +34,7 @@ class PullRequest:
     shortform: str
 
 
-@Union("!slap.plugins.repository_host")
+@Union("!slap.plugins.repository_host")  # type: ignore[misc]
 class RepositoryHost(abc.ABC):
     """Interface for repository hosting services to resolve issue and pull request references, comment on issues
     and create releases."""

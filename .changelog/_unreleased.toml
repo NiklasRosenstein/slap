@@ -3,3 +3,9 @@ id = "38f73caa-d7d8-4a7a-b3dd-fbbc6faaa211"
 type = "feature"
 description = "Add `[tool.slap.release].pre_commit` option that can be used to run a command after `slap release` updated the files and before a commit is made and tagged."
 author = "@NiklasRosenstein"
+
+[[entries]]
+id = "9d94a52c-56a3-4fc1-916d-0627d8fdaf5d"
+type = "improvement"
+description = "Upgrade databind to `^4.4.0`"
+author = "@NiklasRosenstein"
