@@ -32,7 +32,7 @@ jobs:
     - uses: actions/setup-python@v2
       with: { python-version: "${{ matrix.python-version }}" }
     - run: pip install mypy dataclasses types-dataclasses -q
-    - run: mypy src/slap/python/pep508.py
+    - run: mypy src/slap/python/pep508.py --follow-imports silent
     - run: python src/slap/python/pep508.py
 
   docs:
