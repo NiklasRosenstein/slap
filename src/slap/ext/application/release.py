@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import subprocess
 import sys
 import typing as t
 from pathlib import Path
@@ -10,11 +11,11 @@ from databind.core.settings import Alias, ExtraKeys
 from slap.application import Application, Command, argument, option
 from slap.configuration import Configuration
 from slap.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRulePlugin
+from slap.project import Project
 
 if t.TYPE_CHECKING:
     from poetry.core.semver.version import Version  # type: ignore[import]
 
-    from slap.project import Project
     from slap.release import VersionRef
 
 
@@ -52,6 +53,9 @@ class ReleaseConfig:
     #: A list of #ReleasePlugins to use. Defaults to contain the #SourceCodeVersionReferencesPlugin
     #: and #ChangelogReleasePlugin.
     plugins: list[str] = dataclasses.field(default_factory=lambda: ["changelog_release", "source_code_version"])
+
+    #: A shell command to execute after updating files but before committing them.
+    pre_commit: t.Annotated[str | None, Alias("pre-commit")] = None
 
 
 class ReleaseCommandPlugin(Command, ApplicationPlugin):
@@ -479,6 +483,19 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
                 self.line_error("dry mode enabled, no changes will be committed to disk", "comment")
             target_version = self._get_new_version(version_refs, version)
             changed_files = self._bump_version(version_refs, target_version, self.option("dry"))
+
+            run_once = False
+            for obj, config in self.config.items():
+                if isinstance(obj, Project) and obj.directory == self.app.repository.directory:
+                    continue
+                if config.pre_commit:
+                    if not run_once:
+                        self.line("")
+                        run_once = True
+                    self.line(f"running <fg=cyan>$ {config.pre_commit}</fg> hook in <info>{obj.directory}</info>")
+                    if not self.option("dry"):
+                        subprocess.run(config.pre_commit, shell=True, check=True, cwd=obj.directory)
+
             if self.option("tag"):
                 tag_name = self._create_tag(
                     str(target_version), changed_files, self.option("dry"), self.option("force")
