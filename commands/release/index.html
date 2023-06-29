@@ -15,7 +15,7 @@
         <link rel="next" href="../report/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.16">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.17">
     
     
       
@@ -1004,7 +1004,7 @@ Help:
 <span class="k">class</span> <span class="nc">ReleaseConfig</span><span class="p">()</span>
 </code></pre></div>
 
-[[view_source]](https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/application/release.py#L36)
+[[view_source]](https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/application/release.py#L37)
 
 <a id="slap.ext.application.release.ReleaseConfig.branch"></a>
 
@@ -1045,6 +1045,13 @@ version number in the source code).
 A list of `ReleasePlugins` to use. Defaults to contain the {@link pydoc:slap.ext.release.source_code_version.SourceCodeVersionReferencesPlugin}
 and {@link pydoc:slap.ext.release.changelog.ChangelogReleasePlugin}.
 
+<a id="slap.ext.application.release.ReleaseConfig.pre_commit"></a>
+
+<a id="pydoc:slap.ext.application.release.ReleaseConfig.pre_commit"></a>
+#### pre\_commit
+
+A shell command to execute after updating files but before committing them.
+
 
 
 </details>
@@ -1060,7 +1067,7 @@ and {@link pydoc:slap.ext.release.changelog.ChangelogReleasePlugin}.
 <span class="k">class</span> <span class="nc">VersionRefConfig</span><span class="p">()</span>
 </code></pre></div>
 
-[[view_source]](https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/application/release.py#L22)
+[[view_source]](https://github.com/NiklasRosenstein/slap/blob/develop/docs/../src/slap/ext/application/release.py#L23)
 
 Version reference.
 
@@ -1142,7 +1149,7 @@ pushing develop, 0.1.1 to origin
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a51614de.min.js"></script>
+      <script src="../../assets/javascripts/bundle.b425cdc4.min.js"></script>
       
     
   </body>

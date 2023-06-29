@@ -15,7 +15,7 @@
         <link rel="next" href="../configuration/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.16">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.17">
     
     
       
@@ -1007,7 +1007,7 @@ Project &quot;.&quot; (id: slap-cli)
       - &#39;beautifulsoup4 &gt;=4.10.0,&lt;5.0.0&#39;
       - &#39;build &gt;=0.8.0,&lt;0.9.0&#39;
       - &#39;cleo &gt;=1.0.0a4&#39;
-      - &#39;databind &gt;=2.0.0,&lt;3.0.0&#39;
+      - &#39;databind &gt;=4.4.0,&lt;5.0.0&#39;
       - &#39;flit &gt;=3.6.0,&lt;4.0.0&#39;
       - &#39;gitpython &gt;=3.1.31,&lt;4.0.0&#39;
       - &#39;nr.python.environment &gt;=0.1.4,&lt;0.2.0&#39;
@@ -1045,7 +1045,7 @@ Project &quot;.&quot; (id: slap-cli)
 <h2 id="6-sanity-check-your-project-configuration">6. Sanity check your project configuration</h2>
 <p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration. The
 below example is the check output for Slap's own project.</p>
-<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 142 changelogs are valid.
+<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 143 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1092,7 +1092,7 @@ test commands like the below example to your project configuration.</p>
     black| 
     black| Oh no! 💥 💔 💥
     black| 13 files would be reformatted, 41 files would be left unchanged.
-    check|   changelog:validate           OK             — All 142 changelogs are valid.
+    check|   changelog:validate           OK             — All 143 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1191,6 +1191,8 @@ To create a new release, pass the version number or a rule name instead.
   pyproject.toml:       1.9.7 → 1.9.8 # &#39;version = &quot;1.9.7&quot;&#39;
   src/slap/__init__.py: 1.9.7 → 1.9.8 # &#39;__version__ = &quot;1.9.7&quot;&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.9.8.toml
 
 tagging 1.9.8
 
@@ -1267,7 +1269,7 @@ can pass the credentials to the <code>-u,--username</code> and <code>-p,--passwo
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.a51614de.min.js"></script>
+      <script src="../assets/javascripts/bundle.b425cdc4.min.js"></script>
       
     
   </body>
