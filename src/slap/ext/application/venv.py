@@ -47,11 +47,27 @@ SHADOW_INIT_SCRIPTS = {
       return $?
     }
     """,
+    "fish": """
+    function slap
+      set ORIGINAL (command which slap)
+      if test $status -ne 0
+        echo "error: command 'slap' does not exist" >&2
+        return 127
+      end
+      if test (count $argv) -ge 2; and test $argv[1] = "venv"; and string match -qr -- '^-[gc]*a[gc]*' $argv[2]
+        eval (env SLAP_SHADOW=true $ORIGINAL $argv)
+      else
+        $ORIGINAL $argv
+      end
+      return $status
+    end
+    """,
 }
 
 USER_INIT_SCRIPTS = {
     "bash": 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i bash)"',
     "zsh": 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i zsh)"',
+    "fish": 'command -v slap &>/dev/null; and source (env SLAP_SHADOW=true slap venv -i fish | psub)',
 }
 
 
@@ -197,8 +213,9 @@ class VenvCommand(Command):
 
     <u>Usage Example:</u>
 
-        <code>$ slap venv -i bash >> ~/.profile; source ~/.profile  # for bash
-        $ slap venv -i zsh >> ~/.zshrc; source ~/.zshrc       # for zsh
+        <code>$ slap venv -i bash >> ~/.profile; source ~/.profile                                 # for bash
+        $ slap venv -i zsh >> ~/.zshrc; source ~/.zshrc                                      # for zsh
+        $ slap venv -i fish >> ~/.config/fish/config.fish; source ~/.config/fish/config.fish # for fish
         $ slap venv -cg craftr
         <info>creating global environment <s>"craftr"</s> (using <code>python3</code>)</info>
         $ slap venv -lg</code>
@@ -414,8 +431,12 @@ class VenvCommand(Command):
                 )
 
             # TODO (@NiklasRosenstein): Adjust output based on the shell that this is called from?
+            #                (@jonhoo): Possibly based on something more reliable than last component of $SHELL?
             # TODO (@NiklasRosenstein): Must be activate.cmd on Windows
-            print(f'source "{venv.get_bin("activate")}"')
+            if os.environ['SHELL'].endswith('fish'):
+                print(f'source "{venv.get_bin("activate.fish")}"')
+            else:
+                print(f'source "{venv.get_bin("activate")}"')
             manager.set_last_activated(venv.name)
 
         if self.option("delete"):
