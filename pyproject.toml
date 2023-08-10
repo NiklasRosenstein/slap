@@ -60,7 +60,7 @@ optional = true
 mkdocs = "*"
 mkdocs-material = "*"
 novella = "0.2.5"
-pydoc-markdown = "4.6.0"
+pydoc-markdown = "4.8.2"
 
 [tool.poetry.scripts]
 slap = "slap.__main__:main"
