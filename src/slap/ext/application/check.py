@@ -65,7 +65,6 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
         app.cleo.add(self)
 
     def handle(self) -> int:
-
         counter: t.MutableMapping[CheckResult, int] = collections.defaultdict(int)
         if self.app.repository.is_monorepo:
             for check in self._run_application_checks():
@@ -97,7 +96,6 @@ class CheckCommandPlugin(Command, ApplicationPlugin):
     def _print_checks(self, checks: t.Sequence[Check]) -> None:
         max_w = max(len(c.name) for c in checks)
         for check in checks:
-
             if not self.option("show-skipped") and check.result == Check.SKIPPED:
                 continue
 

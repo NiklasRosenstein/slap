@@ -127,7 +127,6 @@ class PipInstaller(Installer):
         self.symlink_helper = symlink_helper
 
     def install(self, dependencies: t.Sequence[Dependency], target: PythonEnvironment, options: InstallOptions) -> int:
-
         from slap.python.dependency import PathDependency, PypiDependency, UrlDependency
 
         # Collect the Pip arguments and the dependencies that need to be installed through other methods.

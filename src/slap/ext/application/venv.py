@@ -67,7 +67,7 @@ SHADOW_INIT_SCRIPTS = {
 USER_INIT_SCRIPTS = {
     "bash": 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i bash)"',
     "zsh": 'which slap >/dev/null && eval "$(SLAP_SHADOW=true slap venv -i zsh)"',
-    "fish": 'command -v slap &>/dev/null; and source (env SLAP_SHADOW=true slap venv -i fish | psub)',
+    "fish": "command -v slap &>/dev/null; and source (env SLAP_SHADOW=true slap venv -i fish | psub)",
 }
 
 
@@ -433,7 +433,7 @@ class VenvCommand(Command):
             # TODO (@NiklasRosenstein): Adjust output based on the shell that this is called from?
             #                (@jonhoo): Possibly based on something more reliable than last component of $SHELL?
             # TODO (@NiklasRosenstein): Must be activate.cmd on Windows
-            if os.environ['SHELL'].endswith('fish'):
+            if os.environ["SHELL"].endswith("fish"):
                 print(f'source "{venv.get_bin("activate.fish")}"')
             else:
                 print(f'source "{venv.get_bin("activate")}"')

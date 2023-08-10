@@ -95,7 +95,6 @@ class TomlChangelogDeser(ChangelogDeser):
 
 
 class ManagedChangelog:
-
     _manager: "ChangelogManager" = weak_property("_ManagedChangelog__manager")
 
     def __init__(self, manager: "ChangelogManager", path: Path, version: str | None) -> None:

@@ -231,7 +231,6 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         logger.debug("Pull request ID: %s", self._pull_request_id)
 
         if self._pull_request_id is not None:
-
             # We need a GitHub token when running in a pull request. This is so that we can query the GitHub API
             # for the pull request information. Technically, we wouldn't need it for public repositories, but that's
             # a special case we don't handle at the moment.

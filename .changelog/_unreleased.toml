@@ -4,3 +4,10 @@ type = "feature"
 description = "Add fish to supported shells for shimming"
 author = "@jonhoo"
 pr = "https://github.com/NiklasRosenstein/slap/pull/92"
+
+[[entries]]
+id = "212485b5-ea5d-42cc-b892-755b118102df"
+type = "fix"
+description = "Fix: CI failing due to black complaining"
+author = "florian.eich@helsing.ai"
+pr = "https://github.com/NiklasRosenstein/slap/pull/94"
