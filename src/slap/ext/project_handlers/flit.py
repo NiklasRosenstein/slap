@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class FlitProjectHandler(PyprojectHandler):
-
     # ProjectHandlerPlugin
 
     def matches_project(self, project: Project) -> bool:

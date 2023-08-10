@@ -91,7 +91,6 @@ class Dependency:
 
 @dataclasses.dataclass
 class _PypiDependency:
-
     name: str
 
     #: The version specification for the package.
@@ -103,7 +102,6 @@ class _PypiDependency:
 
 @dataclasses.dataclass
 class _GitDependency:
-
     name: str
 
     #: The repository URL to get the Python package from.
@@ -121,7 +119,6 @@ class _GitDependency:
 
 @dataclasses.dataclass
 class _PathDependency:
-
     name: str
 
     #: The path from which to install the Python package from.
@@ -136,7 +133,6 @@ class _PathDependency:
 
 @dataclasses.dataclass
 class _UrlDependency:
-
     name: str
 
     #: The URL to get the package to install from.
@@ -145,7 +141,6 @@ class _UrlDependency:
 
 @dataclasses.dataclass
 class _MultiDependency:
-
     name: str
 
     #: Defines multiple possible ways to install a dependency. Each dependency should differ in their #Dependency.python

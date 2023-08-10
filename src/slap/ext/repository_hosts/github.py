@@ -25,7 +25,6 @@ def github_get_username_from_email(api_base_url: str, email: str) -> str | None:
 
 @dataclasses.dataclass
 class GithubRepositoryHost(RepositoryHost):
-
     #: The owner and repository name separated by a slash. If the repository is hosted on GitHub enterprise, the domain
     #: of the GHE instance must precede the owner and repository name by another slash (e.g. `ghe.io/owner/repo`).
     repo: str

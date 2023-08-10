@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestRunner:
-
     _colors = ["blue", "cyan", "magenta", "yellow"]
     _prev_color: t.ClassVar[str | None] = None
 

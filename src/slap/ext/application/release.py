@@ -418,7 +418,6 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
         # Understand the version references defined in the project configuration.
         for project in self.app.configurations():
-
             # Always consider the version number in the pyproject.toml.
             if project.pyproject_toml.exists() and isinstance(project, Project):
                 version_refs += project.get_version_refs()
