@@ -15,7 +15,7 @@
         <link rel="next" href="../configuration/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.17">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.21">
     
     
       
@@ -23,7 +23,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
@@ -1015,7 +1015,7 @@ Project &quot;.&quot; (id: slap-cli)
       - &#39;poetry-core &gt;=1.1.0a6,&lt;2.0.0&#39;
       - &#39;ptyprocess &gt;=0.7.0,&lt;0.8.0&#39;
       - &#39;pygments &gt;=2.11.2,&lt;3.0.0&#39;
-      - &#39;PyYAML &gt;=4.0&#39;
+      - &#39;PyYAML &gt;=6.0&#39;
       - &#39;requests &gt;=2.27.1,&lt;3.0.0&#39;
       - &#39;setuptools &gt;=39.1.0&#39;
       - &#39;tomli &gt;=2.0.0,&lt;3.0.0&#39;
@@ -1037,7 +1037,7 @@ Project &quot;.&quot; (id: slap-cli)
       - mkdocs
       - mkdocs-material
       - &#39;novella ==0.2.5&#39;
-      - &#39;pydoc-markdown ==4.6.0&#39;
+      - &#39;pydoc-markdown ==4.8.2&#39;
 </code></pre></div>
 
 </details>
@@ -1045,7 +1045,7 @@ Project &quot;.&quot; (id: slap-cli)
 <h2 id="6-sanity-check-your-project-configuration">6. Sanity check your project configuration</h2>
 <p>The <a href="../commands/check/"><code>slap check</code></a> command provides some feedback on the sanity of your project configuration. The
 below example is the check output for Slap's own project.</p>
-<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 143 changelogs are valid.
+<div class="highlight"><span class="filename">$ slap check</span><pre><span></span><code>  changelog:validate           OK             — All 144 changelogs are valid.
   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
   general:typed                OK             — py.typed exists as expected
   poetry:classifiers           OK             — All classifiers are valid.
@@ -1076,23 +1076,9 @@ test commands like the below example to your project configuration.</p>
 <details><summary><code>slap test</code> for Slap's project</summary>
 
 <div class="highlight"><span class="filename">$ slap test</span><pre><span></span><code>    $ cd .. &amp;&amp; slap test  # exited with return code 1
-    black| would reformat /home/runner/work/slap/slap/src/slap/changelog.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/application.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/check.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/link.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/test.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/application/release.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/project_handlers/flit.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/project_handlers/poetry.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/repository_hosts/github.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/ext/repository_ci/github_actions.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/install/installer.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/util/cleo.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/python/dependency.py
-    black| 
-    black| Oh no! 💥 💔 💥
-    black| 13 files would be reformatted, 41 files would be left unchanged.
-    check|   changelog:validate           OK             — All 143 changelogs are valid.
+    black| All done! ✨ 🍰 ✨
+    black| 54 files would be left unchanged.
+    check|   changelog:validate           OK             — All 144 changelogs are valid.
     check|   general:packages             OK             — Detected /home/runner/work/slap/slap/src/slap
     check|   general:typed                OK             — py.typed exists as expected
     check|   poetry:classifiers           OK             — All classifiers are valid.
@@ -1109,7 +1095,7 @@ test commands like the below example to your project configuration.</p>
     pytest| bash: pytest: command not found
 
     test summary:
-      • black (exit code: 1)
+      • black (exit code: 0)
       • check (exit code: 0)
       • flake8 (exit code: 127)
       • isort (exit code: 127)
@@ -1191,6 +1177,8 @@ To create a new release, pass the version number or a rule name instead.
   pyproject.toml:       1.9.8 → 1.9.9 # &#39;version = &quot;1.9.8&quot;&#39;
   src/slap/__init__.py: 1.9.8 → 1.9.9 # &#39;__version__ = &quot;1.9.8&quot;&#39;
 
+releasing changelog
+  .changelog/_unreleased.toml → .changelog/1.9.9.toml
 
 tagging 1.9.9
 
@@ -1264,10 +1252,10 @@ can pass the credentials to the <code>-u,--username</code> and <code>-p,--passwo
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.b425cdc4.min.js"></script>
+      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
       
     
   </body>

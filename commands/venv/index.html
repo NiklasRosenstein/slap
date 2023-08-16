@@ -15,7 +15,7 @@
         <link rel="next" href="../../guides/github/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.17">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.21">
     
     
       
@@ -23,7 +23,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc896b0.min.css">
@@ -828,7 +828,7 @@ Options:
   -l, --list                 List the available environments.
   -p, --path                 Print the path of the specified or the current venv. Exit with status code 1 and no output if the environment does not exist or there is no current environment.
   -e, --exists               Return 0 if the specified environment exists, 1 otherwise.
-  -i, --init-code=INIT-CODE  Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash, zsh
+  -i, --init-code=INIT-CODE  Print the code snippet that can be placed in your shells init scripts to shadow this command in order to properly make use of the -a,--activate option. Currently supported shells are: bash, zsh, fish
       --python=PYTHON        The Python executable to use to create the virtual environment. If this is not specified, it defaults to python + the environment name if the environment name looks like a version number (contains numbers and dots). Otehrwise, it defaults to python3.
   -h, --help                 Display help for the given command. When no command is given display help for the help command.
   -q, --quiet                Do not output any message.
@@ -851,8 +851,9 @@ Help:
 
   Usage Example:
 
-      $ slap venv -i bash &gt;&gt; ~/.profile; source ~/.profile  # for bash
-      $ slap venv -i zsh &gt;&gt; ~/.zshrc; source ~/.zshrc       # for zsh
+      $ slap venv -i bash &gt;&gt; ~/.profile; source ~/.profile                                 # for bash
+      $ slap venv -i zsh &gt;&gt; ~/.zshrc; source ~/.zshrc                                      # for zsh
+      $ slap venv -i fish &gt;&gt; ~/.config/fish/config.fish; source ~/.config/fish/config.fish # for fish
       $ slap venv -cg craftr
       creating global environment &quot;craftr&quot; (using python3)
       $ slap venv -lg
@@ -961,10 +962,10 @@ it is an error.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tracking", "navigation.top", "toc.follow", "navigation.sections"], "search": "../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.b425cdc4.min.js"></script>
+      <script src="../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
     
   </body>
