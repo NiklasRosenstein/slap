@@ -338,6 +338,11 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         user_name = os.environ.get("GIT_USER_NAME", "GitHub Action")
         user_email = os.environ.get("GIT_USER_EMAIL", "github-action@users.noreply.github.com")
 
+        # If the repository lives under a symlinked directory, Repo.index.add() will complain if an aliased
+        # filename is passed instead of the real path. This is an issue for example when running unit tests
+        # on OSX where /tmp is a symlink to /private/tmp.
+        changed_files = [f.resolve() for f in changed_files]
+
         # Use gitpython to add files and commit.
         logger.info("Committing changes to %s/%s", *self._head_ref)
         logger.info("Changed files: %s", ", ".join(str(f) for f in changed_files))

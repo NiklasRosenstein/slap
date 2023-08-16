@@ -11,3 +11,9 @@ type = "fix"
 description = "Fix: CI failing due to black complaining"
 author = "florian.eich@helsing.ai"
 pr = "https://github.com/NiklasRosenstein/slap/pull/94"
+
+[[entries]]
+id = "c07051de-2ea8-466a-8cf8-ad7737df0fed"
+type = "fix"
+description = "Fix `GithubActionsRepositoryCiPlugin.publish_changes()` for when a repo lives under a symlinked directory (such as `/tmp -> /private/tmp` on OSX)"
+author = "@NiklasRosenstein"
