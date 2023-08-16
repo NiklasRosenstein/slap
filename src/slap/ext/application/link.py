@@ -101,7 +101,6 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
 
 def link_repository(io: IO, projects: list[Project], dump_pyproject: bool = False, python: str | None = None) -> None:
-
     from flit.install import Installer  # type: ignore[import]
     from nr.util.fs import atomic_swap
 

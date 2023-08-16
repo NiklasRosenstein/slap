@@ -231,7 +231,6 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
         logger.debug("Pull request ID: %s", self._pull_request_id)
 
         if self._pull_request_id is not None:
-
             # We need a GitHub token when running in a pull request. This is so that we can query the GitHub API
             # for the pull request information. Technically, we wouldn't need it for public repositories, but that's
             # a special case we don't handle at the moment.
@@ -338,6 +337,11 @@ class GithubActionsRepositoryCIPlugin(RepositoryCIPlugin):
 
         user_name = os.environ.get("GIT_USER_NAME", "GitHub Action")
         user_email = os.environ.get("GIT_USER_EMAIL", "github-action@users.noreply.github.com")
+
+        # If the repository lives under a symlinked directory, Repo.index.add() will complain if an aliased
+        # filename is passed instead of the real path. This is an issue for example when running unit tests
+        # on OSX where /tmp is a symlink to /private/tmp.
+        changed_files = [f.resolve() for f in changed_files]
 
         # Use gitpython to add files and commit.
         logger.info("Committing changes to %s/%s", *self._head_ref)

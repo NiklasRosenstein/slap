@@ -55,7 +55,6 @@ class Command(_BaseCommand):
 
 
 class CleoApplication(BaseCleoApplication):
-
     from cleo.formatters.style import Style  # type: ignore[import]
     from cleo.io.inputs.input import Input  # type: ignore[import]
     from cleo.io.outputs.output import Output  # type: ignore[import]

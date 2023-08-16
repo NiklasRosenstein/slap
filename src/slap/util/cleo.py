@@ -58,7 +58,6 @@ def add_style(  # type: ignore[misc]
 
 
 class HelpCommand(_HelpCommand, ListCommand):
-
     arguments = ListCommand.arguments
 
     def handle(self) -> int:

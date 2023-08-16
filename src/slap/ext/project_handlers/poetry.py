@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class PoetryProjectHandler(PyprojectHandler):
-
     # ProjectHandlerPlugin
 
     def matches_project(self, project: Project) -> bool:
