@@ -1,5 +1,5 @@
 [[entries]]
 id = "70140882-6084-4717-a530-0abc4610edb9"
 type = "fix"
-description = "Pin `poetry-core` to `<=1.6.0` to prevent issues with the `poetry.core.semver` module that is being imported by Slap and removed in `poetry-core 1.7.0`"
+description = "Pin `poetry-core` to `<1.7.0` to prevent issues with the `poetry.core.semver` module that is being imported by Slap and removed in `poetry-core 1.7.0`"
 author = "@NiklasRosenstein"
