@@ -122,7 +122,7 @@ class PyprojectHandler(BaseProjectHandler):
         for idx, key in enumerate(keys):
             # NOTE (@NiklasRosenstein): I have no clue why this is needed, but if we don't access the internal
             #   container of this "OutOfOrderTableProxy", it appears the mutation later on doesn't actually work.
-            if isinstance(current, tomlkit.container.OutOfOrderTableProxy):
+            if isinstance(current, tomlkit.container.OutOfOrderTableProxy):  # type: ignore[unreachable]
                 current = current._internal_container
 
             if not isinstance(current, tomlkit.items.Table | tomlkit.container.Container):

@@ -1,6 +1,6 @@
 import typing as t
 
-from poetry.core.semver.version import Version  # type: ignore[import]
+from poetry.core.constraints.version import Version  # type: ignore[import]
 
 from slap.plugins import VersionIncrementingRulePlugin
 
