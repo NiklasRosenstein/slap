@@ -9,7 +9,7 @@ from nr.util.generic import T
 if t.TYPE_CHECKING:
     from pathlib import Path
 
-    from poetry.core.semver.version import Version  # type: ignore[import]
+    from poetry.core.constraints.version import Version  # type: ignore[import]
 
     from slap.application import IO, Application
     from slap.check import Check

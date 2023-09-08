@@ -14,7 +14,7 @@ from slap.plugins import ApplicationPlugin, ReleasePlugin, VersionIncrementingRu
 from slap.project import Project
 
 if t.TYPE_CHECKING:
-    from poetry.core.semver.version import Version  # type: ignore[import]
+    from poetry.core.constraints.version import Version  # type: ignore[import]
 
     from slap.release import VersionRef
 
@@ -224,7 +224,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     def _validate_version_refs(self, version_refs: list[VersionRef], version: str | None) -> int:
         """Internal. Verifies the consistency of the given version references. This is used when `--validate` is set."""
 
-        from poetry.core.semver.version import Version
+        from poetry.core.constraints.version import Version
 
         if version is not None:
             Version.parse(version)
@@ -308,7 +308,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         that occur in a `pyproject.toml`, and if they are all equal, they are considered the current version. If they
         are different, a #ValueError is raised."""
 
-        from poetry.core.semver.version import Version
+        from poetry.core.constraints.version import Version
 
         current_version = {r.value for r in version_refs}
         if len(current_version) != 1:
@@ -321,7 +321,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         Otherwise, it is considered a rule and the applicable rule plugin is invoked to construct the new version."""
 
         from nr.util.plugins import NoSuchEntrypointError, load_entrypoint
-        from poetry.core.semver.version import Version
+        from poetry.core.constraints.version import Version
 
         try:
             return Version.parse(rule)

@@ -12,7 +12,7 @@ from databind.core.settings import Alias
 from nr.util.weak import weak_property
 
 if t.TYPE_CHECKING:
-    from poetry.core.semver.version import Version  # type: ignore[import]
+    from poetry.core.constraints.version import Version  # type: ignore[import]
 
     from slap.repository import RepositoryHost
 
@@ -98,7 +98,7 @@ class ManagedChangelog:
     _manager: "ChangelogManager" = weak_property("_ManagedChangelog__manager")
 
     def __init__(self, manager: "ChangelogManager", path: Path, version: str | None) -> None:
-        from poetry.core.semver.version import Version
+        from poetry.core.constraints.version import Version
 
         assert version is None or isinstance(version, str), type(version)
 
