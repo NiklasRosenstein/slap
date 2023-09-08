@@ -1,0 +1,8 @@
+[[entries]]
+id = "bd6c84f9-120b-4262-ad66-949e7529d11f"
+type = "fix"
+description = "Use new Version for poetry-core and lock minor version"
+author = "@alexespencer"
+issues = [
+    "https://github.com/NiklasRosenstein/slap/issues/95",
+]
