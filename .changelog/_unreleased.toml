@@ -1,0 +1,5 @@
+[[entries]]
+id = "501201eb-fecb-419a-97ac-2aa7a09e8b11"
+type = "fix"
+description = "Allow `SHELL` to be not set when running the `slap venv` command"
+author = "@NiklasRosenstein"
