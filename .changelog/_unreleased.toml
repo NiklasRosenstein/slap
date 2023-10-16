@@ -1,0 +1,6 @@
+[[entries]]
+id = "c259ed87-48f7-4a7b-8e16-6f33bd8a7c67"
+type = "improvement"
+description = "Hide git fatal error"
+author = "alex.spencer@helsing.ai"
+pr = "https://github.com/NiklasRosenstein/slap/pull/97"
