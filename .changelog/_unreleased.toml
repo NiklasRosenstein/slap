@@ -1,0 +1,5 @@
+[[entries]]
+id = "b9e94c62-363d-4dbf-8aba-1238d4bc5f04"
+type = "feature"
+description = "Add `component` key to changelog entries, and `slap add -C <component_name>` option"
+author = "@NiklasRosenstein"

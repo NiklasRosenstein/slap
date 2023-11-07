@@ -157,6 +157,12 @@ class ChangelogAddCommand(BaseChangelogCommand):
             "well as the directory relative to the VCS toplevel if the changelog is created not in the toplevel "
             "directory of the repository.",
         ),
+        option(
+            "--component",
+            "-C",
+            description="The name of the component that the changelog is about.",
+            flag=False,
+        ),
     ]
 
     def handle(self) -> int:
@@ -170,6 +176,7 @@ class ChangelogAddCommand(BaseChangelogCommand):
         author: str | None = self.option("author") or get_default_author(self.app)
         pr: str | None = self.option("pr")
         issues: list[str] | None = self.option("issue")
+        component: str | None = self.option("component")
 
         if not vcs and self.option("commit"):
             self.line_error("error: no VCS detected, but <opt>--commit, -c</opt> was used", "error")
@@ -185,7 +192,7 @@ class ChangelogAddCommand(BaseChangelogCommand):
             self.line_error("error: missing <opt>--author,-a</opt>", "error")
             return 1
 
-        entry = self.manager.make_entry(change_type, description, author, pr, issues)
+        entry = self.manager.make_entry(change_type, description, author, pr, issues, component)
         unreleased = self.manager.unreleased()
         changelog = unreleased.content if unreleased.exists() else Changelog()
         changelog.entries.append(entry)
@@ -632,6 +639,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
                 author=author or default_author,
                 pr=None,
                 issues=original_entry.get("fixes", None) or None,
+                component=None,
             )
             entries.append(new_entry)
 

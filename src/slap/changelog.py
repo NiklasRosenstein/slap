@@ -30,6 +30,7 @@ class ChangelogEntry:
     authors: list[str] | None = None
     pr: str | None = None
     issues: list[str] | None = None
+    component: str | None = None
 
     def get_authors(self) -> list[str]:
         result = []
@@ -212,6 +213,7 @@ class ChangelogManager:
         author: str,
         pr: str | None,
         issues: list[str] | None,
+        component: str | None,
     ) -> ChangelogEntry:
         """Creates a new #ChangelogEntry and validates it. If the parameters of the changelog are invalid, a
         #InvalidChangelogEntryException is raised. A random unique ID is generated for the changelog. The *pr*
@@ -229,7 +231,13 @@ class ChangelogManager:
 
         changelog_id = str(uuid.uuid4())
         return ChangelogEntry(
-            id=changelog_id, type=change_type, description=description, author=author, pr=pr, issues=issues or None
+            id=changelog_id,
+            type=change_type,
+            description=description,
+            author=author,
+            pr=pr,
+            issues=issues or None,
+            component=component,
         )
 
     def validate_entry(self, entry: ChangelogEntry) -> None:
