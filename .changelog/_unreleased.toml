@@ -1,0 +1,5 @@
+[[entries]]
+id = "dcd60d11-3358-422d-a86a-474795372cd8"
+type = "improvement"
+description = "allow passing `none` or `null` for the `slap init --license` parameter"
+author = "@NiklasRosenstein"

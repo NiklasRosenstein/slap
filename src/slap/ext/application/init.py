@@ -126,6 +126,8 @@ class InitCommandPlugin(Command, ApplicationPlugin):
             )
         for filename, content in load_template(template):
             if filename == "LICENSE":
+                if self.option("license") in ("null", "none"):
+                    continue
                 content = get_spdx_license_details(self.option("license")).license_text
                 content = wrap_license_text(content).replace("<year>", str(scope["year"]))
                 content = wrap_license_text(content).replace("<copyright holders>", scope["author_name"])
