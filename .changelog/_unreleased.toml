@@ -24,3 +24,10 @@ pr = "https://github.com/NiklasRosenstein/slap/pull/104"
 issues = [
     "https://github.com/NiklasRosenstein/slap/issues/98",
 ]
+
+[[entries]]
+id = "c5d94767-38b7-4b01-8669-c5aaf027d0ab"
+type = "fix"
+description = "Fixed a bug in `slap release` where an unreleased changelog in the project root was not renamed and updated in a mono repository"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/105"
