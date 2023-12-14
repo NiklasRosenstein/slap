@@ -11,9 +11,13 @@ class ChangelogReleasePlugin(ReleasePlugin):
 
     def create_release(self, repository: Repository, target_version: str, dry: bool) -> t.Sequence[Path]:
         changed_files: list[Path] = []
-        for project in repository.projects():
+        for project in [None, *repository.projects()]:
             manager = get_changelog_manager(repository, project)
             unreleased = manager.unreleased()
+            if unreleased.path in changed_files:
+                # We hit this case in a single-project repository, where "None" and the single project will
+                # both return the same changelog manager.
+                continue
             new_version = manager.version(target_version)
             if unreleased.exists():
                 cwd = Path.cwd()
