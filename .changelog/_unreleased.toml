@@ -20,6 +20,7 @@ id = "d8af87d8-191f-40e8-8099-e5a5618cf230"
 type = "improvement"
 description = "remove dependency on `pkg_resources` directly in the module, although a transitive dependency (`nr.util.plugin`) still uses it"
 author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/104"
 issues = [
     "https://github.com/NiklasRosenstein/slap/issues/98",
 ]
