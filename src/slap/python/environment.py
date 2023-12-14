@@ -119,7 +119,7 @@ class PythonEnvironment:
                     dist = metadata.distribution(arg)
                 except metadata.PackageNotFoundError:
                     dist = None
-                    result.append(dist)
+                result.append(dist)
             sys.stdout.buffer.write(pickle.dumps(result))
             """
         )
