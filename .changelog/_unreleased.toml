@@ -1,0 +1,16 @@
+[[entries]]
+id = "dcd60d11-3358-422d-a86a-474795372cd8"
+type = "improvement"
+description = "allow passing `none` or `null` for the `slap init --license` parameter"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/103"
+
+[[entries]]
+id = "af82da0c-1c32-45e0-a28d-534a17c63ea6"
+type = "feature"
+description = "Add `slap venv --no-upgrade-pip` option and automatically upgrade Pip after creating a virtual environment if the option is not specified."
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/103"
+issues = [
+    "https://github.com/NiklasRosenstein/slap/issues/102",
+]
