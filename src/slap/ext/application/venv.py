@@ -256,6 +256,7 @@ class VenvCommand(Command):
             description="Create the environment with the given environment name. If no <opt>name</opt> is specified, "
             "the environment name will be the major.minor version of the current Python version.",
         ),
+        option("--no-upgrade-pip", description="If specified, will not upgrade Pip after creating a new environment."),
         option(
             "--delete",
             "-d",
@@ -325,6 +326,11 @@ class VenvCommand(Command):
                 if self.option(opt):
                     self.line_error("error: <opt>--path,-P</opt> is not compatible with <opt>--{opt}</opt>", "error")
                     return False
+        if self.option("no-upgrade-pip") and not self.option("create"):
+            self.line_error(
+                "error: <opt>--no-pip-upgrade</opt> is only valid in combination with <opt>-c,--create</opt>"
+            )
+            return False
         if not any(
             self.option(opt) for opt in ("activate", "create", "delete", "set", "list", "init-code", "path", "exists")
         ):
@@ -411,6 +417,10 @@ class VenvCommand(Command):
                 f'creating {location} environment <s>"{venv.name}"</s> (using <code>{python}</code>)', "info"
             )
             venv.create(python)
+
+            if not self.option("no-upgrade-pip"):
+                self.line_error("upgrading Pip to the latest version", "info")
+                sp.check_call([str(venv.get_bin("pip")), "install", "-U", "pip"])
 
         if self.option("activate"):
             if not venv:
