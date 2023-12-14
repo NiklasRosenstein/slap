@@ -11,7 +11,12 @@ class ChangelogReleasePlugin(ReleasePlugin):
 
     def create_release(self, repository: Repository, target_version: str, dry: bool) -> t.Sequence[Path]:
         changed_files: list[Path] = []
-        for project in [None, *repository.projects()]:
+
+        config_sources: list[Project | None] = [*repository.projects()]
+        if repository.is_monorepo:
+            config_sources.append(None)
+
+        for project in config_sources:
             manager = get_changelog_manager(repository, project)
             unreleased = manager.unreleased()
             if unreleased.path in changed_files:
