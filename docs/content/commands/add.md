@@ -23,13 +23,14 @@ Poetry as the build backend, it will add `httpx = "^0.22.0"` wheras if it is usi
 
 !!! note
 
-    Slap uses `pkg_resources.get_distribution()` to retrieve the version of the package that got installed, or was
-    already installed, and assumes that the package is available in the target Python environment.
+    Slap uses `importlib.metadata.distribution()` to retrieve the version of the package that got installed, or was
+    already installed, and assumes that the module is available in the target Python environment. The module is part
+    of the Python standard library starting with Python 3.8.
 
 ## Support matrix
 
-| Build system | Supported |
-| ------------ | --------- |
-| Flit | ✅ |
-| Poetry | ✅ |
-| Setuptools | ❌ (dependencies defined in `setup.cfg`) |
+| Build system | Supported                               |
+|--------------|-----------------------------------------|
+| Flit         | ✅                                       |
+| Poetry       | ✅                                       |
+| Setuptools   | ❌ (dependencies defined in `setup.cfg`) |

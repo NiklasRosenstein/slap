@@ -3,8 +3,7 @@
 import json
 import logging
 import typing as t
-
-import pkg_resources
+from importlib.metadata import Distribution
 
 from slap.application import Application, option
 from slap.ext.application.venv import VenvAwareCommand
@@ -50,7 +49,7 @@ class ReportDependenciesCommand(VenvAwareCommand):
             for extra in extras:
                 requirements += project.dependencies().extra.get(extra, [])
 
-        dists_cache: dict[str, pkg_resources.Distribution | None] = {}
+        dists_cache: dict[str, Distribution | None] = {}
         python_environment = PythonEnvironment.of("python")
         requirements = filter_dependencies(requirements, python_environment.pep508, extras)
         with tqdm.tqdm(desc="Resolving requirements graph") as progress:
@@ -67,15 +66,16 @@ class ReportDependenciesCommand(VenvAwareCommand):
         # Retrieve the license text from the distributions.
         if self.option("with-license-text"):
             for dist_name, dist_data in output["metadata"].items():
-                dist = dists_cache[dist_name]
+                if (dist := dists_cache[dist_name]) is None:
+                    continue
+
                 dist_data["license_text"] = None
-                if dist is not None:
-                    for filename in ("LICENSE", "LICENSE.txt", "LICENSE.text", "LICENSE.rst"):
-                        try:
-                            dist_data["license_text"] = dist.get_metadata(filename)
-                            break
-                        except FileNotFoundError:
-                            pass
+                for file in dist.files or []:
+                    if not file.parent.name.endswith(".dist-info"):
+                        continue
+                    if file.name == "LICENSE" or file.name.startswith("LICENSE."):
+                        dist_data["license_text"] = file.read_text()
+                        break
 
         print(json.dumps(output, indent=2, sort_keys=True))
         return 0

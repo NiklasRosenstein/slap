@@ -12,5 +12,5 @@ def test__PythonEnvironment__with_current_python_instance():
     assert environment.prefix == sys.prefix
     assert environment.base_prefix == getattr(sys, "base_prefix", None)
     assert environment.real_prefix == getattr(sys, "real_prefix", None)
-    assert environment.has_pkg_resources()  # Slap requires setuptools, so pkg_resources is definitely available
+    assert environment.has_importlib_metadata()
     assert environment.get_distribution("setuptools") is not None
