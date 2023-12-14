@@ -9,12 +9,13 @@ import shutil
 import subprocess as sp
 import textwrap
 import typing as t
+from importlib.metadata import PathDistribution
 from pathlib import Path
 
 from slap.python import pep508
 
 if t.TYPE_CHECKING:
-    import pkg_resources
+    from importlib.metadata import Distribution
 
     from slap.python.dependency import Dependency
 
@@ -40,13 +41,13 @@ class PythonEnvironment:
 
         return bool(self.real_prefix or (self.base_prefix and self.prefix != self.base_prefix))
 
-    def has_pkg_resources(self) -> bool:
-        """Checks if the Python environment has the `pkg_resources` module available."""
+    def has_importlib_metadata(self) -> bool:
+        """Checks if the Python environment has the `importlib.metadata` module available."""
 
         if self._has_pkg_resources is None:
             code = textwrap.dedent(
                 """
-        try: import pkg_resources
+        try: import importlib.metadata
         except ImportError: print('false')
         else: print('true')
       """
@@ -79,8 +80,8 @@ class PythonEnvironment:
       import sys, platform, json, pickle
       sys.path.append({pep508_path!r})
       import pep508
-      try: import pkg_resources
-      except ImportError: pkg_resources = None
+      try: import importlib.metadata as metadata
+      except ImportError: metadata = None
       print(json.dumps({{
         "executable": sys.executable,
         "version": sys.version,
@@ -90,7 +91,7 @@ class PythonEnvironment:
         "base_prefix": getattr(sys, 'base_prefix', None),
         "real_prefix": getattr(sys, 'real_prefix', None),
         "pep508": pep508.Pep508Environment.current().as_json(),
-        "_has_pkg_resources": pkg_resources is not None,
+        "_has_pkg_resources": metadata is not None,
       }}))
     """
         )
@@ -100,27 +101,27 @@ class PythonEnvironment:
         payload["pep508"] = pep508.Pep508Environment(**payload["pep508"])
         return PythonEnvironment(**payload)
 
-    def get_distribution(self, distribution: str) -> pkg_resources.Distribution | None:
+    def get_distribution(self, distribution: str) -> Distribution | None:
         """Query the details for a single distribution in the Python environment."""
 
         return self.get_distributions([distribution])[distribution]
 
-    def get_distributions(self, distributions: t.Collection[str]) -> dict[str, pkg_resources.Distribution | None]:
+    def get_distributions(self, distributions: t.Collection[str]) -> dict[str, Distribution | None]:
         """Query the details for the given distributions in the Python environment with
-        #pkg_resources.get_distribution()."""
+        #importlib.metadata.distribution()."""
 
         code = textwrap.dedent(
             """
-      import sys, pkg_resources, pickle
-      result = []
-      for arg in sys.argv[1:]:
-        try:
-          dist = pkg_resources.get_distribution(arg)
-        except pkg_resources.DistributionNotFound:
-          dist = None
-        result.append(dist  )
-      sys.stdout.buffer.write(pickle.dumps(result))
-    """
+            import sys, importlib.metadata as metadata, pickle
+            result = []
+            for arg in sys.argv[1:]:
+                try:
+                    dist = metadata.distribution(arg)
+                except metadata.PackageNotFoundError:
+                    dist = None
+                result.append(dist)
+            sys.stdout.buffer.write(pickle.dumps(result))
+            """
         )
 
         keys = list(distributions)
@@ -132,7 +133,7 @@ class PythonEnvironment:
 class DistributionMetadata:
     """Additional metadata for a distribution."""
 
-    location: str
+    location: str | None
     version: str
     license_name: str | None
     platform: str | None
@@ -141,21 +142,17 @@ class DistributionMetadata:
     extras: set[str]
 
 
-def get_distribution_metadata(dist: pkg_resources.Distribution) -> DistributionMetadata:
+def get_distribution_metadata(dist: Distribution) -> DistributionMetadata:
     """Parses the distribution metadata."""
 
-    from email.parser import Parser
-
-    data = Parser().parsestr(dist.get_metadata(dist.PKG_INFO))
-
     return DistributionMetadata(
-        location=dist.location,
-        version=data.get("Version"),
-        license_name=data.get("License"),
-        platform=data.get("Platform"),
-        requires_python=data.get("Requires-Python"),
-        requirements=data.get_all("Requires-Dist") or [],
-        extras=set(data.get_all("Provides-Extra") or []),
+        location=str(dist._path) if isinstance(dist, PathDistribution) else None,  # type: ignore[attr-defined]
+        version=dist.metadata["Version"],
+        license_name=dist.metadata.get("License"),
+        platform=dist.metadata.get("Platform"),
+        requires_python=dist.metadata.get("Requires-Python"),
+        requirements=dist.metadata.get_all("Requires-Dist") or [],
+        extras=set(dist.metadata.get_all("Provides-Extra") or []),
     )
 
 
@@ -187,8 +184,8 @@ class DistributionGraph:
 def build_distribution_graph(
     env: PythonEnvironment,
     dependencies: list[Dependency],
-    resolved_callback: t.Callable[[dict[str, pkg_resources.Distribution | None]], t.Any] | None = None,
-    dists_cache: dict[str, pkg_resources.Distribution | None] | None = None,
+    resolved_callback: t.Callable[[dict[str, Distribution | None]], t.Any] | None = None,
+    dists_cache: dict[str, Distribution | None] | None = None,
 ) -> DistributionGraph:
     """Builds a #DistributionGraph in the given #PythonEnvironment using the given dependencies.
 
