@@ -112,16 +112,16 @@ class PythonEnvironment:
 
         code = textwrap.dedent(
             """
-      import sys, importlib.metadata as metadata, pickle
-      result = []
-      for arg in sys.argv[1:]:
-        try:
-          dist = metadata.distribution(arg)
-        except metadata.PackageNotFoundError:
-          dist = None
-        result.append(dist)
-      sys.stdout.buffer.write(pickle.dumps(result))
-    """
+            import sys, importlib.metadata as metadata, pickle
+            result = []
+            for arg in sys.argv[1:]:
+                try:
+                    dist = metadata.distribution(arg)
+                except metadata.PackageNotFoundError:
+                    dist = None
+                    result.append(dist)
+            sys.stdout.buffer.write(pickle.dumps(result))
+            """
         )
 
         keys = list(distributions)
