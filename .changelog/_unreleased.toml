@@ -1,0 +1,5 @@
+[[entries]]
+id = "b08f0b1f-b3f1-4aee-adc8-d83f27a1b7e5"
+type = "fix"
+description = "Running `slap release` in a sub-project of a mono repository is now supported and only affects that sub-project."
+author = "@NiklasRosenstein"

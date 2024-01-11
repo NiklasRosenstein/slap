@@ -145,7 +145,9 @@ class ReleasePlugin(abc.ABC):
 
         return []
 
-    def create_release(self, repository: Repository, target_version: str, dry: bool) -> t.Sequence[Path]:
+    def create_release(
+        self, repository: Repository, project: Project | None, target_version: str, dry: bool
+    ) -> t.Sequence[Path]:
         """Gives the plugin a chance to perform an arbitrary action after all version references have been bumped,
         being informed of the target version. If *dry* is `True`, the plugin should only act as if it was performing
         its usual actions but not commit the changes to disk. It should return the list of files that it modifies

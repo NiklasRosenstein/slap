@@ -364,7 +364,9 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
         for plugin in self._load_plugins(self.app.repository):
             try:
-                changed_files.extend(plugin.create_release(self.app.repository, str(target_version), dry))
+                changed_files.extend(
+                    plugin.create_release(self.app.repository, self.app.main_project(), str(target_version), dry)
+                )
             except BaseException:
                 self.line_error(f"error with {type(plugin).__name__}.bump_version()", "error")
                 raise
@@ -417,7 +419,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         version_refs = []
 
         # Understand the version references defined in the project configuration.
-        for project in self.app.configurations():
+        for project in self.app.get_target_projects():
             # Always consider the version number in the pyproject.toml.
             if project.pyproject_toml.exists() and isinstance(project, Project):
                 version_refs += project.get_version_refs()
@@ -436,7 +438,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
                     version_refs.append(version_ref)
 
         # Query plugins for additional version references.
-        for project in self.app.repository.projects():
+        for project in self.app.get_target_projects():
             for plugin in self._load_plugins(project):
                 version_refs += plugin.get_version_refs(project)
 
