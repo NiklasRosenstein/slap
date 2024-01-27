@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import weakref
-from typing import Any, Generic, Literal, Optional, TypeVar, cast, overload
+from typing import Any, Generic, Literal, Optional, TypeVar, overload
 
 T = TypeVar("T")
 
