@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
-import pkg_resources
+import importlib_metadata
 import typing_extensions as te
 
 T = t.TypeVar("T")
@@ -38,7 +38,7 @@ def load_entrypoint(group: str | type[T], name: str) -> t.Any | type[T]:
     else:
         group_name = group
 
-    for ep in pkg_resources.iter_entry_points(group_name, name):
+    for ep in importlib_metadata.entry_points(group=group_name, name=name):
         value = ep.load()
         break
     else:
@@ -53,7 +53,7 @@ def load_entrypoint(group: str | type[T], name: str) -> t.Any | type[T]:
     return value
 
 
-_Iter_Entrypoints_1: te.TypeAlias = "t.Iterator[pkg_resources.EntryPoint]"
+_Iter_Entrypoints_1: te.TypeAlias = "t.Iterator[importlib_metadata.EntryPoint]"
 _Iter_Entrypoints_2: te.TypeAlias = "t.Iterator[tuple[str, t.Callable[[], type[T]]]]"
 
 
@@ -75,7 +75,7 @@ def iter_entrypoints(group: str | type[T]) -> _Iter_Entrypoints_1 | _Iter_Entryp
     else:
         group_name = group
 
-    def _make_loader(ep: pkg_resources.EntryPoint) -> t.Callable[[], type[T]]:
+    def _make_loader(ep: importlib_metadata.EntryPoint) -> t.Callable[[], type[T]]:
         def loader():
             assert isinstance(group, type)
             value = ep.load()
@@ -89,7 +89,7 @@ def iter_entrypoints(group: str | type[T]) -> _Iter_Entrypoints_1 | _Iter_Entryp
 
         return loader
 
-    for ep in pkg_resources.iter_entry_points(group_name):
+    for ep in importlib_metadata.entry_points(group=group_name):
         if isinstance(group, type):
             yield ep.name, _make_loader(ep)
         else:

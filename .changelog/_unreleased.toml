@@ -11,3 +11,9 @@ type = "improvement"
 description = "Add `Once.flush()` to use that instead of `.get(resupply=True)`"
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/108"
+
+[[entries]]
+id = "712b2efd-32e6-4ed6-b131-4669d36fc951"
+type = "improvement"
+description = "Use `importlib-metadata` package over `pkg_resources`"
+author = "@NiklasRosenstein"
