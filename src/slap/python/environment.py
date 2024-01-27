@@ -47,10 +47,10 @@ class PythonEnvironment:
         if self._has_pkg_resources is None:
             code = textwrap.dedent(
                 """
-        try: import importlib.metadata
-        except ImportError: print('false')
-        else: print('true')
-      """
+                try: import importlib.metadata
+                except ImportError: print('false')
+                else: print('true')
+                """
             )
             self._has_pkg_resources = json.loads(sp.check_output([self.executable, "-c", code]).decode())
         return self._has_pkg_resources
@@ -77,23 +77,23 @@ class PythonEnvironment:
 
         code = textwrap.dedent(
             f"""
-      import sys, platform, json, pickle
-      sys.path.append({pep508_path!r})
-      import pep508
-      try: import importlib.metadata as metadata
-      except ImportError: metadata = None
-      print(json.dumps({{
-        "executable": sys.executable,
-        "version": sys.version,
-        "version_tuple": sys.version_info[:3],
-        "platform": platform.platform(),
-        "prefix": sys.prefix,
-        "base_prefix": getattr(sys, 'base_prefix', None),
-        "real_prefix": getattr(sys, 'real_prefix', None),
-        "pep508": pep508.Pep508Environment.current().as_json(),
-        "_has_pkg_resources": metadata is not None,
-      }}))
-    """
+            import sys, platform, json, pickle
+            sys.path.append({pep508_path!r})
+            import pep508
+            try: import importlib.metadata as metadata
+            except ImportError: metadata = None
+            print(json.dumps({{
+                "executable": sys.executable,
+                "version": sys.version,
+                "version_tuple": sys.version_info[:3],
+                "platform": platform.platform(),
+                "prefix": sys.prefix,
+                "base_prefix": getattr(sys, 'base_prefix', None),
+                "real_prefix": getattr(sys, 'real_prefix', None),
+                "pep508": pep508.Pep508Environment.current().as_json(),
+                "_has_pkg_resources": metadata is not None,
+            }}))
+            """
         )
 
         payload = json.loads(sp.check_output(list(python) + ["-c", code]).decode())
