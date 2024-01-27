@@ -6,9 +6,9 @@ import typing as t
 from pathlib import Path
 
 from databind.core.settings import Union
-from nr.util.functional import Once
 
 from slap.configuration import Configuration
+from slap.util.once import Once
 
 if t.TYPE_CHECKING:
     from slap.plugins import RepositoryHandlerPlugin
@@ -107,10 +107,9 @@ class Repository(Configuration):
     def _get_repository_handler(self) -> RepositoryHandlerPlugin | None:
         """Returns the handler for this repository."""
 
-        from nr.util.plugins import load_entrypoint
-
         from slap.ext.repository_handlers.default import DefaultRepositoryHandler
         from slap.plugins import RepositoryHandlerPlugin
+        from slap.util.plugins import load_entrypoint
 
         handler: RepositoryHandlerPlugin
         handler_name = self.raw_config().get("repository", {}).get("handler")
@@ -136,10 +135,8 @@ class Repository(Configuration):
     def get_projects_ordered(self) -> list[Project]:
         """Return a topological ordering of the projects."""
 
-        from nr.util.digraph import DiGraph
-        from nr.util.digraph.algorithm.topological_sort import topological_sort
-
         from slap.project import Project
+        from slap.util.digraph import DiGraph, topological_sort
 
         graph: DiGraph[Project, None, None] = DiGraph()
         projects = self.projects()
@@ -153,12 +150,12 @@ class Repository(Configuration):
         return list(topological_sort(graph, sorting_key=lambda p: p.id))
 
     def _get_vcs(self) -> Vcs | None:
-        from nr.util.optional import Optional
+        from nr.stream import Optional
 
         return Optional(self._handler()).map(lambda h: h.get_vcs(self)).or_else(None)
 
     def _get_repository_host(self) -> RepositoryHost | None:
-        from nr.util.optional import Optional
+        from nr.stream import Optional
 
         return Optional(self._handler()).map(lambda h: h.get_repository_host(self)).or_else(None)
 

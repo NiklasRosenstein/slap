@@ -7,13 +7,13 @@ import re
 import typing as t
 from pathlib import Path
 
-from nr.util.algorithm.longest_common_substring import longest_common_substring
-from nr.util.fs import get_file_in_directory
 from setuptools import find_namespace_packages, find_packages
 
 from slap.plugins import ProjectHandlerPlugin
 from slap.project import Package, Project
 from slap.release import VersionRef, match_version_ref_pattern, match_version_ref_pattern_on_lines
+from slap.util.fs import get_file_in_directory
+from slap.util.text import longest_common_substring
 
 if t.TYPE_CHECKING:
     from slap.python.dependency import Dependency

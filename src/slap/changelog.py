@@ -9,7 +9,8 @@ import uuid
 from pathlib import Path
 
 from databind.core.settings import Alias
-from nr.util.weak import weak_property
+
+from slap.util.weak_property import weak_property
 
 if t.TYPE_CHECKING:
     from poetry.core.constraints.version import Version  # type: ignore[import]

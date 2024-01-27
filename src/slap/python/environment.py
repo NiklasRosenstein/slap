@@ -170,7 +170,7 @@ class DistributionGraph:
     missing: set[str]
 
     def sort(self) -> None:
-        from nr.util.orderedset import OrderedSet
+        from slap.util.orderedset import OrderedSet
 
         for dist_name, dependencies in self.dependencies.items():
             self.dependencies[dist_name] = OrderedSet(sorted(dependencies))

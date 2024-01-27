@@ -5,9 +5,10 @@ import re
 import typing as t
 from pathlib import Path
 
-from nr.util.functional import Consumer
-from nr.util.generic import T
-from nr.util.git import Git as _Git, NoCurrentBranchError
+from slap.util.git import Git as _Git, NoCurrentBranchError
+
+T = t.TypeVar("T")
+Consumer = t.Callable[[T], t.Any]
 
 
 class FileStatus(enum.Enum):

@@ -4,7 +4,7 @@ import abc
 import typing as t
 from functools import partial
 
-from nr.util.generic import T
+T = t.TypeVar("T")
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -202,7 +202,7 @@ class RepositoryCIPlugin(abc.ABC):
         """Iterates over all registered automation plugins and returns a dictionary that maps
         the plugin name to a factory function."""
 
-        from nr.util.plugins import iter_entrypoints
+        from slap.util.plugins import iter_entrypoints
 
         result: dict[str, t.Callable[[], RepositoryCIPlugin]] = {}
         for ep in iter_entrypoints(RepositoryCIPlugin.ENTRYPOINT):

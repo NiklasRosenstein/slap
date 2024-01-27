@@ -3,12 +3,11 @@ import dataclasses
 import logging
 import typing as t
 
-from nr.util.plugins import load_entrypoint
-
 from slap.application import Application, Command, option
 from slap.check import Check, CheckResult
 from slap.plugins import ApplicationPlugin, CheckPlugin
 from slap.project import Project
+from slap.util.plugins import load_entrypoint
 
 logger = logging.getLogger(__name__)
 DEFAULT_PLUGINS = ["changelog", "general", "poetry", "release"]

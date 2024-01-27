@@ -5,8 +5,9 @@ import re
 import typing as t
 from pathlib import Path
 
-from nr.util.generic import T
-from nr.util.singleton import NotSet
+from slap.util.notset import NotSet
+
+T = t.TypeVar("T")
 
 
 @t.overload

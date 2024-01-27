@@ -3,7 +3,7 @@
 import typing as t
 from pathlib import Path
 
-from nr.util.generic import T
+T = t.TypeVar("T")
 
 
 class TomlFile(t.MutableMapping[str, t.Any]):

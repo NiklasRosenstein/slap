@@ -10,13 +10,12 @@ from databind.core.settings import Alias
 from slap.configuration import Configuration
 
 if t.TYPE_CHECKING:
-    from nr.util.functional import Once
-
     from slap.install.installer import Indexes
     from slap.plugins import ProjectHandlerPlugin
     from slap.python.dependency import Dependency, VersionSpec
     from slap.release import VersionRef
     from slap.repository import Repository
+    from slap.util.once import Once
 
 
 logger = logging.getLogger(__name__)
@@ -87,8 +86,7 @@ class Project(Configuration):
 
     def __init__(self, repository: Repository, directory: Path) -> None:
         super().__init__(directory)
-        from nr.util.functional import Once
-
+        from slap.util.once import Once
         from slap.util.toml_file import TomlFile
 
         self.repository = repository
@@ -112,9 +110,8 @@ class Project(Configuration):
     def _get_project_handler(self) -> ProjectHandlerPlugin:
         """Returns the handler for this project."""
 
-        from nr.util.plugins import iter_entrypoints, load_entrypoint
-
         from slap.plugins import ProjectHandlerPlugin
+        from slap.util.plugins import iter_entrypoints, load_entrypoint
 
         handler_name = self.config().handler
         if handler_name is None:

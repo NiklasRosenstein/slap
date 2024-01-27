@@ -166,7 +166,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         Installs the requirements of the package using Pip.
         """
 
-        from nr.util.stream import Stream
+        from nr.stream import Stream
 
         from slap.install.installer import InstallOptions, PipInstaller, get_indexes_for_projects
         from slap.python.dependency import PathDependency, PypiDependency, parse_dependencies

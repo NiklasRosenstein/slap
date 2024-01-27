@@ -93,7 +93,7 @@ class InitCommandPlugin(Command, ApplicationPlugin):
         app.cleo.add(self)
 
     def handle(self) -> int:
-        from nr.util.optional import Optional
+        from nr.stream import Optional
 
         template = self.option("template")
         if template not in TEMPLATES:

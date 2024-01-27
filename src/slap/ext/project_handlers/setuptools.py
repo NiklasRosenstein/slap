@@ -106,7 +106,7 @@ def parse_list_semi(val: str) -> list[str]:
 
     [1]: https://setuptools.pypa.io/en/latest/userguide/declarative_config.html#specifying-values"""
 
-    from nr.util.stream import Stream
+    from nr.stream import Stream
 
     return Stream(val.splitlines()).map(lambda v: v.split(";")).concat().map(str.strip).filter(bool).collect()
 

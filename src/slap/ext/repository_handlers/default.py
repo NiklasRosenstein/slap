@@ -2,11 +2,11 @@ import dataclasses
 import typing as t
 
 from databind.core.settings import Alias
-from nr.util.fs import get_file_in_directory
 
 from slap.plugins import RepositoryHandlerPlugin
 from slap.project import Project
 from slap.repository import Repository, RepositoryHost
+from slap.util.fs import get_file_in_directory
 from slap.util.vcs import Vcs, detect_vcs
 
 
@@ -64,7 +64,7 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
         return detect_vcs(repository.directory)
 
     def get_repository_host(self, repository: Repository) -> RepositoryHost | None:
-        from nr.util.plugins import iter_entrypoints
+        from slap.util.plugins import iter_entrypoints
 
         config = self._get_config(repository)
         if config.repository_host:

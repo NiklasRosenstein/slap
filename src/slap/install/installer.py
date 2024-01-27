@@ -11,10 +11,9 @@ import typing as t
 from pathlib import Path
 from urllib.parse import unquote
 
-from nr.util.url import Url
-
 from slap.python.dependency import MultiDependency
 from slap.python.pep508 import filter_dependencies, test_dependency
+from slap.util.url import Url
 
 if t.TYPE_CHECKING:
     from slap.project import Project
