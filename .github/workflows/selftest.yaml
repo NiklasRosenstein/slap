@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with: { python-version: "${{ matrix.python-version }}" }
-    - run: pip install pipx && pipx install . && which slap
+    - run: pip install pipx && pipx install . --pip-args -vvv && which slap
     - run: slap info
     - run: slap test
     - run: slap publish --dry
