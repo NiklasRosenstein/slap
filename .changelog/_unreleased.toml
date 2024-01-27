@@ -18,3 +18,9 @@ type = "improvement"
 description = "Use `importlib-metadata` package over `pkg_resources`"
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/108"
+
+[[entries]]
+id = "2b4061fd-0028-4520-8e76-f7926c1c6ff7"
+type = "improvement"
+description = "Python 3.12 support"
+author = "@NiklasRosenstein"

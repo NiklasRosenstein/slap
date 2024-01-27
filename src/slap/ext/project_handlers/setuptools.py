@@ -22,7 +22,7 @@ class SetuptoolsProjectHandler(BaseProjectHandler):
         import configparser
 
         if self._project is None:
-            parser = configparser.SafeConfigParser()
+            parser = configparser.ConfigParser()
             parser.read(project.directory / "setup.cfg")
             self._setup_cfg = {s: dict(parser.items(s)) for s in parser.sections()}
             self._project = project
