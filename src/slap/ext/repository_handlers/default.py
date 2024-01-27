@@ -69,7 +69,7 @@ class DefaultRepositoryHandler(RepositoryHandlerPlugin):
         config = self._get_config(repository)
         if config.repository_host:
             return config.repository_host
-        for _plugin_name, loader in iter_entrypoints(RepositoryHost):  # type: ignore[misc]
+        for _plugin_name, loader in iter_entrypoints(RepositoryHost):  # type: ignore[type-abstract]
             if instance := loader().detect_repository_host(repository):
                 return instance
         return None

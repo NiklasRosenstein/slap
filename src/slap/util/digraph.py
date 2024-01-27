@@ -21,7 +21,7 @@ class DiGraph(t.Generic[K, N, E]):
     @generic E: The type of value stored for each edge in the graph. Edge values may not be unique.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Create a new empty directed graph.
         """

@@ -9,13 +9,14 @@ import shutil
 import subprocess as sp
 import textwrap
 import typing as t
-from importlib.metadata import PathDistribution
 from pathlib import Path
+
+from importlib_metadata import PathDistribution
 
 from slap.python import pep508
 
 if t.TYPE_CHECKING:
-    from importlib.metadata import Distribution
+    from importlib_metadata import Distribution
 
     from slap.python.dependency import Dependency
 
@@ -42,12 +43,12 @@ class PythonEnvironment:
         return bool(self.real_prefix or (self.base_prefix and self.prefix != self.base_prefix))
 
     def has_importlib_metadata(self) -> bool:
-        """Checks if the Python environment has the `importlib.metadata` module available."""
+        """Checks if the Python environment has the `importlib_metadata` module available."""
 
         if self._has_pkg_resources is None:
             code = textwrap.dedent(
                 """
-                try: import importlib.metadata
+                try: import importlib_metadata
                 except ImportError: print('false')
                 else: print('true')
                 """
@@ -80,7 +81,7 @@ class PythonEnvironment:
             import sys, platform, json, pickle
             sys.path.append({pep508_path!r})
             import pep508
-            try: import importlib.metadata as metadata
+            try: import importlib_metadata as metadata
             except ImportError: metadata = None
             print(json.dumps({{
                 "executable": sys.executable,
@@ -108,11 +109,11 @@ class PythonEnvironment:
 
     def get_distributions(self, distributions: t.Collection[str]) -> dict[str, Distribution | None]:
         """Query the details for the given distributions in the Python environment with
-        #importlib.metadata.distribution()."""
+        #importlib_metadata.distribution()."""
 
         code = textwrap.dedent(
             """
-            import sys, importlib.metadata as metadata, pickle
+            import sys, importlib_metadata as metadata, pickle
             result = []
             for arg in sys.argv[1:]:
                 try:

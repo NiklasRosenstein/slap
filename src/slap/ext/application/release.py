@@ -328,7 +328,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
             return Version.parse(rule)
         except ValueError:
             try:
-                plugin = load_entrypoint(VersionIncrementingRulePlugin, rule)
+                plugin = load_entrypoint(VersionIncrementingRulePlugin, rule)  # type: ignore[type-abstract]
             except NoSuchEntrypointError:
                 self.line(f'error: "<b>{rule}</b>" is not a valid version incrementing rule', "error")
                 sys.exit(1)

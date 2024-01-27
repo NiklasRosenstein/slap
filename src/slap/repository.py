@@ -114,7 +114,7 @@ class Repository(Configuration):
                 return None
         else:
             assert isinstance(handler_name, str), repr(handler_name)
-            handler = load_entrypoint(RepositoryHandlerPlugin, handler_name)()  # type: ignore[misc]
+            handler = load_entrypoint(RepositoryHandlerPlugin, handler_name)()  # type: ignore[type-abstract]
             assert handler.matches_repository(self), (self, handler)
         return handler
 

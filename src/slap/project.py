@@ -115,7 +115,7 @@ class Project(Configuration):
 
         handler_name = self.config().handler
         if handler_name is None:
-            for handler_name, loader in iter_entrypoints(ProjectHandlerPlugin):  # type: ignore[misc]
+            for handler_name, loader in iter_entrypoints(ProjectHandlerPlugin):  # type: ignore[type-abstract]
                 handler = loader()()
                 if handler.matches_project(self):
                     break
@@ -123,7 +123,7 @@ class Project(Configuration):
                 raise RuntimeError(f"unable to identify project handler for {self!r}")
         else:
             assert isinstance(handler_name, str), repr(handler_name)
-            handler = load_entrypoint(ProjectHandlerPlugin, handler_name)()  # type: ignore[misc]
+            handler = load_entrypoint(ProjectHandlerPlugin, handler_name)()  # type: ignore[type-abstract]
             assert handler.matches_project(self), (self, handler)
         return handler
 

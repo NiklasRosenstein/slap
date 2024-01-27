@@ -607,7 +607,7 @@ class ChangelogConvertCommand(BaseChangelogCommand):
                 except Exception as exc:
                     has_failures = True
                     self.line_error(f'warn: could not convert "{filename}": {exc}', "warning")
-                    if self.io.is_very_verbose:
+                    if self.io.is_very_verbose():
                         import traceback
 
                         self.line_error(traceback.format_exc())

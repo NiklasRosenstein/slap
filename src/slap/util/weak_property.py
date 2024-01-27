@@ -47,12 +47,12 @@ class OptionalWeakProperty(WeakProperty[Optional[T]]):
 
 
 @overload
-def weak_property(attr_name: str, once: bool = False, optional: Literal[False] = False) -> T: ...
+def weak_property(attr_name: str, once: bool = False, optional: Literal[False] = False) -> Any: ...
 
 
 @overload
-def weak_property(attr_name: str, once: bool = False, optional: Literal[True] = True) -> T | None: ...
+def weak_property(attr_name: str, once: bool = False, optional: Literal[True] = True) -> Any | None: ...
 
 
-def weak_property(attr_name: str, once: bool = False, optional: bool = False) -> T | None:
-    return cast(T, WeakProperty(attr_name, once) if optional else OptionalWeakProperty(attr_name, once))
+def weak_property(attr_name: str, once: bool = False, optional: bool = False) -> Any | None:
+    return WeakProperty(attr_name, once) if optional else OptionalWeakProperty(attr_name, once)

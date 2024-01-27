@@ -240,7 +240,7 @@ class Application:
 
         logger.debug("Loading application plugins")
 
-        for plugin_name, loader in iter_entrypoints(ApplicationPlugin):  # type: ignore[misc]
+        for plugin_name, loader in iter_entrypoints(ApplicationPlugin):  # type: ignore[type-abstract]
             if plugin_name in disable:
                 continue
             try:

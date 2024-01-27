@@ -163,6 +163,7 @@ class VersionIncrementingRulePlugin(abc.ABC):
 
     ENTRYPOINT = "slap.plugins.version_incrementing_rule"
 
+    @abc.abstractmethod
     def increment_version(self, version: Version) -> Version: ...
 
 

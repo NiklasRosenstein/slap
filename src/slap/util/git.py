@@ -43,10 +43,10 @@ class Git:
     def __init__(self, path: Path | str | None = None):
         self.path = Path(path) if path else Path.cwd()
 
-    def check_call(self, command: t.List[str], stdout: t.Optional[int] = None) -> None:
+    def check_call(self, command: list[str], stdout: t.Optional[int] = None) -> None:
         sp.check_call(command, cwd=self.path, stdout=stdout)
 
-    def check_output(self, command: t.List[str], stderr: t.Optional[int] = None) -> bytes:
+    def check_output(self, command: list[str], stderr: t.Optional[int] = None) -> bytes:
         return sp.check_output(command, cwd=self.path, stderr=stderr)
 
     def init(self) -> None:
@@ -55,11 +55,11 @@ class Git:
     def clone(
         self,
         clone_url: str,
-        branch: str = None,
-        depth: int = None,
+        branch: str | None = None,
+        depth: int | None = None,
         recursive: bool = False,
-        username: str = None,
-        password: str = None,
+        username: str | None = None,
+        password: str | None = None,
         quiet: bool = False,
     ) -> None:
         """
@@ -71,7 +71,7 @@ class Git:
             if not clone_url.startswith("https://"):
                 raise ValueError("cannot specify username/password for non-HTTPS clone URL.")
             schema, remainder = clone_url.partition("://")[::2]
-            auth = ":".join(t.cast(t.List[str], filter(bool, [username, password])))
+            auth = ":".join(t.cast(list[str], filter(bool, [username, password])))
             clone_url = schema + "://" + auth + "@" + remainder
 
         command = ["git", "clone", clone_url, str(self.path)]
@@ -88,7 +88,7 @@ class Git:
         # change directory to the clone target directory, which might not yet exist.
         sp.check_call(command)
 
-    def add(self, files: t.List[str]) -> None:
+    def add(self, files: list[str]) -> None:
         """
         Add files to the index.
         """
@@ -97,7 +97,7 @@ class Git:
         command = ["git", "add", "--"] + files
         self.check_call(command)
 
-    def get_branches(self) -> t.List[Branch]:
+    def get_branches(self) -> list[Branch]:
         """
         Get the branches of the repository. Returns a list of #Branch objects.
         """
@@ -116,7 +116,7 @@ class Git:
 
         return results
 
-    def get_branch_names(self) -> t.List[str]:
+    def get_branch_names(self) -> list[str]:
         """
         Get the branch names.
         """
@@ -134,7 +134,7 @@ class Git:
 
         raise NoCurrentBranchError(self.path)
 
-    def get_remote_refs(self, remote: str) -> t.List[RefWithSha]:
+    def get_remote_refs(self, remote: str) -> list[RefWithSha]:
         result = []
         command = ["git", "ls-remote", "--heads", "origin"]
         for line in self.check_output(command).decode().splitlines():
@@ -142,7 +142,7 @@ class Git:
             result.append(RefWithSha(ref, sha))
         return result
 
-    def get_remote_branch_names(self, remote: str) -> t.List[str]:
+    def get_remote_branch_names(self, remote: str) -> list[str]:
         refs = self.get_remote_refs(remote)
         return [x.ref[11:] for x in refs if x.ref.startswith("refs/heads/")]
 
@@ -159,7 +159,7 @@ class Git:
             command.insert(2, "-f")
         self.check_call(command)
 
-    def pull(self, remote: str = None, branch: str = None, quiet: bool = False):
+    def pull(self, remote: str | None = None, branch: str | None = None, quiet: bool = False) -> None:
         """
         Pull from the specified Git remote.
         """
@@ -176,12 +176,12 @@ class Git:
 
     def fetch(
         self,
-        remote: str = None,
+        remote: str | None = None,
         all: bool = False,
         tags: bool = False,
         prune: bool = False,
         prune_tags: bool = False,
-        argv: t.Optional[t.List[str]] = None,
+        argv: list[str] | None = None,
     ) -> None:
         """
         Fetch a remote repository (or multiple).
@@ -202,7 +202,7 @@ class Git:
 
         self.check_call(command)
 
-    def remotes(self) -> t.List[Remote]:
+    def remotes(self) -> list[Remote]:
         """
         List up all the remotes of the repository.
         """
@@ -214,7 +214,7 @@ class Git:
 
         return [Remote(remote, urls["(fetch)"], urls["(push)"]) for remote, urls in remotes.items()]
 
-    def add_remote(self, remote: str, url: str, argv: t.Optional[t.List[str]] = None) -> None:
+    def add_remote(self, remote: str, url: str, argv: list[str] | None = None) -> None:
         """
         Add a remote with the specified name.
         """
@@ -261,7 +261,7 @@ class Git:
         except sp.CalledProcessError:
             return None
 
-    def rev_list(self, rev: str, path: str = None) -> t.List[str]:
+    def rev_list(self, rev: str, path: str | None = None) -> list[str]:
         """
         Return a list of all Git revisions, optionally in the specified path.
         """
@@ -307,7 +307,7 @@ class Git:
 
         self.check_call(command)
 
-    def checkout(self, ref: str = None, files: t.List[str] = None, quiet: bool = False):
+    def checkout(self, ref: str | None = None, files: list[str] | None = None, quiet: bool = False) -> None:
         """
         Check out the specified ref or files.
         """
@@ -321,7 +321,9 @@ class Git:
             command += ["--"] + files
         self.check_call(command)
 
-    def reset(self, ref: str = None, files: t.List[str] = None, hard: bool = False, quiet: bool = False):
+    def reset(
+        self, ref: str | None = None, files: list[str] | None = None, hard: bool = False, quiet: bool = False
+    ) -> None:
         """
         Reset to the specified ref or reset the files.
         """
@@ -342,7 +344,7 @@ class Git:
 
         return self.check_output(["git", "log", "-1", rev, "--pretty=%B"]).decode()
 
-    def get_diff(self, files: t.List[str] = None, cached: bool = False):
+    def get_diff(self, files: list[str] | None = None, cached: bool = False):
         command = ["git", "--no-pager", "diff", "--color=never"]
         if cached:
             command += ["--cached"]
@@ -385,7 +387,7 @@ class Git:
                 return None
             raise
 
-    def get_files(self) -> t.List[str]:
+    def get_files(self) -> list[str]:
         """Returns a list of all the files tracked in the Git repository."""
 
         return self.check_output(["git", "ls-files"]).decode().strip().splitlines()
