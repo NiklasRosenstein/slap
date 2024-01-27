@@ -102,8 +102,8 @@ class LinkCommandPlugin(VenvAwareCommand, ApplicationPlugin):
 
 def link_repository(io: IO, projects: list[Project], dump_pyproject: bool = False, python: str | None = None) -> None:
     from flit.install import Installer  # type: ignore[import]
-    from nr.util.fs import atomic_swap
 
+    from slap.util.fs import atomic_swap
     from slap.util.pygments import toml_highlight
 
     # We need to pass an absolute path to Python to make sure the scripts have an absolute shebang.

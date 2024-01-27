@@ -3,12 +3,11 @@ import os
 import typing as t
 from pathlib import Path
 
-from nr.util.singleton import NotSet
-
 from slap.application import IO, Application, argument, option
 from slap.ext.application.venv import VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
+from slap.util.notset import NotSet
 
 logger = logging.getLogger(__name__)
 

@@ -62,7 +62,7 @@ class AddCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         app.cleo.add(self)
 
     def handle(self) -> int:
-        from nr.util.stream import Stream
+        from nr.stream import Stream
 
         from slap.install.installer import InstallOptions, PipInstaller, get_indexes_for_projects
         from slap.python.environment import PythonEnvironment

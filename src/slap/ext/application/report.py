@@ -3,7 +3,8 @@
 import json
 import logging
 import typing as t
-from importlib.metadata import Distribution
+
+from importlib_metadata import Distribution
 
 from slap.application import Application, option
 from slap.ext.application.venv import VenvAwareCommand

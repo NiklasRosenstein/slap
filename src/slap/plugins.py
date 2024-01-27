@@ -4,7 +4,7 @@ import abc
 import typing as t
 from functools import partial
 
-from nr.util.generic import T
+T = t.TypeVar("T")
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -163,8 +163,8 @@ class VersionIncrementingRulePlugin(abc.ABC):
 
     ENTRYPOINT = "slap.plugins.version_incrementing_rule"
 
-    def increment_version(self, version: Version) -> Version:
-        ...
+    @abc.abstractmethod
+    def increment_version(self, version: Version) -> Version: ...
 
 
 class RepositoryCIPlugin(abc.ABC):
@@ -179,30 +179,26 @@ class RepositoryCIPlugin(abc.ABC):
     io: IO
 
     @abc.abstractmethod
-    def initialize(self) -> None:
-        ...
+    def initialize(self) -> None: ...
 
     @abc.abstractmethod
-    def get_base_ref(self) -> str:
-        ...
+    def get_base_ref(self) -> str: ...
 
     def get_head_ref(self) -> str | None:
         return None
 
     @abc.abstractmethod
-    def get_pr(self) -> str:
-        ...
+    def get_pr(self) -> str: ...
 
     @abc.abstractmethod
-    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None:
-        ...
+    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None: ...
 
     @staticmethod
     def all() -> dict[str, t.Callable[[], RepositoryCIPlugin]]:
         """Iterates over all registered automation plugins and returns a dictionary that maps
         the plugin name to a factory function."""
 
-        from nr.util.plugins import iter_entrypoints
+        from slap.util.plugins import iter_entrypoints
 
         result: dict[str, t.Callable[[], RepositoryCIPlugin]] = {}
         for ep in iter_entrypoints(RepositoryCIPlugin.ENTRYPOINT):

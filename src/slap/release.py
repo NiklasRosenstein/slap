@@ -5,18 +5,17 @@ import re
 import typing as t
 from pathlib import Path
 
-from nr.util.generic import T
-from nr.util.singleton import NotSet
+from slap.util.notset import NotSet
+
+T = t.TypeVar("T")
 
 
 @t.overload
-def match_version_ref_pattern(filename: Path, pattern: str) -> VersionRef:
-    ...
+def match_version_ref_pattern(filename: Path, pattern: str) -> VersionRef: ...
 
 
 @t.overload
-def match_version_ref_pattern(filename: Path, pattern: str, fallback: T) -> T | VersionRef:
-    ...
+def match_version_ref_pattern(filename: Path, pattern: str, fallback: T) -> T | VersionRef: ...
 
 
 def match_version_ref_pattern(filename: Path, pattern: str, fallback: NotSet | T = NotSet.Value) -> T | VersionRef:

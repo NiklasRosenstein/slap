@@ -8,3 +8,5 @@ ignore=
     W504,
     # whitespace before ':'
     E203,
+    # multiple statements on one line (def)
+    E704,

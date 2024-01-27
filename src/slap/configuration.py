@@ -7,7 +7,7 @@ from pathlib import Path
 from slap.util.toml_file import TomlFile
 
 if t.TYPE_CHECKING:
-    from nr.util.functional import Once
+    from slap.util.once import Once
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class Configuration:
     raw_config: Once[dict[str, t.Any]]
 
     def __init__(self, directory: Path) -> None:
-        from nr.util.functional import Once
+        from slap.util.once import Once
 
         self.directory = directory
         self.pyproject_toml = TomlFile(directory / "pyproject.toml")

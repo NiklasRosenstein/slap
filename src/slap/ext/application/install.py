@@ -32,13 +32,11 @@ python_option = option(
 
 
 @t.overload
-def get_active_python_bin(cmd: Command) -> str:
-    ...
+def get_active_python_bin(cmd: Command) -> str: ...
 
 
 @t.overload
-def get_active_python_bin(cmd: Command, fallback: te.Literal[False]) -> str | None:
-    ...
+def get_active_python_bin(cmd: Command, fallback: te.Literal[False]) -> str | None: ...
 
 
 def get_active_python_bin(cmd: Command, fallback: bool = True) -> str | None:
@@ -166,7 +164,7 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         Installs the requirements of the package using Pip.
         """
 
-        from nr.util.stream import Stream
+        from nr.stream import Stream
 
         from slap.install.installer import InstallOptions, PipInstaller, get_indexes_for_projects
         from slap.python.dependency import PathDependency, PypiDependency, parse_dependencies

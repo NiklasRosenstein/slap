@@ -3,7 +3,7 @@
 import typing as t
 from pathlib import Path
 
-from nr.util.generic import T
+T = t.TypeVar("T")
 
 
 class TomlFile(t.MutableMapping[str, t.Any]):
@@ -52,12 +52,10 @@ class TomlFile(t.MutableMapping[str, t.Any]):
             tomli_w.dump(self._data, fp)
 
     @t.overload
-    def value(self) -> dict[str, t.Any]:
-        ...
+    def value(self) -> dict[str, t.Any]: ...
 
     @t.overload
-    def value(self, data: dict[str, t.Any]) -> None:
-        ...
+    def value(self, data: dict[str, t.Any]) -> None: ...
 
     def value(self, data: dict[str, t.Any] | None = None) -> dict[str, t.Any] | None:
         if data is None:

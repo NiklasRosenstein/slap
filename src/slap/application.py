@@ -20,11 +20,10 @@ from slap import __version__
 from slap.util.strings import split_by_commata
 
 if t.TYPE_CHECKING:
-    from nr.util.functional import Once
-
     from slap.configuration import Configuration
     from slap.project import Project
     from slap.repository import Repository
+    from slap.util.once import Once
 
 __all__ = ["Command", "argument", "option", "IO", "Application"]
 logger = logging.getLogger(__name__)
@@ -116,7 +115,7 @@ class CleoApplication(BaseCleoApplication):
     def _configure_io(self, io: IO) -> None:
         import logging
 
-        from nr.util.logging.formatters.terminal_colors import TerminalColorFormatter
+        from slap.util.logging import TerminalColorFormatter
 
         fmt = "<fg=bright black>%(message)s</fg>"
         if io.input.has_parameter_option("-vvv"):
@@ -172,7 +171,7 @@ class Application:
     cleo: CleoApplication
 
     def __init__(self, directory: Path | None = None, name: str = "slap", version: str = __version__) -> None:
-        from nr.util.functional import Once
+        from slap.util.once import Once
 
         self._directory = directory or Path.cwd()
         self._repository: t.Optional[Repository] = None
@@ -230,9 +229,8 @@ class Application:
         plugins delivered immediately with Slap are enabled by default unless disabled explicitly with the `disable`
         option."""
 
-        from nr.util.plugins import iter_entrypoints
-
         from slap.plugins import ApplicationPlugin
+        from slap.util.plugins import iter_entrypoints
 
         assert not self._plugins_loaded
         self._plugins_loaded = True
@@ -242,7 +240,7 @@ class Application:
 
         logger.debug("Loading application plugins")
 
-        for plugin_name, loader in iter_entrypoints(ApplicationPlugin):  # type: ignore[misc]
+        for plugin_name, loader in iter_entrypoints(ApplicationPlugin):  # type: ignore[type-abstract]
             if plugin_name in disable:
                 continue
             try:

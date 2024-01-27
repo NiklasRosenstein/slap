@@ -5,9 +5,10 @@ import re
 import typing as t
 from pathlib import Path
 
-from nr.util.functional import Consumer
-from nr.util.generic import T
-from nr.util.git import Git as _Git, NoCurrentBranchError
+from slap.util.git import Git as _Git, NoCurrentBranchError
+
+T = t.TypeVar("T")
+Consumer = t.Callable[[T], t.Any]
 
 
 class FileStatus(enum.Enum):
@@ -43,8 +44,7 @@ class Vcs(abc.ABC):
     """Interface to perform actions on a local version control system and its remote counterpart."""
 
     @abc.abstractmethod
-    def get_toplevel(self) -> Path:
-        ...
+    def get_toplevel(self) -> Path: ...
 
     @abc.abstractmethod
     def get_web_url(self) -> str | None:
@@ -95,10 +95,12 @@ class Vcs(abc.ABC):
         specified for the *push* argument, the commit that was just created on the current branch as well as the tag
         name if one was specified will be pushed to the remote."""
 
+    # @abc.abstractclassmethod
     @classmethod
-    @abc.abstractclassmethod
-    def detect(cls: type[T], path: Path) -> T | None:
-        ...
+    def detect(cls: t.Type[T], path: Path) -> T | None:
+        # TODO (@NiklasRosenstein): This should be an abstract classmethod, but mypy doesn't like that.
+        #       See https://github.com/python/typing/issues/1611
+        raise NotImplementedError()
 
 
 class Git(Vcs):
@@ -196,7 +198,7 @@ class Git(Vcs):
             self._git.push(push.name, *refs, force=force)
 
     @classmethod
-    def detect(cls, path: Path) -> t.Union["Git", None]:
+    def detect(cls, path: Path) -> "Git | None":
         if _Git(path).get_toplevel() is not None:
             return Git(path)
         return None

@@ -95,7 +95,7 @@ class GithubRepositoryHost(RepositoryHost):
 
     @staticmethod
     def detect_repository_host(repository: Repository) -> RepositoryHost | None:
-        from nr.util.git import Git
+        from slap.util.git import Git
 
         git = Git(repository.directory)
         if not git.get_toplevel():

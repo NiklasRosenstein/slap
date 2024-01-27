@@ -1,0 +1,27 @@
+[[entries]]
+id = "69eb006e-0206-4aea-87fa-69bf2000a3f3"
+type = "improvement"
+description = "Get rid of deprecated `nr.util` dependency by placing all the required bits of code into Slap itself"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/108"
+
+[[entries]]
+id = "a685b161-8d42-435d-8edd-bdb9be130454"
+type = "improvement"
+description = "Add `Once.flush()` to use that instead of `.get(resupply=True)`"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/108"
+
+[[entries]]
+id = "712b2efd-32e6-4ed6-b131-4669d36fc951"
+type = "improvement"
+description = "Use `importlib-metadata` package over `pkg_resources`"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/108"
+
+[[entries]]
+id = "2b4061fd-0028-4520-8e76-f7926c1c6ff7"
+type = "improvement"
+description = "Python 3.12 support"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/108"

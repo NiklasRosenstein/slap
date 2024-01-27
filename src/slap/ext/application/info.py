@@ -44,10 +44,12 @@ class InfoCommandPlugin(Command, ApplicationPlugin):
             packages = (
                 "<i>none</i>"
                 if packages_list is None
-                else "[]"
-                if len(packages_list or []) == 0
-                else ", ".join(
-                    f"<opt>{p.name} ({os.path.relpath(p.root, project.directory)})</opt>" for p in packages_list
+                else (
+                    "[]"
+                    if len(packages_list or []) == 0
+                    else ", ".join(
+                        f"<opt>{p.name} ({os.path.relpath(p.root, project.directory)})</opt>" for p in packages_list
+                    )
                 )
             )
             self.line(

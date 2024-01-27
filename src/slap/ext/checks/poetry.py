@@ -2,14 +2,14 @@ import typing as t
 from pathlib import Path
 
 import requests
-from nr.util import Optional
-from nr.util.fs import get_file_in_directory
+from nr.stream import Optional
 
 from slap.check import Check, CheckResult, check, get_checks
 from slap.ext.project_handlers.poetry import PoetryProjectHandler
 from slap.plugins import CheckPlugin
 from slap.project import Project
 from slap.util.external.pypi_classifiers import get_classifiers
+from slap.util.fs import get_file_in_directory
 
 
 def get_readme_path(project: Project) -> Path | None:

@@ -197,7 +197,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     def _load_plugins(self, configuration: Configuration) -> list[ReleasePlugin]:
         """Internal. Loads the plugins for the given configuration."""
 
-        from nr.util.plugins import load_entrypoint
+        from slap.util.plugins import load_entrypoint
 
         plugins = []
         for plugin_name in self.config[configuration].plugins:
@@ -252,7 +252,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     def _check_on_release_branch(self) -> bool:
         """Internal. Checks if the current Git branch matches the configured release branch."""
 
-        from nr.util.git import NoCurrentBranchError
+        from slap.util.git import NoCurrentBranchError
 
         if not self.is_git_repository or self.option("no-branch-check"):
             return True
@@ -320,14 +320,15 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
         """Return the new version, based on *rule*. If *rule* is a version string, it is used as the new version.
         Otherwise, it is considered a rule and the applicable rule plugin is invoked to construct the new version."""
 
-        from nr.util.plugins import NoSuchEntrypointError, load_entrypoint
         from poetry.core.constraints.version import Version
+
+        from slap.util.plugins import NoSuchEntrypointError, load_entrypoint
 
         try:
             return Version.parse(rule)
         except ValueError:
             try:
-                plugin = load_entrypoint(VersionIncrementingRulePlugin, rule)
+                plugin = load_entrypoint(VersionIncrementingRulePlugin, rule)  # type: ignore[type-abstract]
             except NoSuchEntrypointError:
                 self.line(f'error: "<b>{rule}</b>" is not a valid version incrementing rule', "error")
                 sys.exit(1)
@@ -336,8 +337,9 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     def _bump_version(self, version_refs: list[VersionRef], target_version: Version, dry: bool) -> list[Path]:
         """Internal. Replaces the version reference in all files with the specified *version*."""
 
-        from nr.util import Stream
-        from nr.util.text import substitute_ranges
+        from nr.stream import Stream
+
+        from slap.util.text import substitute_ranges
 
         self.line(
             f'bumping <b>{len(version_refs)}</b> version reference{"" if len(version_refs) == 1 else "s"} to '
@@ -456,7 +458,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
     def handle(self) -> int:
         """Entrypoint for the command."""
 
-        from nr.util.git import Git
+        from slap.util.git import Git
 
         self.git = Git()
         self.is_git_repository = self.git.get_toplevel() is not None

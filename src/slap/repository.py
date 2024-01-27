@@ -6,9 +6,9 @@ import typing as t
 from pathlib import Path
 
 from databind.core.settings import Union
-from nr.util.functional import Once
 
 from slap.configuration import Configuration
+from slap.util.once import Once
 
 if t.TYPE_CHECKING:
     from slap.plugins import RepositoryHandlerPlugin
@@ -52,25 +52,20 @@ class RepositoryHost(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def get_issue_by_reference(self, issue_reference: str) -> Issue:
-        ...
+    def get_issue_by_reference(self, issue_reference: str) -> Issue: ...
 
     @abc.abstractmethod
-    def get_pull_request_by_reference(self, pr_reference: str) -> PullRequest:
-        ...
+    def get_pull_request_by_reference(self, pr_reference: str) -> PullRequest: ...
 
     @abc.abstractmethod
-    def comment_on_issue(self, issue_reference: str, message: str) -> None:
-        ...
+    def comment_on_issue(self, issue_reference: str, message: str) -> None: ...
 
     @abc.abstractmethod
-    def create_release(self, version: str, description: str, attachments: list[Path]) -> None:
-        ...
+    def create_release(self, version: str, description: str, attachments: list[Path]) -> None: ...
 
     @staticmethod
     @abc.abstractmethod
-    def detect_repository_host(repository: Repository) -> RepositoryHost | None:
-        ...
+    def detect_repository_host(repository: Repository) -> RepositoryHost | None: ...
 
 
 class Repository(Configuration):
@@ -107,10 +102,9 @@ class Repository(Configuration):
     def _get_repository_handler(self) -> RepositoryHandlerPlugin | None:
         """Returns the handler for this repository."""
 
-        from nr.util.plugins import load_entrypoint
-
         from slap.ext.repository_handlers.default import DefaultRepositoryHandler
         from slap.plugins import RepositoryHandlerPlugin
+        from slap.util.plugins import load_entrypoint
 
         handler: RepositoryHandlerPlugin
         handler_name = self.raw_config().get("repository", {}).get("handler")
@@ -120,7 +114,7 @@ class Repository(Configuration):
                 return None
         else:
             assert isinstance(handler_name, str), repr(handler_name)
-            handler = load_entrypoint(RepositoryHandlerPlugin, handler_name)()  # type: ignore[misc]
+            handler = load_entrypoint(RepositoryHandlerPlugin, handler_name)()  # type: ignore[type-abstract]
             assert handler.matches_repository(self), (self, handler)
         return handler
 
@@ -136,10 +130,8 @@ class Repository(Configuration):
     def get_projects_ordered(self) -> list[Project]:
         """Return a topological ordering of the projects."""
 
-        from nr.util.digraph import DiGraph
-        from nr.util.digraph.algorithm.topological_sort import topological_sort
-
         from slap.project import Project
+        from slap.util.digraph import DiGraph, topological_sort
 
         graph: DiGraph[Project, None, None] = DiGraph()
         projects = self.projects()
@@ -153,12 +145,12 @@ class Repository(Configuration):
         return list(topological_sort(graph, sorting_key=lambda p: p.id))
 
     def _get_vcs(self) -> Vcs | None:
-        from nr.util.optional import Optional
+        from nr.stream import Optional
 
         return Optional(self._handler()).map(lambda h: h.get_vcs(self)).or_else(None)
 
     def _get_repository_host(self) -> RepositoryHost | None:
-        from nr.util.optional import Optional
+        from nr.stream import Optional
 
         return Optional(self._handler()).map(lambda h: h.get_repository_host(self)).or_else(None)
 
