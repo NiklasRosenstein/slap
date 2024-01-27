@@ -18,6 +18,7 @@ jobs:
     - uses: actions/setup-python@v2
       with: { python-version: "${{ matrix.python-version }}" }
     - run: pip install pipx && pipx install . --pip-args=-vvv --verbose && which slap
+    - run: echo $PIPX_HOME // $PIPX_BIN_DIR && ls $PIPX_HOME
     - run: slap info
     - run: slap test
     - run: slap publish --dry
