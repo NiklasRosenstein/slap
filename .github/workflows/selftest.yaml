@@ -1,0 +1,26 @@
+name: "Selftest"
+
+on:
+  push:
+    branches: [ "develop" ]
+    tags: [ '*' ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with: { python-version: "${{ matrix.python-version }}" }
+    - run: pipx install . && which slap
+    - run: slap info
+    - run: slap test
+    - run: slap publish --dry
+    - uses: actions/setup-python@v2
+      with: { python-version: "3.9" }
+    - run: slap info
