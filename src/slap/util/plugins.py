@@ -7,7 +7,8 @@ import typing as t
 
 import pkg_resources
 import typing_extensions as te
-from nr.util.generic import T
+
+T = t.TypeVar("T")
 
 logger = logging.getLogger(__name__)
 

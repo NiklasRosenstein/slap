@@ -196,9 +196,8 @@ class Project(Configuration):
 
         assert isinstance(dependency, Dependency), type(dependency)
         self.handler().add_dependency(self, dependency, where)
-        # TODO(@NiklasRosenstein): Use a method to flush the cache of Once when it is available in `nr.utils`.
-        self.raw_config.get(True)
-        self.dependencies.get(True)
+        self.raw_config.flush()
+        self.dependencies.flush()
 
     @property
     def id(self) -> str:  # type: ignore[override]

@@ -23,6 +23,9 @@ class Once(t.Generic[T_co]):
             self._cached = True
         return t.cast(T_co, self._value)
 
+    def flush(self) -> None:
+        self._cached = False
+
     def get(self, resupply: bool = False) -> T_co:
         if resupply:
             self._cached = False

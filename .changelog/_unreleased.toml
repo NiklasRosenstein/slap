@@ -4,3 +4,9 @@ type = "improvement"
 description = "Get rid of deprecated `nr.util` dependency by placing all the required bits of code into Slap itself"
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/108"
+
+[[entries]]
+id = "a685b161-8d42-435d-8edd-bdb9be130454"
+type = "improvement"
+description = "Add `Once.flush()` to use that instead of `.get(resupply=True)`"
+author = "@NiklasRosenstein"
