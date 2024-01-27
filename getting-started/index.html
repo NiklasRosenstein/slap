@@ -1232,7 +1232,7 @@ and any extra dependencies. You can change this behaviour with any of the <code>
   host: GithubRepositoryHost(repo=&#39;NiklasRosenstein/slap&#39;)
   projects: [&#39;slap-cli&#39;]
 Project &quot;.&quot; (id: slap-cli)
-  version: 1.11.2
+  version: 1.12.0
   dist-name: slap-cli
   packages: slap (src)
   readme: README.md
@@ -1324,8 +1324,8 @@ test commands like the below example to your project configuration.</p>
     black| would reformat /home/runner/work/slap/slap/src/slap/util/toml_file.py
     black| would reformat /home/runner/work/slap/slap/src/slap/util/weak_property.py
     black| would reformat /home/runner/work/slap/slap/src/slap/util/terminal.py
-    black| would reformat /home/runner/work/slap/slap/src/slap/util/vcs.py
     black| would reformat /home/runner/work/slap/slap/src/slap/util/git.py
+    black| would reformat /home/runner/work/slap/slap/src/slap/util/vcs.py
     black| 
     black| Oh no! 💥 💔 💥
     black| 15 files would be reformatted, 52 files would be left unchanged.
@@ -1424,16 +1424,14 @@ file to <code>.changelog/{version}.toml</code>.</p>
 
 To create a new release, pass the version number or a rule name instead.
 
-<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.11.3
-  pyproject.toml:       1.11.2 → 1.11.3 # &#39;version = &quot;1.11.2&quot;&#39;
-  src/slap/__init__.py: 1.11.2 → 1.11.3 # &#39;__version__ = &quot;1.11.2&quot;&#39;
+<div class="highlight"><span class="filename">$ slap release --tag --push patch</span><pre><span></span><code>bumping 2 version references to 1.12.1
+  pyproject.toml:       1.12.0 → 1.12.1 # &#39;version = &quot;1.12.0&quot;&#39;
+  src/slap/__init__.py: 1.12.0 → 1.12.1 # &#39;__version__ = &quot;1.12.0&quot;&#39;
 
-releasing changelog
-  .changelog/_unreleased.toml → .changelog/1.11.3.toml
 
-tagging 1.11.3
+tagging 1.12.1
 
-pushing develop, 1.11.3 to origin
+pushing develop, 1.12.1 to origin
 </code></pre></div>
 
 </details>
@@ -1442,8 +1440,8 @@ pushing develop, 1.11.3 to origin
 <p class="admonition-title">Tip</p>
 <p>You can also use the <code>--validate</code> flag to validate and show all known version number references:</p>
 <div class="highlight"><span class="filename">$ slap release --validate</span><pre><span></span><code>versions are ok
-  pyproject.toml:       1.11.2 # &#39;version = &quot;1.11.2&quot;&#39;
-  src/slap/__init__.py: 1.11.2 # &#39;__version__ = &quot;1.11.2&quot;&#39;
+  pyproject.toml:       1.12.0 # &#39;version = &quot;1.12.0&quot;&#39;
+  src/slap/__init__.py: 1.12.0 # &#39;__version__ = &quot;1.12.0&quot;&#39;
 </code></pre></div>
 </div>
 <h2 id="11-publish-to-pypi">11. Publish to PyPI</h2>
