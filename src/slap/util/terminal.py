@@ -46,12 +46,10 @@ class Attribute(enum.Enum):
 
 class Color(abc.ABC):
     @abc.abstractmethod
-    def as_foreground(self) -> str:
-        ...
+    def as_foreground(self) -> str: ...
 
     @abc.abstractmethod
-    def as_background(self) -> str:
-        ...
+    def as_background(self) -> str: ...
 
 
 class SgrColorName(enum.Enum):

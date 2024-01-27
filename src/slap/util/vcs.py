@@ -44,8 +44,7 @@ class Vcs(abc.ABC):
     """Interface to perform actions on a local version control system and its remote counterpart."""
 
     @abc.abstractmethod
-    def get_toplevel(self) -> Path:
-        ...
+    def get_toplevel(self) -> Path: ...
 
     @abc.abstractmethod
     def get_web_url(self) -> str | None:
@@ -98,8 +97,7 @@ class Vcs(abc.ABC):
 
     @classmethod
     @abc.abstractclassmethod
-    def detect(cls: type[T], path: Path) -> T | None:
-        ...
+    def detect(cls: type[T], path: Path) -> T | None: ...
 
 
 class Git(Vcs):

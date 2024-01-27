@@ -96,8 +96,7 @@ class Installer(abc.ABC):
     """An installer for dependencies into a #PythonEnvironment."""
 
     @abc.abstractmethod
-    def install(self, dependencies: list[Dependency], target: PythonEnvironment, options: InstallOptions) -> int:
-        ...
+    def install(self, dependencies: list[Dependency], target: PythonEnvironment, options: InstallOptions) -> int: ...
 
 
 class SymlinkHelper(t.Protocol):
@@ -106,11 +105,9 @@ class SymlinkHelper(t.Protocol):
     #PathDependency is encountered with #PathDependency.link enabled.
     """
 
-    def get_dependencies_for_project(self, project: Path) -> list[Dependency]:
-        ...
+    def get_dependencies_for_project(self, project: Path) -> list[Dependency]: ...
 
-    def link_project(self, project: Path) -> None:
-        ...
+    def link_project(self, project: Path) -> None: ...
 
 
 class PipInstaller(Installer):

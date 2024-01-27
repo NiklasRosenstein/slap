@@ -21,13 +21,11 @@ class NoSuchEntrypointError(RuntimeError):
 
 
 @t.overload
-def load_entrypoint(group: str, name: str) -> t.Any:
-    ...
+def load_entrypoint(group: str, name: str) -> t.Any: ...
 
 
 @t.overload
-def load_entrypoint(group: type[T], name: str) -> type[T]:
-    ...
+def load_entrypoint(group: type[T], name: str) -> type[T]: ...
 
 
 def load_entrypoint(group: str | type[T], name: str) -> t.Any | type[T]:
@@ -58,13 +56,11 @@ _Iter_Entrypoints_2: te.TypeAlias = "t.Iterator[tuple[str, t.Callable[[], type[T
 
 
 @t.overload
-def iter_entrypoints(group: str) -> _Iter_Entrypoints_1:
-    ...
+def iter_entrypoints(group: str) -> _Iter_Entrypoints_1: ...
 
 
 @t.overload
-def iter_entrypoints(group: type[T]) -> _Iter_Entrypoints_2:
-    ...
+def iter_entrypoints(group: type[T]) -> _Iter_Entrypoints_2: ...
 
 
 def iter_entrypoints(group: str | type[T]) -> _Iter_Entrypoints_1 | _Iter_Entrypoints_2:

@@ -14,8 +14,7 @@ def add_style(
     foreground: str | None = ...,
     background: str | None = ...,
     options: list[str] | None = ...,
-) -> None:
-    ...
+) -> None: ...
 
 
 @t.overload
@@ -23,8 +22,7 @@ def add_style(
     io: IO | Formatter,
     name: str,
     style: Style,
-) -> None:
-    ...
+) -> None: ...
 
 
 def add_style(  # type: ignore[misc]

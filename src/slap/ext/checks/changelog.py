@@ -45,13 +45,15 @@ class ChangelogValidationCheckPlugin(CheckPlugin):
             (
                 "\n".join(f"<i>{fn}</i>: {err}" for fn, err in bad_files)
                 if bad_files
-                else ""
-                + "\n"
-                + "\n".join(
-                    f'<i>{fn}</i>: id=<fg=yellow>"{entry_id}"</fg>: {err}' for fn, err, entry_id in bad_changelogs
+                else (
+                    ""
+                    + "\n"
+                    + "\n".join(
+                        f'<i>{fn}</i>: id=<fg=yellow>"{entry_id}"</fg>: {err}' for fn, err, entry_id in bad_changelogs
+                    )
+                    if bad_changelogs
+                    else ""
                 )
-                if bad_changelogs
-                else ""
             ).strip()
             or None,
         )

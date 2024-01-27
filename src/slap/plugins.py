@@ -163,8 +163,7 @@ class VersionIncrementingRulePlugin(abc.ABC):
 
     ENTRYPOINT = "slap.plugins.version_incrementing_rule"
 
-    def increment_version(self, version: Version) -> Version:
-        ...
+    def increment_version(self, version: Version) -> Version: ...
 
 
 class RepositoryCIPlugin(abc.ABC):
@@ -179,23 +178,19 @@ class RepositoryCIPlugin(abc.ABC):
     io: IO
 
     @abc.abstractmethod
-    def initialize(self) -> None:
-        ...
+    def initialize(self) -> None: ...
 
     @abc.abstractmethod
-    def get_base_ref(self) -> str:
-        ...
+    def get_base_ref(self) -> str: ...
 
     def get_head_ref(self) -> str | None:
         return None
 
     @abc.abstractmethod
-    def get_pr(self) -> str:
-        ...
+    def get_pr(self) -> str: ...
 
     @abc.abstractmethod
-    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None:
-        ...
+    def publish_changes(self, changed_files: list[Path], commit_message: str) -> None: ...
 
     @staticmethod
     def all() -> dict[str, t.Callable[[], RepositoryCIPlugin]]:

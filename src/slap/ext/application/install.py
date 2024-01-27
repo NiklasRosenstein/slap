@@ -32,13 +32,11 @@ python_option = option(
 
 
 @t.overload
-def get_active_python_bin(cmd: Command) -> str:
-    ...
+def get_active_python_bin(cmd: Command) -> str: ...
 
 
 @t.overload
-def get_active_python_bin(cmd: Command, fallback: te.Literal[False]) -> str | None:
-    ...
+def get_active_python_bin(cmd: Command, fallback: te.Literal[False]) -> str | None: ...
 
 
 def get_active_python_bin(cmd: Command, fallback: bool = True) -> str | None:

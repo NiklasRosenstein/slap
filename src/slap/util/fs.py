@@ -16,8 +16,7 @@ def atomic_write(
     path: StrPath,
     mode: te.Literal["w"],
     rename_mode: te.Literal["posix", "windows"] | None,
-) -> t.ContextManager[t.TextIO]:
-    ...
+) -> t.ContextManager[t.TextIO]: ...
 
 
 @t.overload
@@ -25,8 +24,7 @@ def atomic_write(
     path: StrPath,
     mode: te.Literal["wb"],
     rename_mode: te.Literal["posix", "windows"] | None,
-) -> t.ContextManager[t.BinaryIO]:
-    ...
+) -> t.ContextManager[t.BinaryIO]: ...
 
 
 @contextlib.contextmanager  # type: ignore
@@ -64,8 +62,7 @@ def atomic_swap(
     path: StrPath,
     mode: te.Literal["w"],
     always_revert: bool,
-) -> t.ContextManager[t.TextIO]:
-    ...
+) -> t.ContextManager[t.TextIO]: ...
 
 
 @t.overload
@@ -73,8 +70,7 @@ def atomic_swap(
     path: StrPath,
     mode: te.Literal["wb"],
     always_revert: bool,
-) -> t.ContextManager[t.BinaryIO]:
-    ...
+) -> t.ContextManager[t.BinaryIO]: ...
 
 
 @contextlib.contextmanager  # type: ignore

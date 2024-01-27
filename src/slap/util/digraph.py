@@ -226,8 +226,7 @@ T_Comparable = t.TypeVar("T_Comparable", bound="Comparable")
 
 
 class Comparable(Protocol):
-    def __lt__(self, other: t.Any) -> bool:
-        ...
+    def __lt__(self, other: t.Any) -> bool: ...
 
 
 def topological_sort(

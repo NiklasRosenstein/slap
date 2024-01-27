@@ -11,13 +11,11 @@ T = t.TypeVar("T")
 
 
 @t.overload
-def match_version_ref_pattern(filename: Path, pattern: str) -> VersionRef:
-    ...
+def match_version_ref_pattern(filename: Path, pattern: str) -> VersionRef: ...
 
 
 @t.overload
-def match_version_ref_pattern(filename: Path, pattern: str, fallback: T) -> T | VersionRef:
-    ...
+def match_version_ref_pattern(filename: Path, pattern: str, fallback: T) -> T | VersionRef: ...
 
 
 def match_version_ref_pattern(filename: Path, pattern: str, fallback: NotSet | T = NotSet.Value) -> T | VersionRef:

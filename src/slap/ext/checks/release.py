@@ -38,9 +38,11 @@ class ReleaseChecksPlugin(CheckPlugin):
 
         return (
             Check.ERROR if packages_without_version else Check.OK,
-            (f'The following packages have no <b>__version__</b>: <b>{", ".join(packages_without_version)}</b>')
-            if packages_without_version
-            else f'Found <b>__version__</b> in <b>{", ".join(x.name for x in project.packages() or [])}</b>',
+            (
+                (f'The following packages have no <b>__version__</b>: <b>{", ".join(packages_without_version)}</b>')
+                if packages_without_version
+                else f'Found <b>__version__</b> in <b>{", ".join(x.name for x in project.packages() or [])}</b>'
+            ),
         )
 
     @check("consistent-versions")

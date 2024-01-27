@@ -56,19 +56,16 @@ class Changelog:
 
 class ChangelogDeser(abc.ABC):
     @abc.abstractmethod
-    def load(self, fp: t.TextIO, filename: str) -> Changelog:
-        ...
+    def load(self, fp: t.TextIO, filename: str) -> Changelog: ...
 
     def save(self, changelog: Changelog, fp: t.TextIO, filename: str) -> None:
         fp.write(self.dump(changelog))
 
     @abc.abstractmethod
-    def dump(self, changelog: Changelog) -> str:
-        ...
+    def dump(self, changelog: Changelog) -> str: ...
 
     @abc.abstractmethod
-    def dump_entry(self, entry: ChangelogEntry) -> str:
-        ...
+    def dump_entry(self, entry: ChangelogEntry) -> str: ...
 
 
 class TomlChangelogDeser(ChangelogDeser):
