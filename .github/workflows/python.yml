@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ github.ref == 'refs/heads/develop' }}
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with: { name: docs, path: docs/_site }
     - uses: Cecilapp/GitHub-Pages-deploy@v3
       env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
