@@ -1,6 +1,10 @@
 # Getting started
 
-@cat ../../readme.md :with { markdown_section = "Installation", rename_section_to = "1. Installation" }
+## 1. Installation
+
+I recommend installing Slap using Pipx. (Requires Python 3.10 or higher)
+
+    $ pipx install slap-cli
 
 ## 2. Bootstrapping a new project
 

@@ -22,7 +22,7 @@ tied to any single Slap command.
 
 ## Plugin loading
 
-All Slap commands are implemented as {@pylink slap.plugins.ApplicationPlugin}s. By default, Slap will load plugin
+All Slap commands are implemented as [`ApplicationPlugin`s][slap.plugins.ApplicationPlugin]. By default, Slap will load plugin
 that is registered under the `slap.plugins.application` entrypoint, however plugins can be disabled using the `disable`
 option or an explicit list of plugins to load and none other can be set with `enable-only`.
 

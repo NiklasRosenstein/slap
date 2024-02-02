@@ -12,8 +12,8 @@ A project with a `slap.toml` configuration file (or with no configuration file) 
 project for two or more sub-projects. This configuration represents a mono-repository where multiple projects
 are stored and versioned together.
 
-Slap understands most details about a project through a {@pylink slap.plugins.ProjectHandlerPlugin}. It comes
-with a default implementation that supports Poetry and Flit Python projects.
+Slap understands most details about a project through a [`ProjectHandlerPlugin`][slap.plugins.ProjectHandlerPlugin].
+It comes with a default implementation that supports Poetry and Flit Python projects.
 
 ## Repository
 
@@ -51,5 +51,5 @@ project (i.e. if it has a `pyproject.toml` instead of a `slap.toml`) it will be 
       slap.toml
     ```
 
-Slap understands most details about a repository through a {@pylink slap.plugins.RepositoryHandlerPlugin}. It
-comes with a default implementation that supports Git repositories and GitHub.
+Slap understands most details about a repository through a [`RepositoryHandlerPlugin`][slap.plugins.RepositoryHandlerPlugin].
+It comes with a default implementation that supports Git repositories and GitHub.

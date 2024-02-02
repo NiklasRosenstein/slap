@@ -14,10 +14,10 @@ Option scope: `[tool.slap.check]` or `[check]`
 
 ## Built-in check plugins
 
-@pydoc slap.ext.checks.changelog.ChangelogValidationCheckPlugin
+::: slap.ext.checks.changelog.ChangelogValidationCheckPlugin
 
-@pydoc slap.ext.checks.general.GeneralChecksPlugin
+::: slap.ext.checks.general.GeneralChecksPlugin
 
-@pydoc slap.ext.checks.poetry.PoetryChecksPlugin
+::: slap.ext.checks.poetry.PoetryChecksPlugin
 
-@pydoc slap.ext.checks.release.ReleaseChecksPlugin
+::: slap.ext.checks.release.ReleaseChecksPlugin

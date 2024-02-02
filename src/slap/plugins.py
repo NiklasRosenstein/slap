@@ -107,10 +107,11 @@ class ProjectHandlerPlugin(abc.ABC):
 
         Arguments:
           project: The project to update.
-          selector: The dependency to add.
+          dependency: The dependency to add.
           where: The location of where to add the dependency. This is either `'run'`, `'dev'`, or otherwise
             refers to the name of an extra requirement.
-          Raises NotImplementedError: If the operation is not supported by the project handler.
+        Raises:
+            NotImplementedError: If the operation is not supported by the project handler.
         """
 
         raise NotImplementedError
