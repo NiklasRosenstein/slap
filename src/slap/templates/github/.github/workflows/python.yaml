@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: NiklasRosenstein/slap@gha/install/v1
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       with: {{ python-version: "${{{{ matrix.python-version }}}}" }}
     - run: slap install --link --no-venv-check
     - run: slap test
