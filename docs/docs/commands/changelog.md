@@ -15,7 +15,7 @@ Option scope: `[tool.slap.changelog]` or `[changelog]`
 
 <details><summary><code>ChangelogConfig</code> documentation</code></summary>
 
-@pydoc slap.ext.application.changelog.ChangelogConfig
+::: slap.ext.application.changelog.ChangelogConfig
 
 </details>
 
@@ -59,7 +59,7 @@ DEFAULT_VALID_TYPES = [
 ]
 ```
 <!--
-@pydoc slap.ext.application.changelog.DEFAULT_VALID_TYPES :with { render_title = false, render_signature = true }
+::: slap.ext.application.changelog.DEFAULT_VALID_TYPES :with { render_title = false, render_signature = true }
 -->
 </details>
 

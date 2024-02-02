@@ -35,13 +35,13 @@ Option scope: `[tool.slap.release]` or `[release]`
 
 <details><summary><code>ReleaseConfig</code></summary>
 
-@pydoc slap.ext.application.release.ReleaseConfig
+::: slap.ext.application.release.ReleaseConfig
 
 </details>
 
 <details><summary><code>VersionRefConfig</code></summary>
 
-@pydoc slap.ext.application.release.VersionRefConfig
+::: slap.ext.application.release.VersionRefConfig
 
 </details>
 

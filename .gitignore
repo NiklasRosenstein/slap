@@ -12,3 +12,5 @@ poetry.lock
 /_old_shut
 .dmypy.json
 .DS_Store
+
+/docs/site/
