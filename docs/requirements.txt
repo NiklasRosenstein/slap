@@ -24,14 +24,14 @@ pathspec==0.12.1
 platformdirs==4.2.0
 Pygments==2.17.2
 pymdown-extensions==10.7
-python-adjudicator==0.5.0
+python-adjudicator==0.3.2
 python-dateutil==2.8.2
 PyYAML==6.0.1
 pyyaml_env_tag==0.1
 regex==2023.12.25
 requests==2.31.0
 six==1.16.0
-typeapi==2.1.2
+typeapi==1.5.1
 typing_extensions==4.9.0
 urllib3==2.2.0
 watchdog==3.0.0
