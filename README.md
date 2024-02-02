@@ -1,6 +1,6 @@
 # Slap
 
-<img src="https://github.com/NiklasRosenstein/slap/raw/develop/docs/content/img/logo.svg" style="height: 200px !important">
+<img src=".github/assets/logo.svg" style="height: 200px !important">
 
   [PEP 517]: https://peps.python.org/pep-0517/
 
