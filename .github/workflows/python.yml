@@ -15,7 +15,7 @@ jobs:
         python-version: ["3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       with: { python-version: "${{ matrix.python-version }}" }
     - run: pip install . && slap install --no-venv-check
     - run: slap info
@@ -29,7 +29,7 @@ jobs:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       with: { python-version: "${{ matrix.python-version }}" }
     - run: pip install mypy dataclasses types-dataclasses -q
     - run: mypy src/slap/python/pep508.py --follow-imports silent
@@ -42,7 +42,7 @@ jobs:
       with: { fetch-depth: 0 }
     - run: git checkout -b $GITHUB_HEAD_REF
       if: github.event_name == 'pull_request'
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v5
       with: { python-version: "3.10" }
     - run: python -m pip install pipx -q && pipx install .
     - run: slap run --no-venv-check docs:install
