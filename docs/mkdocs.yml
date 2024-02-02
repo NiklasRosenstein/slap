@@ -8,6 +8,9 @@ theme:
     primary: blue
     accent: teal
 
+exclude_docs: |
+  !.github
+
 plugins:
   - search
   - mkdocstrings:
