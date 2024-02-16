@@ -11,7 +11,7 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: NiklasRosenstein/slap@gha/install/v1
     - uses: actions/setup-python@v5
       with: {{ python-version: "${{{{ matrix.python-version }}}}" }}
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: NiklasRosenstein/slap@gha/install/v1
     - run: slap install --no-venv-check --only-extras docs
     - run: slap run --no-venv-check docs:build
