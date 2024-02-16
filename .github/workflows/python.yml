@@ -14,7 +14,7 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with: { python-version: "${{ matrix.python-version }}" }
     - run: pip install . && slap install --no-venv-check
@@ -28,7 +28,7 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with: { python-version: "${{ matrix.python-version }}" }
     - run: pip install mypy dataclasses types-dataclasses -q
@@ -38,7 +38,7 @@ jobs:
   docs:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with: { fetch-depth: 0 }
     - run: git checkout -b $GITHUB_HEAD_REF
       if: github.event_name == 'pull_request'
