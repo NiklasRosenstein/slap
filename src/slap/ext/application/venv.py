@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+import json
 import logging
 import os
 import shutil
 import string
 import subprocess as sp
 import typing as t
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
+from git import TYPE_CHECKING
 from nr.python.environment.virtualenv import VirtualEnvInfo, get_current_venv
 
 from slap.application import Application, Command, argument, option
@@ -71,19 +78,91 @@ USER_INIT_SCRIPTS = {
 }
 
 
-class Venv(VirtualEnvInfo):
+class VenvType(Enum):
+    """The type of a virtual environment."""
+
+    Uv = "uv"
+    Venv = "venv"
+
+    def new(self, path: Path, upgrade_on_create: bool) -> Venv:  # type: ignore[valid-type]  # ??
+        match self:
+            case VenvType.Uv:
+                return UvVenv(path)
+            case VenvType.Venv:
+                return DefaultVenv(path, upgrade_on_create)
+            case _:
+                raise NotImplementedError(f"VenvType {self!r} is not implemented")
+
+
+class Venv(VirtualEnvInfo, ABC):
+    """Base class for managed virtual environments."""
+
+    type: t.ClassVar[VenvType]
+
+    @abstractmethod
+    def _create(self, python_bin: str) -> None:
+        raise NotImplementedError
+
     def create(self, python_bin: str) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        sp.check_call([python_bin, "-m", "venv", self.path])
+        self._create(python_bin)
+        metadata = {"type": self.type.value}
+        self.path.joinpath("slap.json").write_text(json.dumps(metadata))
 
     def delete(self) -> None:
         shutil.rmtree(self.path)
 
 
+class UvVenv(Venv):
+    """A virtual environment managed by `uv` (https://github.com/astral-sh/uv)."""
+
+    type = VenvType.Uv
+
+    @staticmethod
+    def find_uv_bin() -> Path:
+        if TYPE_CHECKING:
+
+            def find_uv_bin() -> str: ...
+
+        else:
+            from uv.__main__ import find_uv_bin
+
+        return Path(find_uv_bin())
+
+    def _create(self, python_bin: str) -> None:
+        sp.check_call([str(self.find_uv_bin()), "venv", "--python", python_bin, str(self.path)])
+
+
+@dataclass
+class DefaultVenv(Venv):
+    """A virtual environment managed by the built-in `venv` module."""
+
+    type = VenvType.Venv
+
+    upgrade: bool = True
+
+    def _create(self, python_bin: str) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        command = [python_bin, "-m", "venv", str(self.path)]
+        if self.upgrade:
+            command += ["--upgrade"]
+        sp.check_call(command)
+
+
 class VenvManager:
-    def __init__(self, directory: Path | None = None) -> None:
+    def __init__(self, venv_type: VenvType, directory: Path | None = None, upgrade_on_create: bool = True) -> None:
+        """
+        Args:
+            directory: The directory in which the virtual environments are stored. If not specified, the default
+                directory is `.venvs` in the current working directory.
+            upgrade_on_create: If `True`, the `pip` package manager will be upgraded to the latest version after
+                creating a new virtual environment. This only applies to environments created with the standard
+                `venv` module.
+        """
+
         self.directory = directory or Path(".venvs")
         self.state_file = self.directory / ".state"
+        self.default_venv_type = venv_type
+        self.upgrade_on_create = upgrade_on_create
 
     def _get_state(self) -> dict[str, t.Any]:
         import json
@@ -100,10 +179,16 @@ class VenvManager:
             return
         for path in self.directory.iterdir():
             if path.is_dir() and not path.name.startswith("."):
-                yield Venv(path)
+                yield self.get(path.name)
 
     def get(self, venv_name: str) -> Venv:
-        return Venv(self.directory / venv_name)
+        path = self.directory / venv_name
+        metadata_file = path / "slap.json"
+        if metadata_file.exists():
+            metadata = json.loads(metadata_file.read_text())
+            venv_type = VenvType(metadata["type"])
+            return venv_type.new(path, self.upgrade_on_create)
+        return self.default_venv_type.new(path, self.upgrade_on_create)
 
     def get_last_activated(self) -> Venv | None:
         venv_name = self._get_state().get("last_active_environment")
@@ -116,7 +201,7 @@ class VenvManager:
         self._set_state(state)
 
 
-def get_venv_manager(app: Application) -> VenvManager:
+def get_venv_manager(app: Application, default_venv_type: VenvType, upgrade_on_create: bool) -> VenvManager:
     """
     Returns the virtual environment manager for the given project.
     """
@@ -124,15 +209,17 @@ def get_venv_manager(app: Application) -> VenvManager:
     project = app.main_project()
     if project is not None:
         if not project.shared_venv:
-            return VenvManager(project.directory / ".venvs")
-    return VenvManager(app.repository.directory / ".venvs")
+            return VenvManager(default_venv_type, project.directory / ".venvs", upgrade_on_create)
+    return VenvManager(default_venv_type, app.repository.directory / ".venvs", upgrade_on_create)
 
 
-def get_venv_manager_global_or_local(use_global: bool, app: Application) -> VenvManager:
+def get_venv_manager_global_or_local(
+    use_global: bool, app: Application, default_venv_type: VenvType, upgrade_on_create: bool
+) -> VenvManager:
     if use_global:
-        return VenvManager(GLOBAL_VENVS_DIRECTORY)
+        return VenvManager(default_venv_type, GLOBAL_VENVS_DIRECTORY, upgrade_on_create)
     else:
-        return get_venv_manager(app)
+        return get_venv_manager(app, default_venv_type, upgrade_on_create)
 
 
 class VenvAwareCommand(Command):
@@ -160,6 +247,8 @@ class VenvAwareCommand(Command):
         ),
     ]
 
+    current_venv: Venv | None = None
+
     def __init__(self, app: Application) -> None:
         super().__init__()
         self.app = app
@@ -177,8 +266,16 @@ class VenvAwareCommand(Command):
                 "<info>(venv-aware) a virtual environment is already activated "
                 f'(<s>{os.environ["VIRTUAL_ENV"]}</s>)</info>'
             )
+            metadata_file = venv.path / "slap.json"
+            if metadata_file.exists():
+                venv_type = VenvType(json.loads(metadata_file.read_text())["type"])
+                self.current_venv = venv_type.new(venv.path, True)
+            else:
+                self.current_venv = DefaultVenv(venv.path, True)
         else:
-            manager = get_venv_manager(self.app)
+            from slap.ext.application.config import get_config
+
+            manager = get_venv_manager(self.app, get_config().get_venv_type() or VenvType.Venv, upgrade_on_create=True)
             if self.option("use-venv"):
                 venv = manager.get(self.option("use-venv"))
                 if not venv.exists():
@@ -197,6 +294,7 @@ class VenvAwareCommand(Command):
                     "<info>slap venv -s {env}</info> to set the current environment</warning>"
                 )
                 return 1
+            self.current_venv = venv
         return 0
 
 
@@ -238,6 +336,11 @@ class VenvCommand(Command):
         ),
     ]
     options = [
+        option(
+            "--venv-type",
+            description="The type of virtual environment to create. [venv|uv]",
+            flag=False,
+        ),
         option(
             "--global",
             "-g",
@@ -336,6 +439,13 @@ class VenvCommand(Command):
         ):
             self.line_error("error: no operation specified", "error")
             return False
+        if venv_type_str := self.option("venv-type"):
+            venv_type_str = venv_type_str.lower()
+            try:
+                VenvType(venv_type_str)
+            except ValueError:
+                self.line_error("error: invalid virtual environment type: %r" % venv_type_str, "error")
+                return False
         return True
 
     def _get_python_bin(self) -> str:
@@ -397,7 +507,20 @@ class VenvCommand(Command):
         if shell:
             return self._get_init_code(shell)
 
-        manager = get_venv_manager_global_or_local(self.option("global"), self.app)
+        if venv_type_str := self.option("venv-type"):
+            venv_type = VenvType(venv_type_str.lower())
+        else:
+            from slap.ext.application.config import get_config
+
+            config = get_config()
+            venv_type = config.get_venv_type() or VenvType.Venv
+
+        manager = get_venv_manager_global_or_local(
+            self.option("global"),
+            self.app,
+            default_venv_type=venv_type,
+            upgrade_on_create=True,
+        )
 
         if self.option("list"):
             self._list_environments(manager)
@@ -417,10 +540,6 @@ class VenvCommand(Command):
                 f'creating {location} environment <s>"{venv.name}"</s> (using <code>{python}</code>)', "info"
             )
             venv.create(python)
-
-            if not self.option("no-upgrade-pip"):
-                self.line_error("upgrading Pip to the latest version", "info")
-                sp.check_call([str(venv.get_bin("pip")), "install", "-U", "pip"])
 
         if self.option("activate"):
             if not venv:
@@ -516,8 +635,12 @@ class VenvLinkCommand(Command):
         self.app = app
 
     def handle(self) -> int:
+        from slap.ext.application.config import get_config
+
         location = "global" if self.option("global") else "local"
-        manager = get_venv_manager_global_or_local(self.option("global"), self.app)
+        manager = get_venv_manager_global_or_local(
+            self.option("global"), self.app, get_config().get_venv_type() or VenvType.Venv, True
+        )
         venv = manager.get(self.argument("name"))
         if not venv.exists():
             self.line_error(f'error: {location} environment <s>"{venv.name}"</s> does not exist', "error")

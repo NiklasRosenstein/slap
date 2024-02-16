@@ -5,6 +5,7 @@ from __future__ import annotations
 import abc
 import dataclasses
 import logging
+import os
 import shlex
 import subprocess as sp
 import typing as t
@@ -111,15 +112,16 @@ class SymlinkHelper(t.Protocol):
 
 
 class PipInstaller(Installer):
-    """Installs dependencies via Pip."""
+    """Installs dependencies via Pip or Uv."""
 
-    def __init__(self, symlink_helper: SymlinkHelper | None) -> None:
+    def __init__(self, use_uv: bool = True, symlink_helper: SymlinkHelper | None = None) -> None:
         """
         Args:
           symlink_helper: A helper for implementing #PathDependency.link when it is encountered. If not specified,
             an error will be raised when a #PathDependency is passed that needs to be linked.
         """
 
+        self.use_uv = use_uv
         self.symlink_helper = symlink_helper
 
     def install(self, dependencies: t.Sequence[Dependency], target: PythonEnvironment, options: InstallOptions) -> int:
@@ -188,13 +190,25 @@ class PipInstaller(Installer):
             raise Exception(f"PyPI index {exc} is not configured")
 
         # Construct the Pip command to run.
-        pip_command = [target.executable, "-m", "pip", "install"] + pip_arguments
+        environ = os.environ.copy()
+        if self.use_uv:
+            from slap.ext.application.venv import UvVenv
+
+            assert target.base_prefix, target
+            pip_command = [str(UvVenv.find_uv_bin()), "pip", "install"] + pip_arguments
+            environ["VIRTUAL_ENV"] = target.base_prefix
+        else:
+            pip_command = [target.executable, "-m", "pip", "install"] + pip_arguments
         if options.quiet:
             pip_command += ["-q"]
         if options.upgrade:
             pip_command += ["--upgrade"]
 
-        logger.info("Installing with Pip using command <subj>$ %s</subj>", " ".join(map(shlex.quote, pip_command)))
+        logger.info(
+            "Installing with %s using command <subj>$ %s</subj>",
+            "UV" if self.use_uv else "Pip",
+            " ".join(map(shlex.quote, pip_command)),
+        )
         if (res := sp.call(pip_command)) != 0:
             return res
 

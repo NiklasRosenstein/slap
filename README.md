@@ -30,6 +30,8 @@ Check out the [Getting started](https://niklasrosenstein.github.io/slap/getting-
 
 ## Feature Matrix
 
+  [uv]: https://github.com/astral-sh/uv
+
 | Feature | Poetry | Documentation |
 | ------- | ------ | ------------- |
 | Manage structured changelog entries | ❌ | [slap changelog](https://niklasrosenstein.github.io/slap/commands/changelog/) |
@@ -47,7 +49,7 @@ Check out the [Getting started](https://niklasrosenstein.github.io/slap/getting-
 | Add dependency | ✅ | ✅ | ❌ | [slap add](https://niklasrosenstein.github.io/slap/commands/add/) |
 | Sanity check project configuration | | ✅ | | [slap check](https://niklasrosenstein.github.io/slap/commands/check/) |
 | Bootstrap project files | | ✅ | | [slap init](https://niklasrosenstein.github.io/slap/commands/init/) |
-| Install projects using Pip | ✅ | ✅ | ✅ | [slap install](https://niklasrosenstein.github.io/slap/commands/install/) |
+| Install projects using Pip or [uv] | ✅ | ✅ | ✅ | [slap install](https://niklasrosenstein.github.io/slap/commands/install/) |
 | Symlink projects (editable installs) | ✅ | ✅ | ✅ | [slap link](https://niklasrosenstein.github.io/slap/commands/link/) |
 | Bump interdependencies in mono-repository | ✅ (not tested regularly) | ✅ | ✅ (partial) | [slap release](https://niklasrosenstein.github.io/slap/commands/release/) |
 
@@ -93,3 +95,13 @@ The most notable differences to Poetry are
 * Uses Pip to install your project(s), unlike Poetry which comes with its own dependency resolver and package
   installer (which I personally have been having a lot of issues with in the past).
 * Does not have a concept of lock files
+
+### How can I use the shiny new `uv` installer with Slap?
+
+You can configure Slap to use `uv` to create virtual environments:
+
+    $ slap config --venv-type uv
+
+When Slap detects a virtual environment that was created with `uv` (note: actually, create with `uv` by Slap itself),
+it will use `uv` to install packages into the virtual environment. Alternatively, you can pass the `--installer uv`
+option to `slap install`.

@@ -1,0 +1,6 @@
+[[entries]]
+id = "15722c92-47eb-4c24-9515-f0ee9db7dcfc"
+type = "feature"
+description = "Add `uv` support"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/132"
