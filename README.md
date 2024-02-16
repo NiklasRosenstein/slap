@@ -95,3 +95,13 @@ The most notable differences to Poetry are
 * Uses Pip to install your project(s), unlike Poetry which comes with its own dependency resolver and package
   installer (which I personally have been having a lot of issues with in the past).
 * Does not have a concept of lock files
+
+### How can I use the shiny new `uv` installer with Slap?
+
+You can configure Slap to use `uv` to create virtual environments:
+
+    $ slap config --venv-type uv
+
+When Slap detects a virtual environment that was created with `uv` (note: actually, create with `uv` by Slap itself),
+it will use `uv` to install packages into the virtual environment. Alternatively, you can pass the `--installer uv`
+option to `slap install`.
