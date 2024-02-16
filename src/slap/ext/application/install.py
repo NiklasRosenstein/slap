@@ -11,7 +11,7 @@ from databind.core.settings import Alias, ExtraKeys
 
 from slap.application import Application, Command, option
 from slap.configuration import Configuration
-from slap.ext.application.venv import VenvAwareCommand
+from slap.ext.application.venv import UvVenv, VenvAwareCommand
 from slap.plugins import ApplicationPlugin
 from slap.project import Project
 
@@ -89,6 +89,13 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
     app: Application
     name = "install"
     options = VenvAwareCommand.options + [
+        option(
+            "--installer",
+            description="The installer to use. Defaults to Pip for normal normal venvs, and UV for "
+            "UV-created venvs. [pip|uv]",
+            default=None,
+            flag=False,
+        ),
         option(
             "--only",
             description="Path to the subproject to install only. May still cause other projects to be installed if "
@@ -278,7 +285,18 @@ class InstallCommandPlugin(VenvAwareCommand, ApplicationPlugin):
         )
         self._update_indexes_from_cli(options.indexes)
 
-        installer = PipInstaller(self)
+        if installer := self.option("installer"):
+            use_uv = installer == "uv"
+        else:
+            if not self.current_venv:
+                self.line_error("warning: no virtual environment detected, using Pip installer")
+                use_uv = False
+            elif isinstance(self.current_venv, UvVenv):
+                use_uv = True
+            else:
+                use_uv = False
+
+        installer = PipInstaller(use_uv=use_uv, symlink_helper=self)
         status_code = installer.install(dependencies, python_environment, options)
         if status_code != 0:
             return status_code
