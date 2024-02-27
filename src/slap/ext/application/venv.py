@@ -129,7 +129,9 @@ class UvVenv(Venv):
         return Path(find_uv_bin())
 
     def _create(self, python_bin: str) -> None:
-        sp.check_call([str(self.find_uv_bin()), "venv", "--python", python_bin, str(self.path)])
+        command = [str(self.find_uv_bin()), "venv", "--python", python_bin, str(self.path)]
+        logger.info("creating virtual environment: %s", " ".join(command))
+        sp.check_call(command)
 
 
 @dataclass
@@ -144,7 +146,8 @@ class DefaultVenv(Venv):
         self.path.parent.mkdir(parents=True, exist_ok=True)
         command = [python_bin, "-m", "venv", str(self.path)]
         if self.upgrade:
-            command += ["--upgrade"]
+            command += ["--upgrade-deps"]
+        logger.info("creating virtual environment: %s", " ".join(command))
         sp.check_call(command)
 
 
