@@ -1,0 +1,15 @@
+{
+    "packageRules": [
+        {
+            "groupName": "docs requirements",
+            "fileMatch": ["^docs/requirements\\.txt$"],
+            "matchPackagePattern": ["*"],
+            "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
+        },
+        {
+            "groupName": "minor and patch updates",
+            "matchPackagePattern": ["*"],
+            "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
+        }
+    ]
+}
