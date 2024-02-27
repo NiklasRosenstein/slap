@@ -6,7 +6,6 @@
   "packageRules": [
       {
           "groupName": "docs requirements",
-          "fileMatch": ["^docs/requirements\\.txt$"],
           "matchPackagePatterns": ["*"],
           "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
       },
