@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.6">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.11">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.50c56a3b.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e359304.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -308,10 +308,8 @@
     
     
     
-    
     <li class="md-nav__item md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
@@ -625,10 +623,8 @@
     
     
     
-    
     <li class="md-nav__item md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
@@ -692,10 +688,8 @@
     
     
     
-    
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
@@ -1555,7 +1549,7 @@ application that #ApplicationPlugin#s can register commands to, etc.</p>
 
             <details class="quote">
               <summary>Source code in <code>slap/application.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-160">160</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span>
 <span class="normal"><a href="#__codelineno-0-163">163</a></span>
@@ -1840,7 +1834,7 @@ application that #ApplicationPlugin#s can register commands to, etc.</p>
   </span>
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -1863,7 +1857,7 @@ that do not require the repository to function, so this property creates the rep
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">configurations</span><span class="p">(</span><span class="n">targets_only</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.configuration.Configuration">Configuration</span></span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">configurations</span><span class="p">(</span><span class="n">targets_only</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.configuration.Configuration">Configuration</span></span><span class="p">]</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -1873,7 +1867,7 @@ project is from the same directory as the repository.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/application.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-214">214</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span>
@@ -1904,7 +1898,7 @@ project is from the same directory as the repository.</p>
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_target_projects</span><span class="p">(</span><span class="n">only_projects</span><span class="p">:</span> <span class="n">str</span> <span class="o">|</span> <span class="n"><span title="typing.Sequence">Sequence</span></span><span class="p">[</span><span class="n">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cwd</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.project.Project">Project</span></span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_target_projects</span><span class="p">(</span><span class="n">only_projects</span><span class="p">:</span> <span class="n">str</span> <span class="o">|</span> <span class="n"><span title="typing.Sequence">Sequence</span></span><span class="p">[</span><span class="n">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cwd</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.project.Project">Project</span></span><span class="p">]</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -1914,7 +1908,7 @@ only the main project will be returned. When in the repository root, all project
 
           <details class="quote">
             <summary>Source code in <code>slap/application.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-262">262</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-262">262</a></span>
 <span class="normal"><a href="#__codelineno-0-263">263</a></span>
 <span class="normal"><a href="#__codelineno-0-264">264</a></span>
 <span class="normal"><a href="#__codelineno-0-265">265</a></span>
@@ -1985,7 +1979,7 @@ only the main project will be returned. When in the repository root, all project
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">load_plugins</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">load_plugins</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -1999,7 +1993,7 @@ option.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/application.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-223">223</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
 <span class="normal"><a href="#__codelineno-0-225">225</a></span>
 <span class="normal"><a href="#__codelineno-0-226">226</a></span>
@@ -2074,7 +2068,7 @@ option.</p>
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2083,7 +2077,7 @@ option.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/application.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
 <span class="normal"><a href="#__codelineno-0-260">260</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-257"><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -2149,7 +2143,7 @@ option.</p>
 
             <details class="quote">
               <summary>Source code in <code>slap/plugins.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-23">23</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-23">23</a></span>
 <span class="normal"><a href="#__codelineno-0-24">24</a></span>
 <span class="normal"><a href="#__codelineno-0-25">25</a></span>
 <span class="normal"><a href="#__codelineno-0-26">26</a></span>
@@ -2213,7 +2207,7 @@ option.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">activate</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.application.Application" href="#slap.application.Application">Application</a></span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n"><span title="slap.plugins.T">T</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">activate</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.application.Application" href="#slap.application.Application">Application</a></span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n"><span title="slap.plugins.T">T</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2223,7 +2217,7 @@ the #Application.plugins registry.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-37">37</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-37">37</a></span>
 <span class="normal"><a href="#__codelineno-0-38">38</a></span>
 <span class="normal"><a href="#__codelineno-0-39">39</a></span>
 <span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
@@ -2250,7 +2244,7 @@ the #Application.plugins registry.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">load_configuration</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.application.Application" href="#slap.application.Application">Application</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.plugins.T">T</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">load_configuration</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.application.Application" href="#slap.application.Application">Application</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.plugins.T">T</span></span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2261,7 +2255,7 @@ to access the Slap configuration.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-31">31</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-31">31</a></span>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
 <span class="normal"><a href="#__codelineno-0-33">33</a></span>
 <span class="normal"><a href="#__codelineno-0-34">34</a></span>
@@ -2307,7 +2301,7 @@ of the returned checks.</p>
 
             <details class="quote">
               <summary>Source code in <code>slap/plugins.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-120">120</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-120">120</a></span>
 <span class="normal"><a href="#__codelineno-0-121">121</a></span>
 <span class="normal"><a href="#__codelineno-0-122">122</a></span>
 <span class="normal"><a href="#__codelineno-0-123">123</a></span>
@@ -2376,7 +2370,7 @@ used with Slap.</p>
 
             <details class="quote">
               <summary>Source code in <code>slap/plugins.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-65"> 65</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-65"> 65</a></span>
 <span class="normal"><a href="#__codelineno-0-66"> 66</a></span>
 <span class="normal"><a href="#__codelineno-0-67"> 67</a></span>
 <span class="normal"><a href="#__codelineno-0-68"> 68</a></span>
@@ -2506,7 +2500,7 @@ used with Slap.</p>
 
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">add_dependency</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">,</span> <span class="n">dependency</span><span class="p">:</span> <span class="n"><span title="slap.python.dependency.Dependency">Dependency</span></span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">add_dependency</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">,</span> <span class="n">dependency</span><span class="p">:</span> <span class="n"><span title="slap.python.dependency.Dependency">Dependency</span></span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2576,7 +2570,7 @@ refers to the name of an extra requirement.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-105">105</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-105">105</a></span>
 <span class="normal"><a href="#__codelineno-0-106">106</a></span>
 <span class="normal"><a href="#__codelineno-0-107">107</a></span>
 <span class="normal"><a href="#__codelineno-0-108">108</a></span>
@@ -2621,7 +2615,7 @@ refers to the name of an extra requirement.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_dependencies</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.project.Dependencies">Dependencies</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_dependencies</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.project.Dependencies">Dependencies</span></span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2630,7 +2624,7 @@ refers to the name of an extra requirement.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-89">89</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-89">89</a></span>
 <span class="normal"><a href="#__codelineno-0-90">90</a></span>
 <span class="normal"><a href="#__codelineno-0-91">91</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-89"><a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-90"><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="k">def</span> <span class="nf">get_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dependencies</span><span class="p">:</span>
@@ -2655,7 +2649,7 @@ refers to the name of an extra requirement.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_dist_name</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_dist_name</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2664,7 +2658,7 @@ refers to the name of an extra requirement.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-76">76</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-76">76</a></span>
 <span class="normal"><a href="#__codelineno-0-77">77</a></span>
 <span class="normal"><a href="#__codelineno-0-78">78</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-76"><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="k">def</span> <span class="nf">get_dist_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
@@ -2689,7 +2683,7 @@ refers to the name of an extra requirement.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_packages</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.project.Package">Package</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_packages</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.project.Package">Package</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2699,7 +2693,7 @@ not contain any packages.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-84">84</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-84">84</a></span>
 <span class="normal"><a href="#__codelineno-0-85">85</a></span>
 <span class="normal"><a href="#__codelineno-0-86">86</a></span>
 <span class="normal"><a href="#__codelineno-0-87">87</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
@@ -2726,7 +2720,7 @@ not contain any packages.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_readme</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_readme</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2735,7 +2729,7 @@ not contain any packages.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-80">80</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-80">80</a></span>
 <span class="normal"><a href="#__codelineno-0-81">81</a></span>
 <span class="normal"><a href="#__codelineno-0-82">82</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="k">def</span> <span class="nf">get_readme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
@@ -2756,7 +2750,7 @@ not contain any packages.</p>
 
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_version</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_version</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2765,7 +2759,7 @@ not contain any packages.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-93">93</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-93">93</a></span>
 <span class="normal"><a href="#__codelineno-0-94">94</a></span>
 <span class="normal"><a href="#__codelineno-0-95">95</a></span>
 <span class="normal"><a href="#__codelineno-0-96">96</a></span>
@@ -2790,7 +2784,7 @@ not contain any packages.</p>
 
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_version_refs</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.release.VersionRef">VersionRef</span></span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_version_refs</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.release.VersionRef">VersionRef</span></span><span class="p">]</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2800,7 +2794,7 @@ not contain any packages.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
 <span class="normal"><a href="#__codelineno-0-100">100</a></span>
 <span class="normal"><a href="#__codelineno-0-101">101</a></span>
 <span class="normal"><a href="#__codelineno-0-102">102</a></span>
@@ -2829,7 +2823,7 @@ not contain any packages.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">matches_project</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">matches_project</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2838,7 +2832,7 @@ not contain any packages.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-72">72</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-72">72</a></span>
 <span class="normal"><a href="#__codelineno-0-73">73</a></span>
 <span class="normal"><a href="#__codelineno-0-74">74</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-72"><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-73"><a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="k">def</span> <span class="nf">matches_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -2879,7 +2873,7 @@ update these references to a new version number.</p>
 
             <details class="quote">
               <summary>Source code in <code>slap/plugins.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-134">134</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-134">134</a></span>
 <span class="normal"><a href="#__codelineno-0-135">135</a></span>
 <span class="normal"><a href="#__codelineno-0-136">136</a></span>
 <span class="normal"><a href="#__codelineno-0-137">137</a></span>
@@ -2951,7 +2945,7 @@ update these references to a new version number.</p>
 
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create_release</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target_version</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">dry</span><span class="p">:</span> <span class="n">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="pathlib.Path">Path</span></span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create_release</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target_version</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">dry</span><span class="p">:</span> <span class="n">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="pathlib.Path">Path</span></span><span class="p">]</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2963,7 +2957,7 @@ or would have modified.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-149">149</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-149">149</a></span>
 <span class="normal"><a href="#__codelineno-0-150">150</a></span>
 <span class="normal"><a href="#__codelineno-0-151">151</a></span>
 <span class="normal"><a href="#__codelineno-0-152">152</a></span>
@@ -2996,7 +2990,7 @@ or would have modified.</p>
 
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_version_refs</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.release.VersionRef">VersionRef</span></span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_version_refs</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n"><span title="slap.project.Project">Project</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.release.VersionRef">VersionRef</span></span><span class="p">]</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -3005,7 +2999,7 @@ or would have modified.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-144">144</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-144">144</a></span>
 <span class="normal"><a href="#__codelineno-0-145">145</a></span>
 <span class="normal"><a href="#__codelineno-0-146">146</a></span>
 <span class="normal"><a href="#__codelineno-0-147">147</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-144"><a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="k">def</span> <span class="nf">get_version_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Project</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">VersionRef</span><span class="p">]:</span>
@@ -3050,7 +3044,7 @@ the changes back to the original repository.</p>
 
             <details class="quote">
               <summary>Source code in <code>slap/plugins.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-171">171</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
 <span class="normal"><a href="#__codelineno-0-173">173</a></span>
 <span class="normal"><a href="#__codelineno-0-174">174</a></span>
@@ -3184,7 +3178,7 @@ the changes back to the original repository.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Callable">Callable</span></span><span class="p">[[],</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.plugins.RepositoryCIPlugin" href="#slap.plugins.RepositoryCIPlugin">RepositoryCIPlugin</a></span><span class="p">]]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Callable">Callable</span></span><span class="p">[[],</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.plugins.RepositoryCIPlugin" href="#slap.plugins.RepositoryCIPlugin">RepositoryCIPlugin</a></span><span class="p">]]</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -3194,7 +3188,7 @@ the plugin name to a factory function.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-197">197</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-197">197</a></span>
 <span class="normal"><a href="#__codelineno-0-198">198</a></span>
 <span class="normal"><a href="#__codelineno-0-199">199</a></span>
 <span class="normal"><a href="#__codelineno-0-200">200</a></span>
@@ -3237,7 +3231,7 @@ the plugin name to a factory function.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get</span><span class="p">(</span><span class="n">plugin_name</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">io</span><span class="p">:</span> <span class="n"><span title="slap.application.IO">IO</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.plugins.RepositoryCIPlugin" href="#slap.plugins.RepositoryCIPlugin">RepositoryCIPlugin</a></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get</span><span class="p">(</span><span class="n">plugin_name</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">io</span><span class="p">:</span> <span class="n"><span title="slap.application.IO">IO</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="slap.plugins.RepositoryCIPlugin" href="#slap.plugins.RepositoryCIPlugin">RepositoryCIPlugin</a></span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -3247,7 +3241,7 @@ the plugin name to a factory function.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-210">210</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-210">210</a></span>
 <span class="normal"><a href="#__codelineno-0-211">211</a></span>
 <span class="normal"><a href="#__codelineno-0-212">212</a></span>
 <span class="normal"><a href="#__codelineno-0-213">213</a></span>
@@ -3309,7 +3303,7 @@ the plugin name to a factory function.</p>
 
             <details class="quote">
               <summary>Source code in <code>slap/plugins.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-43">43</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
 <span class="normal"><a href="#__codelineno-0-46">46</a></span>
@@ -3377,7 +3371,7 @@ the plugin name to a factory function.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_projects</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.project.Project">Project</span></span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_projects</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">[</span><span class="n"><span title="slap.project.Project">Project</span></span><span class="p">]</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -3386,7 +3380,7 @@ the plugin name to a factory function.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-60">60</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-60">60</a></span>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
 <span class="normal"><a href="#__codelineno-0-62">62</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Project</span><span class="p">]:</span>
@@ -3411,7 +3405,7 @@ the plugin name to a factory function.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_repository_host</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.repository.RepositoryHost">RepositoryHost</span></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_repository_host</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.repository.RepositoryHost">RepositoryHost</span></span> <span class="o">|</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -3420,7 +3414,7 @@ the plugin name to a factory function.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-56">56</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
 <span class="normal"><a href="#__codelineno-0-58">58</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="k">def</span> <span class="nf">get_repository_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RepositoryHost</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
@@ -3445,7 +3439,7 @@ the plugin name to a factory function.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_vcs</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.util.vcs.Vcs">Vcs</span></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get_vcs</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="slap.util.vcs.Vcs">Vcs</span></span> <span class="o">|</span> <span class="kc">None</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -3454,7 +3448,7 @@ the plugin name to a factory function.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="k">def</span> <span class="nf">get_vcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vcs</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
@@ -3479,7 +3473,7 @@ the plugin name to a factory function.</p>
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">matches_repository</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">matches_repository</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n"><span title="slap.repository.Repository">Repository</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
 </span></code></pre></div>
 
   <div class="doc doc-contents ">
@@ -3488,7 +3482,7 @@ the plugin name to a factory function.</p>
 
           <details class="quote">
             <summary>Source code in <code>slap/plugins.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-48">48</a></span>
+            <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
 <span class="normal"><a href="#__codelineno-0-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">def</span> <span class="nf">matches_repository</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -3529,7 +3523,7 @@ existing version number to another. The builtin rules implemented in #slap.ext.v
 
             <details class="quote">
               <summary>Source code in <code>slap/plugins.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-160">160</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span>
 <span class="normal"><a href="#__codelineno-0-163">163</a></span>
@@ -3627,7 +3621,7 @@ existing version number to another. The builtin rules implemented in #slap.ext.v
     <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.e1c3ead8.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
       
     
   </body>
