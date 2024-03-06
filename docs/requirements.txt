@@ -34,4 +34,4 @@ six==1.16.0
 typeapi==1.5.1
 typing_extensions==4.10.0
 urllib3==2.2.1
-watchdog==3.0.0
+watchdog==4.0.0
