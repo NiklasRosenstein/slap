@@ -1,0 +1,5 @@
+[[entries]]
+id = "42e4627a-55f8-47e8-9ec9-34b82a92cb98"
+type = "fix"
+description = "Try first to import `importlib.metadata` before `importlib_metadata` in `PythonEnvironment.get_distributions()`"
+author = "@NiklasRosenstein"

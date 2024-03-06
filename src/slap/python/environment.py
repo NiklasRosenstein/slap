@@ -113,7 +113,9 @@ class PythonEnvironment:
 
         code = textwrap.dedent(
             """
-            import sys, importlib_metadata as metadata, pickle
+            import sys, pickle
+            try: import importlib.metadata as metadata
+            except ImportError: import importlib_metadata as metadata
             result = []
             for arg in sys.argv[1:]:
                 try:
