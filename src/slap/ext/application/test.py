@@ -44,7 +44,7 @@ class TestRunner:
         TestRunner._prev_color = color
 
         if os.name == "nt":
-            command = ["cmd", "/k", self.config]
+            command = ["cmd", "/c", self.config]
         else:
             shell = os.getenv("SHELL", "bash")
             command = [shell, "-c", self.config]

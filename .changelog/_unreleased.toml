@@ -1,0 +1,5 @@
+[[entries]]
+id = "f71eac90-2178-4538-b99b-07b2eae96758"
+type = "fix"
+description = "Use correct cmd option"
+author = "@mcintel"
