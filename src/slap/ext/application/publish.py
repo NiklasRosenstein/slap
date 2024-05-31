@@ -82,8 +82,8 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
             executable = self.option("python")
             if not executable:
-                isolated_env = stack.enter_context(build.env.IsolatedEnvBuilder())
-                executable = isolated_env.executable
+                isolated_env = stack.enter_context(build.env.DefaultIsolatedEnv())
+                executable = isolated_env.python_executable
             else:
                 isolated_env = None
 
