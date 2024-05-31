@@ -18,3 +18,10 @@ type = "improvement"
 description = "Upgrade UV to ^0.2.0"
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/141"
+
+[[entries]]
+id = "f71eac90-2178-4538-b99b-07b2eae96758"
+type = "fix"
+description = "Use correct cmd option"
+author = "@mcintel"
+pr = "https://github.com/NiklasRosenstein/slap/pull/146"
