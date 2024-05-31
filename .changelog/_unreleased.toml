@@ -11,3 +11,10 @@ type = "improvement"
 description = "Upgrade Build to ^1.0.0"
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/119"
+
+[[entries]]
+id = "f98854c7-5ec9-4c17-a98c-78809e81bae9"
+type = "improvement"
+description = "Upgrade UV to ^0.2.0"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/141"
