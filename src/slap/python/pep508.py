@@ -1,6 +1,4 @@
-# We want to be at least Python 3.6 compatible, so instead of __future__.annotations we use string
-# type hints and the typing module.
-
+from __future__ import annotations
 import ast
 import functools
 import operator
@@ -43,7 +41,7 @@ class Pep508Environment:
         return f"{type(self).__name__}({args})"
 
     @staticmethod
-    def current() -> "Pep508Environment":
+    def current() -> Pep508Environment:
         """Returns a #Pep508Environment for the current Python interpreter."""
 
         import os
