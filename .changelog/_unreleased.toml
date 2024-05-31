@@ -4,3 +4,9 @@ type = "breaking change"
 description = "Drop support for installing into Python 3.6 virtual environments"
 author = "@NiklasRosenstein"
 pr = "https://github.com/NiklasRosenstein/slap/pull/118"
+
+[[entries]]
+id = "1e511db2-f7b6-450b-b303-0003a007d9ce"
+type = "improvement"
+description = "Upgrade Build to ^1.0.0"
+author = "@NiklasRosenstein"
