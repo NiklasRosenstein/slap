@@ -1,0 +1,5 @@
+[[entries]]
+id = "f065877b-eecb-4577-90fb-d18c1fb381af"
+type = "breaking change"
+description = "Drop support for installing into Python 3.6 virtual environments"
+author = "@NiklasRosenstein"
