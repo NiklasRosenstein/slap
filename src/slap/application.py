@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import os
 import subprocess as sp
 import textwrap
 import typing as t
@@ -118,16 +119,16 @@ class CleoApplication(BaseCleoApplication):
         from slap.util.logging import TerminalColorFormatter
 
         fmt = "<fg=bright black>%(message)s</fg>"
-        if io.input.has_parameter_option("-vvv"):
+        if io.input.has_parameter_option("-vvv") or os.getenv("SLAP_VERBOSE") in ("3", "full"):
             fmt = "<fg=bright black>%(asctime)s | %(levelname)s | %(name)s | %(message)s</fg>"
             level = logging.DEBUG
-        elif io.input.has_parameter_option("-vv"):
+        elif io.input.has_parameter_option("-vv") or os.getenv("SLAP_VERBOSE") in ("2", "more"):
             level = logging.DEBUG
-        elif io.input.has_parameter_option("-v"):
+        elif io.input.has_parameter_option("-v") or os.getenv("SLAP_VERBOSE") in ("1", "on", "yes"):
             level = logging.INFO
-        elif io.input.has_parameter_option("-q"):
+        elif io.input.has_parameter_option("-q") or os.getenv("SLAP_VERBOSE") in ("-1", "less", "quiet"):
             level = logging.ERROR
-        elif io.input.has_parameter_option("-qq"):
+        elif io.input.has_parameter_option("-qq") or os.getenv("SLAP_VERBOSE") in ("-2", "least"):
             level = logging.CRITICAL
         else:
             level = logging.WARNING
