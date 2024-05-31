@@ -1,4 +1,25 @@
 [[entries]]
+id = "f065877b-eecb-4577-90fb-d18c1fb381af"
+type = "breaking change"
+description = "Drop support for installing into Python 3.6 virtual environments"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/118"
+
+[[entries]]
+id = "1e511db2-f7b6-450b-b303-0003a007d9ce"
+type = "improvement"
+description = "Upgrade Build to ^1.0.0"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/119"
+
+[[entries]]
+id = "f98854c7-5ec9-4c17-a98c-78809e81bae9"
+type = "improvement"
+description = "Upgrade UV to ^0.2.0"
+author = "@NiklasRosenstein"
+pr = "https://github.com/NiklasRosenstein/slap/pull/141"
+
+[[entries]]
 id = "f71eac90-2178-4538-b99b-07b2eae96758"
 type = "fix"
 description = "Use correct cmd option"
