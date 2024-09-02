@@ -312,7 +312,7 @@ class ReleaseCommandPlugin(Command, ApplicationPlugin):
 
         current_version = {r.value for r in version_refs}
         if len(current_version) != 1:
-            raise ValueError("could not determine current version number")
+            raise ValueError(f"could not determine current version number, multiple found: {current_version}")
 
         return Version.parse(next(iter(current_version)))
 
