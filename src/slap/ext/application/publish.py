@@ -1,4 +1,5 @@
 import contextlib
+import os
 import tempfile
 from pathlib import Path
 from typing import Iterable
@@ -25,6 +26,10 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
 
     The command-line options are almost identical to the <code>twine upload</code> command.
 
+    Twine environment variables (except TWINE_NON_INTERACTIVE) are pulled through and
+    assigned in the same way as with the <code>twine</code> command. Options set as CLI
+    options override environment variable value settings.
+
     Note: You can combine the `-d` and `-b` options to effectively perform a build, storing
     the artifacts into the specified directory but not publishing them.
     """
@@ -39,18 +44,29 @@ class PublishCommandPlugin(Command, ApplicationPlugin):
             description="use this Python executable to build the distribution but do not automatically install build "
             "requirements into it; if not specified a temporary build environment is created",
         ),
-        option("repository", "r", flag=False, default="pypi"),
-        option("repository-url", flag=False),
+        option(
+            "repository",
+            "r",
+            flag=False,
+            default=os.getenv("TWINE_REPOSITORY", "pypi"),
+            description="[env: TWINE_REPOSITORY]",
+        ),
+        option(
+            "repository-url",
+            flag=False,
+            default=os.getenv("TWINE_REPOSITORY_URL"),
+            description="[env: TWINE_REPOSITORY_URL]",
+        ),
         option("sign", "s"),
         option("sign-with", flag=False),
         option("identity", "i", flag=False),
-        option("username", "u", flag=False),
-        option("password", "p", flag=False),
+        option("username", "u", flag=False, default=os.getenv("TWINE_USERNAME"), description="[env: TWINE_USERNAME]"),
+        option("password", "p", flag=False, default=os.getenv("TWINE_PASSWORD"), description="[env: TWINE_PASSWORD]"),
         option("non-interactive"),
         option("comment", "c", flag=False),
         option("config-file", flag=False, default="~/.pypirc"),
         option("skip-existing"),
-        option("cert", flag=False),
+        option("cert", flag=False, default=os.getenv("TWINE_CERT"), description="[env: TWINE_CERT]"),
         option("client-cert", flag=False),
         # option("verbose"),
         option("disable-progress-bar"),
