@@ -21,7 +21,7 @@ Homepage = "https://github.com/NiklasRosenstein/slap"
 Repository = "https://github.com/NiklasRosenstein/slap.git"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.13,<3.14"
 beautifulsoup4 = "^4.10.0"
 cleo = ">=1.0.0a4"
 "databind" = "^4.4.0"
@@ -33,14 +33,14 @@ PyYAML = ">=6.0"
 requests = "^2.27.1"
 setuptools = ">=39.1.0"  # Needed for setuptools backend
 tomli = "^2.0.0"
-tomlkit = "^0.12.1"
+tomlkit = "^0.13.0"
 twine = "^5.0.0"
 tqdm = "^4.64.0"
 build = "^1.0.0"
 "nr.python.environment" = "^0.1.4"
 gitpython = "^3.1.31"
 "nr.stream" = "^1.1.5"
-uv = "^0.2.0"
+uv = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 black = "^24.1.0"
