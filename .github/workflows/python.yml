@@ -44,7 +44,7 @@ jobs:
       if: github.event_name == 'pull_request'
     - uses: actions/setup-python@v5
       with: { python-version: "3.10" }
-    - uses: astral-sh/setup-uv@v5
+    - uses: astral-sh/setup-uv@v7
     - run: uv tool install .
     - run: slap run --no-venv-check docs:build
     - uses: actions/upload-artifact@v4
