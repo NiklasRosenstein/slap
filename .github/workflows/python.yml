@@ -43,7 +43,7 @@ jobs:
     - run: git checkout -b $GITHUB_HEAD_REF
       if: github.event_name == 'pull_request'
     - uses: actions/setup-python@v5
-      with: { python-version: "3.10" }
+      with: { python-version: "3.14" }
     - uses: astral-sh/setup-uv@v5
     - run: uv tool install .
     - run: slap run --no-venv-check docs:build
